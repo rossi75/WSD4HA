@@ -1,5 +1,5 @@
 # WSD4HA
-provides a simple WSD protocol for scanning documents into homeassistant server
+provides a simple WSD protocol for scanning documents into homeassistant server file system
 
 
 ## **!! actually in development !!**
