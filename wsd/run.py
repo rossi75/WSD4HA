@@ -14,10 +14,12 @@ import subprocess
 # - max-age übernehmen
 # - Drucker oder Scanner name übernehmen
 # - passende antwort schreiben
+# - Logs mit D/T
 # - scanauftrag entgegennehmen
 # - webserver zum laufen bekommen
 # - nach einem neuzugang die liste anzeigen
 # - nach einem abgang diesen im log ausführlich ausgeben
+# - neuer scanner wird zu oft erkannt
 
 # ---------------- Logging ----------------
 logging.basicConfig(level=logging.INFO, format='[%(levelname)s] %(message)s')
