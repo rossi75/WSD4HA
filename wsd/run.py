@@ -53,7 +53,7 @@ def get_host_ip():
         result = subprocess.check_output("ip route get 1.1.1.1 | awk '{print $7}'", shell=True)
         return result.decode().strip()
     except Exception as e:
-        logger.warning(f"Konnte Host-IP nicht ermitteln: {e}")
+        logger.warning(f"{datetime.datetime.now():%Y%m%d %H%M%S} [*] Could not obtain Host IP: {e}")
         return "127.0.0.1"
 
 def get_local_ip():
@@ -65,6 +65,7 @@ def get_local_ip():
         s.close()
         return ip
     except Exception:
+        logger.warning(f"{datetime.datetime.now():%Y%m%d %H%M%S} [*] Could not obtain Host IP: {e}")
         return "undefined"
 
 #LOCAL_IP = get_local_ip()
@@ -80,7 +81,7 @@ def check_port(port):
             return False
 
 if not check_port(WSD_HTTP_PORT):
-    logger.error(f"[STARTUP] Port {WSD_HTTP_PORT} is already in use!")
+    logger.error(f"[*] Port {WSD_HTTP_PORT} is already in use!")
     sys.exit(1)
 else:
     logger.info(f"Statusserver reachable at {LOCAL_IP}:{WSD_HTTP_PORT}")
@@ -201,7 +202,7 @@ def parse_wsd_packet(data: bytes):
             "uuid": uuid.text if uuid is not None else None,
         }
     except Exception as e:
-        logger.debug(f"[WSD] Error while parsing: {e}")
+        logger.debug(f"{datetime.datetime.now():%Y%m%d %H%M%S} [WSD] Error while parsing: {e}")
         return None
 
 # ---------------- SSDP Parser ----------------
@@ -216,7 +217,7 @@ def parse_ssdp_packet(data: bytes):
                 headers[k.strip().upper()] = v.strip()
         return headers
     except Exception as e:
-        logger.debug(f"[SSDP] Error while parsing: {e}")
+        logger.debug(f"{datetime.datetime.now():%Y%m%d %H%M%S} [SSDP] Error while parsing: {e}")
         return None
 
 # ---------------- UDP Discovery Skeleton ----------------
@@ -264,17 +265,17 @@ async def discovery_listener():
                 if parsed:
                     uuid = parsed.get("uuid")
                     action = parsed.get("action")
-                    logger.info(f"[WSD] from {addr} → Action={parsed['action']} UUID={parsed['uuid']}")
+                    logger.info(f"{datetime.datetime.now():%Y%m%d %H%M%S} [WSD] from {addr} → Action={parsed['action']} UUID={parsed['uuid']}")
                     
                     key = uuid or ip
                     if key not in SCANNERS:
-                        s = Scanner(name=f"Scanner-{ip}", ip=ip, uuid=uuid)
+                        s = Scanner(name=f"Scanner_{ip}", ip=ip, uuid=uuid)
                         SCANNERS[key] = s
-                        logger.info(f"[DISCOVERY] Neuer Scanner: {s.name} ({s.ip})")
+                        logger.info(f"{datetime.datetime.now():%Y%m%d %H%M%S} [DISCOVERY] [WSD] Neuer Scanner: {s.name} ({s.ip})")
                     else:
                         SCANNERS[key].update()
                 else:
-                    logger.debug(f"[WSD] unknown packet from {addr}: {data[:80]!r}")
+                    logger.debug(f"{datetime.datetime.now():%Y%m%d %H%M%S} [WSD] unknown packet from {addr}: {data[:80]!r}")
 
             # SSDP
             elif task is ssdp_task:
@@ -282,17 +283,17 @@ async def discovery_listener():
                 if headers:
                     usn = headers.get("USN")
                     nt = headers.get("NT")
-                    logger.info(f"[SSDP] from {addr} → NT={headers.get('NT')} USN={headers.get('USN')}")
+                    logger.info(f"{datetime.datetime.now():%Y%m%d %H%M%S} [SSDP] from {addr} → NT={headers.get('NT')} USN={headers.get('USN')}")
 
                     key = usn or ip
                     if key not in SCANNERS:
-                        s = Scanner(name=f"Scanner-{ip}", ip=ip, uuid=usn)
+                        s = Scanner(name=f"Scanner_{ip}", ip=ip, uuid=usn)
                         SCANNERS[key] = s
-                        logger.info(f"[DISCOVERY] Neuer Scanner (SSDP): {s.name} ({s.ip})")
+                        logger.info(f"{datetime.datetime.now():%Y%m%d %H%M%S} [DISCOVERY] [SSDP] Neuer Scanner: {s.name} ({s.ip})")
                     else:
                         SCANNERS[key].update()
                 else:
-                    logger.debug(f"[SSDP] unknown packet from {addr}: {data[:80]!r}")
+                    logger.debug(f"{datetime.datetime.now():%Y%m%d %H%M%S} [SSDP] unknown packet from {addr}: {data[:80]!r}")
 
         # Offene Tasks abbrechen (sonst sammeln sie sich an)
         for task in pending:
@@ -369,7 +370,7 @@ async def heartbeat_monitor():
             delta = (now - s.last_seen).total_seconds()
             if delta > WSD_OFFLINE_TIMEOUT and s.online:
                 s.online = false
-                logger.warning(f"[DISCOVERY] Scanner {s.name} ({s.ip}) offline since {WSD_OFFLINE_TIMEOUT} Seconds")
+                logger.warning(f"{datetime.datetime.now():%Y%m%d %H%M%S} [DISCOVERY] Scanner {s.name} ({s.ip}) offline since {WSD_OFFLINE_TIMEOUT} Seconds")
         await asyncio.sleep(5)
 
 # ---------------- Main ----------------
