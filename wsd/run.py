@@ -24,8 +24,7 @@ WSD_HTTP_PORT = int(os.environ.get("HTTP_PORT", 8080))
 WSD_OFFLINE_TIMEOUT = int(os.environ.get("OFFLINE_TIMEOUT", 300))  # Sekunden
 
 logger.info(f"Starting up WSD scanner service at {datetime.datetime.now():%Y%m%d-%H%M%S}")
-logger.info(f"   Configuration:")
-logger.info(f"--------------------")
+logger.info(f"---------------  Konfiguration  ---------------")
 logger.info(f"Scan-Ordner: {WSD_SCAN_FOLDER}")
 logger.info(f"max Dateien: {WSD_MAX_FILES}")
 logger.info(f"HTTP-Port: {WSD_HTTP_PORT}")
@@ -43,6 +42,8 @@ def check_port(port):
 if not check_port(WSD_HTTP_PORT):
     logger.error(f"[STARTUP] Port {WSD_HTTP_PORT} ist bereits belegt! Bitte anderen Port wählen.")
     sys.exit(1)
+else:
+    logger.info(f"Statusserver reachable at :{WSD_HTTP_PORT}")
 
 # ---------------- Scanner-Datenstruktur ----------------
 class Scanner:
