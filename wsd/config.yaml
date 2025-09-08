@@ -2,6 +2,8 @@ name: WSD Scanner
 version: "0.1.02_"
 slug: wsd_scanner
 description: "Minimaler WSD-Server [für Samsung C480W und ggf andere Scanner]"
+url: https://github.com/rossi75/WSD4HA
+webui: http://[HOST]:[PORT:8110]
 arch:
   - amd64
   - aarch64
@@ -10,19 +12,16 @@ startup: services
 #boot: "auto"
 init: false
 ports:
-#  - 8080:8080
-  8080/tcp: 8080
+  8110/tcp: 8110
   3702/udp: 3702
   1900/udp: 1900
 schema:
   scan_folder: str
   max_files: int
-  http_port: int
   scanner_offline_timeout: int
 options:
   scan_folder: "/share/scans"
   max_files: 5
-  http_port: 8080
   scanner_offline_timeout: 300
 map:
 #  - "{{ options.scan_folder }}:rw"
@@ -30,5 +29,4 @@ map:
 environment:
   WSD_SCAN_FOLDER: "{{ options.scan_folder }}"
   WSD_MAX_FILES: "{{ options.max_files }}"
-  WSD_HTTP_PORT: "{{ options.http_port }}"
   WSD_OFFLINE_TIMEOUT: "{{ options.scanner_offline_timeout }}"
