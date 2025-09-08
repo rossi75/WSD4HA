@@ -21,7 +21,7 @@ schema:
   scanner_offline_timeout: int
 options:
   scan_folder: "/share/scans"
-  max_files: 5
+  max_files: 50
   scanner_offline_timeout: 300
 map:
 #  - "{{ options.scan_folder }}:rw"
