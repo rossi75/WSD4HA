@@ -87,11 +87,12 @@ class Scanner:
         self.last_seen = datetime.datetime.now()
         self.online = True
 
-    def update(self):
+    def update(self, max_age=WSD_OFFLINE_TIMEOUT):
         self.last_seen = datetime.datetime.now()
+        self.max_age = max_age
         self.online = True
-        if max_age:
-            self.max_age = max_age
+#        if max_age:
+#            self.max_age = max_age
 
 SCANNERS = {}  # key = UUID oder IP
 
