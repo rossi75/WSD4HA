@@ -24,15 +24,29 @@ WSD_SCAN_FOLDER.mkdir(parents=True, exist_ok=True)
 WSD_HTTP_PORT = 8110
 WSD_MAX_FILES = int(os.environ.get("MAX_FILES", 5))
 WSD_OFFLINE_TIMEOUT = int(os.environ.get("OFFLINE_TIMEOUT", 300))  # Sekunden
-LOCAL_IP = get_local_ip()
+#LOCAL_IP = get_local_ip()
 
 logger.info(f"******************************************************")
 logger.info(f"Starting up WSD scanner service at {datetime.datetime.now():%d.%m.%Y, %H:%M:%S}")
 logger.info(f"---------------  Konfiguration  ---------------")
 logger.info(f"Scan-Path: {WSD_SCAN_FOLDER}")
 logger.info(f"max scanned files to show: {WSD_MAX_FILES}")
-logger.info(f"HTTP for UI: http://{LOCAL_IP}:{WSD_HTTP_PORT}")
+logger.info(f"HTTP-Port for UI: {WSD_HTTP_PORT}")
 logger.info(f"Offline Timeout: {WSD_OFFLINE_TIMEOUT}s")
+
+# ---------------- lokale IP abfragen ----------------
+def get_local_ip():
+    try:
+        # UDP-Socket zu einer externen Adresse öffnen (wird nicht gesendet)
+        s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+        s.connect(("8.8.8.8", 80))  # Google DNS, nur für Routing
+        ip = s.getsockname()[0]
+        s.close()
+        return ip
+    except Exception:
+        return "undefined"
+
+LOCAL_IP = get_local_ip()
 
 # ---------------- Portprüfung ----------------
 def check_port(port):
@@ -48,18 +62,6 @@ if not check_port(WSD_HTTP_PORT):
     sys.exit(1)
 else:
     logger.info(f"Statusserver reachable at {LOCAL_IP}:{WSD_HTTP_PORT}")
-
-# ---------------- lokale IP abfragen ----------------
-def get_local_ip():
-    try:
-        # UDP-Socket zu einer externen Adresse öffnen (wird nicht gesendet)
-        s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-        s.connect(("8.8.8.8", 80))  # Google DNS, nur für Routing
-        ip = s.getsockname()[0]
-        s.close()
-        return ip
-    except Exception:
-        return "unbekannt"
 
 # ---------------- Scanner-Datenstruktur ----------------
 class Scanner:
