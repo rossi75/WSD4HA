@@ -23,7 +23,13 @@ WSD_MAX_FILES = int(os.environ.get("MAX_FILES", 5))
 WSD_HTTP_PORT = int(os.environ.get("HTTP_PORT", 8080))
 WSD_OFFLINE_TIMEOUT = int(os.environ.get("OFFLINE_TIMEOUT", 300))  # Sekunden
 
-logger.info(f"Scan-Ordner: {WSD_SCAN_FOLDER}, max Dateien: {WSD_MAX_FILES}, HTTP-Port: {WSD_HTTP_PORT}, Offline Timeout: {WSD_OFFLINE_TIMEOUT}s")
+logger.info(f"Starting up WSD scanner service at {datetime.datetime.now():%Y%m%d-%H%M%S}")
+logger.info(f"   Configuration:")
+logger.info(f"--------------------")
+logger.info(f"Scan-Ordner: {WSD_SCAN_FOLDER}")
+logger.info(f"max Dateien: {WSD_MAX_FILES}")
+logger.info(f"HTTP-Port: {WSD_HTTP_PORT}")
+logger.info(f"Offline Timeout: {WSD_OFFLINE_TIMEOUT}s")
 
 # ---------------- Portprüfung ----------------
 def check_port(port):
