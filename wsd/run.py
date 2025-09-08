@@ -20,15 +20,16 @@ WSD_SCAN_FOLDER.mkdir(parents=True, exist_ok=True)
 #WSD_MAX_FILES = int(os.environ.get("WSD_MAX_FILES", 5))
 #WSD_HTTP_PORT = int(os.environ.get("WSD_HTTP_PORT", 8080))
 #WSD_OFFLINE_TIMEOUT = int(os.environ.get("WSD_OFFLINE_TIMEOUT", 300))  # Sekunden
+#WSD_HTTP_PORT = int(os.environ.get("HTTP_PORT", 8080))
+WSD_HTTP_PORT = 8110
 WSD_MAX_FILES = int(os.environ.get("MAX_FILES", 5))
-WSD_HTTP_PORT = int(os.environ.get("HTTP_PORT", 8080))
 WSD_OFFLINE_TIMEOUT = int(os.environ.get("OFFLINE_TIMEOUT", 300))  # Sekunden
 
-logger.info(f"Starting up WSD scanner service at {datetime.datetime.now():%Y%m%d-%H%M%S}")
+logger.info(f"Starting up WSD scanner service at {datetime.datetime.now():%d.%m.%Y, %H:%M:%S}")
 logger.info(f"---------------  Konfiguration  ---------------")
-logger.info(f"Scan-Ordner: {WSD_SCAN_FOLDER}")
-logger.info(f"max Dateien: {WSD_MAX_FILES}")
-logger.info(f"HTTP-Port: {WSD_HTTP_PORT}")
+logger.info(f"Scan-Path: {WSD_SCAN_FOLDER}")
+logger.info(f"max scanned files to show: {WSD_MAX_FILES}")
+logger.info(f"HTTP-Port: {HOST}:{WSD_HTTP_PORT}")
 logger.info(f"Offline Timeout: {WSD_OFFLINE_TIMEOUT}s")
 
 # ---------------- Portprüfung ----------------
@@ -41,10 +42,10 @@ def check_port(port):
             return False
 
 if not check_port(WSD_HTTP_PORT):
-    logger.error(f"[STARTUP] Port {WSD_HTTP_PORT} ist bereits belegt! Bitte anderen Port wählen.")
+    logger.error(f"[STARTUP] Port {WSD_HTTP_PORT} is already in use!")
     sys.exit(1)
 else:
-    logger.info(f"Statusserver reachable at :{WSD_HTTP_PORT}")
+    logger.info(f"Statusserver reachable at {HOST}:{WSD_HTTP_PORT}")
 
 # ---------------- Scanner-Datenstruktur ----------------
 class Scanner:
@@ -69,16 +70,16 @@ SCANNERS = {}  # key = UUID oder IP
 
 # ---------------- HTTP/SOAP Server ----------------
 async def handle_scan_job(request):
-    logger.info("[SCAN] Scan-Job gestartet")
+    logger.info("[SCAN] Scan-Job started")
     data = await request.read()
-    logger.info(f"[SCAN] Erste Bytes empfangen: {len(data)}")
+    logger.info(f"[SCAN] Received first Bytes: {len(data)}")
     filename = WSD_SCAN_FOLDER / f"scan-{datetime.datetime.now():%Y%m%d-%H%M%S}.bin"
     try:
         with open(filename, "wb") as f:
             f.write(data)
-        logger.info(f"[SCAN] Scan abgeschlossen: {filename} ({len(data)/1024:.1f} KB)")
+        logger.info(f"[SCAN] Scan finished: {filename} ({len(data)/1024:.1f} KB)")
     except Exception as e:
-        logger.error(f"[SCAN] Fehler beim Speichern: {e}")
+        logger.error(f"[SCAN] Error while saving: {e}")
     return web.Response(text="""
         <soap:Envelope xmlns:soap="http://www.w3.org/2003/05/soap-envelope">
             <soap:Body>
@@ -121,15 +122,15 @@ async def status_page(request):
             </style>
         </head>
         <body>
-            <h1>WSD Add-on läuft</h1>
-            <h2>Letzte {WSD_MAX_FILES} Scans:</h2>
+            <h1>WSD Add-on running</h1>
+            <h2>Last {WSD_MAX_FILES} Scans:</h2>
             <table>
-                <tr><th>Dateiname</th><th>Datum/Uhrzeit</th><th>Größe (KB)</th></tr>
+                <tr><th>Filename</th><th>Date/Time</th><th>Size (KB)</th></tr>
                 {file_list}
             </table>
-            <h2>Aktive Scanner:</h2>
+            <h2>Active Scanners:</h2>
             <table>
-                <tr><th>Name</th><th>IP</th><th>MAC</th><th>UUID</th><th>Formate</th><th>Status</th><th>Letzte Meldung</th></tr>
+                <tr><th>Name</th><th>IP</th><th>MAC</th><th>UUID</th><th>Formats</th><th>State</th><th>Last seen</th></tr>
                 {scanner_list}
             </table>
         </body>
@@ -144,7 +145,7 @@ async def start_http_server():
     await runner.setup()
     site = web.TCPSite(runner, "0.0.0.0", WSD_HTTP_PORT)
     await site.start()
-    logger.info(f"[*] HTTP SOAP Server läuft auf Port {WSD_HTTP_PORT}")
+    logger.info(f"[*] HTTP SOAP Server running on Port {WSD_HTTP_PORT}")
 
 # ---------------- UDP Discovery Skeleton ----------------
 async def discovery_listener():
@@ -159,7 +160,7 @@ async def discovery_listener():
     wsd_sock.bind(('', MCAST_PORT))
     mreq = socket.inet_aton(MCAST_GRP) + socket.inet_aton('0.0.0.0')
     wsd_sock.setsockopt(socket.IPPROTO_IP, socket.IP_ADD_MEMBERSHIP, mreq)
-    logger.info("[*] WSD-Listener läuft auf Port 3702/UDP")
+    logger.info("[*] WSD-Listener running on Port 3702/UDP")
 
     # SSDP (1900)
     SSDP_PORT = 1900
@@ -168,7 +169,7 @@ async def discovery_listener():
 #    ssdp_sock.bind(('', 1900))
     ssdp_sock.bind(('', SSDP_PORT))
     ssdp_sock.setsockopt(socket.IPPROTO_IP, socket.IP_ADD_MEMBERSHIP, mreq)
-    logger.info("[*] SSDP-Listener läuft auf Port 1900/UDP")
+    logger.info("[*] SSDP-Listener running on Port 1900/UDP")
 
     loop = asyncio.get_running_loop()
     while True:
@@ -202,11 +203,11 @@ async def discovery_listener():
                         if uuid not in SCANNERS:
                             s = Scanner(name=f"Scanner-{ip}", ip=ip, uuid=uuid, types=types, location=xaddrs[0] if xaddrs else None)
                             SCANNERS[uuid] = s
-                            logger.info(f"[WSD] Neuer Scanner: {s.name} ({s.ip}) UUID={s.uuid}")
+                            logger.info(f"[WSD] new Scanner detected: {s.name} ({s.ip}) UUID={s.uuid}")
                         else:
                             SCANNERS[uuid].update()
                 except Exception as e:
-                    logger.warning(f"[WSD] Fehler beim Parsen: {e}")
+                    logger.warning(f"[WSD] Error while parsing: {e}")
 
             elif b"NOTIFY * HTTP/1.1" in data:
                 # --- SSDP ---
@@ -223,7 +224,7 @@ async def discovery_listener():
                     if uuid not in SCANNERS:
                         s = Scanner(name=f"Scanner-{ip}", ip=ip, uuid=uuid, location=location, max_age=max_age)
                         SCANNERS[uuid] = s
-                        logger.info(f"[SSDP] Neuer Scanner: {s.name} ({s.ip}) UUID={s.uuid} location={location}")
+                        logger.info(f"[SSDP] new Scanner detected: {s.name} ({s.ip}) UUID={s.uuid} location={location}")
                     else:
                         SCANNERS[uuid].update(max_age=max_age)
 
@@ -247,7 +248,7 @@ async def heartbeat_monitor():
         for s in SCANNERS.values():
             delta = (now - s.last_seen).total_seconds()
             if delta > WSD_OFFLINE_TIMEOUT and s.online:
-                logger.warning(f"[DISCOVERY] Scanner {s.name} ({s.ip}) offline seit {WSD_OFFLINE_TIMEOUT} Sekunden")
+                logger.warning(f"[DISCOVERY] Scanner {s.name} ({s.ip}) offline since {WSD_OFFLINE_TIMEOUT} Seconds")
         await asyncio.sleep(5)
 
 # ---------------- Main ----------------
