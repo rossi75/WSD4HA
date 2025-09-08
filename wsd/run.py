@@ -6,6 +6,8 @@ import datetime
 import socket
 import logging
 import sys
+import re
+import xml.etree.ElementTree as ET
 
 # ---------------- Logging ----------------
 logging.basicConfig(level=logging.INFO, format='[%(levelname)s] %(message)s')
@@ -14,9 +16,12 @@ logger = logging.getLogger("wsd-addon")
 # ---------------- Optionen aus Environment ----------------
 WSD_SCAN_FOLDER = Path(os.environ.get("WSD_SCAN_FOLDER", "/share/scans"))
 WSD_SCAN_FOLDER.mkdir(parents=True, exist_ok=True)
-WSD_MAX_FILES = int(os.environ.get("WSD_MAX_FILES", 5))
-WSD_HTTP_PORT = int(os.environ.get("WSD_HTTP_PORT", 8080))
-WSD_OFFLINE_TIMEOUT = int(os.environ.get("WSD_OFFLINE_TIMEOUT", 300))  # Sekunden
+#WSD_MAX_FILES = int(os.environ.get("WSD_MAX_FILES", 5))
+#WSD_HTTP_PORT = int(os.environ.get("WSD_HTTP_PORT", 8080))
+#WSD_OFFLINE_TIMEOUT = int(os.environ.get("WSD_OFFLINE_TIMEOUT", 300))  # Sekunden
+WSD_MAX_FILES = int(os.environ.get("MAX_FILES", 5))
+WSD_HTTP_PORT = int(os.environ.get("HTTP_PORT", 8080))
+WSD_OFFLINE_TIMEOUT = int(os.environ.get("OFFLINE_TIMEOUT", 300))  # Sekunden
 
 logger.info(f"Scan-Ordner: {WSD_SCAN_FOLDER}, max Dateien: {WSD_MAX_FILES}, HTTP-Port: {WSD_HTTP_PORT}, Offline Timeout: {WSD_OFFLINE_TIMEOUT}s")
 
@@ -41,12 +46,16 @@ class Scanner:
         self.mac = mac
         self.uuid = uuid
         self.formats = formats or []
+        self.location = location
+        self.max_age = max_age
         self.last_seen = datetime.datetime.now()
         self.online = True
 
     def update(self):
         self.last_seen = datetime.datetime.now()
         self.online = True
+        if max_age:
+            self.max_age = max_age
 
 SCANNERS = {}  # key = UUID oder IP
 
@@ -55,7 +64,7 @@ async def handle_scan_job(request):
     logger.info("[SCAN] Scan-Job gestartet")
     data = await request.read()
     logger.info(f"[SCAN] Erste Bytes empfangen: {len(data)}")
-    filename = WSD_SCAN_FOLDER / f"scan-{datetime.datetime.now():%Y%m%d-%H%M%S}.pdf"
+    filename = WSD_SCAN_FOLDER / f"scan-{datetime.datetime.now():%Y%m%d-%H%M%S}.bin"
     try:
         with open(filename, "wb") as f:
             f.write(data)
@@ -90,6 +99,7 @@ async def status_page(request):
             s.online = False
         color = "green" if s.online else ("orange" if delta < 2*WSD_OFFLINE_TIMEOUT else "red")
         formats = ", ".join(s.formats)
+        #formats = ", ".join(s.types)
         scanner_list += f"<tr style='color:{color}'><td>{s.name}</td><td>{s.ip}</td><td>{s.mac or ''}</td><td>{s.uuid or ''}</td><td>{formats}</td><td>{'Online' if s.online else 'Offline'}</td><td>{s.last_seen.strftime('%Y-%m-%d %H:%M:%S')}</td></tr>"
 
     return web.Response(text=f"""
@@ -130,6 +140,9 @@ async def start_http_server():
 
 # ---------------- UDP Discovery Skeleton ----------------
 async def discovery_listener():
+ #   loop = asyncio.get_running_loop()
+
+    # WSD (3702)
     MCAST_GRP = '239.255.255.250'
     MCAST_PORT = 3702
 
