@@ -27,9 +27,9 @@ WSD_MAX_FILES = int(os.environ.get("MAX_FILES", 5))
 WSD_OFFLINE_TIMEOUT = int(os.environ.get("OFFLINE_TIMEOUT", 300))  # Sekunden
 #LOCAL_IP = get_local_ip()
 
-logger.info(f"******************************************************")
-logger.info(f"Starting up WSD scanner service at {datetime.datetime.now():%d.%m.%Y, %H:%M:%S}")
-logger.info(f"---------------  Konfiguration  ---------------")
+logger.info(f"**********************************************************")
+logger.info(f"Starting up WSD Scanner Service at {datetime.datetime.now():%d.%m.%Y, %H:%M:%S}")
+logger.info(f"---------------------  Configuration  ---------------------")
 logger.info(f"Scan-Path: {WSD_SCAN_FOLDER}")
 logger.info(f"max scanned files to show: {WSD_MAX_FILES}")
 logger.info(f"HTTP-Port for UI: {WSD_HTTP_PORT}")
@@ -228,6 +228,8 @@ async def discovery_listener():
     ssdp_sock.bind(("", MCAST_PORT_SSDP))
     ssdp_sock.setsockopt(socket.IPPROTO_IP, socket.IP_ADD_MEMBERSHIP, mreq)
     logger.info("[*] SSDP-Listener running on Port 1900/UDP")
+
+    logger.info(f"-----------------------  Events  -------------------------")
 
     while True:
         # Beide Sockets überwachen
