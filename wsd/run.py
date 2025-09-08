@@ -173,10 +173,13 @@ async def discovery_listener():
 
     loop = asyncio.get_running_loop()
     while True:
-        done, _ = await asyncio.wait(
-            [loop.sock_recv(wsd_sock, 4096), loop.sock_recv(ssdp_sock, 4096)],
-            return_when=asyncio.FIRST_COMPLETED
-        )
+        # WICHTIG: create_task() statt direkt übergeben
+        recv_task = asyncio.create_task(loop.sock_recv(sock, 4096))
+        done, _ = await asyncio.wait({recv_task}, return_when=asyncio.FIRST_COMPLETED)
+#        done, _ = await asyncio.wait(
+#            [loop.sock_recv(wsd_sock, 4096), loop.sock_recv(ssdp_sock, 4096)],
+#            return_when=asyncio.FIRST_COMPLETED
+#        )
 
         for task in done:
             data, addr = task.result()
