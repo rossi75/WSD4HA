@@ -65,7 +65,7 @@ else:
 
 # ---------------- Scanner-Datenstruktur ----------------
 class Scanner:
-    def __init__(self, name, ip, mac=None, uuid=None, formats=None):
+    def __init__(self, name, ip, mac=None, uuid=None, formats=None, location=None, max_age=WSD_OFFLINE_TIMEOUT):
         self.name = name
         self.ip = ip
         self.mac = mac
