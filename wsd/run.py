@@ -10,6 +10,15 @@ import re
 import xml.etree.ElementTree as ET
 import subprocess
 
+# ----------------- To Do -----------------
+# - max-age übernehmen
+# - Drucker oder Scanner name übernehmen
+# - passende antwort schreiben
+# - scanauftrag entgegennehmen
+# - webserver zum laufen bekommen
+# - nach einem neuzugang die liste anzeigen
+# - nach einem abgang diesen im log ausführlich ausgeben
+
 # ---------------- Logging ----------------
 logging.basicConfig(level=logging.INFO, format='[%(levelname)s] %(message)s')
 logger = logging.getLogger("wsd-addon")
