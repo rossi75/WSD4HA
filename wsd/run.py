@@ -220,8 +220,10 @@ async def discovery_listener():
 
     while True:
         # Beide Sockets überwachen
-        wsd_task = asyncio.create_task(loop.sock_recv(wsd_sock, 8192))
-        ssdp_task = asyncio.create_task(loop.sock_recv(ssdp_sock, 8192))
+#        wsd_task = asyncio.create_task(loop.sock_recv(wsd_sock, 8192))
+#        ssdp_task = asyncio.create_task(loop.sock_recv(ssdp_sock, 8192))
+        wsd_task = asyncio.create_task(loop.sock_recvfrom(wsd_sock, 8192))
+        ssdp_task = asyncio.create_task(loop.sock_recvfrom(ssdp_sock, 8192))
 
         done, pending = await asyncio.wait(
             {wsd_task, ssdp_task}, return_when=asyncio.FIRST_COMPLETED
@@ -341,6 +343,7 @@ async def heartbeat_monitor():
         for s in SCANNERS.values():
             delta = (now - s.last_seen).total_seconds()
             if delta > WSD_OFFLINE_TIMEOUT and s.online:
+                s.online = false
                 logger.warning(f"[DISCOVERY] Scanner {s.name} ({s.ip}) offline since {WSD_OFFLINE_TIMEOUT} Seconds")
         await asyncio.sleep(5)
 
