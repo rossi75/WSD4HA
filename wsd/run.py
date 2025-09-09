@@ -355,7 +355,7 @@ async def discovery_listener():
             else:
                 uuid_clean = uuid_text
         
-        logger.info(f"{datetime.datetime.now():%Y%m%d %H%M%S} [DISCOVERY] received from {ip} ({uuid}), Action={action_text}, Types={types_text}")
+        logger.info(f"{datetime.datetime.now():%Y%m%d %H%M%S} [DISCOVERY] received from {ip} ({uuid_clean}), Action={action_text}, Types={types_text}")
 
         # Nur Scanner beachten
         #if types is None or "wscn:ScanDeviceType" not in types.text:
