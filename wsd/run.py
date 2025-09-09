@@ -251,8 +251,14 @@ async def discovery_listener():
             continue
         action_text = action.text.strip()
 
-        types = root.find(".//{http://schemas.xmlsoap.org/ws/2005/04/discovery}Types")
-        types_text = types.text.strip() if types.text else ""
+        #types = root.find(".//{http://schemas.xmlsoap.org/ws/2005/04/discovery}Types")
+        #types_text = types.text.strip() if types.text else ""
+        types_elem = root.find(".//{http://schemas.xmlsoap.org/ws/2005/04/discovery}Types")
+        if types_elem is not None and types_elem.text:
+            types_text = types_elem.text.strip()
+        else:
+            types_text = ""
+
         uuid_elem = root.find(".//{http://schemas.xmlsoap.org/ws/2004/08/addressing}Address")
         uuid = uuid_elem.text.strip() if uuid_elem is not None else f"UUID-{ip}"
 
@@ -283,22 +289,21 @@ async def discovery_listener():
         logger.info("[SCANNERS] registered Scanners:")
         for s in SCANNERS.values():
             logger.info(f"  - {s.name} ({s.ip}, {s.uuid})")
+       
+        # Offene Tasks abbrechen (sonst sammeln sie sich an)
+        for task in pending:
+            task.cancel()
+
 #                    logger.info(f"{datetime.datetime.now():%Y%m%d %H%M%S} [WSD] from {addr} → Action={parsed['action']} UUID={parsed['uuid']}")
 #                        logger.info(f"{datetime.datetime.now():%Y%m%d %H%M%S} [DISCOVERY] [WSD] Neuer Scanner: {s.name} ({s.ip})")
 #                    logger.debug(f"{datetime.datetime.now():%Y%m%d %H%M%S} [WSD] unknown packet from {addr}: {data[:80]!r}")
 #                   logger.info(f"{datetime.datetime.now():%Y%m%d %H%M%S} [SSDP] from {addr} → NT={headers.get('NT')} USN={headers.get('USN')}")
 #                        logger.info(f"{datetime.datetime.now():%Y%m%d %H%M%S} [DISCOVERY] [SSDP] Neuer Scanner: {s.name} ({s.ip})")
 #                    logger.debug(f"{datetime.datetime.now():%Y%m%d %H%M%S} [SSDP] unknown packet from {addr}: {data[:80]!r}")
-
-        # Offene Tasks abbrechen (sonst sammeln sie sich an)
-        for task in pending:
-            task.cancel()
-
 #                            logger.info(f"[WSD] new Scanner detected: {s.name} ({s.ip}) UUID={s.uuid}")
 #                    logger.warning(f"[WSD] Error while parsing: {e}")#
 #                        logger.info(f"[SSDP] new Scanner detected: {s.name} ({s.ip}) UUID={s.uuid} location={location}")
 #                        SCANNERS[uuid].update(max_age=max_age)
-
 #            logger.info(f"[DISCOVERY] Neuer Scanner erkannt: {s.name} ({s.ip}) online")
 
 # ---------------- Scanner Heartbeat ----------------
