@@ -14,7 +14,7 @@ import subprocess
 # - max-age übernehmen
 # - Drucker oder Scanner name übernehmen
 # - passende antwort schreiben
-# - Logs mit D/T
+# + Logs mit D/T
 # - scanauftrag entgegennehmen
 # - webserver zum laufen bekommen
 # - nach einem neuzugang die liste anzeigen
@@ -222,145 +222,84 @@ def parse_ssdp_packet(data: bytes):
 
 # ---------------- UDP Discovery Skeleton ----------------
 async def discovery_listener():
-    loop = asyncio.get_running_loop()
+#    loop = asyncio.get_running_loop()
 
     # WSD (3702)
-    MCAST_GRP_WSD = "239.255.255.250"
-    MCAST_PORT_WSD = 3702
-    wsd_sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM, socket.IPPROTO_UDP)
-    wsd_sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
-    wsd_sock.bind(("", MCAST_PORT_WSD))
-    mreq = socket.inet_aton(MCAST_GRP_WSD) + socket.inet_aton("0.0.0.0")
-    wsd_sock.setsockopt(socket.IPPROTO_IP, socket.IP_ADD_MEMBERSHIP, mreq)
+    MCAST_GRP = "239.255.255.250"
+    MCAST_PORT = 3702
+    
+    sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM, socket.IPPROTO_UDP)
+    sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+    sock.bind(("", MCAST_PORT))
+    mreq = socket.inet_aton(MCAST_GRP) + socket.inet_aton("0.0.0.0")
+    sock.setsockopt(socket.IPPROTO_IP, socket.IP_ADD_MEMBERSHIP, mreq)
     logger.info("[*] WSD-Listener running on Port 3702/UDP")
-
-    # SSDP (1900)
-    MCAST_PORT_SSDP = 1900
-    ssdp_sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM, socket.IPPROTO_UDP)
-    ssdp_sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
-    ssdp_sock.bind(("", MCAST_PORT_SSDP))
-    ssdp_sock.setsockopt(socket.IPPROTO_IP, socket.IP_ADD_MEMBERSHIP, mreq)
-    logger.info("[*] SSDP-Listener running on Port 1900/UDP")
 
     logger.info(f"-----------------------  Events  -------------------------")
 
+    loop = asyncio.get_running_loop()
     while True:
-        # Beide Sockets überwachen
-#        wsd_task = asyncio.create_task(loop.sock_recv(wsd_sock, 8192))
-#        ssdp_task = asyncio.create_task(loop.sock_recv(ssdp_sock, 8192))
-        wsd_task = asyncio.create_task(loop.sock_recvfrom(wsd_sock, 8192))
-        ssdp_task = asyncio.create_task(loop.sock_recvfrom(ssdp_sock, 8192))
+        data, addr = await loop.sock_recvfrom(sock, 8192)
+        ip = addr[0]
+        try:
+            root = ET.fromstring(data.decode("utf-8", errors="ignore"))
+        except Exception:
+            continue
 
-        done, pending = await asyncio.wait(
-            {wsd_task, ssdp_task}, return_when=asyncio.FIRST_COMPLETED
-        )
+        action = root.find(".//{http://schemas.xmlsoap.org/ws/2004/08/addressing}Action")
+        if action is None:
+            continue
+        action_text = action.text.strip()
 
-        for task in done:
-            data, addr = task.result()
-            ip = addr[0]
+        types = root.find(".//{http://schemas.xmlsoap.org/ws/2005/04/discovery}Types")
+        types_text = types.text.strip() if types.text else ""
+        uuid_elem = root.find(".//{http://schemas.xmlsoap.org/ws/2004/08/addressing}Address")
+        uuid = uuid_elem.text.strip() if uuid_elem is not None else f"UUID-{ip}"
 
-            # WSD
-            if task is wsd_task:
-                parsed = parse_wsd_packet(data)
-                if parsed:
-                    uuid = parsed.get("uuid")
-                    action = parsed.get("action")
-                    logger.info(f"{datetime.datetime.now():%Y%m%d %H%M%S} [WSD] from {addr} → Action={parsed['action']} UUID={parsed['uuid']}")
-                    
-                    key = uuid or ip
-                    if key not in SCANNERS:
-                        s = Scanner(name=f"Scanner_{ip}", ip=ip, uuid=uuid)
-                        SCANNERS[key] = s
-                        logger.info(f"{datetime.datetime.now():%Y%m%d %H%M%S} [DISCOVERY] [WSD] Neuer Scanner: {s.name} ({s.ip})")
-                    else:
-                        SCANNERS[key].update()
-                else:
-                    logger.debug(f"{datetime.datetime.now():%Y%m%d %H%M%S} [WSD] unknown packet from {addr}: {data[:80]!r}")
+        logger.info(f"[DISCOVERY] Von {ip} ({uuid}) empfangen: Action={action_text}, Types={types_text}")
 
-            # SSDP
-            elif task is ssdp_task:
-                headers = parse_ssdp_packet(data)
-                if headers:
-                    usn = headers.get("USN")
-                    nt = headers.get("NT")
-                    logger.info(f"{datetime.datetime.now():%Y%m%d %H%M%S} [SSDP] from {addr} → NT={headers.get('NT')} USN={headers.get('USN')}")
+        # Nur Scanner beachten
+        if types is None or "wscn:ScanDeviceType" not in types.text:
+            continue
 
-                    key = usn or ip
-                    if key not in SCANNERS:
-                        s = Scanner(name=f"Scanner_{ip}", ip=ip, uuid=usn)
-                        SCANNERS[key] = s
-                        logger.info(f"{datetime.datetime.now():%Y%m%d %H%M%S} [DISCOVERY] [SSDP] Neuer Scanner: {s.name} ({s.ip})")
-                    else:
-                        SCANNERS[key].update()
-                else:
-                    logger.debug(f"{datetime.datetime.now():%Y%m%d %H%M%S} [SSDP] unknown packet from {addr}: {data[:80]!r}")
+        if "Hello" in action_text:
+            uuid = root.find(".//{http://schemas.xmlsoap.org/ws/2004/08/addressing}Address")
+            uuid = uuid.text.strip() if uuid is not None else f"UUID-{ip}"
+            if uuid not in SCANNERS:
+                SCANNERS[uuid] = Scanner(name=f"Scanner-{ip}", ip=ip, uuid=uuid)
+                logger.info(f"{datetime.datetime.now():%Y%m%d %H%M%S} [HELLO] New Scanner: {SCANNERS[uuid].name} ({ip})")
+            else:
+                SCANNERS[uuid].update()
+                logger.info(f"[HELLO] Bekannter Scanner wieder online: {SCANNERS[uuid].name} ({ip})")
+        
+        elif "Bye" in action_text:
+            uuid = root.find(".//{http://schemas.xmlsoap.org/ws/2004/08/addressing}Address")
+            uuid = uuid.text.strip() if uuid is not None else f"UUID-{ip}"
+            if uuid in SCANNERS:
+                logger.info(f"[BYE] Scanner offline: {SCANNERS[uuid].name} ({ip})")
+                del SCANNERS[uuid]
+
+        # Nach jedem Update: Liste loggen
+        logger.info("[SCANNERS] registered Scanners:")
+        for s in SCANNERS.values():
+            logger.info(f"  - {s.name} ({s.ip}, {s.uuid})")
+#                    logger.info(f"{datetime.datetime.now():%Y%m%d %H%M%S} [WSD] from {addr} → Action={parsed['action']} UUID={parsed['uuid']}")
+#                        logger.info(f"{datetime.datetime.now():%Y%m%d %H%M%S} [DISCOVERY] [WSD] Neuer Scanner: {s.name} ({s.ip})")
+#                    logger.debug(f"{datetime.datetime.now():%Y%m%d %H%M%S} [WSD] unknown packet from {addr}: {data[:80]!r}")
+#                   logger.info(f"{datetime.datetime.now():%Y%m%d %H%M%S} [SSDP] from {addr} → NT={headers.get('NT')} USN={headers.get('USN')}")
+#                        logger.info(f"{datetime.datetime.now():%Y%m%d %H%M%S} [DISCOVERY] [SSDP] Neuer Scanner: {s.name} ({s.ip})")
+#                    logger.debug(f"{datetime.datetime.now():%Y%m%d %H%M%S} [SSDP] unknown packet from {addr}: {data[:80]!r}")
 
         # Offene Tasks abbrechen (sonst sammeln sie sich an)
         for task in pending:
             task.cancel()
 
-#        for task in done:
-#            data, addr = task.result()
-#            ip = addr[0]
-#
-#            if b"<wsd:Hello" in data or b"<wsd:Bye" in data:
-#                # --- WSD SOAP ---
-#                try:
-#                    xml = ET.fromstring(data.decode(errors="ignore"))
-#                    ns = {
-#                        "soap": "http://www.w3.org/2003/05/soap-envelope",
-#                        "wsa": "http://schemas.xmlsoap.org/ws/2004/08/addressing",
-#                        "wsd": "http://schemas.xmlsoap.org/ws/2005/04/discovery",
-#                    }
-#                    addr_elem = xml.find(".//wsa:Address", ns)
-#                    types_elem = xml.find(".//wsd:Types", ns)
-#                    xaddrs_elem = xml.find(".//wsd:XAddrs", ns)
-# 
-#                    uuid = addr_elem.text.strip() if addr_elem is not None else None
-#                    types = types_elem.text.strip().split() if types_elem is not None else []
-#                    xaddrs = xaddrs_elem.text.strip().split() if xaddrs_elem is not None else []###
-#
-#                    if uuid:
-#                        if uuid not in SCANNERS:
-#                            s = Scanner(name=f"Scanner-{ip}", ip=ip, uuid=uuid, types=types, location=xaddrs[0] if xaddrs else None)
-#                            SCANNERS[uuid] = s
 #                            logger.info(f"[WSD] new Scanner detected: {s.name} ({s.ip}) UUID={s.uuid}")
-#                        else:
-#                            SCANNERS[uuid].update()
-#                except Exception as e:
 #                    logger.warning(f"[WSD] Error while parsing: {e}")#
-#
-#            elif b"NOTIFY * HTTP/1.1" in data:
-#                # --- SSDP ---
-#                text = data.decode(errors="ignore")
-#                uuid_match = re.search(r"uuid:([a-fA-F0-9\-]+)", text)
-#                location_match = re.search(r"LOCATION:\s*(.*)", text, re.IGNORECASE)
-#                maxage_match = re.search(r"max-age=(\d+)", text, re.IGNORECASE)#
-
-#                uuid = f"uuid:{uuid_match.group(1)}" if uuid_match else None
-#                location = location_match.group(1).strip() if location_match else None
-#                max_age = int(maxage_match.group(1)) if maxage_match else 60#
-#
-#                if uuid:
-#                    if uuid not in SCANNERS:
-#                        s = Scanner(name=f"Scanner-{ip}", ip=ip, uuid=uuid, location=location, max_age=max_age)
-#                        SCANNERS[uuid] = s
 #                        logger.info(f"[SSDP] new Scanner detected: {s.name} ({s.ip}) UUID={s.uuid} location={location}")
-#                    else:
 #                        SCANNERS[uuid].update(max_age=max_age)
 
-    
-#    while True:
-#        data, addr = await loop.sock_recv(sock, 1024)
-#        # Dummy-Daten für Scanner
-#        scanner_id = addr[0]  # IP als Schlüssel
-#        if scanner_id not in SCANNERS:
-#            s = Scanner(name=f"Scanner-{addr[0]}", ip=addr[0], uuid=f"UUID-{addr[0]}")
-#            SCANNERS[scanner_id] = s
 #            logger.info(f"[DISCOVERY] Neuer Scanner erkannt: {s.name} ({s.ip}) online")
-#        else:
-#            SCANNERS[scanner_id].update()
-#        await asyncio.sleep(0.1)
 
 # ---------------- Scanner Heartbeat ----------------
 async def heartbeat_monitor():
