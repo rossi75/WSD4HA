@@ -320,23 +320,42 @@ async def discovery_listener():
         except Exception:
             continue
 
-        action = root.find(".//{http://schemas.xmlsoap.org/ws/2004/08/addressing}Action")
-        if action is None:
-            continue
-        action_text = action.text.strip()
-
+        #action = root.find(".//{http://schemas.xmlsoap.org/ws/2004/08/addressing}Action")
+        #if action is None:
+        #    continue
+        #action_text = action.text.strip()
+        action_elem = root.find(".//wsa:Action", NAMESPACES)
+        action_text = None
+        if action_elem is not None and action_elem.text:
+            action_text = action_elem.text.split("/")[-1]  # → "Hello|Bye|Probe"
+    
         #types = root.find(".//{http://schemas.xmlsoap.org/ws/2005/04/discovery}Types")
         #types_text = types.text.strip() if types.text else ""
-        types_elem = root.find(".//{http://schemas.xmlsoap.org/ws/2005/04/discovery}Types")
+#        types_elem = root.find(".//{http://schemas.xmlsoap.org/ws/2005/04/discovery}Types")
+#        if types_elem is not None and types_elem.text:
+#            types_text = types_elem.text.strip()
+        types_elem = root.find(".//wsd:Types", NAMESPACES)
+        types_text = ""
         if types_elem is not None and types_elem.text:
-            types_text = types_elem.text.strip()
-        else:
-            types_text = ""
+            # Zerlegen + Präfixe entfernen
+            types_text = " ".join(t.split(":")[-1] for t in types_elem.text.split())
 
-        uuid_elem = root.find(".//{http://schemas.xmlsoap.org/ws/2004/08/addressing}Address")
-        uuid = uuid_elem.text.strip() if uuid_elem is not None else f"UUID-{ip}"
+#        uuid_elem = root.find(".//{http://schemas.xmlsoap.org/ws/2004/08/addressing}Address")
+#        if uuid_elem is not None
+#            uuid = uuid_elem.text.strip()
+#        else f"UUID-{ip}"
 
-        logger.info(f"{datetime.datetime.now():%Y%m%d %H%M%S} [DISCOVERY] received from: {ip} ({uuid}), Action={action_text}, Types={types_text}")
+        # UUID (ohne urn:uuid:)
+        uuid_elem = root.find(".//wsa:Address", NAMESPACES)
+        uuid_clean = None
+        if uuid_elem is not None and uuid_elem.text:
+            uuid_text = uuid_elem.text.strip()
+            if uuid_text.startswith("urn:uuid:"):
+                uuid_clean = uuid_text.replace("urn:uuid:", "")
+            else:
+                uuid_clean = uuid_text
+        
+        logger.info(f"{datetime.datetime.now():%Y%m%d %H%M%S} [DISCOVERY] received from {ip} ({uuid}), Action={action_text}, Types={types_text}")
 
         # Nur Scanner beachten
         #if types is None or "wscn:ScanDeviceType" not in types.text:
@@ -362,9 +381,11 @@ async def discovery_listener():
 
         # Nach jedem Update: Liste loggen
         logger.info("[SCANNERS] registered Scanners:")
-        for s in SCANNERS.values():
-            logger.info(f"  - {s.name} ({s.ip}, {s.uuid})")
-       
+#        for s in SCANNERS.values():
+#            logger.info(f"  - {s.name} ({s.ip}, {s.uuid})")
+        for idx, s in enumerate(SCANNERS.values(), start=1):
+            logger.info(f"[{idx}] {s.name} ({s.ip}) UUID={s.uuid} Online={s.online}")
+
         # Offene Tasks abbrechen (sonst sammeln sie sich an)
     #    for task in pending:
     #        task.cancel()
