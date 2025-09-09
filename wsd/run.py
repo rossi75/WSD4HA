@@ -320,30 +320,16 @@ async def discovery_listener():
         except Exception:
             continue
 
-        #action = root.find(".//{http://schemas.xmlsoap.org/ws/2004/08/addressing}Action")
-        #if action is None:
-        #    continue
-        #action_text = action.text.strip()
         action_elem = root.find(".//wsa:Action", NAMESPACES)
         action_text = None
         if action_elem is not None and action_elem.text:
             action_text = action_elem.text.split("/")[-1]  # → "Hello|Bye|Probe"
     
-        #types = root.find(".//{http://schemas.xmlsoap.org/ws/2005/04/discovery}Types")
-        #types_text = types.text.strip() if types.text else ""
-#        types_elem = root.find(".//{http://schemas.xmlsoap.org/ws/2005/04/discovery}Types")
-#        if types_elem is not None and types_elem.text:
-#            types_text = types_elem.text.strip()
         types_elem = root.find(".//wsd:Types", NAMESPACES)
         types_text = ""
         if types_elem is not None and types_elem.text:
             # Zerlegen + Präfixe entfernen
             types_text = " ".join(t.split(":")[-1] for t in types_elem.text.split())
-
-#        uuid_elem = root.find(".//{http://schemas.xmlsoap.org/ws/2004/08/addressing}Address")
-#        if uuid_elem is not None
-#            uuid = uuid_elem.text.strip()
-#        else f"UUID-{ip}"
 
         # UUID (ohne urn:uuid:)
         uuid_elem = root.find(".//wsa:Address", NAMESPACES)
@@ -358,9 +344,11 @@ async def discovery_listener():
         logger.info(f"{datetime.datetime.now():%Y%m%d %H%M%S} [DISCOVERY] received from {ip} ({uuid_clean}), Action={action_text}, Types={types_text}")
 
         # Nur Scanner beachten
-        #if types is None or "wscn:ScanDeviceType" not in types.text:
-        if "wscn:ScanDeviceType" not in types_text:
+#        if "wscn:ScanDeviceType" not in types_text:
+        if "ScanDeviceType" not in types_text:
             continue
+        else:
+            logger.info(f"Device seems not to be a Scanner")
 
         if "Hello" in action_text:
             uuid = root.find(".//{http://schemas.xmlsoap.org/ws/2004/08/addressing}Address")
@@ -370,7 +358,7 @@ async def discovery_listener():
                 logger.info(f"{datetime.datetime.now():%Y%m%d %H%M%S} [HELLO] New Scanner: {SCANNERS[uuid].name} ({ip})")
             else:
                 SCANNERS[uuid].update()
-                logger.info(f"{datetime.datetime.now():%Y%m%d %H%M%S} [HELLO]known Scanner back again: {SCANNERS[uuid].name} ({ip})")
+                logger.info(f"{datetime.datetime.now():%Y%m%d %H%M%S} [HELLO]known Scanner updated/back again: {SCANNERS[uuid].name} ({ip})")
         
         elif "Bye" in action_text:
             uuid = root.find(".//{http://schemas.xmlsoap.org/ws/2004/08/addressing}Address")
@@ -378,7 +366,10 @@ async def discovery_listener():
             if uuid in SCANNERS:
                 logger.info(f"{datetime.datetime.now():%Y%m%d %H%M%S} [BYE] Scanner offline: {SCANNERS[uuid].name} ({ip})")
                 del SCANNERS[uuid]
-
+        
+        else:
+            logger.info(f"unrecognized operation {action_text}")
+        
         # Nach jedem Update: Liste loggen
         logger.info("[SCANNERS] registered Scanners:")
 #        for s in SCANNERS.values():
