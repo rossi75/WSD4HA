@@ -262,7 +262,7 @@ async def discovery_listener():
         uuid_elem = root.find(".//{http://schemas.xmlsoap.org/ws/2004/08/addressing}Address")
         uuid = uuid_elem.text.strip() if uuid_elem is not None else f"UUID-{ip}"
 
-        logger.info(f"[DISCOVERY] Von {ip} ({uuid}) empfangen: Action={action_text}, Types={types_text}")
+        logger.info(f"{datetime.datetime.now():%Y%m%d %H%M%S} [DISCOVERY] received from: {ip} ({uuid}), Action={action_text}, Types={types_text}")
 
         # Nur Scanner beachten
         #if types is None or "wscn:ScanDeviceType" not in types.text:
@@ -277,13 +277,13 @@ async def discovery_listener():
                 logger.info(f"{datetime.datetime.now():%Y%m%d %H%M%S} [HELLO] New Scanner: {SCANNERS[uuid].name} ({ip})")
             else:
                 SCANNERS[uuid].update()
-                logger.info(f"[HELLO] Bekannter Scanner wieder online: {SCANNERS[uuid].name} ({ip})")
+                logger.info(f"{datetime.datetime.now():%Y%m%d %H%M%S} [HELLO]known Scanner back again: {SCANNERS[uuid].name} ({ip})")
         
         elif "Bye" in action_text:
             uuid = root.find(".//{http://schemas.xmlsoap.org/ws/2004/08/addressing}Address")
             uuid = uuid.text.strip() if uuid is not None else f"UUID-{ip}"
             if uuid in SCANNERS:
-                logger.info(f"[BYE] Scanner offline: {SCANNERS[uuid].name} ({ip})")
+                logger.info(f"{datetime.datetime.now():%Y%m%d %H%M%S} [BYE] Scanner offline: {SCANNERS[uuid].name} ({ip})")
                 del SCANNERS[uuid]
 
         # Nach jedem Update: Liste loggen
