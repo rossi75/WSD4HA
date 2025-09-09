@@ -292,8 +292,8 @@ async def discovery_listener():
             logger.info(f"  - {s.name} ({s.ip}, {s.uuid})")
        
         # Offene Tasks abbrechen (sonst sammeln sie sich an)
-        for task in pending:
-            task.cancel()
+    #    for task in pending:
+    #        task.cancel()
 
 #                    logger.info(f"{datetime.datetime.now():%Y%m%d %H%M%S} [WSD] from {addr} → Action={parsed['action']} UUID={parsed['uuid']}")
 #                        logger.info(f"{datetime.datetime.now():%Y%m%d %H%M%S} [DISCOVERY] [WSD] Neuer Scanner: {s.name} ({s.ip})")
