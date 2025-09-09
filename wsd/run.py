@@ -265,7 +265,8 @@ async def discovery_listener():
         logger.info(f"[DISCOVERY] Von {ip} ({uuid}) empfangen: Action={action_text}, Types={types_text}")
 
         # Nur Scanner beachten
-        if types is None or "wscn:ScanDeviceType" not in types.text:
+        #if types is None or "wscn:ScanDeviceType" not in types.text:
+        if "wscn:ScanDeviceType" not in types_text:
             continue
 
         if "Hello" in action_text:
