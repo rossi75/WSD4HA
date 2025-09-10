@@ -1,6 +1,9 @@
 from config import WSD_OFFLINE_TIMEOUT
 #from config import WSD_HTTP_PORT, WSD_OFFLINE_TIMEOUT, WSD_SCAN_FOLDER
 
+logging.basicConfig(level=logging.INFO, format='[%(levelname)s] %(message)s')
+logger = logging.getLogger("wsd-addon")
+
 # ---------------- Scanner-Datenstruktur ----------------
 class Scanner:
     def __init__(self, name, ip, mac=None, uuid=None, formats=None, location=None, max_age=WSD_OFFLINE_TIMEOUT, xaddr=""):
