@@ -10,6 +10,9 @@ import re
 import xml.etree.ElementTree as ET
 import subprocess
 
+logging.basicConfig(level=logging.INFO, format='[%(levelname)s] %(message)s')
+logger = logging.getLogger("wsd-addon")
+
 # ---------------- WSD SOAP Parser ----------------
 def parse_wsd_packet(data: bytes):
     try:
