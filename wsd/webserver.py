@@ -9,6 +9,7 @@ import sys
 import re
 import xml.etree.ElementTree as ET
 import subprocess
+from wsd import discovery_listener, heartbeat_monitor, handle_scan_job
 
 # ---------------- WebUI ----------------
 async def status_page(request):
