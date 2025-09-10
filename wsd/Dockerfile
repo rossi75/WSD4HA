@@ -16,6 +16,7 @@ COPY run.py .
 COPY config.yaml .
 
 VOLUME ["/share/scans"]
-EXPOSE 8080
+EXPOSE 8110
 
-CMD ["python3", "run.py"]
+#CMD ["python3", "run.py"]
+CMD ["python3", "main.py"]
