@@ -49,6 +49,9 @@ logger.info(f"---------------------  Configuration  ---------------------")
 logger.info(f"Scan-Path: {WSD_SCAN_FOLDER}")
 logger.info(f"max scanned files to show: {WSD_MAX_FILES}")
 logger.info(f"HTTP-Port for UI: {WSD_HTTP_PORT}")
+if WSD_OFFLINE_TIMEOUT < 120:
+    logger.warning("OFFLINE_TIMEOUT zu klein, auf 120 gesetzt")
+    WSD_OFFLINE_TIMEOUT = 120
 logger.info(f"Offline Timeout: {WSD_OFFLINE_TIMEOUT}s")
 
 # ---------------- lokale IP abfragen ----------------
@@ -73,8 +76,8 @@ def get_local_ip():
         logger.warning(f"{datetime.datetime.now():%Y%m%d %H%M%S} [*] Could not obtain Host IP: {e}")
         return "undefined"
 
-#LOCAL_IP = get_local_ip()
-LOCAL_IP = get_host_ip()
+LOCAL_IP = get_local_ip()
+#LOCAL_IP = get_host_ip()
 
 # ---------------- Portprüfung ----------------
 def check_port(port):
@@ -100,15 +103,22 @@ class Scanner:
         self.uuid = uuid
         self.formats = formats or []
         self.location = location
-        self.max_age = max_age
         self.xaddr = xaddr            # Service-Adresse (aus <wsd:XAddrs>)
-        self.last_seen = datetime.datetime.now()
-        self.online = True
+    
+        # zusätzliche Infos
+        self.friendly_name = None
         self.firmware = None
         self.serial = None
         self.model = None
         self.manufacturer = None
 
+        # Status
+        self.last_seen = datetime.datetime.now()
+        self.max_age = max_age
+        self.online = True
+        self.offline_since = None
+        self.remove_after = None  # Zeitpunkt zum Löschen
+   
         # gleich beim Erstellen Metadaten abrufen (falls Adresse bekannt)
         if self.xaddr:
             try:
@@ -120,12 +130,15 @@ class Scanner:
         self.last_seen = datetime.datetime.now()
         self.max_age = max_age
         self.online = True
-#        if max_age:
-#            self.max_age = max_age
+        self.offline_since = None
+        self.remove_after = None
 
     def fetch_metadata(self):
-        """Fragt Scanner-Metadaten per WS-Transfer/Get ab"""
+        logger.info(f"[META]] trying to request Metadata from {self.ip} {e}")
+        # Fragt Scanner-Metadaten per WS-Transfer/Get ab
+
         if not self.xaddr:
+            logger.warning(f"[META]] missing .xaddr element !")
             return
 
         # Minimaler SOAP-Request für "Get"
@@ -178,6 +191,15 @@ class Scanner:
             self.manufacturer = mf.text.strip()
 
         logger.info(f"{datetime.datetime.now():%Y%m%d %H%M%S} [Scanner:{self.ip}] Metadaten: {self.name} | FW={self.firmware} | SN={self.serial}")
+
+    # wird aufgerufen wenn ein Scanner offline gesetzt wird
+    def mark_offline(self):
+        if self.online:
+            logger.warning(f"[Scanner Offline] {self.ip} ({self.friendly_name or self.name})")
+        self.online = False
+        if not self.offline_since:
+            self.offline_since = datetime.datetime.now()
+            self.remove_after = self.offline_since + datetime.timedelta(seconds=self.max_age)
 
 SCANNERS = {}  # key = UUID oder IP
 
@@ -397,12 +419,51 @@ async def discovery_listener():
 async def heartbeat_monitor():
     while True:
         now = datetime.datetime.now()
-        for s in SCANNERS.values():
-            delta = (now - s.last_seen).total_seconds()
-            if delta > WSD_OFFLINE_TIMEOUT and s.online:
-                s.online = false
-                logger.warning(f"{datetime.datetime.now():%Y%m%d %H%M%S} [DISCOVERY] Scanner {s.name} ({s.ip}) offline since {WSD_OFFLINE_TIMEOUT} Seconds")
-        await asyncio.sleep(5)
+        to_remove = []
+
+        for scanner in list(scanners):
+            age = (now - scanner.last_seen).total_seconds()
+            timeout = scanner.max_age
+
+            # Halbzeit-Check
+            if age > timeout / 2 and age <= (timeout / 2 + 30):
+                logger.info(f"[Heartbeat] Halbzeit-Check {scanner.ip}")
+                asyncio.create_task(check_scanner(scanner))
+
+            # 3/4-Check
+            if age > (timeout * 0.75) and age <= (timeout * 0.75 + 30):
+                logger.info(f"[Heartbeat] Viertel-Check {scanner.ip}")
+                asyncio.create_task(check_scanner(scanner))
+
+            # Timeout überschritten → offline markieren
+            if age > timeout and scanner.online:
+                scanner.mark_offline()
+
+            # Nach Ablauf von Timeout+Offline → entfernen
+            if not scanner.online and scanner.remove_after and now >= scanner.remove_after:
+                logger.warning(f"[Scanner Remove] {scanner.ip} ({scanner.friendly_name or scanner.name}) entfernt")
+                to_remove.append(scanner)
+
+        for s in to_remove:
+            scanners.remove(s)
+
+        await asyncio.sleep(30)
+        
+#        for s in SCANNERS.values():
+#            delta = (now - s.last_seen).total_seconds()
+#            if delta > WSD_OFFLINE_TIMEOUT and s.online:
+#                s.online = false
+#                logger.warning(f"{datetime.datetime.now():%Y%m%d %H%M%S} [DISCOVERY] Scanner {s.name} ({s.ip}) offline since {WSD_OFFLINE_TIMEOUT} Seconds")
+#        await asyncio.sleep(5)
+
+# ---------------- Scanner Keepalive checken ----------------
+async def check_scanner(scanner):
+    try:
+        await fetch_metadata(scanner)  # nutzt SOAP-Get
+        scanner.update(scanner.max_age)
+        logger.info(f"[Heartbeat OK] {scanner.ip} lebt noch")
+    except Exception as e:
+        logger.warning(f"[Heartbeat FAIL] {scanner.ip}: {e}")
 
 # ---------------- Main ----------------
 async def main():
