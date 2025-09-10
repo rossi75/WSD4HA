@@ -18,8 +18,9 @@ RUN pip install --no-cache-dir -r requirements.txt
 #COPY scanner.py .
 #COPY wsd.py .
 #COPY webserver.py .
-COPY main.py /app/
 COPY config.yaml /app/
+COPY main.py /app/
+COPY config.py /app/
 COPY scanner.py /app/
 COPY wsd.py /app/
 COPY webserver.py /app/
