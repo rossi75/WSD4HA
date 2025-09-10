@@ -10,6 +10,7 @@ import re
 import xml.etree.ElementTree as ET
 import subprocess
 from wsd import discovery_listener, heartbeat_monitor, handle_scan_job
+from config import WSD_HTTP_PORT, WSD_OFFLINE_TIMEOUT, WSD_SCAN_FOLDER
 
 # ---------------- WebUI ----------------
 async def status_page(request):
