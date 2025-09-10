@@ -12,7 +12,7 @@ configuration:
     name: Max. Files
     description: >-
       How many scanned documents/files can be seen in the WEB-UI's list
-  scanner_timeout:
+  scanner_offline_timeout:
     name: Timeout
     description: >-
       Time interval when a Probe Request expires. DHCP-like, so after half of the time the Probe Request is being sent out to renew the timer.
