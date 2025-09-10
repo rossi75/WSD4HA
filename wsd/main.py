@@ -1,6 +1,8 @@
 import asyncio
 from webserver import start_http_server
 from wsd import discovery_listener, heartbeat_monitor
+from config import WSD_HTTP_PORT, WSD_OFFLINE_TIMEOUT, WSD_SCAN_FOLDER
+from scanner import Scanner, SCANNERS
 
 async def main():
     await asyncio.gather(
