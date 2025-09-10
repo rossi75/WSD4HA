@@ -17,4 +17,5 @@ configuration:
     description: >-
       Time interval when a Probe Request expires. DHCP-like, so after half of the time the Probe Request is being sent out to renew the timer.
 network:
-  5050/tcp: The WSD4HA webserver
+  8110/tcp: The WSD4HA webserver
+  3702/udp: port to receive the WSD notifications
