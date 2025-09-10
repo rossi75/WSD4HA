@@ -12,8 +12,12 @@ WORKDIR /app
 COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
-COPY run.py .
+#COPY run.py .
+COPY main.py .
 COPY config.yaml .
+COPY scanner.py .
+COPY wsd.py .
+COPY webserver.py .
 
 VOLUME ["/share/scans"]
 EXPOSE 8110
