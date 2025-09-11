@@ -81,7 +81,7 @@ async def discovery_listener():
     sock.bind(("", MCAST_PORT))
     mreq = socket.inet_aton(MCAST_GRP) + socket.inet_aton("0.0.0.0")
     sock.setsockopt(socket.IPPROTO_IP, socket.IP_ADD_MEMBERSHIP, mreq)
-    logger.info("[*] WSD-Listener running on Port 3702/UDP")
+    logger.info("WSD-Listener running on Port 3702/UDP")
 
     logger.info(f"-----------------------  Events  -------------------------")
 
