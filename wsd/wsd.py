@@ -271,37 +271,11 @@ async def heartbeat_monitor():
                 logger.info(f"[Heartbeat] --> Marking {scanner.ip} ({scanner.friendly_name or scanner.name}) to remove")
                 to_remove.append(scanner)
 
+        # welche Scanner sollen entfernt werden?
         for s in to_remove:
             logger.info(f"[Heartbeat]     --> Removing {scanner.ip} ({scanner.friendly_name or scanner.name}) from list")
             scanners.remove(s)
 
         await asyncio.sleep(30)
         
-#        for s in SCANNERS.values():
-#            delta = (now - s.last_seen).total_seconds()
-#            if delta > WSD_OFFLINE_TIMEOUT and s.online:
-#                s.online = false
-#                logger.warning(f"{datetime.datetime.now():%Y%m%d %H%M%S} [DISCOVERY] Scanner {s.name} ({s.ip}) offline since {WSD_OFFLINE_TIMEOUT} Seconds")
-#        await asyncio.sleep(5)
 
-
-# ---------------- HTTP/SOAP Server ----------------
-async def handle_scan_job(request):
-    logger.info(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} [SCAN] Scan-Job started")
-    data = await request.read()
-    logger.info(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} [SCAN] Received first Bytes: {len(data)}")
-    #logger.debug(f"[SCAN] Received first Bytes: {len(data)}")
-    filename = WSD_SCAN_FOLDER / f"scan-{datetime.datetime.now():%Y%m%d_%H%M%S}.bin"
-    try:
-        with open(filename, "wb") as f:
-            f.write(data)
-        logger.info(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} [SCAN] Scan finished: {filename} ({len(data)/1024:.1f} KB)")
-    except Exception as e:
-        logger.error(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} [SCAN] Error while saving: {e}")
-    return web.Response(text="""
-        <soap:Envelope xmlns:soap="http://www.w3.org/2003/05/soap-envelope">
-            <soap:Body>
-                <ScanJobResponse>OK</ScanJobResponse>
-            </soap:Body>
-        </soap:Envelope>
-    """, content_type='application/soap+xml')
