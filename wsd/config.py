@@ -64,7 +64,7 @@ def get_local_ip():
         s.close()
         return ip
     except Exception:
-        logger.warning(f"{datetime.datetime.now():%Y%m%d %H%M%S} [*] Could not obtain Host IP: {e}")
+        logger.warning(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} [*] Could not obtain Host IP: {e}")
         return "undefined"
 
 LOCAL_IP = get_local_ip()
