@@ -136,7 +136,8 @@ async def discovery_listener():
         SCANNERS[uuid_clean] = scanner
 
         # sofort Metadata laden
-        asyncio.create_task(fetch_metadata(scanner))
+#        asyncio.create_task(fetch_metadata(scanner))
+        asyncio.create_task(scanner.fetch_metadata())
 
 
 # Offene Tasks abbrechen (sonst sammeln sie sich an)
