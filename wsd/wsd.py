@@ -69,8 +69,89 @@ def pick_best_xaddr(xaddrs: str) -> str:
 
     return ipv4 or hostname or None
 
-# ---------------- UDP Discovery Skeleton ----------------
-async def discovery_listener():
+
+# ---------------- Message handler ----------------
+async def handle_messages(data, addr):
+    while True:
+        data, addr = await loop.sock_recvfrom(sock, 8192)
+#        data = await loop.sock_recv(sock, 8192)  # nur Daten
+        # Absender separat holen (non-blocking)
+#        addr = sock.getpeername() if sock.getpeername() else ("0.0.0.0", 0)
+        ip = addr[0] if addr else "?"
+
+        try:
+            root = ET.fromstring(data.decode("utf-8", errors="ignore"))
+        except Exception:
+            logger.warning("[WSD:hm] Exception while reading from ET")
+            continue
+#        root = ET.fromstring(data.decode("utf-8", errors="ignore"))
+
+        # UUID (without urn:uuid:)
+        uuid_raw = root.find(".//wsa:Address", NAMESPACES)
+        uuid = None
+        if uuid_raw is not None and uuid_raw.text:
+            uuid_text = uuid_raw.text.strip()
+            if uuid_text.startswith("urn:uuid:"):
+                uuid = uuid_text.replace("urn:uuid:", "")
+            else:
+                uuid = uuid_text
+
+        # extract Action
+        action_elem = root.find(".//wsa:Action", NAMESPACES)
+        action_text = None
+        if action_elem is not None and action_elem.text:
+            action_text = action_elem.text.split("/")[-1]  # → "Hello|Bye|Probe"
+
+        # extract Device Capability        
+        types_elem = root.find(".//wsd:Types", NAMESPACES)
+        types_text = ""
+        if types_elem is not None and types_elem.text:
+            # Zerlegen + Präfixe entfernen
+            types_text = " ".join(t.split(":")[-1] for t in types_elem.text.split())
+
+        # exctract XAddrs
+        xaddrs_elem = root.find(".//{http://schemas.xmlsoap.org/ws/2005/04/discovery}XAddrs")
+        xaddr = ""
+        if xaddrs_elem is not None and xaddrs_elem.text:
+            xaddr = pick_best_xaddr(xaddrs_elem.text.strip())
+
+        logger.info(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} [WSD:DISCOVERY] received from {ip}")
+        logger.info(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} [WSD:DISCOVERY]    -->   UUID: {uuid}")
+        logger.info(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} [WSD:DISCOVERY]    --> Action: {action_text}")
+        logger.info(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} [WSD:DISCOVERY]    -->  Types: {types_text}")
+        logger.info(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} [WSD:DISCOVERY]    -->  XADDR: {xaddr}")
+
+        #if "Hello" in action_text:
+        if action_text == "Hello":
+            # Nur Scanner berücksichtigen
+            if "ScanDeviceType" not in types_text:
+                logger.info(f"[WSD:HELLO] Ignored non-scanner device UUID={uuid} Types={types_text}")
+                continue
+
+            if uuid not in SCANNERS:
+                SCANNERS[uuid] = Scanner(name=f"IP_{ip}", ip=ip, uuid=uuid)
+                logger.info(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} [WSD:HELLO] New Scanner: {SCANNERS[uuid].name} ({ip})")
+            else:
+                SCANNERS[uuid].update()
+                logger.info(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} [WSD:HELLO]known Scanner updated/back again: {SCANNERS[uuid].name} ({ip})")
+
+            list_scanners()
+
+#        elif "Bye" in action_text:
+        elif action_text == "Bye":
+            logger.info(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} [WSD:BYE] Bye for uuid: {uuid}")
+            if uuid in SCANNERS:
+                logger.info(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} [WSD:BYE] Scanner offline: {SCANNERS[uuid].name} ({ip})")
+                del SCANNERS[uuid]
+            list_scanners()
+
+        else:
+            logger.info(f"unrecognized operation {action_text}")
+
+#            await asyncio.sleep(0)  # kurz Yield zurück an Loop
+
+# ---------------- UDP listener ----------------
+async def UDP_listener_3702():
     # WSD (Port 3702/UDP)
     MCAST_GRP = "239.255.255.250"
     MCAST_PORT = 3702
@@ -82,93 +163,20 @@ async def discovery_listener():
     sock.setsockopt(socket.IPPROTO_IP, socket.IP_ADD_MEMBERSHIP, mreq)
 #    sock.setblocking(False)   # WICHTIG für asyncio!
     logger.info("WSD-Listener running on Port 3702/UDP")
-
     logger.info(f"-----------------------  Events  -------------------------")
 
     # Daten abholen
     loop = asyncio.get_running_loop()
-
-    async def handle_messages():
+    async def recv_loop():
         while True:
             data, addr = await loop.sock_recvfrom(sock, 8192)
-    #        data = await loop.sock_recv(sock, 8192)  # nur Daten
-            # Absender separat holen (non-blocking)
-#        addr = sock.getpeername() if sock.getpeername() else ("0.0.0.0", 0)
-            ip = addr[0] if addr else "?"
+            await handle_message(data, addr)   # ausgelagerte Verarbeitung
+            await asyncio.sleep(0)
 
-            try:
-                root = ET.fromstring(data.decode("utf-8", errors="ignore"))
-            except Exception:
-                logger.warning("[WSD:hm] Exception while reading from ET")
-                continue
-#        root = ET.fromstring(data.decode("utf-8", errors="ignore"))
-
-            # UUID (without urn:uuid:)
-            uuid_raw = root.find(".//wsa:Address", NAMESPACES)
-            uuid = None
-            if uuid_raw is not None and uuid_raw.text:
-                uuid_text = uuid_raw.text.strip()
-                if uuid_text.startswith("urn:uuid:"):
-                    uuid = uuid_text.replace("urn:uuid:", "")
-                else:
-                    uuid = uuid_text
-
-            # extract Action
-            action_elem = root.find(".//wsa:Action", NAMESPACES)
-            action_text = None
-            if action_elem is not None and action_elem.text:
-                action_text = action_elem.text.split("/")[-1]  # → "Hello|Bye|Probe"
-
-            # extract Device Capability        
-            types_elem = root.find(".//wsd:Types", NAMESPACES)
-            types_text = ""
-            if types_elem is not None and types_elem.text:
-                # Zerlegen + Präfixe entfernen
-                types_text = " ".join(t.split(":")[-1] for t in types_elem.text.split())
-
-            # exctract XAddrs
-            xaddrs_elem = root.find(".//{http://schemas.xmlsoap.org/ws/2005/04/discovery}XAddrs")
-            xaddr = ""
-            if xaddrs_elem is not None and xaddrs_elem.text:
-                xaddr = pick_best_xaddr(xaddrs_elem.text.strip())
-
-            logger.info(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} [WSD:DISCOVERY] received from {ip}")
-            logger.info(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} [WSD:DISCOVERY]    -->   UUID: {uuid}")
-            logger.info(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} [WSD:DISCOVERY]    --> Action: {action_text}")
-            logger.info(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} [WSD:DISCOVERY]    -->  Types: {types_text}")
-            logger.info(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} [WSD:DISCOVERY]    -->  XADDR: {xaddr}")
-
-            #if "Hello" in action_text:
-            if action_text == "Hello":
-                # Nur Scanner berücksichtigen
-                if "ScanDeviceType" not in types_text:
-                    logger.info(f"[WSD:HELLO] Ignored non-scanner device UUID={uuid} Types={types_text}")
-                    continue
-
-                if uuid not in SCANNERS:
-                    SCANNERS[uuid] = Scanner(name=f"IP_{ip}", ip=ip, uuid=uuid)
-                    logger.info(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} [WSD:HELLO] New Scanner: {SCANNERS[uuid].name} ({ip})")
-                else:
-                    SCANNERS[uuid].update()
-                    logger.info(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} [WSD:HELLO]known Scanner updated/back again: {SCANNERS[uuid].name} ({ip})")
-
-                list_scanners()
-
-    #        elif "Bye" in action_text:
-            elif action_text == "Bye":
-                logger.info(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} [WSD:BYE] Bye for uuid: {uuid}")
-                if uuid in SCANNERS:
-                    logger.info(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} [WSD:BYE] Scanner offline: {SCANNERS[uuid].name} ({ip})")
-                    del SCANNERS[uuid]
-                list_scanners()
-
-            else:
-                logger.info(f"unrecognized operation {action_text}")
-
-#            await asyncio.sleep(0)  # kurz Yield zurück an Loop
+    asyncio.create_task(recv_loop())
 
     # Hier nur Task starten!
-    asyncio.create_task(handle_messages())# Nach jedem Update: Liste loggen
+#    asyncio.create_task(handle_messages())# Nach jedem Update: Liste loggen
 #        logger.info("[SCANNERS] registered Scanners:")
 #        for s in SCANNERS.values():
 #            logger.info(f"  - {s.name} ({s.ip}, {s.uuid})")
