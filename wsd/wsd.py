@@ -80,10 +80,10 @@ async def discovery_listener():
 
         # Nur Scanner beachten
 #        if "wscn:ScanDeviceType" not in types_text:
-        if "ScanDeviceType" not in types_text:
-            continue
-        else:
-            logger.info(f"Device seems not to be a Scanner")
+#        if "ScanDeviceType" not in types_text:
+#            continue
+#        else:
+#            logger.info(f"Device seems not to be a Scanner")
 
         if "Hello" in action_text:
             uuid = root.find(".//{http://schemas.xmlsoap.org/ws/2004/08/addressing}Address")
@@ -136,29 +136,32 @@ async def heartbeat_monitor():
         to_remove = []
 
         for scanner in list(scanners):
+            logger.info(f"[Heartbeat] Timer-Check for {scanner.ip}...")
             age = (now - scanner.last_seen).total_seconds()
             timeout = scanner.max_age
 
             # Halbzeit-Check
             if age > timeout / 2 and age <= (timeout / 2 + 30):
-                logger.info(f"[Heartbeat] Halbzeit-Check {scanner.ip}")
+                logger.info(f"[Heartbeat] --> proceeding Halbzeit-Check")
                 asyncio.create_task(check_scanner(scanner))
 
             # 3/4-Check
             if age > (timeout * 0.75) and age <= (timeout * 0.75 + 30):
-                logger.info(f"[Heartbeat] Viertel-Check {scanner.ip}")
+                logger.info(f"[Heartbeat] --> proceeding Viertel-Check")
                 asyncio.create_task(check_scanner(scanner))
 
             # Timeout überschritten → offline markieren
             if age > timeout and scanner.online:
+                logger.info(f"[Heartbeat] --> mark as offline")
                 scanner.mark_offline()
 
             # Nach Ablauf von Timeout+Offline → entfernen
             if not scanner.online and scanner.remove_after and now >= scanner.remove_after:
-                logger.warning(f"[Scanner Remove] {scanner.ip} ({scanner.friendly_name or scanner.name}) entfernt")
+                logger.info(f"[Heartbeat] --> Marking {scanner.ip} ({scanner.friendly_name or scanner.name}) to remove")
                 to_remove.append(scanner)
 
         for s in to_remove:
+            logger.info(f"[Heartbeat]     --> Removing {scanner.ip} ({scanner.friendly_name or scanner.name}) from list")
             scanners.remove(s)
 
         await asyncio.sleep(30)
