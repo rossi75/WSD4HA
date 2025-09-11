@@ -96,14 +96,14 @@ async def discovery_listener():
             continue
 
         # UUID (without urn:uuid:)
-        uuid_elem = root.find(".//wsa:Address", NAMESPACES)
-        uuid_clean = None
-        if uuid_elem is not None and uuid_elem.text:
-            uuid_text = uuid_elem.text.strip()
+        uuid_raw = root.find(".//wsa:Address", NAMESPACES)
+        uuid = None
+        if uuid_raw is not None and uuid_raw.text:
+            uuid_text = uuid_raw.text.strip()
             if uuid_text.startswith("urn:uuid:"):
-                uuid_clean = uuid_text.replace("urn:uuid:", "")
+                uuid = uuid_text.replace("urn:uuid:", "")
             else:
-                uuid_clean = uuid_text
+                uuid = uuid_text
 
         # extract Action
         action_elem = root.find(".//wsa:Action", NAMESPACES)
@@ -125,7 +125,7 @@ async def discovery_listener():
             xaddr = pick_best_xaddr(xaddrs_elem.text.strip())
 
         logger.info(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} [WSD:DISCOVERY] received from {ip}")
-        logger.info(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} [WSD:DISCOVERY]    -->   UUID: {uuid_clean}")
+        logger.info(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} [WSD:DISCOVERY]    -->   UUID: {uuid}")
         logger.info(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} [WSD:DISCOVERY]    --> Action: {action_text}")
         logger.info(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} [WSD:DISCOVERY]    -->  Types: {types_text}")
         logger.info(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} [WSD:DISCOVERY]    -->  XADDR: {xaddr}")
@@ -138,8 +138,8 @@ async def discovery_listener():
 #            logger.info(f"Device seems not to be a Scanner")
 
         if "Hello" in action_text:
-            uuid = root.find(".//{http://schemas.xmlsoap.org/ws/2004/08/addressing}Address")
-            uuid = uuid.text.strip() if uuid is not None else f"UUID-{ip}"
+#            uuid = root.find(".//{http://schemas.xmlsoap.org/ws/2004/08/addressing}Address")
+#            uuid = uuid.text.strip() if uuid is not None else f"UUID-{ip}"
             if uuid not in SCANNERS:
                 SCANNERS[uuid] = Scanner(name=f"Scanner-{ip}", ip=ip, uuid=uuid)
                 logger.info(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} [WSD:HELLO] New Scanner: {SCANNERS[uuid].name} ({ip})")
@@ -164,9 +164,11 @@ async def discovery_listener():
         for idx, s in enumerate(SCANNERS.values(), start=1):
             logger.info(f"[{idx}] {s.name} ({s.ip}) UUID={s.uuid} Online={s.online}")
 
-        scanner = Scanner(name=uuid_clean, ip=addr[0], uuid=uuid_clean, xaddr=xaddr)
+        # erst das objekt neu erstellen
+        scanner = Scanner(name=uuid, ip=addr[0], uuid=uuid, xaddr=xaddr)
 #        scanners.append(scanner)
-        SCANNERS[uuid_clean] = scanner
+        # dann das Objekt der Liste hinzufügen
+        SCANNERS[uuid] = scanner
 
         # sofort Metadata laden
 #        asyncio.create_task(fetch_metadata(scanner))
