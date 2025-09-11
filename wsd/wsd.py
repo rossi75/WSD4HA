@@ -36,6 +36,34 @@ def parse_wsd_packet(data: bytes):
         logger.debug(f"{datetime.datetime.now():%Y%m%d %H%M%S} [WSD] Error while parsing: {e}")
         return None
 
+# ---------------- XADDR filtern ----------------
+def pick_best_xaddr(xaddrs: str) -> str:
+    """
+    Wählt aus einer Liste von XAddrs den besten Kandidaten:
+    - bevorzugt IPv4
+    - ignoriert IPv6, wenn IPv4 vorhanden ist
+    - nimmt den Hostnamen, falls keine IP vorhanden ist
+    """
+    if not xaddrs:
+        return None
+
+    candidates = xaddrs.split()
+
+    ipv4 = None
+    hostname = None
+
+    for addr in candidates:
+        if addr.startswith("http://["):  
+            # IPv6 -> ignorieren
+            continue
+        elif addr.startswith("http://") and any(c.isdigit() for c in addr.split("/")[2].split(":")[0]):
+            # IPv4 gefunden
+            ipv4 = addr
+        else:
+            # vermutlich Hostname
+            hostname = addr
+
+    return ipv4 or hostname or None
 
 # ---------------- UDP Discovery Skeleton ----------------
 async def discovery_listener():
@@ -89,7 +117,9 @@ async def discovery_listener():
 
         # XAddrs sammeln
         xaddrs_elem = root.find(".//{http://schemas.xmlsoap.org/ws/2005/04/discovery}XAddrs")
-        xaddr = xaddrs_elem.text.strip() if xaddrs_elem is not None else None
+        xaddr = ""
+        if xaddrs_elem is not None and xaddrs_elem.text:
+            xaddr = pick_best_xaddr(xaddrs_elem.text.strip())
 
         logger.info(f"{datetime.datetime.now():%Y%m%d %H%M%S} [DISCOVERY] received from {ip}")
         logger.info(f"{datetime.datetime.now():%Y%m%d %H%M%S} [DISCOVERY]    -->   UUID: {uuid_clean}")
