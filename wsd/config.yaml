@@ -13,7 +13,6 @@ startup: services
 init: false
 ports:
   8110/tcp: 8110
-#  3702/udp: 3702
 host_network: true
 schema:
   scan_folder: str
