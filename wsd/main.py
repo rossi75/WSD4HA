@@ -1,7 +1,8 @@
 import asyncio
 from webserver import start_http_server
 #import webserver
-from wsd import UDP_listener_3702, heartbeat_monitor, handle_scan_job
+#from wsd import UDP_listener_3702, heartbeat_monitor, handle_scan_job
+from wsd import UDP_listener_3702, heartbeat_monitor
 #import wsd
 from config import WSD_HTTP_PORT, WSD_OFFLINE_TIMEOUT, WSD_SCAN_FOLDER
 #import config
