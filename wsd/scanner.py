@@ -23,8 +23,7 @@ class Scanner:
         self.ip = ip
         self.mac = mac
         self.uuid = uuid
-        self.formats = formats or []
-        self.location = location
+        self.formats = formats or [] # unnötg?
         self.xaddr = xaddr            # Service-Adresse (aus <wsd:XAddrs>)
     
         # zusätzliche Infos
@@ -33,9 +32,11 @@ class Scanner:
         self.serial = None
         self.model = None
         self.manufacturer = None
+        self.location
 
         # Status
-        self.last_seen = datetime.datetime.now()
+        #self.last_seen = datetime.datetime.now()
+        self.last_seen = datetime.datetime.now() - datetime.timedelta(seconds=max_age // 2) # last_seen so zurücksetzen, dass wir "halbzeit" erreicht haben
         self.max_age = max_age
         self.online = True
         self.offline_since = None
