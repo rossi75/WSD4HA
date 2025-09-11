@@ -1,9 +1,9 @@
 FROM python:3.12-slim
 # Labels für HA
 LABEL \
-    io.hass.name="WSD Scanner" \
-    io.hass.description="Empfängt WSD Scans und stellt sie im WebUI bereit" \
-    io.hass.version="0.0.5" \
+    io.hass.name="WSD4HA" \
+    io.hass.description="Registers at a document scanner as a WSD destination to receive and store any scanned documents in HA" \
+    io.hass.version="0.0.6" \
     io.hass.type="addon" \
     io.hass.arch="amd64|aarch64"
 
