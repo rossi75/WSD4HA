@@ -47,6 +47,7 @@ class Scanner:
 #            except Exception as e:
 #                logger.warning(f"[Scanner:{self.ip}] Konnte Metadaten nicht abrufen: {e}")
 
+    # Scanner ist noch online, Aufruf mit SCANNER[uuid].update()
     def update(self, max_age=WSD_OFFLINE_TIMEOUT):
         self.last_seen = datetime.datetime.now()
         self.max_age = max_age
@@ -57,21 +58,26 @@ class Scanner:
     # Fragt Scanner-Metadaten per WS-Transfer/Get ab
     # def fetch_metadata(self):
 #    async def fetch_metadata(self):
-    async def fetch_metadata(uuid: str):
-        scanner = SCANNERS.get(uuid)
+#    async def fetch_metadata(uuid: str):
+    async def fetch_metadata(self):
+#        scanner = SCANNERS.get(uuid)#
 
-        if scanner:
+#        if scanner:
         #    await scanner.fetch_metadata()
-            logger.info(f"[META] found Scanner with UUID {uuid}")
-        else:
-            logger.warning(f"[META] no Scanner found with UUID {uuid}")
+#            logger.info(f"[META] found Scanner with UUID {uuid}")
+#        else:
+#            logger.warning(f"[META] no Scanner found with UUID {uuid}")
+#            return
+
+        if self.uuid not in SCANNERS:
+            logger.info(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} [META] could not find Scanner with uuid: {self.uuid})")
             return
         
-        if not scanner.xaddr:
-            logger.warning(f"[META]] missing .xaddr element !")
+        if not self.xaddr:
+            logger.warning(f"[META]] missing xaddr element in struct!")
             return
 
-        logger.info(f"[META]] trying to request Metadata for {uuid}")
+        logger.info(f"[META]] trying to request Metadata for {self.uuid}")
 
         # Minimaler SOAP-Request für "Get"
         soap_request = f"""<?xml version="1.0" encoding="utf-8"?>
