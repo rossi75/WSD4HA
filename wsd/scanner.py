@@ -5,6 +5,12 @@ import sys
 from config import WSD_OFFLINE_TIMEOUT
 #from config import WSD_HTTP_PORT, WSD_OFFLINE_TIMEOUT, WSD_SCAN_FOLDER
 
+NAMESPACES = {
+    "soap": "http://www.w3.org/2003/05/soap-envelope",
+    "wsd": "http://schemas.xmlsoap.org/ws/2005/04/discovery",
+    "wsa": "http://schemas.xmlsoap.org/ws/2004/08/addressing"
+}
+
 logging.basicConfig(level=logging.INFO, format='[%(levelname)s] %(message)s')
 logger = logging.getLogger("wsd-addon")
 
