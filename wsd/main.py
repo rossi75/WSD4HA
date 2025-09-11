@@ -8,7 +8,8 @@ from config import WSD_HTTP_PORT, WSD_OFFLINE_TIMEOUT, WSD_SCAN_FOLDER
 #from scanner import Scanner, SCANNERS
 from scanner import Scanner
 #import scanner
-from state import SCANNERS
+#from state import SCANNERS
+#from globals import SCANNERS
 
 async def main():
     await asyncio.gather(
