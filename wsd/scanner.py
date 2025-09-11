@@ -54,14 +54,24 @@ class Scanner:
         self.offline_since = None
         self.remove_after = None
 
+    # Fragt Scanner-Metadaten per WS-Transfer/Get ab
     # def fetch_metadata(self):
-    async def fetch_metadata(self):
-        logger.info(f"[META]] trying to request Metadata for {self.ip}, {self.uuid}")
-        # Fragt Scanner-Metadaten per WS-Transfer/Get ab
+#    async def fetch_metadata(self):
+    async def fetch_metadata(uuid: str):
+        scanner = SCANNERS.get(uuid)
 
-        if not self.xaddr:
+        if scanner:
+        #    await scanner.fetch_metadata()
+            logger.info(f"[META] found Scanner with UUID {uuid}")
+        else:
+            logger.warning(f"[META] no Scanner found with UUID {uuid}")
+            return
+        
+        if not scanner.xaddr:
             logger.warning(f"[META]] missing .xaddr element !")
             return
+
+        logger.info(f"[META]] trying to request Metadata for {uuid}")
 
         # Minimaler SOAP-Request für "Get"
         soap_request = f"""<?xml version="1.0" encoding="utf-8"?>
