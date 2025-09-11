@@ -47,7 +47,8 @@ WSD_OFFLINE_TIMEOUT = int(os.environ.get("OFFLINE_TIMEOUT", 300))  # Sekunden
 #LOCAL_IP = get_local_ip()
 
 logger.info(f"**********************************************************")
-logger.info(f"Starting up WSD Scanner Service at {datetime.datetime.now():%d.%m.%Y, %H:%M:%S}")
+logger.info(f"Starting up WSD Scanner Service")
+logger.info(f"{datetime.datetime.now():%d.%m.%Y, %H:%M:%S}")
 logger.info(f"---------------------  Configuration  ---------------------")
 logger.info(f"Scan-Path: {WSD_SCAN_FOLDER}")
 logger.info(f"max scanned files to show: {WSD_MAX_FILES}")
