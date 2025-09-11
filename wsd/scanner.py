@@ -2,6 +2,7 @@ import datetime
 import socket
 import logging
 import sys
+from state import SCANNERS
 from config import WSD_OFFLINE_TIMEOUT
 #from config import WSD_HTTP_PORT, WSD_OFFLINE_TIMEOUT, WSD_SCAN_FOLDER
 
@@ -136,5 +137,5 @@ class Scanner:
             self.offline_since = datetime.datetime.now()
             self.remove_after = self.offline_since + datetime.timedelta(seconds=self.max_age)
 
-SCANNERS = {}  # key = UUID oder IP
+#SCANNERS = {}  # key = UUID oder IP
 
