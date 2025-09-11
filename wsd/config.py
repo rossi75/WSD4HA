@@ -9,6 +9,7 @@ import sys
 import re
 import xml.etree.ElementTree as ET
 import subprocess
+from scanner import list_scanners
 
 NAMESPACES = {
     "soap": "http://www.w3.org/2003/05/soap-envelope",
@@ -53,6 +54,7 @@ if WSD_OFFLINE_TIMEOUT < 120:
     logger.warning("OFFLINE_TIMEOUT zu klein, auf 120 gesetzt")
     WSD_OFFLINE_TIMEOUT = 120
 logger.info(f"Offline Timeout: {WSD_OFFLINE_TIMEOUT}s")
+list_scanners()
 
 # ---------------- lokale IP abfragen ----------------
 def get_local_ip():
