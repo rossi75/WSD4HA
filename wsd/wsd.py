@@ -156,6 +156,7 @@ async def discovery_listener():
         
         else:
             logger.info(f"unrecognized operation {action_text}")
+            return
         
         # Nach jedem Update: Liste loggen
         logger.info("[SCANNERS] registered Scanners:")
@@ -177,17 +178,18 @@ async def discovery_listener():
 #        asyncio.create_task(Scanner.fetch_metadata())
 #        asyncio.create_task(Scanner.fetch_metadata(SCANNERS[uuid]))
 #        asyncio.create_task(Scanner.fetch_metadata(scanner))
-        asyncio.create_task(Scanner.fetch_metadata(Scanner))
+#        asyncio.create_task(Scanner.fetch_metadata(Scanner))
+        await scanner.fetch_metadata(uuid)
         logger.info(f"[WSD:p2]")
-        try:
-            logger.info(f"[WSD:p3]")
-            asyncio.create_task(Scanner.fetch_metadata(Scanner))
+#        try:
+#            logger.info(f"[WSD:p3]")
+#            asyncio.create_task(Scanner.fetch_metadata(Scanner))
     #        await fetch_metadata(scanner)  # nutzt SOAP-Get
-            logger.info(f"[WSD_fmd]")
-        except Exception as e:
-            logger.warning(f"[Heartbeat FAIL] {Scanner.ip}: {e}")
+#            logger.info(f"[WSD_fmd]")
+#        except Exception as e:
+#            logger.warning(f"[Heartbeat FAIL] {Scanner.ip}: {e}")
 #            logger.warning(f"[Heartbeat FAIL] {scanner.ip}: {e}")
-        logger.info(f"[WSD:p4]")
+#        logger.info(f"[WSD:p4]")
 
 
 # Offene Tasks abbrechen (sonst sammeln sie sich an)
