@@ -229,7 +229,8 @@ async def heartbeat_monitor():
         now = datetime.datetime.now()
         to_remove = []
 
-        for scanner in list(scanners):
+#        for scanner in list(scanners):
+        for scanner in list(SCANNERS):
             logger.info(f"[Heartbeat] Timer-Check for {scanner.ip}...")
             age = (now - scanner.last_seen).total_seconds()
             timeout = scanner.max_age
