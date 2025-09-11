@@ -1,5 +1,8 @@
 # Changelog
 
+## 0.0.3_ – 2025-09-11
+- change weather
+
 ## 0.0.3 – 2025-09-11
 - 🆕 added Scanner-Heartbeat
 - port readout stuck
