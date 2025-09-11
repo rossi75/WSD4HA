@@ -176,7 +176,7 @@ async def UDP_listener_3702():
         while True:
             data, addr = await loop.sock_recvfrom(sock, 8192)
             await message_processor(data, addr)   # ausgelagerte Verarbeitung
-            await asyncio.sleep(0)
+            await asyncio.sleep(1)
 
     asyncio.create_task(recv_loop())
 
