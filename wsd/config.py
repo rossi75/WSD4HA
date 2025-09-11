@@ -55,15 +55,6 @@ if WSD_OFFLINE_TIMEOUT < 120:
 logger.info(f"Offline Timeout: {WSD_OFFLINE_TIMEOUT}s")
 
 # ---------------- lokale IP abfragen ----------------
-def get_host_ip():
-    try:
-        # Liest die IP der Standard-Route (funktioniert auch in Docker)
-        result = subprocess.check_output("ip route get 1.1.1.1 | awk '{print $7}'", shell=True)
-        return result.decode().strip()
-    except Exception as e:
-        logger.warning(f"{datetime.datetime.now():%Y%m%d %H%M%S} [*] Could not obtain Host IP: {e}")
-        return "127.0.0.1"
-
 def get_local_ip():
     try:
         # UDP-Socket zu einer externen Adresse öffnen (wird nicht gesendet)
@@ -77,7 +68,6 @@ def get_local_ip():
         return "undefined"
 
 LOCAL_IP = get_local_ip()
-#LOCAL_IP = get_host_ip()
 
 # ---------------- Portprüfung ----------------
 def check_port(port):
