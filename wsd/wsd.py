@@ -72,8 +72,11 @@ def pick_best_xaddr(xaddrs: str) -> str:
 
 # ---------------- Message handler ----------------
 async def message_processor(data, addr):
+    logger.info(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} [Message] Processing sth")
+    logger.debug(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} [Message] received data {data}")
+    logger.debug(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} [Message] received addr {addr}")
     while True:
-        data, addr = await loop.sock_recvfrom(sock, 8192)
+#        data, addr = await loop.sock_recvfrom(sock, 8192)
 #        data = await loop.sock_recv(sock, 8192)  # nur Daten
         # Absender separat holen (non-blocking)
 #        addr = sock.getpeername() if sock.getpeername() else ("0.0.0.0", 0)
@@ -243,7 +246,7 @@ async def heartbeat_monitor():
     while True:
         now = datetime.datetime.now()
         to_remove = []
-        logger.info(f"[Heartbeat] wake-up")
+        logger.info(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} [Heartbeat] wake-up")
 
 #        for scanner in list(scanners):
         for scanner in list(SCANNERS):
