@@ -10,7 +10,7 @@ import re
 import xml.etree.ElementTree as ET
 import subprocess
 from state import SCANNERS
-from scanner import Scanner
+from scanner import Scanner, list_scanners
 
 
 NAMESPACES = {
