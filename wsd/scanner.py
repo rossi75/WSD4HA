@@ -60,6 +60,7 @@ class Scanner:
 #    async def fetch_metadata(self):
 #    async def fetch_metadata(uuid: str):
     async def fetch_metadata(self):
+        logger.info(f"[fmd:p10]")
 #        scanner = SCANNERS.get(uuid)#
 
 #        if scanner:
