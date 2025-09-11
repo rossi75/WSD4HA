@@ -233,6 +233,7 @@ async def heartbeat_monitor():
     while True:
         now = datetime.datetime.now()
         to_remove = []
+        logger.info(f"[Heartbeat] wake-up")
 
 #        for scanner in list(scanners):
         for scanner in list(SCANNERS):
