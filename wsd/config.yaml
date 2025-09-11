@@ -1,7 +1,7 @@
 name: WSD Scanner
 version: "0.002"
 slug: wsd_scanner
-description: "Minimaler WSD-Server [für Samsung C480W und ggf andere Scanner]"
+description: "Minimaler WSD-Server für Samsung C480W [und ggf andere Scanner]"
 url: https://github.com/rossi75/WSD4HA
 webui: http://[HOST]:[PORT:8110]
 arch:
