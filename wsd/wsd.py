@@ -181,10 +181,12 @@ async def discovery_listener():
         logger.info(f"[WSD:p2]")
         try:
             logger.info(f"[WSD:p3]")
-            await fetch_metadata(scanner)  # nutzt SOAP-Get
+            asyncio.create_task(Scanner.fetch_metadata(Scanner))
+    #        await fetch_metadata(scanner)  # nutzt SOAP-Get
             logger.info(f"[WSD_fmd]")
         except Exception as e:
-            logger.warning(f"[Heartbeat FAIL] {scanner.ip}: {e}")
+            logger.warning(f"[Heartbeat FAIL] {Scanner.ip}: {e}")
+#            logger.warning(f"[Heartbeat FAIL] {scanner.ip}: {e}")
         logger.info(f"[WSD:p4]")
 
 
