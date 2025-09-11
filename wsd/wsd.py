@@ -153,6 +153,8 @@ async def message_processor(data, addr):
     else:
         logger.info(f"unrecognized operation {action_text}")
 
+    logger.info(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} [WSD:Message] done")
+
 #            await asyncio.sleep(0)  # kurz Yield zurück an Loop
 
 # ---------------- UDP listener ----------------
