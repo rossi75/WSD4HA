@@ -10,8 +10,7 @@ import re
 import xml.etree.ElementTree as ET
 import subprocess
 
-NAMESPACES =
-{
+NAMESPACES = {
     "soap": "http://www.w3.org/2003/05/soap-envelope",
     "wsd": "http://schemas.xmlsoap.org/ws/2005/04/discovery",
     "wsa": "http://schemas.xmlsoap.org/ws/2004/08/addressing"
