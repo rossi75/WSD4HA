@@ -3,7 +3,7 @@ FROM python:3.12-slim
 LABEL \
     io.hass.name="WSD Scanner" \
     io.hass.description="Empfängt WSD Scans und stellt sie im WebUI bereit" \
-    io.hass.version="0.0.3" \
+    io.hass.version="0.0.4" \
     io.hass.type="addon" \
     io.hass.arch="amd64|aarch64"
 
@@ -22,6 +22,7 @@ RUN pip install --no-cache-dir -r requirements.txt
 #COPY webserver.py /app/
 
 COPY config.yaml .
+COPY state.py .
 COPY main.py .
 COPY config.py .
 COPY scanner.py .
