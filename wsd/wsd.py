@@ -155,6 +155,7 @@ async def discovery_listener():
             if uuid in SCANNERS:
                 logger.info(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} [WSD:BYE] Scanner offline: {SCANNERS[uuid].name} ({ip})")
                 del SCANNERS[uuid]
+            return
         
         else:
             logger.info(f"unrecognized operation {action_text}")
