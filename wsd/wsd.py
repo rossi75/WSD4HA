@@ -133,7 +133,7 @@ async def discovery_listener():
 
         scanner = Scanner(name=uuid_clean, ip=addr[0], uuid=uuid_clean, xaddr=xaddr)
 #        scanners.append(scanner)
-        SCANNERS[uuid_clear] = scanner
+        SCANNERS[uuid_clean] = scanner
 
         # sofort Metadata laden
         asyncio.create_task(fetch_metadata(scanner))
