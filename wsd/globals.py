@@ -1,4 +1,11 @@
 # to be imported by all files
+#import datetime
+#import socket
+import logging
+import sys
+
+
+# -----------------  define SCANNERS dict  -----------------
 SCANNERS = {}
 
 # -----------------  Nach jedem Update: Liste loggen  -----------------
