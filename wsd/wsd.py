@@ -112,7 +112,14 @@ async def discovery_listener():
         for idx, s in enumerate(SCANNERS.values(), start=1):
             logger.info(f"[{idx}] {s.name} ({s.ip}) UUID={s.uuid} Online={s.online}")
 
-        # Offene Tasks abbrechen (sonst sammeln sie sich an)
+        scanner = Scanner(name=uuid_clear, ip=addr[0], uuid=uuid_clear, xaddr=xaddr)
+        scanners.append(scanner)
+
+        # sofort Metadata laden
+        asyncio.create_task(fetch_metadata(scanner))
+
+
+# Offene Tasks abbrechen (sonst sammeln sie sich an)
     #    for task in pending:
     #        task.cancel()
 
