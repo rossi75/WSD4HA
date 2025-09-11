@@ -71,7 +71,7 @@ class Scanner:
             "Content-Type": "application/soap+xml; charset=utf-8"
         }
 
-        logger.debug(f"{datetime.datetime.now():%Y%m%d %H%M%S} [Scanner:{self.ip}] Sende Metadata-Request an {self.xaddr}")
+        logger.info(f"{datetime.datetime.now():%Y%m%d %H%M%S} [Scanner:{self.ip}] Sende Metadata-Request an {self.xaddr}")
         r = httpx.post(self.xaddr, data=soap_request, headers=headers, timeout=5.0)
 
         if r.status_code != 200:
@@ -80,29 +80,44 @@ class Scanner:
         root = ET.fromstring(r.text)
 
         # FriendlyName
+        logger.info(f"{datetime.datetime.now():%Y%m%d %H%M%S} [Scanner:{self.ip}] --> Trying to get friendly name")
         fn = root.find(".//{http://schemas.xmlsoap.org/ws/2006/02/devprof}FriendlyName")
+        logger.info(f"{datetime.datetime.now():%Y%m%d %H%M%S} --> fn: {fn}")
         if fn is not None and fn.text:
             self.name = fn.text.strip()
+        logger.info(f"{datetime.datetime.now():%Y%m%d %H%M%S} --> self.name: {self.name}")
 
         # FirmwareVersion
+        logger.info(f"{datetime.datetime.now():%Y%m%d %H%M%S} [Scanner:{self.ip}] --> Trying to get Firmware Version")
         fw = root.find(".//{http://schemas.xmlsoap.org/ws/2006/02/devprof}FirmwareVersion")
+        logger.info(f"{datetime.datetime.now():%Y%m%d %H%M%S} --> fw: {fw}")
         if fw is not None:
             self.firmware = fw.text.strip()
+        logger.info(f"{datetime.datetime.now():%Y%m%d %H%M%S} --> self.name: {self.firmware}")
 
         # SerialNumber
+        logger.info(f"{datetime.datetime.now():%Y%m%d %H%M%S} [Scanner:{self.ip}] --> Trying to get Serial Number")
         sn = root.find(".//{http://schemas.xmlsoap.org/ws/2006/02/devprof}SerialNumber")
+        logger.info(f"{datetime.datetime.now():%Y%m%d %H%M%S} --> sn: {sn}")
         if sn is not None:
             self.serial = sn.text.strip()
+        logger.info(f"{datetime.datetime.now():%Y%m%d %H%M%S} --> self.name: {self.serial}")
 
         # Model
+        logger.info(f"{datetime.datetime.now():%Y%m%d %H%M%S} [Scanner:{self.ip}] --> Trying to get model name")
         model = root.find(".//{http://schemas.xmlsoap.org/ws/2006/02/devprof}ModelName")
+        logger.info(f"{datetime.datetime.now():%Y%m%d %H%M%S} --> model: {model}")
         if model is not None:
             self.model = model.text.strip()
+        logger.info(f"{datetime.datetime.now():%Y%m%d %H%M%S} --> self.name: {self.model}")
 
         # Manufacturer
+        logger.info(f"{datetime.datetime.now():%Y%m%d %H%M%S} [Scanner:{self.ip}] --> Trying to get Manufacturer")
         mf = root.find(".//{http://schemas.xmlsoap.org/ws/2006/02/devprof}Manufacturer")
+        logger.info(f"{datetime.datetime.now():%Y%m%d %H%M%S} --> mf: {mf}")
         if mf is not None:
             self.manufacturer = mf.text.strip()
+        logger.info(f"{datetime.datetime.now():%Y%m%d %H%M%S} --> self.name: {self.manufacturer}")
 
         logger.info(f"{datetime.datetime.now():%Y%m%d %H%M%S} [Scanner:{self.ip}] Metadaten: {self.name} | FW={self.firmware} | SN={self.serial}")
 
