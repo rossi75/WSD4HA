@@ -86,7 +86,8 @@ async def message_processor(data, addr):
         root = ET.fromstring(data.decode("utf-8", errors="ignore"))
     except Exception:
         logger.warning("[WSD:hm] Exception while reading from ET")
-        continue
+        return
+#        continue
 #        root = ET.fromstring(data.decode("utf-8", errors="ignore"))
 
     # UUID (without urn:uuid:)
