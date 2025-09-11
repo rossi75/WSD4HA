@@ -252,7 +252,8 @@ async def heartbeat_monitor():
 
 #        for scanner in list(scanners):
         for scanner in list(SCANNERS):
-            logger.info(f"[Heartbeat] Timer-Check for {scanner.ip}...")
+#            logger.info(f"[Heartbeat] Timer-Check for {scanner.ip}...")
+            logger.info(f"[Heartbeat] Timer-Check for {scanner.uuid}...")
             age = (now - scanner.last_seen).total_seconds()
             timeout = scanner.max_age
 
