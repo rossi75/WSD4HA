@@ -131,7 +131,7 @@ async def discovery_listener():
         for idx, s in enumerate(SCANNERS.values(), start=1):
             logger.info(f"[{idx}] {s.name} ({s.ip}) UUID={s.uuid} Online={s.online}")
 
-        scanner = Scanner(name=uuid_clear, ip=addr[0], uuid=uuid_clear, xaddr=xaddr)
+        scanner = Scanner(name=uuid_clean, ip=addr[0], uuid=uuid_clean, xaddr=xaddr)
 #        scanners.append(scanner)
         SCANNERS[uuid_clear] = scanner
 
