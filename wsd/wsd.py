@@ -85,12 +85,13 @@ async def discovery_listener():
 
     logger.info(f"-----------------------  Events  -------------------------")
 
+    # Daten abholen
     loop = asyncio.get_running_loop()
     while True:
-        data = await loop.sock_recv(sock, 8192)  # nur Daten
-            # Absender separat holen (non-blocking)
-            addr = sock.getpeername() if sock.getpeername() else ("0.0.0.0", 0)
 #        data, addr = await loop.sock_recvfrom(sock, 8192)
+        data = await loop.sock_recv(sock, 8192)  # nur Daten
+        # Absender separat holen (non-blocking)
+        addr = sock.getpeername() if sock.getpeername() else ("0.0.0.0", 0)
         ip = addr[0] if addr else "?"
         
 #        try:
