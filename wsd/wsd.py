@@ -71,7 +71,7 @@ def pick_best_xaddr(xaddrs: str) -> str:
 
 
 # ---------------- Message handler ----------------
-async def handle_messages(data, addr):
+async def message_processor(data, addr):
     while True:
         data, addr = await loop.sock_recvfrom(sock, 8192)
 #        data = await loop.sock_recv(sock, 8192)  # nur Daten
@@ -170,7 +170,7 @@ async def UDP_listener_3702():
     async def recv_loop():
         while True:
             data, addr = await loop.sock_recvfrom(sock, 8192)
-            await handle_message(data, addr)   # ausgelagerte Verarbeitung
+            await message_processor(data, addr)   # ausgelagerte Verarbeitung
             await asyncio.sleep(0)
 
     asyncio.create_task(recv_loop())
