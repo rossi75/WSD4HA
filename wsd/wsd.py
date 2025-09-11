@@ -165,7 +165,7 @@ async def discovery_listener():
         else:
             logger.info(f"unrecognized operation {action_text}")
             #return
-        
+        await asyncio.sleep(0)  # kurz Yield zurück an Loop
         # Nach jedem Update: Liste loggen
 #        logger.info("[SCANNERS] registered Scanners:")
 #        for s in SCANNERS.values():
