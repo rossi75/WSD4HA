@@ -32,7 +32,7 @@ class Scanner:
         self.serial = None
         self.model = None
         self.manufacturer = None
-        self.location
+        self.location = location
 
         # Status
         #self.last_seen = datetime.datetime.now()
