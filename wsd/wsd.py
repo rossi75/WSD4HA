@@ -176,9 +176,13 @@ async def UDP_listener_3702():
     loop = asyncio.get_running_loop()
     async def recv_loop():
         while True:
+            logger.info(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} [WSD:recv_loop] 1")
             data, addr = await loop.sock_recvfrom(sock, 8192)
+            logger.info(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} [WSD:recv_loop] 2")
             await message_processor(data, addr)   # ausgelagerte Verarbeitung
+            logger.info(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} [WSD:recv_loop] 3")
             await asyncio.sleep(1)
+            logger.info(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} [WSD:recv_loop] 4")
 
     asyncio.create_task(recv_loop())
 
