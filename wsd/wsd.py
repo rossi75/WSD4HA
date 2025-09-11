@@ -174,7 +174,8 @@ async def discovery_listener():
 
         # sofort Metadata laden
 #        asyncio.create_task(fetch_metadata(scanner))
-        asyncio.create_task(Scanner.fetch_metadata())
+#        asyncio.create_task(Scanner.fetch_metadata(SCANNERS[uuid]))
+        asyncio.create_task(Scanner.fetch_metadata(SCANNERS[uuid]))
         logger.info(f"[WSD:p2]")
 
 
