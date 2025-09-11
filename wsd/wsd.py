@@ -33,7 +33,7 @@ def parse_wsd_packet(data: bytes):
             "uuid": uuid.text if uuid is not None else None,
         }
     except Exception as e:
-        logger.debug(f"{datetime.datetime.now():%Y%m%d %H%M%S} [WSD] Error while parsing: {e}")
+        logger.debug(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} [WSD] Error while parsing: {e}")
         return None
 
 # ---------------- XADDR filtern ----------------
@@ -44,6 +44,7 @@ def pick_best_xaddr(xaddrs: str) -> str:
     - ignoriert IPv6, wenn IPv4 vorhanden ist
     - nimmt den Hostnamen, falls keine IP vorhanden ist
     """
+    logger.info(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} [WSD:XADDR] received {xaddrs}")
     if not xaddrs:
         return None
 
@@ -62,6 +63,8 @@ def pick_best_xaddr(xaddrs: str) -> str:
         else:
             # vermutlich Hostname
             hostname = addr
+
+    logger.info(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} [WSD:XADDR] extracted {ipv4 or hostname or None}")
 
     return ipv4 or hostname or None
 
@@ -121,11 +124,11 @@ async def discovery_listener():
         if xaddrs_elem is not None and xaddrs_elem.text:
             xaddr = pick_best_xaddr(xaddrs_elem.text.strip())
 
-        logger.info(f"{datetime.datetime.now():%Y%m%d %H%M%S} [DISCOVERY] received from {ip}")
-        logger.info(f"{datetime.datetime.now():%Y%m%d %H%M%S} [DISCOVERY]    -->   UUID: {uuid_clean}")
-        logger.info(f"{datetime.datetime.now():%Y%m%d %H%M%S} [DISCOVERY]    --> Action: {action_text}")
-        logger.info(f"{datetime.datetime.now():%Y%m%d %H%M%S} [DISCOVERY]    -->  Types: {types_text}")
-        logger.info(f"{datetime.datetime.now():%Y%m%d %H%M%S} [DISCOVERY]    -->  XADDR: {xaddr}")
+        logger.info(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} [WSD:DISCOVERY] received from {ip}")
+        logger.info(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} [WSD:DISCOVERY]    -->   UUID: {uuid_clean}")
+        logger.info(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} [WSD:DISCOVERY]    --> Action: {action_text}")
+        logger.info(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} [WSD:DISCOVERY]    -->  Types: {types_text}")
+        logger.info(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} [WSD:DISCOVERY]    -->  XADDR: {xaddr}")
 
         # Nur Scanner beachten
 #        if "wscn:ScanDeviceType" not in types_text:
@@ -139,16 +142,16 @@ async def discovery_listener():
             uuid = uuid.text.strip() if uuid is not None else f"UUID-{ip}"
             if uuid not in SCANNERS:
                 SCANNERS[uuid] = Scanner(name=f"Scanner-{ip}", ip=ip, uuid=uuid)
-                logger.info(f"{datetime.datetime.now():%Y%m%d %H%M%S} [HELLO] New Scanner: {SCANNERS[uuid].name} ({ip})")
+                logger.info(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} [WSD:HELLO] New Scanner: {SCANNERS[uuid].name} ({ip})")
             else:
                 SCANNERS[uuid].update()
-                logger.info(f"{datetime.datetime.now():%Y%m%d %H%M%S} [HELLO]known Scanner updated/back again: {SCANNERS[uuid].name} ({ip})")
+                logger.info(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} [WSD:HELLO]known Scanner updated/back again: {SCANNERS[uuid].name} ({ip})")
         
         elif "Bye" in action_text:
             uuid = root.find(".//{http://schemas.xmlsoap.org/ws/2004/08/addressing}Address")
             uuid = uuid.text.strip() if uuid is not None else f"UUID-{ip}"
             if uuid in SCANNERS:
-                logger.info(f"{datetime.datetime.now():%Y%m%d %H%M%S} [BYE] Scanner offline: {SCANNERS[uuid].name} ({ip})")
+                logger.info(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} [WSD:BYE] Scanner offline: {SCANNERS[uuid].name} ({ip})")
                 del SCANNERS[uuid]
         
         else:
@@ -243,17 +246,17 @@ async def check_scanner(scanner):
 
 # ---------------- HTTP/SOAP Server ----------------
 async def handle_scan_job(request):
-    logger.info("{datetime.datetime.now():%Y%m%d %H%M%S} [SCAN] Scan-Job started")
+    logger.info(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} [SCAN] Scan-Job started")
     data = await request.read()
-    logger.info(f"{datetime.datetime.now():%Y%m%d %H%M%S} [SCAN] Received first Bytes: {len(data)}")
+    logger.info(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} [SCAN] Received first Bytes: {len(data)}")
     #logger.debug(f"[SCAN] Received first Bytes: {len(data)}")
-    filename = WSD_SCAN_FOLDER / f"scan-{datetime.datetime.now():%Y%m%d-%H%M%S}.bin"
+    filename = WSD_SCAN_FOLDER / f"scan-{datetime.datetime.now():%Y%m%d_%H%M%S}.bin"
     try:
         with open(filename, "wb") as f:
             f.write(data)
-        logger.info(f"{datetime.datetime.now():%Y%m%d %H%M%S} [SCAN] Scan finished: {filename} ({len(data)/1024:.1f} KB)")
+        logger.info(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} [SCAN] Scan finished: {filename} ({len(data)/1024:.1f} KB)")
     except Exception as e:
-        logger.error(f"{datetime.datetime.now():%Y%m%d %H%M%S} [SCAN] Error while saving: {e}")
+        logger.error(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} [SCAN] Error while saving: {e}")
     return web.Response(text="""
         <soap:Envelope xmlns:soap="http://www.w3.org/2003/05/soap-envelope">
             <soap:Body>
