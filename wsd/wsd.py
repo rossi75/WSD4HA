@@ -92,7 +92,7 @@ async def discovery_listener():
         except Exception:
             continue
 
-        # UUID (ohne urn:uuid:)
+        # UUID (without urn:uuid:)
         uuid_elem = root.find(".//wsa:Address", NAMESPACES)
         uuid_clean = None
         if uuid_elem is not None and uuid_elem.text:
@@ -102,20 +102,20 @@ async def discovery_listener():
             else:
                 uuid_clean = uuid_text
 
-        # Action auslesen
+        # extract Action
         action_elem = root.find(".//wsa:Action", NAMESPACES)
         action_text = None
         if action_elem is not None and action_elem.text:
             action_text = action_elem.text.split("/")[-1]  # → "Hello|Bye|Probe"
 
-        # Device Capability        
+        # extract Device Capability        
         types_elem = root.find(".//wsd:Types", NAMESPACES)
         types_text = ""
         if types_elem is not None and types_elem.text:
             # Zerlegen + Präfixe entfernen
             types_text = " ".join(t.split(":")[-1] for t in types_elem.text.split())
 
-        # XAddrs sammeln
+        # exctract XAddrs
         xaddrs_elem = root.find(".//{http://schemas.xmlsoap.org/ws/2005/04/discovery}XAddrs")
         xaddr = ""
         if xaddrs_elem is not None and xaddrs_elem.text:
