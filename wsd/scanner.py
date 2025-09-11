@@ -54,7 +54,7 @@ class Scanner:
         self.offline_since = None
         self.remove_after = None
 
-#    def fetch_metadata(self):
+    # def fetch_metadata(self):
     async def fetch_metadata(self):
         logger.info(f"[META]] trying to request Metadata from {self.ip} {e}")
         # Fragt Scanner-Metadaten per WS-Transfer/Get ab
