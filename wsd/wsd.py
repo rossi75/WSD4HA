@@ -9,6 +9,7 @@ import sys
 import re
 import xml.etree.ElementTree as ET
 import subprocess
+from state import SCANNERS
 
 NAMESPACES = {
     "soap": "http://www.w3.org/2003/05/soap-envelope",
