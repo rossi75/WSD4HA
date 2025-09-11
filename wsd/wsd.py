@@ -176,7 +176,8 @@ async def discovery_listener():
 #        asyncio.create_task(fetch_metadata(scanner))
 #        asyncio.create_task(Scanner.fetch_metadata())
 #        asyncio.create_task(Scanner.fetch_metadata(SCANNERS[uuid]))
-        asyncio.create_task(Scanner.fetch_metadata(scanner))
+#        asyncio.create_task(Scanner.fetch_metadata(scanner))
+        asyncio.create_task(Scanner.fetch_metadata(Scanner))
         logger.info(f"[WSD:p2]")
         try:
             logger.info(f"[WSD:p3]")
