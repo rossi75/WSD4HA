@@ -9,7 +9,8 @@ import sys
 import re
 import xml.etree.ElementTree as ET
 import subprocess
-from state import SCANNERS
+#from state import SCANNERS
+from globals import SCANNERS
 from scanner import Scanner, list_scanners
 
 
