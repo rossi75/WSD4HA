@@ -22,7 +22,8 @@ RUN pip install --no-cache-dir -r requirements.txt
 #COPY webserver.py /app/
 
 COPY config.yaml .
-COPY state.py .
+#COPY state.py .
+COPY globals.py .
 COPY main.py .
 COPY config.py .
 COPY scanner.py .
