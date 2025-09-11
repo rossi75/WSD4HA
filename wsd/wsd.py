@@ -130,7 +130,8 @@ async def message_processor(data, addr):
         # Nur Scanner berücksichtigen
         if "ScanDeviceType" not in types_text:
             logger.info(f"[WSD:HELLO] Ignored non-scanner device UUID={uuid} Types={types_text}")
-            continue
+            return
+            #continue
 
         if uuid not in SCANNERS:
             SCANNERS[uuid] = Scanner(name=f"IP_{ip}", ip=ip, uuid=uuid)
