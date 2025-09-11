@@ -10,6 +10,8 @@ import re
 import xml.etree.ElementTree as ET
 import subprocess
 from state import SCANNERS
+from scanner import Scanner
+
 
 NAMESPACES = {
     "soap": "http://www.w3.org/2003/05/soap-envelope",
@@ -62,17 +64,6 @@ async def discovery_listener():
         except Exception:
             continue
 
-        action_elem = root.find(".//wsa:Action", NAMESPACES)
-        action_text = None
-        if action_elem is not None and action_elem.text:
-            action_text = action_elem.text.split("/")[-1]  # → "Hello|Bye|Probe"
-    
-        types_elem = root.find(".//wsd:Types", NAMESPACES)
-        types_text = ""
-        if types_elem is not None and types_elem.text:
-            # Zerlegen + Präfixe entfernen
-            types_text = " ".join(t.split(":")[-1] for t in types_elem.text.split())
-
         # UUID (ohne urn:uuid:)
         uuid_elem = root.find(".//wsa:Address", NAMESPACES)
         uuid_clean = None
@@ -82,8 +73,29 @@ async def discovery_listener():
                 uuid_clean = uuid_text.replace("urn:uuid:", "")
             else:
                 uuid_clean = uuid_text
-        
-        logger.info(f"{datetime.datetime.now():%Y%m%d %H%M%S} [DISCOVERY] received from {ip} ({uuid_clean}), Action={action_text}, Types={types_text}")
+
+        # Action auslesen
+        action_elem = root.find(".//wsa:Action", NAMESPACES)
+        action_text = None
+        if action_elem is not None and action_elem.text:
+            action_text = action_elem.text.split("/")[-1]  # → "Hello|Bye|Probe"
+
+        # Device Capability        
+        types_elem = root.find(".//wsd:Types", NAMESPACES)
+        types_text = ""
+        if types_elem is not None and types_elem.text:
+            # Zerlegen + Präfixe entfernen
+            types_text = " ".join(t.split(":")[-1] for t in types_elem.text.split())
+
+        # XAddrs sammeln
+        xaddrs_elem = root.find(".//{http://schemas.xmlsoap.org/ws/2005/04/discovery}XAddrs")
+        xaddr = xaddrs_elem.text.strip() if xaddrs_elem is not None else None
+
+        logger.info(f"{datetime.datetime.now():%Y%m%d %H%M%S} [DISCOVERY] received from {ip}")
+        logger.info(f"{datetime.datetime.now():%Y%m%d %H%M%S} [DISCOVERY]    -->   UUID: {uuid_clean}")
+        logger.info(f"{datetime.datetime.now():%Y%m%d %H%M%S} [DISCOVERY]    --> Action: {action_text}")
+        logger.info(f"{datetime.datetime.now():%Y%m%d %H%M%S} [DISCOVERY]    -->  Types: {types_text}")
+        logger.info(f"{datetime.datetime.now():%Y%m%d %H%M%S} [DISCOVERY]    -->  XADDR: {xaddr}")
 
         # Nur Scanner beachten
 #        if "wscn:ScanDeviceType" not in types_text:
@@ -120,7 +132,8 @@ async def discovery_listener():
             logger.info(f"[{idx}] {s.name} ({s.ip}) UUID={s.uuid} Online={s.online}")
 
         scanner = Scanner(name=uuid_clear, ip=addr[0], uuid=uuid_clear, xaddr=xaddr)
-        scanners.append(scanner)
+#        scanners.append(scanner)
+        SCANNERS[uuid_clear] = scanner
 
         # sofort Metadata laden
         asyncio.create_task(fetch_metadata(scanner))
