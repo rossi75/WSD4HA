@@ -25,7 +25,7 @@ class Scanner:
         self.uuid = uuid
         self.formats = formats or [] # unnötg?
         self.xaddr = xaddr            # Service-Adresse (aus <wsd:XAddrs>)
-    
+
         # zusätzliche Infos
         self.friendly_name = None
         self.firmware = None
@@ -41,21 +41,27 @@ class Scanner:
         self.online = True
         self.offline_since = None
         self.remove_after = None  # Zeitpunkt zum Löschen
-   
-        # gleich beim Erstellen Metadaten abrufen (falls Adresse bekannt)
-#        if self.xaddr:
-#            try:
-#                self.fetch_metadata()
-#            except Exception as e:
-#                logger.warning(f"[Scanner:{self.ip}] Konnte Metadaten nicht abrufen: {e}")
 
-    # Scanner ist noch online, Aufruf mit SCANNER[uuid].update()
+
+    # Scanner ist noch online
+    # Aufruf mit SCANNER[uuid].update()
     def update(self, max_age=WSD_OFFLINE_TIMEOUT):
         self.last_seen = datetime.datetime.now()
         self.max_age = max_age
         self.online = True
         self.offline_since = None
         self.remove_after = None
+
+    # wird aufgerufen wenn ein Scanner offline gesetzt wird
+    # Aufruf mit SCANNER[uuid].update()
+    def mark_offline(self):
+        if self.online:
+            self.online = False
+        if not self.offline_since:
+            self.offline_since = datetime.datetime.now()
+            self.remove_after = self.offline_since + datetime.timedelta(seconds=self.max_age)
+        logger.info(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S}[Scanner Offline] {self.ip} ({self.friendly_name or self.name})")
+
 
     # Fragt Scanner-Metadaten per WS-Transfer/Get ab
     # def fetch_metadata(self):
@@ -75,7 +81,7 @@ class Scanner:
         if self.uuid not in SCANNERS:
             logger.info(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} [META] could not find Scanner with uuid: {self.uuid})")
             return
-        
+
         if not self.xaddr:
             logger.warning(f"[META]] missing xaddr element in struct!")
             return
@@ -147,22 +153,3 @@ class Scanner:
         logger.info(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} --> self.name: {self.manufacturer}")
 
         logger.info(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} [Scanner:{self.ip}] Metadaten: {self.name} | FW={self.firmware} | SN={self.serial}")
-
-    # -----------------  wird aufgerufen wenn ein Scanner offline gesetzt wird  -----------------
-    def mark_offline(self):
-        if self.online:
-            logger.warning(f"[Scanner Offline] {self.ip} ({self.friendly_name or self.name})")
-        self.online = False
-        if not self.offline_since:
-            self.offline_since = datetime.datetime.now()
-            self.remove_after = self.offline_since + datetime.timedelta(seconds=self.max_age)
-
-#SCANNERS = {}  # key = UUID oder IP
-        # -----------------  Nach jedem Update: Liste loggen  -----------------
-#def list_scanners():
-#    logger.info("[SCANNERS] registered Scanners:")
-##        for s in SCANNERS.values():
-##            logger.info(f"  - {s.name} ({s.ip}, {s.uuid})")
-#    for i, s in enumerate(SCANNERS.values(), start=1):
-#        logger.info(f"[{i}] {s.name} ({s.ip}) UUID={s.uuid} Online={s.online}")
-
