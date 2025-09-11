@@ -164,15 +164,18 @@ async def discovery_listener():
         for idx, s in enumerate(SCANNERS.values(), start=1):
             logger.info(f"[{idx}] {s.name} ({s.ip}) UUID={s.uuid} Online={s.online}")
 
+        logger.info(f"[WSD:p1]")
         # erst das objekt neu erstellen
-        scanner = Scanner(name=uuid, ip=addr[0], uuid=uuid, xaddr=xaddr)
+#        scanner = Scanner(name=uuid, ip=addr[0], uuid=uuid, xaddr=xaddr)
+#        logger.info(f"[WSD:p1]")
 #        scanners.append(scanner)
         # dann das Objekt der Liste hinzufügen
-        SCANNERS[uuid] = scanner
+#        SCANNERS[uuid] = scanner
 
         # sofort Metadata laden
 #        asyncio.create_task(fetch_metadata(scanner))
         asyncio.create_task(scanner.fetch_metadata())
+        logger.info(f"[WSD:p2]")
 
 
 # Offene Tasks abbrechen (sonst sammeln sie sich an)
@@ -191,6 +194,15 @@ async def discovery_listener():
 #                        SCANNERS[uuid].update(max_age=max_age)
 #            logger.info(f"[DISCOVERY] Neuer Scanner erkannt: {s.name} ({s.ip}) online")
 
+
+# ---------------- Scanner Keepalive checken ----------------
+async def check_scanner(scanner):
+    try:
+        await fetch_metadata(scanner)  # nutzt SOAP-Get
+        scanner.update(scanner.max_age)
+        logger.info(f"[Heartbeat OK] {scanner.ip} lebt noch")
+    except Exception as e:
+        logger.warning(f"[Heartbeat FAIL] {scanner.ip}: {e}")
 
 # ---------------- Scanner Heartbeat ----------------
 async def heartbeat_monitor():
@@ -236,15 +248,6 @@ async def heartbeat_monitor():
 #                logger.warning(f"{datetime.datetime.now():%Y%m%d %H%M%S} [DISCOVERY] Scanner {s.name} ({s.ip}) offline since {WSD_OFFLINE_TIMEOUT} Seconds")
 #        await asyncio.sleep(5)
 
-
-# ---------------- Scanner Keepalive checken ----------------
-async def check_scanner(scanner):
-    try:
-        await fetch_metadata(scanner)  # nutzt SOAP-Get
-        scanner.update(scanner.max_age)
-        logger.info(f"[Heartbeat OK] {scanner.ip} lebt noch")
-    except Exception as e:
-        logger.warning(f"[Heartbeat FAIL] {scanner.ip}: {e}")
 
 # ---------------- HTTP/SOAP Server ----------------
 async def handle_scan_job(request):
