@@ -41,11 +41,11 @@ class Scanner:
         self.remove_after = None  # Zeitpunkt zum Löschen
    
         # gleich beim Erstellen Metadaten abrufen (falls Adresse bekannt)
-        if self.xaddr:
-            try:
-                self.fetch_metadata()
-            except Exception as e:
-                logger.warning(f"[Scanner:{self.ip}] Konnte Metadaten nicht abrufen: {e}")
+#        if self.xaddr:
+#            try:
+#                self.fetch_metadata()
+#            except Exception as e:
+#                logger.warning(f"[Scanner:{self.ip}] Konnte Metadaten nicht abrufen: {e}")
 
     def update(self, max_age=WSD_OFFLINE_TIMEOUT):
         self.last_seen = datetime.datetime.now()
@@ -56,7 +56,7 @@ class Scanner:
 
     # def fetch_metadata(self):
     async def fetch_metadata(self):
-        logger.info(f"[META]] trying to request Metadata from {self.ip} {e}")
+        logger.info(f"[META]] trying to request Metadata for {self.ip}, {self.uuid}")
         # Fragt Scanner-Metadaten per WS-Transfer/Get ab
 
         if not self.xaddr:
