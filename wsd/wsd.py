@@ -160,20 +160,20 @@ async def discovery_listener():
                 logger.info(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} [WSD:BYE] Scanner offline: {SCANNERS[uuid].name} ({ip})")
                 del SCANNERS[uuid]
                 list_scanners()
-            return
+            #return
         
         else:
             logger.info(f"unrecognized operation {action_text}")
-            return
+            #return
         
         # Nach jedem Update: Liste loggen
-        logger.info("[SCANNERS] registered Scanners:")
+#        logger.info("[SCANNERS] registered Scanners:")
 #        for s in SCANNERS.values():
 #            logger.info(f"  - {s.name} ({s.ip}, {s.uuid})")
-        for idx, s in enumerate(SCANNERS.values(), start=1):
-            logger.info(f"[{idx}] {s.name} ({s.ip}) UUID={s.uuid} Online={s.online}")
+#        for idx, s in enumerate(SCANNERS.values(), start=1):
+#            logger.info(f"[{idx}] {s.name} ({s.ip}) UUID={s.uuid} Online={s.online}")
 
-        logger.info(f"[WSD:p1] {uuid}")
+#        logger.info(f"[WSD:p1] {uuid}")
         # erst das objekt neu erstellen
 #        scanner = Scanner(name=uuid, ip=addr[0], uuid=uuid, xaddr=xaddr)
 #        logger.info(f"[WSD:p1]")
@@ -188,9 +188,9 @@ async def discovery_listener():
 #        asyncio.create_task(Scanner.fetch_metadata(scanner))
 #        asyncio.create_task(Scanner.fetch_metadata(Scanner))
 #        await scanner.fetch_metadata(uuid)
-        await SCANNERS[uuid].fetch_metadata()
+#        await SCANNERS[uuid].fetch_metadata()
  
-        logger.info(f"[WSD:p2]")
+#        logger.info(f"[WSD:p2]")
 #        try:
 #            logger.info(f"[WSD:p3]")
 #            asyncio.create_task(Scanner.fetch_metadata(Scanner))
