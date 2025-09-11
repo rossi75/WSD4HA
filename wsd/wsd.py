@@ -146,6 +146,8 @@ async def discovery_listener():
             else:
                 SCANNERS[uuid].update()
                 logger.info(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} [WSD:HELLO]known Scanner updated/back again: {SCANNERS[uuid].name} ({ip})")
+
+            Scanner.list_scanners()
         
         elif "Bye" in action_text:
             uuid = root.find(".//{http://schemas.xmlsoap.org/ws/2004/08/addressing}Address")
