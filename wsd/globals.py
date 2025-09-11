@@ -4,6 +4,8 @@
 import logging
 import sys
 
+logging.basicConfig(level=logging.INFO, format='[%(levelname)s] %(message)s')
+logger = logging.getLogger("wsd-addon")
 
 # -----------------  define SCANNERS dict  -----------------
 SCANNERS = {}
