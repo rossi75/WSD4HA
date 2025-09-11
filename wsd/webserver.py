@@ -9,7 +9,7 @@ import sys
 import re
 import xml.etree.ElementTree as ET
 import subprocess
-from wsd import discovery_listener, heartbeat_monitor, handle_scan_job
+from wsd import UDP_listener_3702, heartbeat_monitor, handle_scan_job
 from config import WSD_HTTP_PORT, WSD_OFFLINE_TIMEOUT, WSD_SCAN_FOLDER
 
 logging.basicConfig(level=logging.INFO, format='[%(levelname)s] %(message)s')
