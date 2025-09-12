@@ -10,8 +10,8 @@ import re
 import xml.etree.ElementTree as ET
 import subprocess
 #from state import SCANNERS
-#from globals import SCANNERS, list_scanners 
-from globals import SCANNERS, list_scanners, OFFLINE_TIMEOUT
+from globals import SCANNERS, list_scanners 
+#from globals import SCANNERS, list_scanners, OFFLINE_TIMEOUT
 from scanner import Scanner
 from config import OFFLINE_TIMEOUT
 #from scanner import Scanner, fetch_metadata
