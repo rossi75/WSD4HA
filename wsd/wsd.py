@@ -135,11 +135,11 @@ async def message_processor(data, addr):
             SCANNERS[uuid] = Scanner(uuid=uuid, ip=ip, xaddr=xaddr)
             logger.info(f"[WSD:HELLO] New Scanner: {SCANNERS[uuid].uuid} ({ip})")
         else:
-            logger.info(f"[WSD:MESSAGE_DEBUG] BEFORE update: {self.uuid}, xaddr={self.xaddr}")
+#            logger.info(f"[WSD:MESSAGE_DEBUG] BEFORE update: {self.uuid}, xaddr={self.xaddr}")
             SCANNERS[uuid].update()
             logger.info(f"[WSD:HELLO] known Scanner updated/back again: {SCANNERS[uuid].friendly_name} ({ip})")
 #            logger.info(f"[WSD:HELLO] known Scanner updated/back again: {SCANNERS[uuid].name} ({ip})")
-            logger.info(f"[WSD:MESSAGE_DEBUG] AFTER update: {self.uuid}, xaddr={self.xaddr}")
+#            logger.info(f"[WSD:MESSAGE_DEBUG] AFTER update: {self.uuid}, xaddr={self.xaddr}")
 
         list_scanners()
 
@@ -229,10 +229,10 @@ async def UDP_listener_3702():
 async def check_scanner(scanner):
     try:
 #        await fetch_metadata(scanner)  # nutzt SOAP-Get
-        logger.info(f"[WSD:CHECK_SCANNER_DEBUG] BEFORE update: {scanner.uuid}, xaddr={scanner.xaddr}")
+#        logger.info(f"[WSD:CHECK_SCANNER_DEBUG] BEFORE update: {scanner.uuid}, xaddr={scanner.xaddr}")
         await scanner.fetch_metadata()  # nutzt SOAP-Get
 #        scanner.update(scanner.max_age)
-        logger.info(f"[WSD:CHECK_SCANNER_DEBUG] AFTER update: {scanner.uuid}, xaddr={scanner.xaddr}")
+#        logger.info(f"[WSD:CHECK_SCANNER_DEBUG] AFTER update: {scanner.uuid}, xaddr={scanner.xaddr}")
         scanner.update(OFFLINE_TIMEOUT)
         logger.info(f"[WSD:Heartbeat OK] {scanner.friendly_name or scanner.ip} lebt noch")
     except Exception as e:
@@ -243,31 +243,30 @@ async def heartbeat_monitor():
     while True:
         now = datetime.datetime.now()
         to_remove = []
-        logger.info(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S}[WSD:Heartbeat] wake-up")
+        logger.debug(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S}[WSD:Heartbeat] wake-up")
 
         for uuid, scanner in SCANNERS.items():
             logger.info(f"[WSD:Heartbeat] Timer-Check for {uuid} ({scanner.ip})...")
             age = (now - scanner.last_seen).total_seconds()
 #            timeout = scanner.max_age
             logger.info(f"   --> last_seen = {scanner.last_seen}")
-            logger.info(f"   -->       age = {age}")
+            logger.debug(f"   -->       age = {age}")
 #            logger.info(f"   -->   timeout = {timeout}")
-            logger.info(f"   -->      uuid = {uuid}")
 #            logger.info(f"   -->     xaddr = {xaddr}")
             logger.info(f"   -->     xaddr = {scanner.xaddr}")
 
             # Halbzeit-Check
-            if age > timeout / 2 and age <= (timeout / 2 + 30):
+            if age > OFFLINE_TIMEOUT / 2 and age <= (OFFLINE_TIMEOUT / 2 + 30):
                 logger.info(f"[WSD:Heartbeat] --> proceeding Halbzeit-Check")
                 asyncio.create_task(check_scanner(scanner))
 
             # 3/4-Check
-            if age > (timeout * 0.75) and age <= (timeout * 0.75 + 30):
+            if age > (OFFLINE_TIMEOUT * 0.75) and age <= (OFFLINE_TIMEOUT * 0.75 + 30):
                 logger.info(f"[WSD:Heartbeat] --> proceeding Viertel-Check")
                 asyncio.create_task(check_scanner(scanner))
 
             # Timeout überschritten → offline markieren
-            if age > timeout and scanner.online:
+            if age > OFFLINE_TIMEOUT and scanner.online:
                 logger.info(f"[WSD:Heartbeat] --> mark as offline")
                 scanner.mark_offline()
 
