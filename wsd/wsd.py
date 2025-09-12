@@ -75,11 +75,6 @@ async def message_processor(data, addr):
     logger.info(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} [Message] Processing sth")
     logger.debug(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} [Message] received data {data}")
     logger.debug(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} [Message] received addr {addr}")
-#    while True:
-#        data, addr = await loop.sock_recvfrom(sock, 8192)
-#        data = await loop.sock_recv(sock, 8192)  # nur Daten
-        # Absender separat holen (non-blocking)
-#        addr = sock.getpeername() if sock.getpeername() else ("0.0.0.0", 0)
     ip = addr[0] if addr else "?"
 
     try:
@@ -87,8 +82,6 @@ async def message_processor(data, addr):
     except Exception:
         logger.warning("[WSD:hm] Exception while reading from ET")
         return
-#        continue
-#        root = ET.fromstring(data.decode("utf-8", errors="ignore"))
 
     # UUID (without urn:uuid:)
     uuid_raw = root.find(".//wsa:Address", NAMESPACES)
@@ -125,7 +118,6 @@ async def message_processor(data, addr):
     logger.info(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} [WSD:DISCOVERY]    -->  Types: {types_text}")
     logger.info(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} [WSD:DISCOVERY]    -->  XADDR: {xaddr}")
 
-    #if "Hello" in action_text:
     if action_text == "Hello":
         # Nur Scanner berücksichtigen
         if "ScanDeviceType" not in types_text:
@@ -142,7 +134,6 @@ async def message_processor(data, addr):
 
         list_scanners()
 
-#        elif "Bye" in action_text:
     elif action_text == "Bye":
         logger.info(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} [WSD:BYE] Bye for uuid: {uuid}")
         if uuid in SCANNERS:
@@ -155,7 +146,6 @@ async def message_processor(data, addr):
 
     logger.info(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} [WSD:Message] done")
 
-#            await asyncio.sleep(0)  # kurz Yield zurück an Loop
 
 # ---------------- UDP listener ----------------
 async def UDP_listener_3702():
@@ -274,7 +264,8 @@ async def heartbeat_monitor():
         logger.debug(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} [Heartbeat] checking for Scanners to remove from known list")
         for s in to_remove:
             logger.info(f"[Heartbeat]     --> Removing {scanner.ip} ({scanner.friendly_name or scanner.name}) from list")
-            scanners.remove(s)
+#            scanners.remove(s)
+            scanner.remove(s)
 
         logger.debug(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} [Heartbeat] goodbye")
         #await asyncio.sleep(30)
