@@ -37,7 +37,8 @@ def parse_wsd_packet(data: bytes):
             "uuid": uuid.text if uuid is not None else None,
         }
     except Exception as e:
-        logger.debug(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} [WSD] Error while parsing: {e}")
+#        logger.debug(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} [WSD] Error while parsing: {e}")
+        logger.debug(f"[WSD] Error while parsing: {e}")
         return None
 
 # ---------------- XADDR filtern ----------------
@@ -68,7 +69,8 @@ def pick_best_xaddr(xaddrs: str) -> str:
             # vermutlich Hostname
             hostname = addr
 
-    logger.info(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} [WSD:XADDR] extracted {ipv4 or hostname or None}")
+#    logger.info(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} [WSD:XADDR] extracted {ipv4 or hostname or None}")
+    logger.info(f" [WSD:XADDR] extracted {ipv4 or hostname or None}")
 
     return ipv4 or hostname or None
 
@@ -76,8 +78,8 @@ def pick_best_xaddr(xaddrs: str) -> str:
 # ---------------- Message handler ----------------
 async def message_processor(data, addr):
     logger.info(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} [Message] Processing sth")
-    logger.debug(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} [Message] received data {data}")
-    logger.debug(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} [Message] received addr {addr}")
+    logger.debug(f" [Message]    ---> received data {data}")
+    logger.debug(f" [Message]    ---> received addr {addr}")
     ip = addr[0] if addr else "?"
 
     try:
@@ -115,39 +117,39 @@ async def message_processor(data, addr):
     if xaddrs_elem is not None and xaddrs_elem.text:
         xaddr = pick_best_xaddr(xaddrs_elem.text.strip())
 
-    logger.info(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} [WSD:DISCOVERY] received from {ip}")
-    logger.info(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} [WSD:DISCOVERY]    -->   UUID: {uuid}")
-    logger.info(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} [WSD:DISCOVERY]    --> Action: {action_text}")
-    logger.info(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} [WSD:DISCOVERY]    -->  Types: {types_text}")
-    logger.info(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} [WSD:DISCOVERY]    -->  XADDR: {xaddr}")
+    logger.info(f" [WSD:DISCOVERY] received from {ip}")
+    logger.info(f"    -->   UUID: {uuid}")
+    logger.info(f"    --> Action: {action_text}")
+    logger.info(f"    -->  Types: {types_text}")
+    logger.info(f"    -->  XADDR: {xaddr}")
 
     if action_text == "Hello":
         # Nur Scanner berücksichtigen
         if "ScanDeviceType" not in types_text:
-            logger.info(f"[WSD:HELLO] Ignored non-scanner device UUID={uuid} Types={types_text}")
+            logger.info(f" [WSD:HELLO] Ignored non-scanner device UUID={uuid} Types={types_text}")
             return
             #continue
 
         if uuid not in SCANNERS:
             SCANNERS[uuid] = Scanner(name=f"IP_{ip}", ip=ip, uuid=uuid)
-            logger.info(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} [WSD:HELLO] New Scanner: {SCANNERS[uuid].name} ({ip})")
+            logger.info(f" [WSD:HELLO] New Scanner: {SCANNERS[uuid].name} ({ip})")
         else:
             SCANNERS[uuid].update()
-            logger.info(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} [WSD:HELLO]known Scanner updated/back again: {SCANNERS[uuid].name} ({ip})")
+            logger.info(f" [WSD:HELLO] known Scanner updated/back again: {SCANNERS[uuid].name} ({ip})")
 
         list_scanners()
 
     elif action_text == "Bye":
-        logger.info(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} [WSD:BYE] Bye for uuid: {uuid}")
+        logger.info(f" [WSD:BYE] Bye for uuid: {uuid}")
         if uuid in SCANNERS:
-            logger.info(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} [WSD:BYE] Scanner offline: {SCANNERS[uuid].name} ({ip})")
+            logger.info(f" [WSD:BYE] Scanner offline: {SCANNERS[uuid].name} ({ip})")
             del SCANNERS[uuid]
         list_scanners()
 
     else:
-        logger.info(f"unrecognized operation {action_text}")
+        logger.warning(f" [WSD:Message] unrecognized operation {action_text}")
 
-    logger.info(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} [WSD:Message] done")
+    logger.info(f" [WSD:Message] done")
 
 
 # ---------------- UDP listener ----------------
@@ -266,7 +268,7 @@ async def heartbeat_monitor():
                 to_remove.append(scanner)
 
         # welche Scanner sollen entfernt werden?
-        logger.debug(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} [WSD:Heartbeat] checking for Scanners to remove from known list")
+        logger.debug(f" [WSD:Heartbeat] checking for Scanners to remove from known list")
         for s in to_remove:
             logger.info(f"[Heartbeat]     --> Removing {scanner.ip} ({scanner.friendly_name or scanner.name}) from list")
 #            scanners.remove(s)
