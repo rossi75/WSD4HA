@@ -70,11 +70,12 @@ class Scanner:
 #    async def fetch_metadata(self):
 #    async def fetch_metadata(uuid: str):
     async def fetch_metadata(self):
-        logger.info(f"[META] p1")
+        logger.info(f"[META] searching for UUID {self.uuid}")
         if self.uuid not in SCANNERS:
             logger.info(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} [META] could not find Scanner with uuid: {self.uuid})")
             return
 
+        logger.info(f"[META]   ---> xaddr: {self.xaddr} ")
         if not self.xaddr:
             logger.warning(f"[META] missing xaddr element in struct!")
             logger.warning(f"[META]    --> xaddr = {self.xaddr}")
