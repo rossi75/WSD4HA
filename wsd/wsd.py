@@ -131,12 +131,14 @@ async def message_processor(data, addr):
             #continue
 
         if uuid not in SCANNERS:
-            SCANNERS[uuid] = Scanner(name=f"IP_{ip}", ip=ip, uuid=uuid)
-            logger.info(f"[WSD:HELLO] New Scanner: {SCANNERS[uuid].name} ({ip})")
+#            SCANNERS[uuid] = Scanner(name=f"IP_{ip}", ip=ip, uuid=uuid)
+            SCANNERS[uuid] = Scanner(uuid=uuid, ip=ip, xaddr=xaddr)
+            logger.info(f"[WSD:HELLO] New Scanner: {SCANNERS[uuid].uuid} ({ip})")
         else:
             logger.info(f"[WSD:MESSAGE_DEBUG] BEFORE update: {self.uuid}, xaddr={self.xaddr}")
             SCANNERS[uuid].update()
-            logger.info(f"[WSD:HELLO] known Scanner updated/back again: {SCANNERS[uuid].name} ({ip})")
+            logger.info(f"[WSD:HELLO] known Scanner updated/back again: {SCANNERS[uuid].friendly_name} ({ip})")
+#            logger.info(f"[WSD:HELLO] known Scanner updated/back again: {SCANNERS[uuid].name} ({ip})")
             logger.info(f"[WSD:MESSAGE_DEBUG] AFTER update: {self.uuid}, xaddr={self.xaddr}")
 
         list_scanners()
@@ -144,7 +146,7 @@ async def message_processor(data, addr):
     elif action_text == "Bye":
         logger.info(f"[WSD:BYE] Bye for uuid: {uuid}")
         if uuid in SCANNERS:
-            logger.info(f"[WSD:BYE] Scanner offline: {SCANNERS[uuid].name} ({ip})")
+            logger.info(f"[WSD:BYE] Scanner offline: {SCANNERS[uuid].friendly_name} ({ip})")
             del SCANNERS[uuid]
         list_scanners()
 
@@ -232,9 +234,9 @@ async def check_scanner(scanner):
 #        scanner.update(scanner.max_age)
         logger.info(f"[WSD:CHECK_SCANNER_DEBUG] AFTER update: {scanner.uuid}, xaddr={scanner.xaddr}")
         scanner.update(OFFLINE_TIMEOUT)
-        logger.info(f"[WSD:Heartbeat OK] {scanner.name or scanner.ip} lebt noch")
+        logger.info(f"[WSD:Heartbeat OK] {scanner.friendly_name or scanner.ip} lebt noch")
     except Exception as e:
-        logger.warning(f"[WSD:Heartbeat FAIL] {scanner.name or scanner.ip}: {e}")
+        logger.warning(f"[WSD:Heartbeat FAIL] {scanner.friendly_name or scanner.ip}: {e}")
 
 # ---------------- Scanner Heartbeat ----------------
 async def heartbeat_monitor():
@@ -271,13 +273,13 @@ async def heartbeat_monitor():
 
             # Nach Ablauf von Timeout+Offline → entfernen
             if not scanner.online and scanner.remove_after and now >= scanner.remove_after:
-                logger.info(f"[WSD:Heartbeat] --> Marking {scanner.ip} ({scanner.friendly_name or scanner.name}) to remove")
+                logger.info(f"[WSD:Heartbeat] --> Marking {scanner.ip} ({scanner.friendly_name}) to remove")
                 to_remove.append(scanner)
 
         # welche Scanner sollen entfernt werden?
         logger.debug(f"[WSD:Heartbeat] checking for Scanners to remove from known list")
         for s in to_remove:
-            logger.info(f"[Heartbeat]     --> Removing {scanner.ip} ({scanner.friendly_name or scanner.name}) from list")
+            logger.info(f"[Heartbeat]     --> Removing {scanner.ip} ({scanner.friendly_name}) from list")
 #            scanners.remove(s)
             scanner.remove(s)
 
