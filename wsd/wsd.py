@@ -11,7 +11,8 @@ import xml.etree.ElementTree as ET
 import subprocess
 #from state import SCANNERS
 from globals import SCANNERS, list_scanners 
-from scanner import Scanner, fetch_metadata
+from scanner import Scanner
+#from scanner import Scanner, fetch_metadata
 
 
 NAMESPACES = {
@@ -219,7 +220,8 @@ async def UDP_listener_3702():
 # ---------------- Scanner Keepalive checken ----------------
 async def check_scanner(scanner):
     try:
-        await fetch_metadata(scanner)  # nutzt SOAP-Get
+#        await fetch_metadata(scanner)  # nutzt SOAP-Get
+        await scanner.fetch_metadata()  # nutzt SOAP-Get
         scanner.update(scanner.max_age)
         logger.info(f"[Heartbeat OK] {scanner.ip} lebt noch")
     except Exception as e:
