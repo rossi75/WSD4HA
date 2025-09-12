@@ -2,7 +2,6 @@ import datetime
 import socket
 import logging
 import sys
-#from state import SCANNERS
 from globals import SCANNERS, list_scanners 
 from config import WSD_OFFLINE_TIMEOUT
 #from config import WSD_HTTP_PORT, WSD_OFFLINE_TIMEOUT, WSD_SCAN_FOLDER
@@ -51,6 +50,8 @@ class Scanner:
         self.online = True
         self.offline_since = None
         self.remove_after = None
+        logger.info(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} [SCANNER:upd] {self.ip} ({self.friendly_name or self.name})")
+        logger.info(f"   --> new last_seen: {self.last_seen}")
 
     # wird aufgerufen wenn ein Scanner offline gesetzt wird
     # Aufruf mit SCANNER[uuid].update()
@@ -60,7 +61,7 @@ class Scanner:
         if not self.offline_since:
             self.offline_since = datetime.datetime.now()
             self.remove_after = self.offline_since + datetime.timedelta(seconds=self.max_age)
-        logger.info(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S}[Scanner Offline] {self.ip} ({self.friendly_name or self.name})")
+        logger.info(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} [SCANNER:m_offl] {self.ip} ({self.friendly_name or self.name})")
 
 
     # Fragt Scanner-Metadaten per WS-Transfer/Get ab
