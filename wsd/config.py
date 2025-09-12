@@ -49,12 +49,12 @@ logger = logging.getLogger("wsd-addon")
 HTTP_PORT = 8110
 
 #OFFLINE_TIMEOUT = int(os.environ.get("OFFLINE_TIMEOUT", 300))  # Sekunden
-OFFLINE_TIMEOUT = os.environ.get("OFFLINE_TIMEOUT", 300)  # Sekunden
-#raw = os.environ.get("OFFLINE_TIMEOUT", 300)  # Sekunden
-#try:
-#    OFFLINE_TIMEOUT = int(raw)  # Sekunden
-#except ValueError:
-#    OFFLINE_TIMEOUT = 300  # Fallback vom Fallback
+#OFFLINE_TIMEOUT = os.environ.get("OFFLINE_TIMEOUT", 300)  # Sekunden
+raw = os.environ.get("OFFLINE_TIMEOUT", 300)  # Sekunden
+try:
+    OFFLINE_TIMEOUT = int(raw)  # Sekunden
+except ValueError:
+    OFFLINE_TIMEOUT = 300  # Fallback vom Fallback
 
 SCAN_FOLDER = Path(os.environ.get("SCAN_FOLDER", "/share/scans"))
 SCAN_FOLDER.mkdir(parents=True, exist_ok=True)
