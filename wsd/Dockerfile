@@ -29,6 +29,7 @@ COPY config.py .
 COPY scanner.py .
 COPY wsd.py .
 COPY webserver.py .
+#COPY translations/en.yaml ./translations
 
 VOLUME ["/share/scans"]
 EXPOSE 8110
