@@ -226,18 +226,18 @@ async def check_scanner(scanner):
     try:
 #        await fetch_metadata(scanner)  # nutzt SOAP-Get
         await scanner.fetch_metadata()  # nutzt SOAP-Get
-        scanner.update(scanner.max_age)
+#        scanner.update(scanner.max_age)
         scanner.update(OFFLINE_TIMEOUT)
-        logger.info(f"[WSD:Heartbeat OK] {scanner.ip} lebt noch")
+        logger.info(f"[WSD:Heartbeat OK] {scanner.name or scanner.ip} lebt noch")
     except Exception as e:
-        logger.warning(f"[WSD:Heartbeat FAIL] {scanner.ip}: {e}")
+        logger.warning(f"[WSD:Heartbeat FAIL] {scanner.name or scanner.ip}: {e}")
 
 # ---------------- Scanner Heartbeat ----------------
 async def heartbeat_monitor():
     while True:
         now = datetime.datetime.now()
         to_remove = []
-        logger.debug(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} [WSD:Heartbeat] wake-up")
+        logger.info(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} [WSD:Heartbeat] wake-up")
 
         for uuid, scanner in SCANNERS.items():
             logger.info(f"[WSD:Heartbeat] Timer-Check for {uuid} ({scanner.ip})...")
@@ -246,6 +246,8 @@ async def heartbeat_monitor():
             logger.info(f"   --> last_seen = {scanner.last_seen}")
             logger.info(f"   -->       age = {age}")
             logger.info(f"   -->   timeout = {timeout}")
+            logger.info(f"   -->      uuid = {uuid}")
+            logger.info(f"   -->     xaddr = {xaddr}")
 
             # Halbzeit-Check
             if age > timeout / 2 and age <= (timeout / 2 + 30):
