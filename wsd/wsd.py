@@ -68,9 +68,7 @@ def pick_best_xaddr(xaddrs: str) -> str:
             # vermutlich Hostname
             hostname = addr
 
-#    logger.info(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S}[WSD:XADDR] extracted {ipv4 or hostname or None}")
     logger.info(f"[WSD:XADDR] extracted {ipv4 or hostname or None}")
-
     return ipv4 or hostname or None
 
 
@@ -178,43 +176,6 @@ async def UDP_listener_3702():
     # asyncio.create_task(recv_loop())
     await recv_loop()
 
-    # Hier nur Task starten!
-#    asyncio.create_task(handle_messages())# Nach jedem Update: Liste loggen
-#        logger.info("[SCANNERS] registered Scanners:")
-#        for s in SCANNERS.values():
-#            logger.info(f"  - {s.name} ({s.ip}, {s.uuid})")
-#        for idx, s in enumerate(SCANNERS.values(), start=1):
-#            logger.info(f"[{idx}] {s.name} ({s.ip}) UUID={s.uuid} Online={s.online}")
-
-#        logger.info(f"[WSD:p1] {uuid}")
-        # erst das objekt neu erstellen
-#        scanner = Scanner(name=uuid, ip=addr[0], uuid=uuid, xaddr=xaddr)
-#        logger.info(f"[WSD:p1]")
-#        scanners.append(scanner)
-        # dann das Objekt der Liste hinzufügen
-#        SCANNERS[uuid] = scanner
-
-        # sofort Metadata laden
-#        asyncio.create_task(fetch_metadata(scanner))
-#        asyncio.create_task(Scanner.fetch_metadata())
-#        asyncio.create_task(Scanner.fetch_metadata(SCANNERS[uuid]))
-#        asyncio.create_task(Scanner.fetch_metadata(scanner))
-#        asyncio.create_task(Scanner.fetch_metadata(Scanner))
-#        await scanner.fetch_metadata(uuid)
-#        await SCANNERS[uuid].fetch_metadata()
- 
-#        logger.info(f"[WSD:p2]")
-#        try:
-#            logger.info(f"[WSD:p3]")
-#            asyncio.create_task(Scanner.fetch_metadata(Scanner))
-    #        await fetch_metadata(scanner)  # nutzt SOAP-Get
-#            logger.info(f"[WSD_fmd]")
-#        except Exception as e:
-#            logger.warning(f"[Heartbeat FAIL] {Scanner.ip}: {e}")
-#            logger.warning(f"[Heartbeat FAIL] {scanner.ip}: {e}")
-#        logger.info(f"[WSD:p4]")
-
-
 
 # ---------------- Scanner Keepalive checken ----------------
 async def check_scanner(scanner):
@@ -226,6 +187,7 @@ async def check_scanner(scanner):
         logger.info(f"[WSD:Heartbeat OK] {scanner.friendly_name or scanner.ip} lebt noch")
     except Exception as e:
         logger.warning(f"[WSD:Heartbeat FAIL] {scanner.friendly_name or scanner.ip}: {e}")
+
 
 # ---------------- Scanner Heartbeat ----------------
 async def heartbeat_monitor():
