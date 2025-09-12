@@ -12,6 +12,7 @@ import subprocess
 #from state import SCANNERS
 from globals import SCANNERS, list_scanners 
 from scanner import Scanner
+from config import OFFLINE_TIMEOUT
 #from scanner import Scanner, fetch_metadata
 
 
@@ -223,56 +224,57 @@ async def check_scanner(scanner):
 #        await fetch_metadata(scanner)  # nutzt SOAP-Get
         await scanner.fetch_metadata()  # nutzt SOAP-Get
         scanner.update(scanner.max_age)
-        logger.info(f"[Heartbeat OK] {scanner.ip} lebt noch")
+        scanner.update(OFFLINE_TIMEOUT)
+        logger.info(f"[WSD:Heartbeat OK] {scanner.ip} lebt noch")
     except Exception as e:
-        logger.warning(f"[Heartbeat FAIL] {scanner.ip}: {e}")
+        logger.warning(f"[WSD:Heartbeat FAIL] {scanner.ip}: {e}")
 
 # ---------------- Scanner Heartbeat ----------------
 async def heartbeat_monitor():
     while True:
         now = datetime.datetime.now()
         to_remove = []
-        logger.debug(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} [Heartbeat] wake-up")
+        logger.debug(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} [WSD:Heartbeat] wake-up")
 
         for uuid, scanner in SCANNERS.items():
-            logger.info(f"[Heartbeat] Timer-Check for {uuid} ({scanner.ip})...")
+            logger.info(f"[WSD:Heartbeat] Timer-Check for {uuid} ({scanner.ip})...")
             age = (now - scanner.last_seen).total_seconds()
             timeout = scanner.max_age
-            logger.info(f"[Heartbeat] --> last_seen = {scanner.last_seen}")
-            logger.info(f"[Heartbeat] -->       age = {age}")
-            logger.info(f"[Heartbeat] -->   timeout = {timeout}")
+            logger.info(f"   --> last_seen = {scanner.last_seen}")
+            logger.info(f"   -->       age = {age}")
+            logger.info(f"   -->   timeout = {timeout}")
 
             # Halbzeit-Check
             if age > timeout / 2 and age <= (timeout / 2 + 30):
-                logger.info(f"[Heartbeat] --> proceeding Halbzeit-Check")
+                logger.info(f"[WSD:Heartbeat] --> proceeding Halbzeit-Check")
                 asyncio.create_task(check_scanner(scanner))
 
             # 3/4-Check
             if age > (timeout * 0.75) and age <= (timeout * 0.75 + 30):
-                logger.info(f"[Heartbeat] --> proceeding Viertel-Check")
+                logger.info(f"[WSD:Heartbeat] --> proceeding Viertel-Check")
                 asyncio.create_task(check_scanner(scanner))
 
             # Timeout überschritten → offline markieren
             if age > timeout and scanner.online:
-                logger.info(f"[Heartbeat] --> mark as offline")
+                logger.info(f"[WSD:Heartbeat] --> mark as offline")
                 scanner.mark_offline()
 
             # Nach Ablauf von Timeout+Offline → entfernen
             if not scanner.online and scanner.remove_after and now >= scanner.remove_after:
-                logger.info(f"[Heartbeat] --> Marking {scanner.ip} ({scanner.friendly_name or scanner.name}) to remove")
+                logger.info(f"[WSD:Heartbeat] --> Marking {scanner.ip} ({scanner.friendly_name or scanner.name}) to remove")
                 to_remove.append(scanner)
 
         # welche Scanner sollen entfernt werden?
-        logger.debug(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} [Heartbeat] checking for Scanners to remove from known list")
+        logger.debug(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} [WSD:Heartbeat] checking for Scanners to remove from known list")
         for s in to_remove:
             logger.info(f"[Heartbeat]     --> Removing {scanner.ip} ({scanner.friendly_name or scanner.name}) from list")
 #            scanners.remove(s)
             scanner.remove(s)
 
-        logger.debug(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} [Heartbeat] goodbye")
+        logger.debug(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} [WSD:Heartbeat] goodbye")
         #await asyncio.sleep(30)
         await asyncio.sleep(10)
-        logger.debug(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} [Heartbeat] back in town")
+        logger.debug(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} [WSD:Heartbeat] back in town")
 
 
 
