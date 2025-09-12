@@ -18,41 +18,44 @@ logger = logging.getLogger("wsd-addon")
 
 # ---------------- Scanner-Datenstruktur ----------------
 class Scanner:
-    def __init__(self, name, ip, mac=None, uuid=None, formats=None, location=None, max_age=OFFLINE_TIMEOUT, xaddr=None):
-        self.name = name
-        self.ip = ip
-        self.mac = mac
+#    def __init__(self, name, ip, mac=None, uuid=None, formats=None, location=None, max_age=OFFLINE_TIMEOUT, xaddr=None):
+    def __init__(self, uuid, ip="0.0.0.0", xaddr=None):
         self.uuid = uuid
-        self.formats = formats or [] # unnötg?
+        self.ip = ip
         self.xaddr = xaddr            # Service-Adresse (aus <wsd:XAddrs>)
+#        self.name = name
+#        self.formats = formats or [] # unnötg?
 
         # zusätzliche Infos
         self.friendly_name = None
+        self.mac = None
         self.firmware = None
         self.serial = None
         self.model = None
         self.manufacturer = None
-        self.location = location
 
         # Status
         #self.last_seen = datetime.datetime.now()
         self.last_seen = datetime.datetime.now() - datetime.timedelta(seconds=max_age // 2) # last_seen so zurücksetzen, dass wir "halbzeit" erreicht haben
-        self.max_age = max_age
         self.online = True
         self.offline_since = None
         self.remove_after = None  # Zeitpunkt zum Löschen
+#        self.max_age = max_age
 
 
     # Scanner ist noch online
     # Aufruf mit SCANNER[uuid].update()
-    def update(self, max_age=OFFLINE_TIMEOUT):
+#    def update(self, max_age=OFFLINE_TIMEOUT):
+    def update(self):
         self.last_seen = datetime.datetime.now()
-        self.max_age = max_age
+#        self.max_age = max_age
         self.online = True
         self.offline_since = None
         self.remove_after = None
-        logger.info(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} [SCANNER:upd] {self.ip} ({self.friendly_name or self.name})")
+#        logger.info(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} [SCANNER:upd] {self.ip} ({self.friendly_name or self.name})")
+        logger.info(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} [SCANNER:upd] Seen {self.friendly_name} ({self.ip}) with UUID {self.uuid}")
         logger.info(f"   --> new last_seen: {self.last_seen}")
+        logger.info(f"   -->   debug xaddr: {self.xaddr}")
 
     # wird aufgerufen wenn ein Scanner offline gesetzt wird
     # Aufruf mit SCANNER[uuid].mark_offline()
@@ -61,8 +64,14 @@ class Scanner:
             self.online = False
         if not self.offline_since:
             self.offline_since = datetime.datetime.now()
-            self.remove_after = self.offline_since + datetime.timedelta(seconds=self.max_age)
-        logger.info(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} [SCANNER:m_offl] {self.ip} ({self.friendly_name or self.name})")
+#            self.remove_after = self.offline_since + datetime.timedelta(seconds=self.max_age)
+            self.remove_after = self.offline_since + datetime.timedelta(seconds=OFFLINE_TIMEOUT)
+#        logger.info(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} [SCANNER:m_offl] {self.ip} ({self.friendly_name or self.name})")
+        logger.info(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} [SCANNER:m_offl] marked {self.friendly_name} ({self.ip}) with UUID {self.uuid} as offline")
+        logger.info(f"   -->        online: {self.online}")
+        logger.info(f"   --> offline_since: {self.offline_since}")
+        logger.info(f"   -->  remove_after: {self.remove_after}")
+        logger.info(f"   -->   debug xaddr: {self.xaddr}")
 
 
     # Fragt Scanner-Metadaten per WS-Transfer/Get ab
