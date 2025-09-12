@@ -82,7 +82,7 @@ def get_local_ip():
         s.close()
         return ip
     except Exception:
-        logger.warning(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} [*] Could not obtain Host IP: {e}")
+        logger.warning(f"[CONFIG] Could not obtain Host IP: {e}")
         return "undefined"
 
 LOCAL_IP = get_local_ip()
@@ -97,7 +97,7 @@ def check_port(port):
             return False
 
 if not check_port(HTTP_PORT):
-    logger.error(f"[*] Port {HTTP_PORT} is already in use!")
+    logger.error(f"[CONFIG] Port {HTTP_PORT} is already in use!")
     sys.exit(1)
 else:
     logger.info(f"Statusserver reachable at {LOCAL_IP}:{HTTP_PORT}")
