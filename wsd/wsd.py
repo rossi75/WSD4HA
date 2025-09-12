@@ -134,8 +134,10 @@ async def message_processor(data, addr):
             SCANNERS[uuid] = Scanner(name=f"IP_{ip}", ip=ip, uuid=uuid)
             logger.info(f"[WSD:HELLO] New Scanner: {SCANNERS[uuid].name} ({ip})")
         else:
+            logger.info(f"[WSD:MESSAGE_DEBUG] BEFORE update: {self.uuid}, xaddr={self.xaddr}")
             SCANNERS[uuid].update()
             logger.info(f"[WSD:HELLO] known Scanner updated/back again: {SCANNERS[uuid].name} ({ip})")
+            logger.info(f"[WSD:MESSAGE_DEBUG] AFTER update: {self.uuid}, xaddr={self.xaddr}")
 
         list_scanners()
 
@@ -225,8 +227,10 @@ async def UDP_listener_3702():
 async def check_scanner(scanner):
     try:
 #        await fetch_metadata(scanner)  # nutzt SOAP-Get
+        logger.info(f"[WSD:CHECK_SCANNER_DEBUG] BEFORE update: {scanner.uuid}, xaddr={scanner.xaddr}")
         await scanner.fetch_metadata()  # nutzt SOAP-Get
 #        scanner.update(scanner.max_age)
+        logger.info(f"[WSD:CHECK_SCANNER_DEBUG] AFTER update: {scanner.uuid}, xaddr={scanner.xaddr}")
         scanner.update(OFFLINE_TIMEOUT)
         logger.info(f"[WSD:Heartbeat OK] {scanner.name or scanner.ip} lebt noch")
     except Exception as e:
@@ -242,10 +246,10 @@ async def heartbeat_monitor():
         for uuid, scanner in SCANNERS.items():
             logger.info(f"[WSD:Heartbeat] Timer-Check for {uuid} ({scanner.ip})...")
             age = (now - scanner.last_seen).total_seconds()
-            timeout = scanner.max_age
+#            timeout = scanner.max_age
             logger.info(f"   --> last_seen = {scanner.last_seen}")
             logger.info(f"   -->       age = {age}")
-            logger.info(f"   -->   timeout = {timeout}")
+#            logger.info(f"   -->   timeout = {timeout}")
             logger.info(f"   -->      uuid = {uuid}")
 #            logger.info(f"   -->     xaddr = {xaddr}")
             logger.info(f"   -->     xaddr = {scanner.xaddr}")
