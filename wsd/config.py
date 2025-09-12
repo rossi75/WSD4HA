@@ -47,15 +47,23 @@ logger = logging.getLogger("wsd-addon")
 #WSD_OFFLINE_TIMEOUT = int(os.environ.get("WSD_OFFLINE_TIMEOUT", 300))  # Sekunden
 #WSD_HTTP_PORT = int(os.environ.get("HTTP_PORT", 8080))
 HTTP_PORT = 8110
+
 #OFFLINE_TIMEOUT = int(os.environ.get("OFFLINE_TIMEOUT", 300))  # Sekunden
 raw = os.environ.get("OFFLINE_TIMEOUT", 300)  # Sekunden
 try:
     OFFLINE_TIMEOUT = int(raw)  # Sekunden
 except ValueError:
     OFFLINE_TIMEOUT = 300  # Fallback vom Fallback
+
 SCAN_FOLDER = Path(os.environ.get("SCAN_FOLDER", "/share/scans"))
 SCAN_FOLDER.mkdir(parents=True, exist_ok=True)
-MAX_FILES = int(os.environ.get("MAX_FILES", 5))
+
+#MAX_FILES = int(os.environ.get("MAX_FILES", 5))
+raw = int(os.environ.get("MAX_FILES", 5))
+try:
+    MAX_FILES = int(raw)
+except ValueError:
+    MAX_FILES = 50 # Fallback vom Fallback
 
 logger.info(f"**********************************************************")
 logger.info(f"Starting up WSD Scanner Service")
