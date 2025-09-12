@@ -280,7 +280,9 @@ async def heartbeat_monitor():
         for s in to_remove:
             logger.info(f"[Heartbeat]     --> Removing {scanner.ip} ({scanner.friendly_name}) from list")
 #            scanners.remove(s)
-            scanner.remove(s)
+#            scanner.remove(s)
+            del SCANNERS[scanner.uuid]
+            list_scanners()
 
         logger.debug(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S}[WSD:Heartbeat] goodbye")
         #await asyncio.sleep(30)
