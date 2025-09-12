@@ -3,7 +3,8 @@ import socket
 import logging
 import sys
 from globals import SCANNERS, list_scanners 
-from config import WSD_OFFLINE_TIMEOUT
+#from config import WSD_OFFLINE_TIMEOUT
+from config import OFFLINE_TIMEOUT
 #from config import WSD_HTTP_PORT, WSD_OFFLINE_TIMEOUT, WSD_SCAN_FOLDER
 
 NAMESPACES = {
@@ -17,7 +18,7 @@ logger = logging.getLogger("wsd-addon")
 
 # ---------------- Scanner-Datenstruktur ----------------
 class Scanner:
-    def __init__(self, name, ip, mac=None, uuid=None, formats=None, location=None, max_age=WSD_OFFLINE_TIMEOUT, xaddr=""):
+    def __init__(self, name, ip, mac=None, uuid=None, formats=None, location=None, max_age=OFFLINE_TIMEOUT, xaddr=None):
         self.name = name
         self.ip = ip
         self.mac = mac
@@ -44,7 +45,7 @@ class Scanner:
 
     # Scanner ist noch online
     # Aufruf mit SCANNER[uuid].update()
-    def update(self, max_age=WSD_OFFLINE_TIMEOUT):
+    def update(self, max_age=OFFLINE_TIMEOUT):
         self.last_seen = datetime.datetime.now()
         self.max_age = max_age
         self.online = True
