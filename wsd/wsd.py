@@ -37,7 +37,6 @@ def parse_wsd_packet(data: bytes):
             "uuid": uuid.text if uuid is not None else None,
         }
     except Exception as e:
-#        logger.debug(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} [WSD] Error while parsing: {e}")
         logger.debug(f"[WSD] Error while parsing: {e}")
         return None
 
@@ -131,15 +130,11 @@ async def message_processor(data, addr):
             #continue
 
         if uuid not in SCANNERS:
-#            SCANNERS[uuid] = Scanner(name=f"IP_{ip}", ip=ip, uuid=uuid)
             SCANNERS[uuid] = Scanner(uuid=uuid, ip=ip, xaddr=xaddr)
             logger.info(f"[WSD:HELLO] New Scanner: {SCANNERS[uuid].uuid} ({ip})")
         else:
-#            logger.info(f"[WSD:MESSAGE_DEBUG] BEFORE update: {self.uuid}, xaddr={self.xaddr}")
             SCANNERS[uuid].update()
             logger.info(f"[WSD:HELLO] known Scanner updated/back again: {SCANNERS[uuid].friendly_name} ({ip})")
-#            logger.info(f"[WSD:HELLO] known Scanner updated/back again: {SCANNERS[uuid].name} ({ip})")
-#            logger.info(f"[WSD:MESSAGE_DEBUG] AFTER update: {self.uuid}, xaddr={self.xaddr}")
 
         list_scanners()
 
@@ -175,14 +170,10 @@ async def UDP_listener_3702():
     loop = asyncio.get_running_loop()
     async def recv_loop():
         while True:
-#            logger.info(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S}[WSD:recv_loop] 1")
-            logger.debug(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S}[WSD:recv_loop] waiting for UDP data")
+            logger.debug(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} [WSD:recv_loop] waiting for UDP data")
             data, addr = await loop.sock_recvfrom(sock, 8192)
-#            logger.info(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S}[WSD:recv_loop] 2")
             await message_processor(data, addr)   # ausgelagerte Verarbeitung
-#            logger.info(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S}[WSD:recv_loop] 3")
             await asyncio.sleep(1)
-#            logger.info(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S}[WSD:recv_loop] 4")
 
     # asyncio.create_task(recv_loop())
     await recv_loop()
@@ -229,10 +220,8 @@ async def UDP_listener_3702():
 async def check_scanner(scanner):
     try:
 #        await fetch_metadata(scanner)  # nutzt SOAP-Get
-#        logger.info(f"[WSD:CHECK_SCANNER_DEBUG] BEFORE update: {scanner.uuid}, xaddr={scanner.xaddr}")
         await scanner.fetch_metadata()  # nutzt SOAP-Get
 #        scanner.update(scanner.max_age)
-#        logger.info(f"[WSD:CHECK_SCANNER_DEBUG] AFTER update: {scanner.uuid}, xaddr={scanner.xaddr}")
         scanner.update(OFFLINE_TIMEOUT)
         logger.info(f"[WSD:Heartbeat OK] {scanner.friendly_name or scanner.ip} lebt noch")
     except Exception as e:
@@ -243,17 +232,13 @@ async def heartbeat_monitor():
     while True:
         now = datetime.datetime.now()
         to_remove = []
-        logger.debug(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S}[WSD:Heartbeat] wake-up")
+        logger.debug(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} [WSD:Heartbeat] wake-up")
 
         for uuid, scanner in SCANNERS.items():
-            logger.info(f"[WSD:Heartbeat] Timer-Check for {uuid} ({scanner.ip})...")
+            logger.info(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} [WSD:Heartbeat] Timer-Check for {uuid} ({scanner.ip})...")
             age = (now - scanner.last_seen).total_seconds()
-#            timeout = scanner.max_age
             logger.info(f"   --> last_seen = {scanner.last_seen}")
             logger.debug(f"   -->       age = {age}")
-#            logger.info(f"   -->   timeout = {timeout}")
-#            logger.info(f"   -->     xaddr = {xaddr}")
-            logger.info(f"   -->     xaddr = {scanner.xaddr}")
 
             # Halbzeit-Check
             if age > OFFLINE_TIMEOUT / 2 and age <= (OFFLINE_TIMEOUT / 2 + 30):
@@ -279,15 +264,13 @@ async def heartbeat_monitor():
         logger.debug(f"[WSD:Heartbeat] checking for Scanners to remove from known list")
         for s in to_remove:
             logger.info(f"[Heartbeat]     --> Removing {scanner.ip} ({scanner.friendly_name}) from list")
-#            scanners.remove(s)
-#            scanner.remove(s)
             del SCANNERS[scanner.uuid]
             list_scanners()
 
-        logger.debug(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S}[WSD:Heartbeat] goodbye")
+        logger.debug(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} [WSD:Heartbeat] goodbye")
         #await asyncio.sleep(30)
         await asyncio.sleep(10)
-        logger.debug(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S}[WSD:Heartbeat] back in town")
+        logger.debug(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} [WSD:Heartbeat] back in town")
 
 
 
