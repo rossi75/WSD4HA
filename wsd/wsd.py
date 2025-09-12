@@ -49,7 +49,7 @@ def pick_best_xaddr(xaddrs: str) -> str:
     - ignoriert IPv6, wenn IPv4 vorhanden ist
     - nimmt den Hostnamen, falls keine IP vorhanden ist
     """
-    logger.info(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} [WSD:XADDR] received {xaddrs}")
+    logger.info(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S}[WSD:XADDR] received {xaddrs}")
     if not xaddrs:
         return None
 
@@ -69,8 +69,8 @@ def pick_best_xaddr(xaddrs: str) -> str:
             # vermutlich Hostname
             hostname = addr
 
-#    logger.info(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} [WSD:XADDR] extracted {ipv4 or hostname or None}")
-    logger.info(f" [WSD:XADDR] extracted {ipv4 or hostname or None}")
+#    logger.info(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S}[WSD:XADDR] extracted {ipv4 or hostname or None}")
+    logger.info(f"[WSD:XADDR] extracted {ipv4 or hostname or None}")
 
     return ipv4 or hostname or None
 
@@ -117,7 +117,7 @@ async def message_processor(data, addr):
     if xaddrs_elem is not None and xaddrs_elem.text:
         xaddr = pick_best_xaddr(xaddrs_elem.text.strip())
 
-    logger.info(f" [WSD:DISCOVERY] received from {ip}")
+    logger.info(f"[WSD:DISCOVERY] received from {ip}")
     logger.info(f"    -->   UUID: {uuid}")
     logger.info(f"    --> Action: {action_text}")
     logger.info(f"    -->  Types: {types_text}")
@@ -126,30 +126,30 @@ async def message_processor(data, addr):
     if action_text == "Hello":
         # Nur Scanner berücksichtigen
         if "ScanDeviceType" not in types_text:
-            logger.info(f" [WSD:HELLO] Ignored non-scanner device UUID={uuid} Types={types_text}")
+            logger.info(f"[WSD:HELLO] Ignored non-scanner device UUID={uuid} Types={types_text}")
             return
             #continue
 
         if uuid not in SCANNERS:
             SCANNERS[uuid] = Scanner(name=f"IP_{ip}", ip=ip, uuid=uuid)
-            logger.info(f" [WSD:HELLO] New Scanner: {SCANNERS[uuid].name} ({ip})")
+            logger.info(f"[WSD:HELLO] New Scanner: {SCANNERS[uuid].name} ({ip})")
         else:
             SCANNERS[uuid].update()
-            logger.info(f" [WSD:HELLO] known Scanner updated/back again: {SCANNERS[uuid].name} ({ip})")
+            logger.info(f"[WSD:HELLO] known Scanner updated/back again: {SCANNERS[uuid].name} ({ip})")
 
         list_scanners()
 
     elif action_text == "Bye":
-        logger.info(f" [WSD:BYE] Bye for uuid: {uuid}")
+        logger.info(f"[WSD:BYE] Bye for uuid: {uuid}")
         if uuid in SCANNERS:
-            logger.info(f" [WSD:BYE] Scanner offline: {SCANNERS[uuid].name} ({ip})")
+            logger.info(f"[WSD:BYE] Scanner offline: {SCANNERS[uuid].name} ({ip})")
             del SCANNERS[uuid]
         list_scanners()
 
     else:
-        logger.warning(f" [WSD:Message] unrecognized operation {action_text}")
+        logger.warning(f"[WSD:Message] unrecognized operation {action_text}")
 
-    logger.info(f" [WSD:Message] done")
+    logger.info(f"[WSD:Message] done")
 
 
 # ---------------- UDP listener ----------------
@@ -171,14 +171,14 @@ async def UDP_listener_3702():
     loop = asyncio.get_running_loop()
     async def recv_loop():
         while True:
-#            logger.info(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} [WSD:recv_loop] 1")
-            logger.debug(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} [WSD:recv_loop] waiting for UDP data")
+#            logger.info(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S}[WSD:recv_loop] 1")
+            logger.debug(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S}[WSD:recv_loop] waiting for UDP data")
             data, addr = await loop.sock_recvfrom(sock, 8192)
-#            logger.info(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} [WSD:recv_loop] 2")
+#            logger.info(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S}[WSD:recv_loop] 2")
             await message_processor(data, addr)   # ausgelagerte Verarbeitung
-#            logger.info(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} [WSD:recv_loop] 3")
+#            logger.info(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S}[WSD:recv_loop] 3")
             await asyncio.sleep(1)
-#            logger.info(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} [WSD:recv_loop] 4")
+#            logger.info(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S}[WSD:recv_loop] 4")
 
     # asyncio.create_task(recv_loop())
     await recv_loop()
@@ -237,7 +237,7 @@ async def heartbeat_monitor():
     while True:
         now = datetime.datetime.now()
         to_remove = []
-        logger.info(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} [WSD:Heartbeat] wake-up")
+        logger.info(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S}[WSD:Heartbeat] wake-up")
 
         for uuid, scanner in SCANNERS.items():
             logger.info(f"[WSD:Heartbeat] Timer-Check for {uuid} ({scanner.ip})...")
@@ -271,16 +271,16 @@ async def heartbeat_monitor():
                 to_remove.append(scanner)
 
         # welche Scanner sollen entfernt werden?
-        logger.debug(f" [WSD:Heartbeat] checking for Scanners to remove from known list")
+        logger.debug(f"[WSD:Heartbeat] checking for Scanners to remove from known list")
         for s in to_remove:
             logger.info(f"[Heartbeat]     --> Removing {scanner.ip} ({scanner.friendly_name or scanner.name}) from list")
 #            scanners.remove(s)
             scanner.remove(s)
 
-        logger.debug(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} [WSD:Heartbeat] goodbye")
+        logger.debug(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S}[WSD:Heartbeat] goodbye")
         #await asyncio.sleep(30)
         await asyncio.sleep(10)
-        logger.debug(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} [WSD:Heartbeat] back in town")
+        logger.debug(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S}[WSD:Heartbeat] back in town")
 
 
 
