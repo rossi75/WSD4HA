@@ -265,6 +265,9 @@ async def heartbeat_monitor():
             logger.info(f"[Heartbeat] Timer-Check for {uuid} ({scanner.ip})...")
             age = (now - scanner.last_seen).total_seconds()
             timeout = scanner.max_age
+            logger.info(f"[Heartbeat] --> last_seen = {scanner.last_seen}")
+            logger.info(f"[Heartbeat] -->       age = {age}")
+            logger.info(f"[Heartbeat] -->   timeout = {timeout}")
 
             # Halbzeit-Check
             if age > timeout / 2 and age <= (timeout / 2 + 30):
