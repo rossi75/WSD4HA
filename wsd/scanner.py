@@ -26,7 +26,7 @@ class Scanner:
 #        self.name = name
 #        self.formats = formats or [] # unnötg?
 
-        # zusätzliche Infos
+        # zusätzliche optionale Infos
         self.friendly_name = None
         self.mac = None
         self.firmware = None
