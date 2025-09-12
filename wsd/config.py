@@ -35,28 +35,28 @@ logger = logging.getLogger("wsd-addon")
 
 # ---------------- Optionen aus Environment ----------------
 #WSD_SCAN_FOLDER = Path(os.environ.get("WSD_SCAN_FOLDER", "/share/scans"))
-WSD_SCAN_FOLDER = Path(os.environ.get("SCAN_FOLDER", "/share/scans"))
-WSD_SCAN_FOLDER.mkdir(parents=True, exist_ok=True)
+SCAN_FOLDER = Path(os.environ.get("WSD_SCAN_FOLDER", "/share/scans"))
+SCAN_FOLDER.mkdir(parents=True, exist_ok=True)
 #WSD_MAX_FILES = int(os.environ.get("WSD_MAX_FILES", 5))
 #WSD_HTTP_PORT = int(os.environ.get("WSD_HTTP_PORT", 8080))
 #WSD_OFFLINE_TIMEOUT = int(os.environ.get("WSD_OFFLINE_TIMEOUT", 300))  # Sekunden
 #WSD_HTTP_PORT = int(os.environ.get("HTTP_PORT", 8080))
-WSD_HTTP_PORT = 8110
-WSD_MAX_FILES = int(os.environ.get("MAX_FILES", 5))
-WSD_OFFLINE_TIMEOUT = int(os.environ.get("OFFLINE_TIMEOUT", 300))  # Sekunden
+HTTP_PORT = 8110
+MAX_FILES = int(os.environ.get("WSD_MAX_FILES", 5))
+OFFLINE_TIMEOUT = int(os.environ.get("WSD_OFFLINE_TIMEOUT", 300))  # Sekunden
 
 logger.info(f"**********************************************************")
 logger.info(f"Starting up WSD Scanner Service")
 logger.info(f"{datetime.datetime.now():%d.%m.%Y, %H:%M:%S}")
 logger.info(f"---------------------  Configuration  ---------------------")
-logger.info(f"Scan-Path: {WSD_SCAN_FOLDER}")
-logger.info(f"max scanned files to show: {WSD_MAX_FILES}")
-logger.info(f"HTTP-Port for UI: {WSD_HTTP_PORT}")
-if WSD_OFFLINE_TIMEOUT < 120:
+logger.info(f"Scan-Path: {SCAN_FOLDER}")
+logger.info(f"max scanned files to show: {MAX_FILES}")
+logger.info(f"HTTP-Port for UI: {HTTP_PORT}")
+if OFFLINE_TIMEOUT < 120:
     logger.warning("OFFLINE_TIMEOUT zu klein, auf 120 gesetzt")
-    WSD_OFFLINE_TIMEOUT = 120
-WSD_OFFLINE_TIMEOUT = 120
-logger.info(f"Offline Timeout: {WSD_OFFLINE_TIMEOUT}s")
+    OFFLINE_TIMEOUT = 120
+OFFLINE_TIMEOUT = 120
+logger.info(f"Offline Timeout: {OFFLINE_TIMEOUT}s")
 
 # ---------------- lokale IP abfragen ----------------
 def get_local_ip():
@@ -82,9 +82,9 @@ def check_port(port):
         except OSError:
             return False
 
-if not check_port(WSD_HTTP_PORT):
-    logger.error(f"[*] Port {WSD_HTTP_PORT} is already in use!")
+if not check_port(HTTP_PORT):
+    logger.error(f"[*] Port {HTTP_PORT} is already in use!")
     sys.exit(1)
 else:
-    logger.info(f"Statusserver reachable at {LOCAL_IP}:{WSD_HTTP_PORT}")
+    logger.info(f"Statusserver reachable at {LOCAL_IP}:{HTTP_PORT}")
 
