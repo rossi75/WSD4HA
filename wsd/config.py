@@ -35,15 +35,15 @@ logger = logging.getLogger("wsd-addon")
 
 # ---------------- Optionen aus Environment ----------------
 #WSD_SCAN_FOLDER = Path(os.environ.get("WSD_SCAN_FOLDER", "/share/scans"))
-SCAN_FOLDER = Path(os.environ.get("WSD_SCAN_FOLDER", "/share/scans"))
-SCAN_FOLDER.mkdir(parents=True, exist_ok=True)
 #WSD_MAX_FILES = int(os.environ.get("WSD_MAX_FILES", 5))
 #WSD_HTTP_PORT = int(os.environ.get("WSD_HTTP_PORT", 8080))
 #WSD_OFFLINE_TIMEOUT = int(os.environ.get("WSD_OFFLINE_TIMEOUT", 300))  # Sekunden
 #WSD_HTTP_PORT = int(os.environ.get("HTTP_PORT", 8080))
 HTTP_PORT = 8110
-MAX_FILES = int(os.environ.get("WSD_MAX_FILES", 5))
-OFFLINE_TIMEOUT = int(os.environ.get("WSD_OFFLINE_TIMEOUT", 300))  # Sekunden
+OFFLINE_TIMEOUT = int(os.environ.get("OFFLINE_TIMEOUT", 300))  # Sekunden
+SCAN_FOLDER = Path(os.environ.get("SCAN_FOLDER", "/share/scans"))
+SCAN_FOLDER.mkdir(parents=True, exist_ok=True)
+MAX_FILES = int(os.environ.get("MAX_FILES", 5))
 
 logger.info(f"**********************************************************")
 logger.info(f"Starting up WSD Scanner Service")
