@@ -69,25 +69,17 @@ class Scanner:
 #    async def fetch_metadata(self):
 #    async def fetch_metadata(uuid: str):
     async def fetch_metadata(self):
-        logger.info(f"[fmd:p10]")
-#        scanner = SCANNERS.get(uuid)#
-
-#        if scanner:
-        #    await scanner.fetch_metadata()
-#            logger.info(f"[META] found Scanner with UUID {uuid}")
-#        else:
-#            logger.warning(f"[META] no Scanner found with UUID {uuid}")
-#            return
-
+        logger.info(f"[META] p1")
         if self.uuid not in SCANNERS:
             logger.info(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} [META] could not find Scanner with uuid: {self.uuid})")
             return
 
         if not self.xaddr:
-            logger.warning(f"[META]] missing xaddr element in struct!")
+            logger.warning(f"[META] missing xaddr element in struct!")
+            logger.warning(f"[META]    --> xaddr = {self.xaddr}")
             return
 
-        logger.info(f"[META]] trying to request Metadata for {self.uuid}")
+        logger.info(f"[META] trying to request Metadata for {self.uuid}")
 
         # Minimaler SOAP-Request für "Get"
         soap_request = f"""<?xml version="1.0" encoding="utf-8"?>
