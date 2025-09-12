@@ -146,4 +146,10 @@ class Scanner:
             self.manufacturer = mf.text.strip()
         logger.info(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} --> self.name: {self.manufacturer}")
 
-        logger.info(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} [Scanner:{self.ip}] Metadaten: {self.name} | FW={self.firmware} | SN={self.serial}")
+#        logger.info(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} [Scanner:{self.ip}] Metadaten: {self.name} | FW={self.firmware} | SN={self.serial}")
+        logger.info(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} [Scanner:fmd] fetched additional Metadata from {self.xaddr}")
+        logger.info(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S}    -->         Name: {self.friendly_name}")
+        logger.info(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S}    -->     Firmware: {self.firmware}")
+        logger.info(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S}    -->       Serial: {self.serial}")
+        logger.info(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S}    -->        Model: {self.model}")
+        logger.info(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S}    --> Manufacturer: {self.manufacturer}")
