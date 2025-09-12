@@ -27,7 +27,7 @@ NAMESPACES = {
 # - webserver zum laufen bekommen
 # + nach einem neuzugang die liste anzeigen
 # + nach einem abgang diesen im log ausführlich ausgeben
-# - neuer scanner wird zu oft erkannt
+# + neuer scanner wird zu oft erkannt
 
 # ---------------- Logging ----------------
 logging.basicConfig(level=logging.INFO, format='[%(levelname)s] %(message)s')
@@ -44,7 +44,6 @@ WSD_SCAN_FOLDER.mkdir(parents=True, exist_ok=True)
 WSD_HTTP_PORT = 8110
 WSD_MAX_FILES = int(os.environ.get("MAX_FILES", 5))
 WSD_OFFLINE_TIMEOUT = int(os.environ.get("OFFLINE_TIMEOUT", 300))  # Sekunden
-#LOCAL_IP = get_local_ip()
 
 logger.info(f"**********************************************************")
 logger.info(f"Starting up WSD Scanner Service")
@@ -56,8 +55,8 @@ logger.info(f"HTTP-Port for UI: {WSD_HTTP_PORT}")
 if WSD_OFFLINE_TIMEOUT < 120:
     logger.warning("OFFLINE_TIMEOUT zu klein, auf 120 gesetzt")
     WSD_OFFLINE_TIMEOUT = 120
+WSD_OFFLINE_TIMEOUT = 120
 logger.info(f"Offline Timeout: {WSD_OFFLINE_TIMEOUT}s")
-#list_scanners()
 
 # ---------------- lokale IP abfragen ----------------
 def get_local_ip():
