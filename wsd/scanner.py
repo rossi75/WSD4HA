@@ -99,16 +99,18 @@ class Scanner:
             "Content-Type": "application/soap+xml; charset=utf-8"
         }
 
-        logger.info(f" [Scanner:{self.ip}] Sende Metadata-Request an {self.xaddr}")
+        logger.info(f" [Scanner:{self.ip}] Sending Metadata-Request to {self.xaddr}")
         r = httpx.post(self.xaddr, data=soap_request, headers=headers, timeout=5.0)
 
         if r.status_code != 200:
             raise RuntimeError(f"HTTP {r.status_code} von {self.xaddr}")
 
         root = ET.fromstring(r.text)
+        logger.debug(f"received XML:")
+        logger.debug(f"{root}")
 
         # FriendlyName
-        logger.info(f"   ---> Trying to get friendly name")
+        logger.info(f"   ---> Trying to extract friendly name")
         fn = root.find(".//{http://schemas.xmlsoap.org/ws/2006/02/devprof}FriendlyName")
         logger.info(f"   ---> fn: {fn}")
         if fn is not None and fn.text:
@@ -116,7 +118,7 @@ class Scanner:
         logger.info(f"      ---> .name: {self.name}")
 
         # FirmwareVersion
-        logger.info(f"   ---> Trying to get Firmware Version")
+        logger.info(f"   ---> Trying to extract Firmware Version")
         fw = root.find(".//{http://schemas.xmlsoap.org/ws/2006/02/devprof}FirmwareVersion")
         logger.info(f"   ---> fw: {fw}")
         if fw is not None:
@@ -124,7 +126,7 @@ class Scanner:
         logger.info(f"      ---> .firmware: {self.firmware}")
 
         # SerialNumber
-        logger.info(f"   ---> Trying to get Serial Number")
+        logger.info(f"   ---> Trying to extract Serial Number")
         sn = root.find(".//{http://schemas.xmlsoap.org/ws/2006/02/devprof}SerialNumber")
         logger.info(f"   ---> sn: {sn}")
         if sn is not None:
@@ -132,7 +134,7 @@ class Scanner:
         logger.info(f"      ---> .serial: {self.serial}")
 
         # Model
-        logger.info(f"   ---> Trying to get model name")
+        logger.info(f"   ---> Trying to extract model name")
         model = root.find(".//{http://schemas.xmlsoap.org/ws/2006/02/devprof}ModelName")
         logger.info(f"   ---> model: {model}")
         if model is not None:
@@ -140,7 +142,7 @@ class Scanner:
         logger.info(f"      ---> .model: {self.model}")
 
         # Manufacturer
-        logger.info(f"   ---> Trying to get Manufacturer")
+        logger.info(f"   ---> Trying to extract Manufacturer")
         mf = root.find(".//{http://schemas.xmlsoap.org/ws/2006/02/devprof}Manufacturer")
         logger.info(f"   ---> mf: {mf}")
         if mf is not None:
