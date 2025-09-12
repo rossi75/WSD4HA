@@ -255,12 +255,14 @@ async def heartbeat_monitor():
     while True:
         now = datetime.datetime.now()
         to_remove = []
-        logger.info(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} [Heartbeat] wake-up")
+        logger.debug(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} [Heartbeat] wake-up")
 
 #        for scanner in list(scanners):
-        for scanner in list(SCANNERS):
+#        for scanner in list(SCANNERS):
+        for uuid, scanner in SCANNERS.items():
 #            logger.info(f"[Heartbeat] Timer-Check for {scanner.ip}...")
-            logger.info(f"[Heartbeat] Timer-Check for {scanner.uuid}...")
+#            logger.info(f"[Heartbeat] Timer-Check for {scanner.uuid}...")
+            logger.info(f"[Heartbeat] Timer-Check for {uuid} ({scanner.ip})...")
             age = (now - scanner.last_seen).total_seconds()
             timeout = scanner.max_age
 
@@ -291,9 +293,9 @@ async def heartbeat_monitor():
             scanners.remove(s)
 
 #        await asyncio.sleep(30)
-        logger.info(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} [Heartbeat] goodbye")
+        logger.debug(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} [Heartbeat] goodbye")
         await asyncio.sleep(10)
-        logger.info(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} [Heartbeat] back in town")
+        logger.debug(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} [Heartbeat] back in town")
 
 
 
