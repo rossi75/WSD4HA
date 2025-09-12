@@ -70,14 +70,14 @@ logger.info(f"**********************************************************")
 logger.info(f"Starting up WSD Scanner Service")
 logger.info(f"{datetime.datetime.now():%d.%m.%Y, %H:%M:%S}")
 logger.info(f"---------------------  Configuration  ---------------------")
-logger.info(f"Scan-Path: {SCAN_FOLDER}")
-logger.info(f"max scanned files to show: {MAX_FILES}")
-logger.info(f"HTTP-Port for UI: {HTTP_PORT}")
 if OFFLINE_TIMEOUT < 120:
     logger.warning("OFFLINE_TIMEOUT zu klein, auf 120 gesetzt")
     OFFLINE_TIMEOUT = 120
 OFFLINE_TIMEOUT = 120
 logger.info(f"Offline Timeout: {OFFLINE_TIMEOUT}s")
+logger.info(f"Scan-Path: {SCAN_FOLDER}")
+logger.info(f"max scanned files to show: {MAX_FILES}")
+logger.info(f"HTTP-Port for UI: {HTTP_PORT}")
 
 # ---------------- lokale IP abfragen ----------------
 def get_local_ip():
