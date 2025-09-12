@@ -9,15 +9,7 @@ import sys
 import re
 import xml.etree.ElementTree as ET
 import subprocess
-#from scanner import list_scanners
-#from globals import list_scanners
 from globals import SCANNERS, list_scanners 
-#from globals import SCANNERS, list_scanners, OFFLINE_TIMEOUT, SCAN_FOLDER, MAX_FILES
-
-#OFFLINE_TIMEOUT = int(os.environ.get("OFFLINE_TIMEOUT", 300))  # Sekunden
-#SCAN_FOLDER = Path(os.environ.get("SCAN_FOLDER", "/share/scans"))
-#SCAN_FOLDER.mkdir(parents=True, exist_ok=True)
-#MAX_FILES = int(os.environ.get("MAX_FILES", 5))
 
 
 NAMESPACES = {
@@ -56,6 +48,7 @@ try:
 except ValueError:
     OFFLINE_TIMEOUT = 300  # Fallback vom Fallback
 
+# [INFO] Scan-Path: {{ options.scan_folder }} = ???
 SCAN_FOLDER = Path(os.environ.get("SCAN_FOLDER", "/share/scans"))
 SCAN_FOLDER.mkdir(parents=True, exist_ok=True)
 
