@@ -35,12 +35,11 @@ class Scanner:
         self.manufacturer = None
 
         # Status
-        #self.last_seen = datetime.datetime.now()
-        self.last_seen = datetime.datetime.now() - datetime.timedelta(seconds=max_age // 2) # last_seen so zurücksetzen, dass wir "halbzeit" erreicht haben
+#        self.last_seen = datetime.datetime.now() - datetime.timedelta(seconds=max_age // 2) # last_seen so zurücksetzen, dass wir "halbzeit" erreicht haben
+        self.last_seen = datetime.datetime.now() - datetime.timedelta(seconds=OFFLINE_TIMEOUT // 2) # last_seen so zurücksetzen, dass wir "halbzeit" erreicht haben
         self.online = True
         self.offline_since = None
         self.remove_after = None  # Zeitpunkt zum Löschen
-#        self.max_age = max_age
 
 
     # Scanner ist noch online
