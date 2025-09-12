@@ -59,7 +59,7 @@ SCAN_FOLDER = Path(os.environ.get("SCAN_FOLDER", "/share/scans"))
 SCAN_FOLDER.mkdir(parents=True, exist_ok=True)
 
 #MAX_FILES = int(os.environ.get("MAX_FILES", 5))
-raw = int(os.environ.get("MAX_FILES", 5))
+raw = os.environ.get("MAX_FILES", 5)
 try:
     MAX_FILES = int(raw)
 except ValueError:
