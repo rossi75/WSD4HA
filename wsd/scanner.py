@@ -55,7 +55,7 @@ class Scanner:
         logger.info(f"   --> new last_seen: {self.last_seen}")
 
     # wird aufgerufen wenn ein Scanner offline gesetzt wird
-    # Aufruf mit SCANNER[uuid].update()
+    # Aufruf mit SCANNER[uuid].mark_offline()
     def mark_offline(self):
         if self.online:
             self.online = False
