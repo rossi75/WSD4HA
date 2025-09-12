@@ -168,7 +168,7 @@ async def UDP_listener_3702():
     sock.bind(("", MCAST_PORT))
     mreq = socket.inet_aton(MCAST_GRP) + socket.inet_aton("0.0.0.0")
     sock.setsockopt(socket.IPPROTO_IP, socket.IP_ADD_MEMBERSHIP, mreq)
-#    sock.setblocking(False)   # WICHTIG für asyncio!
+    sock.setblocking(False)   # WICHTIG für asyncio!
     logger.info("WSD-Listener running on Port 3702/UDP")
     logger.info(f"-----------------------  Events  -------------------------")
 
