@@ -247,7 +247,8 @@ async def heartbeat_monitor():
             logger.info(f"   -->       age = {age}")
             logger.info(f"   -->   timeout = {timeout}")
             logger.info(f"   -->      uuid = {uuid}")
-            logger.info(f"   -->     xaddr = {xaddr}")
+#            logger.info(f"   -->     xaddr = {xaddr}")
+            logger.info(f"   -->     xaddr = {scanner.xaddr}")
 
             # Halbzeit-Check
             if age > timeout / 2 and age <= (timeout / 2 + 30):
