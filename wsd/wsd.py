@@ -184,7 +184,8 @@ async def UDP_listener_3702():
             await asyncio.sleep(1)
             logger.info(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} [WSD:recv_loop] 4")
 
-    asyncio.create_task(recv_loop())
+    # asyncio.create_task(recv_loop())
+    await recv_loop()
 
     # Hier nur Task starten!
 #    asyncio.create_task(handle_messages())# Nach jedem Update: Liste loggen
