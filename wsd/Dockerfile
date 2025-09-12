@@ -3,7 +3,7 @@ FROM python:3.12-slim
 LABEL \
     io.hass.name="WSD4HA" \
     io.hass.description="Registers at a document scanner as a WSD destination to receive and store any scanned documents in HA" \
-    io.hass.version="0.0.6" \
+    io.hass.version="0.0.7" \
     io.hass.type="addon" \
     io.hass.arch="amd64|aarch64"
 
