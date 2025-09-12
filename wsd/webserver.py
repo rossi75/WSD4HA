@@ -12,6 +12,7 @@ import subprocess
 #from wsd import UDP_listener_3702, heartbeat_monitor, handle_scan_job
 #from config import WSD_HTTP_PORT, WSD_OFFLINE_TIMEOUT, WSD_SCAN_FOLDER
 from config import OFFLINE_TIMEOUT, SCAN_FOLDER, HTTP_PORT
+from globals import SCANNERS, OFFLINE_TIMEOUT, SCAN_FOLDER, MAX_FILES
 
 logging.basicConfig(level=logging.INFO, format='[%(levelname)s] %(message)s')
 logger = logging.getLogger("wsd-addon")
@@ -19,7 +20,7 @@ logger = logging.getLogger("wsd-addon")
 # ---------------- WebUI ----------------
 async def status_page(request):
     # Dateien
-    files = sorted(WSD_SCAN_FOLDER.iterdir(), reverse=True)[:MAX_FILES]
+    files = sorted(SCAN_FOLDER.iterdir(), reverse=True)[:MAX_FILES]
     file_list = ''
     for f in files:
         stat = f.stat()
@@ -32,7 +33,7 @@ async def status_page(request):
     now = datetime.datetime.now()
     for s in SCANNERS.values():
         delta = (now - s.last_seen).total_seconds()
-        if delta > WSD_OFFLINE_TIMEOUT:
+        if delta > OFFLINE_TIMEOUT:
             s.online = False
         color = "green" if s.online else ("orange" if delta < 2*OFFLINE_TIMEOUT else "red")
         formats = ", ".join(s.formats)
