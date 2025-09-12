@@ -3,7 +3,7 @@
 #import socket
 import logging
 import sys
-import os
+#import os
 
 # -----------------  global configuration  -----------------
 logging.basicConfig(level=logging.INFO, format='[%(levelname)s] %(message)s')
@@ -12,10 +12,10 @@ logger = logging.getLogger("wsd-addon")
 # -----------------  global configuration  -----------------
 #from globals import SCANNERS, list_scanners, OFFLINE_TIMEOUT, SCAN_FOLDER, MAX_FILES
 
-OFFLINE_TIMEOUT = int(os.environ.get("OFFLINE_TIMEOUT", 300))  # Sekunden
-SCAN_FOLDER = Path(os.environ.get("SCAN_FOLDER", "/share/scans"))
+#OFFLINE_TIMEOUT = int(os.environ.get("OFFLINE_TIMEOUT", 300))  # Sekunden
+#SCAN_FOLDER = Path(os.environ.get("SCAN_FOLDER", "/share/scans"))
 #SCAN_FOLDER.mkdir(parents=True, exist_ok=True)
-MAX_FILES = int(os.environ.get("MAX_FILES", 5))
+#MAX_FILES = int(os.environ.get("MAX_FILES", 5))
 
 
 # -----------------  define SCANNERS dict  -----------------
