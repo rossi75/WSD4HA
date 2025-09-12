@@ -15,11 +15,11 @@ ports:
   8110/tcp: 8110
 host_network: true
 options:
-  scanner_offline_timeout: 300
+  offline_timeout: 300
   scan_folder: "/share/scans"
   max_files: 50
 schema:
-  scanner_offline_timeout: int(120,3600)
+  offline_timeout: int(120,3600)
   scan_folder: str
   max_files: int
 map:
