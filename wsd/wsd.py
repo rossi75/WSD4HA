@@ -225,22 +225,6 @@ async def UDP_listener_3702():
 #        logger.info(f"[WSD:p4]")
 
 
-# Offene Tasks abbrechen (sonst sammeln sie sich an)
-    #    for task in pending:
-    #        task.cancel()
-
-#                    logger.info(f"{datetime.datetime.now():%Y%m%d %H%M%S} [WSD] from {addr} → Action={parsed['action']} UUID={parsed['uuid']}")
-#                        logger.info(f"{datetime.datetime.now():%Y%m%d %H%M%S} [DISCOVERY] [WSD] Neuer Scanner: {s.name} ({s.ip})")
-#                    logger.debug(f"{datetime.datetime.now():%Y%m%d %H%M%S} [WSD] unknown packet from {addr}: {data[:80]!r}")
-#                   logger.info(f"{datetime.datetime.now():%Y%m%d %H%M%S} [SSDP] from {addr} → NT={headers.get('NT')} USN={headers.get('USN')}")
-#                        logger.info(f"{datetime.datetime.now():%Y%m%d %H%M%S} [DISCOVERY] [SSDP] Neuer Scanner: {s.name} ({s.ip})")
-#                    logger.debug(f"{datetime.datetime.now():%Y%m%d %H%M%S} [SSDP] unknown packet from {addr}: {data[:80]!r}")
-#                            logger.info(f"[WSD] new Scanner detected: {s.name} ({s.ip}) UUID={s.uuid}")
-#                    logger.warning(f"[WSD] Error while parsing: {e}")#
-#                        logger.info(f"[SSDP] new Scanner detected: {s.name} ({s.ip}) UUID={s.uuid} location={location}")
-#                        SCANNERS[uuid].update(max_age=max_age)
-#            logger.info(f"[DISCOVERY] Neuer Scanner erkannt: {s.name} ({s.ip}) online")
-
 
 # ---------------- Scanner Keepalive checken ----------------
 async def check_scanner(scanner):
@@ -258,11 +242,7 @@ async def heartbeat_monitor():
         to_remove = []
         logger.debug(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} [Heartbeat] wake-up")
 
-#        for scanner in list(scanners):
-#        for scanner in list(SCANNERS):
         for uuid, scanner in SCANNERS.items():
-#            logger.info(f"[Heartbeat] Timer-Check for {scanner.ip}...")
-#            logger.info(f"[Heartbeat] Timer-Check for {scanner.uuid}...")
             logger.info(f"[Heartbeat] Timer-Check for {uuid} ({scanner.ip})...")
             age = (now - scanner.last_seen).total_seconds()
             timeout = scanner.max_age
@@ -296,8 +276,8 @@ async def heartbeat_monitor():
             logger.info(f"[Heartbeat]     --> Removing {scanner.ip} ({scanner.friendly_name or scanner.name}) from list")
             scanners.remove(s)
 
-#        await asyncio.sleep(30)
         logger.debug(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} [Heartbeat] goodbye")
+        #await asyncio.sleep(30)
         await asyncio.sleep(10)
         logger.debug(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} [Heartbeat] back in town")
 
