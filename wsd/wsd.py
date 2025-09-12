@@ -291,7 +291,7 @@ async def heartbeat_monitor():
                 to_remove.append(scanner)
 
         # welche Scanner sollen entfernt werden?
-        logger.info(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} [Heartbeat] checking for Scanners to remove from known list")
+        logger.debug(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} [Heartbeat] checking for Scanners to remove from known list")
         for s in to_remove:
             logger.info(f"[Heartbeat]     --> Removing {scanner.ip} ({scanner.friendly_name or scanner.name}) from list")
             scanners.remove(s)
