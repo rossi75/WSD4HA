@@ -10,7 +10,7 @@ import re
 import xml.etree.ElementTree as ET
 import subprocess
 #from state import SCANNERS
-from globals import SCANNERS, list_scanners 
+from globals import SCANNERS, list_scanners, NAMESPACES
 #from globals import SCANNERS, list_scanners, OFFLINE_TIMEOUT
 from scanner import Scanner
 from config import OFFLINE_TIMEOUT
@@ -19,12 +19,12 @@ import uuid
 #import aiohttp
 #from datetime import datetime, timedelta
 
-NAMESPACES = {
-    "wsa": "http://schemas.xmlsoap.org/ws/2004/08/addressing",
-    "wse": "http://schemas.xmlsoap.org/ws/2004/08/eventing",
-    "wsd": "http://schemas.xmlsoap.org/ws/2005/04/discovery",
-    "soap": "http://www.w3.org/2003/05/soap-envelope"
-}
+#NAMESPACES = {
+#    "wsa": "http://schemas.xmlsoap.org/ws/2004/08/addressing",
+#    "wse": "http://schemas.xmlsoap.org/ws/2004/08/eventing",
+#    "wsd": "http://schemas.xmlsoap.org/ws/2005/04/discovery",
+#    "soap": "http://www.w3.org/2003/05/soap-envelope"
+#}
 
 NAMESPACES = {
 }
