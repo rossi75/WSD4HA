@@ -139,6 +139,12 @@ async def message_processor(data, addr):
         else:
             SCANNERS[uuid].update()
             logger.info(f"[WSD:HELLO] known Scanner updated/back again: {SCANNERS[uuid].friendly_name} ({ip})")
+            # in your discovery handler (async context)
+            res = await subscribe_to_scanner(scanner, my_notify_url=f"http://{HOST_IP}:{HTTP_PORT}/wsd/notify", expires_seconds=3600)
+            if res["ok"]:
+                logger.info("subscribed id=%s expires=%s", res["identifier"], res["expires"])
+            else:
+                logger.warning("subscribe failed: %s", res.get("reason"))
 
         list_scanners()
 
