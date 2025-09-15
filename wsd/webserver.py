@@ -53,7 +53,7 @@ async def status_page(request):
         #formats = ", ".join(s.types)
 #        scanner_list += f"<tr style='color:{color}'>
         scanner_list += "<tr style='color:{color}'>"
-        scanner_list += "<td>" + {s.ip} + "</td>"
+        scanner_list += "<td>" {s.ip} "</td>"
         scanner_list += "<td>{s.uuid}</td>"
         scanner_list += "<td>{s.friendly_name or ''}</td>"
         scanner_list += "<td>{s.mac or ''}</td>"
