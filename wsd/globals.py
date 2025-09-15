@@ -21,6 +21,15 @@ logger = logging.getLogger("wsd-addon")
 # -----------------  define SCANNERS dict  -----------------
 SCANNERS = {}
 
+# -----------------  define NAMESPACE  -----------------
+NAMESPACES = {
+    "soap": "http://www.w3.org/2003/05/soap-envelope",
+    "wsa": "http://schemas.xmlsoap.org/ws/2004/08/addressing",
+    "wsd": "http://schemas.xmlsoap.org/ws/2005/04/discovery",
+    "wse": "http://schemas.xmlsoap.org/ws/2004/08/eventing",
+    "wscn": "http://schemas.microsoft.com/windows/2006/08/wdp/scan"  # optional
+}
+
 # -----------------  Nach jedem Update: Liste loggen  -----------------
 def list_scanners():
     logger.info("[SCANNERS] registered Scanners:")
