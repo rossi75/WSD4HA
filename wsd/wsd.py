@@ -19,6 +19,7 @@ from scanner import Scanner
 from config import OFFLINE_TIMEOUT, LOCAL_IP, HTTP_PORT
 #from scanner import Scanner, fetch_metadata
 import uuid
+import templates
 #import aiohttp
 #from datetime import datetime, timedelta
 
@@ -239,6 +240,40 @@ async def heartbeat_monitor():
         await asyncio.sleep(10)
         logger.debug(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} [WSD:Heartbeat] back in town")
 
+
+# ---------------- Send Scanner Probe ----------------
+async def send_probe(scanner):
+    logger.info(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} [WSD:send_probe] sending probe for {scanner.uuid}")
+    msg_id = uuid.uuid4()
+    xml = SOAP_PROBE_TEMPLATE.format(msg_id=msg_id)
+
+    headers = {
+        "Content-Type": "application/soap+xml",
+#        "User-Agent": "WSD4HA",
+        "User-Agent": "WSDAPI",
+    }
+
+#    for xaddr in scanner["xaddrs"]:
+    for xaddr in scanner.xaddr:
+#        url = f"http://{scanner['ip']}:80/StableWSDiscoveryEndpoint/schemas-xmlsoap-org_ws_2005_04_discovery"
+        url = f"http://{scanner.ip}:80/StableWSDiscoveryEndpoint/schemas-xmlsoap-org_ws_2005_04_discovery"
+        
+        logger.info(f"   ---> URL: {url}")
+        logger.info(f"   ---> XML:")
+        logger.info({xml})
+        
+        async with aiohttp.ClientSession() as session:
+            try:
+                async with session.post(url, data=xml, headers=headers, timeout=5) as resp:
+                    if resp.status == 200:
+                        body = await resp.text()
+                        # TODO: parse ProbeMatches aus body
+#                        print(f"ProbeMatch von {scanner['ip']}:\n{body}")
+                        logger.info(f"ProbeMatch von {scanner.ip}:\n{body}")
+            except Exception as e:
+                print(f"Probe fehlgeschlagen bei {url}: {e}")
+
+        logger.info(f"   ---> Statuscode: {resp.status}")
 
 
 # ---------------- Scanner Subscribe ----------------
