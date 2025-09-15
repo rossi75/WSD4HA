@@ -88,7 +88,6 @@ async def status_page(request):
             </table>
             <h2>Active Scanners:</h2>
             <table>
-                <tr><th>Name</th><th>IP</th><th>MAC</th><th>UUID</th><th>Formats</th><th>State</th><th>Last seen</th></tr>
                 <tr><th>IP</th><th>UUID</th><th>Name</th><th>MAC</th><th>State</th><th>Last seen</th><th>XADDR</th><th>Subscr ID</th><th>Subscr Exp</th><th>Manufacturer</th><th>Model</th><th>Firmware</th><th>Serial</th></tr>
                 {scanner_list}
             </table>
@@ -96,6 +95,8 @@ async def status_page(request):
         </html>
     """, content_type="text/html")
     logger.info(f"   ---> probably delivered http-response")
+
+#                <tr><th>Name</th><th>IP</th><th>MAC</th><th>UUID</th><th>Formats</th><th>State</th><th>Last seen</th></tr>
 
 # ---------------- HTTP Server ----------------
 async def start_http_server():
