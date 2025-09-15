@@ -17,7 +17,7 @@ from globals import SCANNERS
 #from globals import SCANNERS, list_scanners 
 #from globals import SCANNERS, list_scanners, OFFLINE_TIMEOUT
 from scanner import Scanner
-
+#from scan_job import handle_scan_job
 
 logging.basicConfig(level=logging.INFO, format='[%(levelname)s] %(message)s')
 logger = logging.getLogger("wsd-addon")
@@ -77,7 +77,7 @@ async def status_page(request):
 async def start_http_server():
     logger.info(f"[d/t] [WEBSERVER:start_http] starting HTTP SOAP Server on Port {HTTP_PORT}")
     app = web.Application()
-    app.router.add_post("/wsd/scan", handle_scan_job)
+ #   app.router.add_post("/wsd/scan", handle_scan_job)
     app.router.add_get("/", status_page)
     
     runner = web.AppRunner(app)
