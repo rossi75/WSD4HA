@@ -20,6 +20,7 @@ logger = logging.getLogger("wsd-addon")
 
 # ---------------- WebUI ----------------
 async def status_page(request):
+    logger.info(f"[d/t] [WEBSERVER.status_page] received request for status page")
     # Dateien
     files = sorted(SCAN_FOLDER.iterdir(), reverse=True)[:MAX_FILES]
     file_list = ''
@@ -42,6 +43,7 @@ async def status_page(request):
         scanner_list += f"<tr style='color:{color}'><td>{s.name}</td><td>{s.ip}</td><td>{s.mac or ''}</td><td>{s.uuid or ''}</td><td>{formats}</td><td>{'Online' if s.online else 'Offline'}</td><td>{s.last_seen.strftime('%Y-%m-%d %H:%M:%S')}</td></tr>"
 
     return web.Response(text=f"""
+        logger.info(f"   ---> forming and delivering http-response")
         <html>
         <head>
             <title>WSD Add-on Status</title>
@@ -66,8 +68,10 @@ async def status_page(request):
         </body>
         </html>
     """, content_type="text/html")
+    logger.info(f"   ---> probably delivered http-response")
 
 async def start_http_server():
+    logger.info(f"[d/t] [WEBSERVER:start_http] starting HTTP SOAP Server on Port {HTTP_PORT}")
     app = web.Application()
     app.router.add_post("/wsd/scan", handle_scan_job)
     app.router.add_get("/", status_page)
@@ -78,4 +82,4 @@ async def start_http_server():
     # An alle Interfaces binden (0.0.0.0) -> wichtig für Docker / HA
     site = web.TCPSite(runner, "0.0.0.0", HTTP_PORT)
     await site.start()
-    logger.info(f"[*] HTTP SOAP Server running on Port {HTTP_PORT}")
+    logger.info(f"   ---> HTTP SOAP Server should run on Port {HTTP_PORT}")
