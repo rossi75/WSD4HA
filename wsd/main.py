@@ -14,9 +14,8 @@ from scanner import Scanner
 
 async def main():
     await asyncio.gather(
- #       start_http_server(),
+        start_http_server(),
         UDP_listener_3702(),
-#        discovery_listener(),
         heartbeat_monitor(),
     )
 
