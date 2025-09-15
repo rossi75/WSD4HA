@@ -301,11 +301,14 @@ async def subscribe_to_scanner(scanner, my_notify_url: str):
     headers = {"Content-Type": "application/soap+xml; charset=utf-8", "User-Agent": "WSD-Client"}
     async with aiohttp.ClientSession() as session:
         try:
+            logger.info(f"   ---> sending SOAP request")
             async with session.post(scanner.xaddr, data=soap.encode("utf-8"), headers=headers, timeout=10) as resp:
                 #logger.debug(f"   ---> sending SOAP request:")
-                logger.info(f"   ---> sending SOAP request:")
-                text = await resp.text()
                 status = resp.status
+                text = await resp.text()
+                logger.info(f"   ---> Status: {status}")
+                logger.info(f"   ---> text:")
+                logger.info("{text}")
         except Exception as e:
             logger.warning(f"   ---> anything went wrong in sending SOAP request: {e}")
             return {"ok": False, "reason": f"http error: {e}", "identifier": None}
