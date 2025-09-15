@@ -14,17 +14,17 @@ import subprocess
 #from config import OFFLINE_TIMEOUT, SCAN_FOLDER, HTTP_PORT
 from config import OFFLINE_TIMEOUT, SCAN_FOLDER, HTTP_PORT, MAX_FILES
 #from globals import SCANNERS, OFFLINE_TIMEOUT, SCAN_FOLDER, MAX_FILES
-from globals import SCANNERS
+from globals import SCANNERS, NAMESPACES
 #from globals import SCANNERS, list_scanners 
 #from globals import SCANNERS, list_scanners, OFFLINE_TIMEOUT
 from scanner import Scanner
 #from scan_job import handle_scan_job
 
-NAMESPACES_NOTIFY = {
-    "s": "http://www.w3.org/2003/05/soap-envelope",
-    "wse": "http://schemas.xmlsoap.org/ws/2004/08/eventing",
-    "wscn": "http://schemas.microsoft.com/windows/2006/08/wdp/scan",  # optional
-}
+#NAMESPACES_NOTIFY = {
+#    "s": "http://www.w3.org/2003/05/soap-envelope",
+#    "wse": "http://schemas.xmlsoap.org/ws/2004/08/eventing",
+#    "wscn": "http://schemas.microsoft.com/windows/2006/08/wdp/scan",  # optional
+#}
 
 logging.basicConfig(level=logging.INFO, format='[%(levelname)s] %(message)s')
 logger = logging.getLogger("wsd-addon")
