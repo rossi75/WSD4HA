@@ -20,12 +20,18 @@ from globals import SCANNERS
 from scanner import Scanner
 #from scan_job import handle_scan_job
 
+NAMESPACES_NOTIFY = {
+    "s": "http://www.w3.org/2003/05/soap-envelope",
+    "wse": "http://schemas.xmlsoap.org/ws/2004/08/eventing",
+    "wscn": "http://schemas.microsoft.com/windows/2006/08/wdp/scan",  # optional
+}
+
 logging.basicConfig(level=logging.INFO, format='[%(levelname)s] %(message)s')
 logger = logging.getLogger("wsd-addon")
 
 # ---------------- WebUI ----------------
 async def status_page(request):
-    logger.info(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} [WEBSERVER.status_page] received request for status page")
+    logger.info(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} [WEBSERVER:status_page] received request for status page")
     # Dateien
     files = sorted(SCAN_FOLDER.iterdir(), reverse=True)[:MAX_FILES]
     file_list = ''
@@ -76,10 +82,11 @@ async def status_page(request):
     logger.info(f"   ---> probably delivered http-response")
 
 async def start_http_server():
-    logger.info(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} [WEBSERVER:start_http] starting HTTP SOAP Server on Port {HTTP_PORT}")
+    logger.info(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S}[WEBSERVER:start_http] starting HTTP SOAP Server on Port {HTTP_PORT}")
     app = web.Application()
  #   app.router.add_post("/wsd/scan", handle_scan_job)
     app.router.add_get("/", status_page)
+    app.router.add_post("/wsd/notify", notify_handler)
     
     runner = web.AppRunner(app)
     await runner.setup()
@@ -88,3 +95,29 @@ async def start_http_server():
     site = web.TCPSite(runner, "0.0.0.0", HTTP_PORT)
     await site.start()
     logger.info(f"   ---> HTTP SOAP Server should run on Port {HTTP_PORT}")
+
+
+
+async def notify_handler(request):
+    text = await request.text()
+    # quick log
+    logger.info(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S}[WEBSERVER:NOTIFY] received notification payload: %s", text[:600])
+    try:
+        root = ET.fromstring(text)
+    except Exception as e:
+        logger.warning("[WEBSERVER:NOTIFY] invalid xml: %s", e)
+        return web.Response(status=400, text="bad xml")
+
+    # try to extract identifier / event content
+    ident = root.find(".//wse:Identifier", NAMESPACES_NOTIFY)
+    body = root.find(".//s:Body", NAMESPACES_NOTIFY)
+    # dump body child names for debugging
+    events = []
+    if body is not None:
+        for child in body:
+            events.append(child.tag)
+    logger.info(f"WEBSERVER:[NOTIFY] identifier={ident.text if ident is not None else None}, events={events}")
+
+    # Acknowledge (200 OK). Some implement a SOAP response; many accept simple 200.
+    return web.Response(status=200, text="OK")
+
