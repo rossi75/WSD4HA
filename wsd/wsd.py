@@ -133,10 +133,6 @@ async def message_processor(data, addr):
             SCANNERS[uuid].update()
             logger.info(f"[WSD:HELLO] known Scanner updated/back again: {SCANNERS[uuid].friendly_name} ({ip})")
             # in your discovery handler (async context)
-#            res = await subscribe_to_scanner(scanner, my_notify_url=f"http://{HOST_IP}:{HTTP_PORT}/wsd/notify", expires_seconds=3600)
-#            res = await subscribe_to_scanner(SCANNERS[uuid], my_notify_url=f"http://{HOST_IP}:{HTTP_PORT}/wsd/notify", expires_seconds=3600)
-#            res = await subscribe_to_scanner(SCANNERS[uuid], my_notify_url=f"http://{LOCAL_IP}:{HTTP_PORT}/wsd/notify", expires_seconds=3600)
-#            res = await subscribe_to_scanner(SCANNERS[uuid], my_notify_url=f"http://{LOCAL_IP}:{HTTP_PORT}/wsd/notify", expires_seconds={OFFLINE_TIMEOUT})
             res = await subscribe_to_scanner(SCANNERS[uuid], my_notify_url=f"http://{LOCAL_IP}:{HTTP_PORT}/wsd/notify")
             if res["ok"]:
                 logger.info("   ---> subscribed id=%s expires=%s", res["identifier"], res["expires"])
@@ -287,33 +283,25 @@ async def subscribe_to_scanner(scanner, my_notify_url: str):
         </wse:Subscribe>
       </s:Body>
     </s:Envelope>"""
-#          <wse:Expires>PT{expires_seconds}S</wse:Expires>
 
-#    logger.debug(f"   ---> SOAP request:")
-#    logger.debug(f"{soap}")
     logger.info(f"   ---> SOAP request:")
-#    logger.info("{soap}")
-#    logger.info("soap")
     logger.info({soap})
-    logger.info(f"   ---> SOAP request UTF-8:")
-    logger.info({soap.encode("utf-8")})
-    
+
     async with aiohttp.ClientSession() as session:
         try:
             logger.info(f"   ---> sending SOAP request")
             async with session.post(scanner.xaddr, data=soap.encode("utf-8"), headers=headers, timeout=10) as resp:
-                #logger.debug(f"   ---> sending SOAP request:")
                 status = resp.status
                 text = await resp.text()
-                logger.info(f"   ---> Status: {status}")
-                logger.info(f"   ---> text:")
-                logger.info({text})
         except Exception as e:
             logger.warning(f"   ---> anything went wrong in sending SOAP request: {e}")
             return {"ok": False, "reason": f"http error: {e}", "identifier": None}
 
-    logger.debug(f"   ---> Response:")
-    logger.debug(f"{text}")
+#    logger.debug(f"   ---> Response:")
+#    logger.debug(f"{text}")
+    logger.info(f"   ---> Status: {status}")
+    logger.info(f"   ---> Response:")
+    logger.info(f"{text}")
     
     # parse response for Identifier and Expires
     try:
