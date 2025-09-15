@@ -47,8 +47,8 @@ async def status_page(request):
         #formats = ", ".join(s.types)
         scanner_list += f"<tr style='color:{color}'><td>{s.name}</td><td>{s.ip}</td><td>{s.mac or ''}</td><td>{s.uuid or ''}</td><td>{formats}</td><td>{'Online' if s.online else 'Offline'}</td><td>{s.last_seen.strftime('%Y-%m-%d %H:%M:%S')}</td></tr>"
 
+    logger.info(f"   ---> forming and delivering http-response")
     return web.Response(text=f"""
-        logger.info(f"   ---> forming and delivering http-response")
         <html>
         <head>
             <title>WSD Add-on Status</title>
