@@ -15,12 +15,18 @@ from globals import SCANNERS, list_scanners
 from scanner import Scanner
 from config import OFFLINE_TIMEOUT
 #from scanner import Scanner, fetch_metadata
-
+import uuid
+#import aiohttp
+#from datetime import datetime, timedelta
 
 NAMESPACES = {
-    "soap": "http://www.w3.org/2003/05/soap-envelope",
+    "wsa": "http://schemas.xmlsoap.org/ws/2004/08/addressing",
+    "wse": "http://schemas.xmlsoap.org/ws/2004/08/eventing",
     "wsd": "http://schemas.xmlsoap.org/ws/2005/04/discovery",
-    "wsa": "http://schemas.xmlsoap.org/ws/2004/08/addressing"
+    "soap": "http://www.w3.org/2003/05/soap-envelope"
+}
+
+NAMESPACES = {
 }
 
 logging.basicConfig(level=logging.INFO, format='[%(levelname)s] %(message)s')
@@ -236,3 +242,100 @@ async def heartbeat_monitor():
 
 
 
+# ---------------- Scanner Subscribe ----------------
+#async def subscribe_to_scanner(scanner, my_notify_url: str, expires_seconds: int = 3600):
+async def subscribe_to_scanner(scanner, my_notify_url: str):
+    logger.info(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} [WSD:Subscribe] trying to subscribe to {scanner.ip}/{scanner.xaddr}")
+    """
+    Versucht eine Subscribe-Request an scanner.xaddr zu senden.
+    - scanner.xaddr must be a service URL (z.B. http://192.168.0.3:8018/wsd/scan)
+    - my_notify_url muss vom Scanner erreichbar sein (http://<HA_IP>:<port>/wsd/notify)
+    Rückgabe: dict mit keys {"ok":bool, "identifier":str|None, "expires":datetime|None, "status":int}
+    """
+    if not scanner.xaddr:
+        logger.warning(f"   ! missing xaddr !")
+        return {"ok": False, "reason": "no xaddr", "identifier": None}
+
+    logger.info(f"   ---> forming SOAP request")
+    message_uuid = str(uuid.uuid4())
+    soap = f"""<?xml version="1.0" encoding="utf-8"?>
+    <s:Envelope xmlns:s="http://www.w3.org/2003/05/soap-envelope"
+                xmlns:wsa="http://schemas.xmlsoap.org/ws/2004/08/addressing"
+                xmlns:wse="http://schemas.xmlsoap.org/ws/2004/08/eventing">
+      <s:Header>
+        <wsa:To>{scanner.xaddr}</wsa:To>
+        <wsa:Action>http://schemas.xmlsoap.org/ws/2004/08/eventing/Subscribe</wsa:Action>
+        <wsa:MessageID>urn:uuid:{message_uuid}</wsa:MessageID>
+        <wsa:ReplyTo>
+          <wsa:Address>http://schemas.xmlsoap.org/ws/2004/08/addressing/role/anonymous</wsa:Address>
+        </wsa:ReplyTo>
+      </s:Header>
+      <s:Body>
+        <wse:Subscribe>
+          <wse:Delivery Mode="http://schemas.xmlsoap.org/ws/2004/08/eventing/DeliveryModes/Push">
+            <wse:NotifyTo>
+              <wsa:Address>{my_notify_url}</wsa:Address>
+            </wse:NotifyTo>
+          </wse:Delivery>
+          <wse:Expires>PT{OFFLINE_TIMEOUT}S</wse:Expires>
+        </wse:Subscribe>
+      </s:Body>
+    </s:Envelope>"""
+#          <wse:Expires>PT{expires_seconds}S</wse:Expires>
+
+#    logger.debug(f"   ---> SOAP request:")
+#    logger.debug(f"{soap}")
+    logger.info(f"   ---> SOAP request:")
+    logger.info(f"{soap}")
+
+    headers = {"Content-Type": "application/soap+xml; charset=utf-8", "User-Agent": "WSD-Client"}
+    async with aiohttp.ClientSession() as session:
+        try:
+            async with session.post(scanner.xaddr, data=soap.encode("utf-8"), headers=headers, timeout=10) as resp:
+                #logger.debug(f"   ---> sending SOAP request:")
+                logger.info(f"   ---> sending SOAP request:")
+                text = await resp.text()
+                status = resp.status
+        except Exception as e:
+            logger.warning(f"   ---> anything went wrong in sending SOAP request: {e}")
+            return {"ok": False, "reason": f"http error: {e}", "identifier": None}
+
+    logger.debug(f"   ---> Response:")
+    logger.debug(f"{text}")
+    
+    # parse response for Identifier and Expires
+    try:
+        logger.info(f"   ---> extracting values from answer")
+        root = ET.fromstring(text)
+        logger.debug(f"   ---> raw: {root}")
+
+        ident_elem = root.find(".//wse:Identifier", NAMESPACES)
+        expires_elem = root.find(".//wse:Expires", NAMESPACES)
+        
+        logger.debug(f"   ---> Identifier: {ident_elem}")
+        logger.debug(f"   ---> Expires: {expires_elem}")
+        
+        identifier = ident_elem.text.strip() if ident_elem is not None and ident_elem.text else None
+        expires_dt = None
+
+        if expires_elem is not None and expires_elem.text:
+            # expect PT1234S - convert roughly
+            txt = expires_elem.text.strip()
+            if txt.startswith("PT") and txt.endswith("S"):
+                secs = int(txt[2:-1])
+                expires_dt = datetime.now() + timedelta(seconds=secs)
+        
+        # store subscription details on scanner instance
+        if identifier:
+            scanner.subscription_id = identifier
+            scanner.subscription_expires = expires_dt
+        return {"ok": True, "identifier": identifier, "expires": expires_dt, "status": status}
+
+    except Exception as e:
+        logger.warning(f"   ---> anything went wrong in extracting SOAP response: {e}")
+        return {"ok": False, "reason": f"xml parse error: {e}", "identifier": None}
+
+    logger.info(f"   ---> Subscription ID: {scanner.subscription_id}")
+    logger.info(f"   ---> Subscription expires: {scanner.subscription_expires}")
+#    logger.info(f"   ---> Subscription ID: {scanner.subscription_id}")
+#    logger.info(f"   ---> Subscription ID: {scanner.subscription_id}")
