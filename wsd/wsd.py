@@ -26,9 +26,6 @@ import uuid
 #    "soap": "http://www.w3.org/2003/05/soap-envelope"
 #}
 
-NAMESPACES = {
-}
-
 logging.basicConfig(level=logging.INFO, format='[%(levelname)s] %(message)s')
 logger = logging.getLogger("wsd-addon")
 
