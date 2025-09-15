@@ -111,7 +111,7 @@ async def message_processor(data, addr):
     xaddrs_elem = root.find(".//{http://schemas.xmlsoap.org/ws/2005/04/discovery}XAddrs")
     xaddr = ""
     if xaddrs_elem is not None and xaddrs_elem.text:
-        xaddr = pick_best_xaddr(xaddrs_elem.text.strip()) + "/scan
+        xaddr = pick_best_xaddr(xaddrs_elem.text.strip()) + "/scan"
 
     logger.info(f"[WSD:DISCOVERY] received from {ip}")
     logger.info(f"    -->   UUID: {uuid}")
