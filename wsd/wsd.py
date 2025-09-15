@@ -22,13 +22,6 @@ import uuid
 #import aiohttp
 #from datetime import datetime, timedelta
 
-#NAMESPACES = {
-#    "wsa": "http://schemas.xmlsoap.org/ws/2004/08/addressing",
-#    "wse": "http://schemas.xmlsoap.org/ws/2004/08/eventing",
-#    "wsd": "http://schemas.xmlsoap.org/ws/2005/04/discovery",
-#    "soap": "http://www.w3.org/2003/05/soap-envelope"
-#}
-
 logging.basicConfig(level=logging.INFO, format='[%(levelname)s] %(message)s')
 logger = logging.getLogger("wsd-addon")
 
@@ -350,5 +343,4 @@ async def subscribe_to_scanner(scanner, my_notify_url: str):
 
     logger.info(f"   ---> Subscription ID: {scanner.subscription_id}")
     logger.info(f"   ---> Subscription expires: {scanner.subscription_expires}")
-#    logger.info(f"   ---> Subscription ID: {scanner.subscription_id}")
-#    logger.info(f"   ---> Subscription ID: {scanner.subscription_id}")
+
