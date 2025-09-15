@@ -26,6 +26,11 @@ import templates
 logging.basicConfig(level=logging.INFO, format='[%(levelname)s] %(message)s')
 logger = logging.getLogger("wsd-addon")
 
+import time
+import threading
+
+PROBE_INTERVAL = 30  # Sekunden
+
 # ---------------- WSD SOAP Parser ----------------
 def parse_wsd_packet(data: bytes):
     try:
@@ -195,6 +200,39 @@ async def check_scanner(scanner):
         logger.warning(f"[WSD:Heartbeat FAIL] {scanner.friendly_name or scanner.ip}: {e}")
 
 
+# ---------------- Scanner Probe ----------------
+async def probe_monitor():
+    while True:
+        logger.debug(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} [WSD:Probe] wake-up")
+
+        now = time.time()
+        for uuid, scanner in SCANNERS.items():
+            logger.info(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} [WSD:Probe] Timer-Check for {uuid} ({scanner.ip})...")
+#            status = scanner.get("status")
+#            last_seen = scanner.get("last_seen", 0)
+            status = scanner.status
+            last_seen = scanner.last_seen
+            age = (now - scanner.last_seen).total_seconds()
+            logger.info(f"   --> last_seen = {scanner.last_seen}")
+            logger.debug(f"   -->       age = {age}")
+
+#            if status in ("discovered", "stale") and now - last_seen > PROBE_INTERVAL:
+            if status in ("discovered", "stale") and now - last_seen > OFFLINE_TIMEOUT:
+                try:
+                    send_probe(uuid)
+                except Exception as e:
+#                    scanner["status"] = "error"
+#                    scanner["error"] = str(e)
+                    scanner.status = "error"
+                    scanner.error = str(e)
+ 
+        logger.debug(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} [WSD:Probe] goodbye")
+        #await asyncio.sleep(30)
+        await asyncio.sleep(12)
+        logger.debug(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} [WSD:Probe] back in town")
+#        time.sleep(5)
+
+
 # ---------------- Scanner Heartbeat ----------------
 async def heartbeat_monitor():
     while True:
@@ -237,7 +275,7 @@ async def heartbeat_monitor():
 
         logger.debug(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} [WSD:Heartbeat] goodbye")
         #await asyncio.sleep(30)
-        await asyncio.sleep(10)
+        await asyncio.sleep(20)
         logger.debug(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} [WSD:Heartbeat] back in town")
 
 
