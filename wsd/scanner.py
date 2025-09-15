@@ -54,8 +54,7 @@ class Scanner:
         self.remove_after = None
 #        logger.info(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} [SCANNER:upd] {self.ip} ({self.friendly_name or self.name})")
         logger.info(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} [SCANNER:upd] Seen {self.friendly_name} ({self.ip}) with UUID {self.uuid}")
-        logger.info(f"   --> new last_seen: {self.last_seen}")
-        logger.info(f"   -->   debug xaddr: {self.xaddr}")
+        logger.debug(f"   --> new last_seen: {self.last_seen}")
 
     # wird aufgerufen wenn ein Scanner offline gesetzt wird
     # Aufruf mit SCANNER[uuid].mark_offline()
@@ -68,11 +67,10 @@ class Scanner:
             self.remove_after = self.offline_since + datetime.timedelta(seconds=OFFLINE_TIMEOUT)
 #        logger.info(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} [SCANNER:m_offl] {self.ip} ({self.friendly_name or self.name})")
         logger.info(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} [SCANNER:m_offl] marked {self.friendly_name} ({self.ip}) with UUID {self.uuid} as offline")
-        logger.info(f"   -->        online: {self.online}")
-        logger.info(f"   --> offline_since: {self.offline_since}")
-        logger.info(f"   -->  remove_after: {self.remove_after}")
-        logger.info(f"   -->   debug xaddr: {self.xaddr}")
-
+        logger.debug(f"   -->        online: {self.online}")
+        logger.debug(f"   --> offline_since: {self.offline_since}")
+        logger.debug(f"   -->  remove_after: {self.remove_after}")
+        logger.debug(f"   -->   debug xaddr: {self.xaddr}")
 
     # Fragt Scanner-Metadaten per WS-Transfer/Get ab
     # def fetch_metadata(self):
