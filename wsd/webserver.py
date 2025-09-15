@@ -83,7 +83,7 @@ async def status_page(request):
 
 # ---------------- HTTP Server ----------------
 async def start_http_server():
-    logger.info(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S}[WEBSERVER:start_http] configuring HTTP SOAP Server on Port {HTTP_PORT}")
+    logger.info(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S}[WEBSERVER:start_http] configuring HTTP/SOAP Server on Port {HTTP_PORT}")
     app = web.Application()
     app.router.add_get("/", status_page)
     logger.debug(f"   ---> added endpoint /")
@@ -99,7 +99,7 @@ async def start_http_server():
     # An alle Interfaces binden (0.0.0.0) -> wichtig für Docker / HA
     site = web.TCPSite(runner, "0.0.0.0", HTTP_PORT)
     await site.start()
-    logger.info(f"   ---> HTTP SOAP Server should run on Port {HTTP_PORT}")
+    logger.info(f"   ---> HTTP/SOAP Server should run on Port {HTTP_PORT}")
 
 
 # ---------------- NOTIFY handler ----------------
