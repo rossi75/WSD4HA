@@ -14,7 +14,8 @@ from globals import SCANNERS, list_scanners, NAMESPACES
 #from globals import SCANNERS, list_scanners, OFFLINE_TIMEOUT
 from scanner import Scanner
 #from config import OFFLINE_TIMEOUT
-from config import OFFLINE_TIMEOUT, LOCAL_IP
+#from config import OFFLINE_TIMEOUT, LOCAL_IP
+from config import OFFLINE_TIMEOUT, LOCAL_IP, HTTP_PORT
 #from scanner import Scanner, fetch_metadata
 import uuid
 #import aiohttp
