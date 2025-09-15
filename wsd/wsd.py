@@ -47,7 +47,7 @@ def pick_best_xaddr(xaddrs: str) -> str:
     - ignoriert IPv6, wenn IPv4 vorhanden ist
     - nimmt den Hostnamen, falls keine IP vorhanden ist
     """
-    logger.info(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S}[WSD:XADDR] received {xaddrs}")
+    logger.debug(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S}[WSD:XADDR] received {xaddrs}")
     if not xaddrs:
         return None
 
@@ -67,7 +67,7 @@ def pick_best_xaddr(xaddrs: str) -> str:
             # vermutlich Hostname
             hostname = addr
 
-    logger.info(f"[WSD:XADDR] extracted {ipv4 or hostname or None}")
+    logger.debug(f"[WSD:XADDR] extracted {ipv4 or hostname or None}")
     return ipv4 or hostname or None
 
 
@@ -111,7 +111,7 @@ async def message_processor(data, addr):
     xaddrs_elem = root.find(".//{http://schemas.xmlsoap.org/ws/2005/04/discovery}XAddrs")
     xaddr = ""
     if xaddrs_elem is not None and xaddrs_elem.text:
-        xaddr = pick_best_xaddr(xaddrs_elem.text.strip())
+        xaddr = pick_best_xaddr(xaddrs_elem.text.strip()) + "/scan
 
     logger.info(f"[WSD:DISCOVERY] received from {ip}")
     logger.info(f"    -->   UUID: {uuid}")
