@@ -144,7 +144,7 @@ async def message_processor(data, addr):
         list_scanners()
 
     else:
-        logger.warning(f"[WSD:Message] unrecognized operation {action_text}")
+        logger.warning(f"[WSD:Message] received unrecognized operation {action_text} from {ip}")
 
     logger.info(f"[WSD:Message] done")
 
