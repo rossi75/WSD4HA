@@ -255,7 +255,7 @@ async def heartbeat_monitor():
 # ---------------- Scanner Subscribe ----------------
 #async def subscribe_to_scanner(scanner, my_notify_url: str, expires_seconds: int = 3600):
 async def subscribe_to_scanner(scanner, my_notify_url: str):
-    logger.info(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} [WSD:Subscribe] trying to subscribe to {scanner.ip}/{scanner.xaddr}")
+    logger.info(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} [WSD:Subscribe] trying to subscribe to {scanner.xaddr}")
     """
     Versucht eine Subscribe-Request an scanner.xaddr zu senden.
     - scanner.xaddr must be a service URL (z.B. http://192.168.0.3:8018/wsd/scan)
@@ -296,7 +296,7 @@ async def subscribe_to_scanner(scanner, my_notify_url: str):
 #    logger.debug(f"   ---> SOAP request:")
 #    logger.debug(f"{soap}")
     logger.info(f"   ---> SOAP request:")
-    logger.info(f"{soap}")
+    logger.info("{soap}")
 
     headers = {"Content-Type": "application/soap+xml; charset=utf-8", "User-Agent": "WSD-Client"}
     async with aiohttp.ClientSession() as session:
