@@ -142,7 +142,8 @@ async def message_processor(data, addr):
 #            res = await subscribe_to_scanner(scanner, my_notify_url=f"http://{HOST_IP}:{HTTP_PORT}/wsd/notify", expires_seconds=3600)
 #            res = await subscribe_to_scanner(SCANNERS[uuid], my_notify_url=f"http://{HOST_IP}:{HTTP_PORT}/wsd/notify", expires_seconds=3600)
 #            res = await subscribe_to_scanner(SCANNERS[uuid], my_notify_url=f"http://{LOCAL_IP}:{HTTP_PORT}/wsd/notify", expires_seconds=3600)
-            res = await subscribe_to_scanner(SCANNERS[uuid], my_notify_url=f"http://{LOCAL_IP}:{HTTP_PORT}/wsd/notify", expires_seconds={OFFLINE_TIMEOUT})
+#            res = await subscribe_to_scanner(SCANNERS[uuid], my_notify_url=f"http://{LOCAL_IP}:{HTTP_PORT}/wsd/notify", expires_seconds={OFFLINE_TIMEOUT})
+            res = await subscribe_to_scanner(SCANNERS[uuid], my_notify_url=f"http://{LOCAL_IP}:{HTTP_PORT}/wsd/notify")
             if res["ok"]:
                 logger.info("   ---> subscribed id=%s expires=%s", res["identifier"], res["expires"])
             else:
