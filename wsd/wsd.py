@@ -255,11 +255,14 @@ async def subscribe_to_scanner(scanner, my_notify_url: str):
     - my_notify_url muss vom Scanner erreichbar sein (http://<HA_IP>:<port>/wsd/notify)
     Rückgabe: dict mit keys {"ok":bool, "identifier":str|None, "expires":datetime|None, "status":int}
     """
+
     if not scanner.xaddr:
         logger.warning(f"   ! missing xaddr !")
         return {"ok": False, "reason": "no xaddr", "identifier": None}
 
     logger.info(f"   ---> forming SOAP request")
+
+    headers = {"Content-Type": "application/soap+xml; charset=utf-8", "User-Agent": "WSD-Client"}
     message_uuid = str(uuid.uuid4())
     soap = f"""<?xml version="1.0" encoding="utf-8"?>
     <s:Envelope xmlns:s="http://www.w3.org/2003/05/soap-envelope"
@@ -289,9 +292,12 @@ async def subscribe_to_scanner(scanner, my_notify_url: str):
 #    logger.debug(f"   ---> SOAP request:")
 #    logger.debug(f"{soap}")
     logger.info(f"   ---> SOAP request:")
-    logger.info("{soap}")
-
-    headers = {"Content-Type": "application/soap+xml; charset=utf-8", "User-Agent": "WSD-Client"}
+#    logger.info("{soap}")
+#    logger.info("soap")
+    logger.info({soap})
+    logger.info(f"   ---> SOAP request UTF-8:")
+    logger.info({soap.encode("utf-8")})
+    
     async with aiohttp.ClientSession() as session:
         try:
             logger.info(f"   ---> sending SOAP request")
@@ -301,7 +307,7 @@ async def subscribe_to_scanner(scanner, my_notify_url: str):
                 text = await resp.text()
                 logger.info(f"   ---> Status: {status}")
                 logger.info(f"   ---> text:")
-                logger.info("{text}")
+                logger.info({text})
         except Exception as e:
             logger.warning(f"   ---> anything went wrong in sending SOAP request: {e}")
             return {"ok": False, "reason": f"http error: {e}", "identifier": None}
