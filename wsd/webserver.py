@@ -49,9 +49,23 @@ async def status_page(request):
         if delta > OFFLINE_TIMEOUT:
             s.online = False
         color = "green" if s.online else ("orange" if delta < 2*OFFLINE_TIMEOUT else "red")
-        formats = ", ".join(s.formats)
+#        formats = ", ".join(s.formats)
         #formats = ", ".join(s.types)
-        scanner_list += f"<tr style='color:{color}'><td>{s.name}</td><td>{s.ip}</td><td>{s.mac or ''}</td><td>{s.uuid or ''}</td><td>{formats}</td><td>{'Online' if s.online else 'Offline'}</td><td>{s.last_seen.strftime('%Y-%m-%d %H:%M:%S')}</td></tr>"
+        scanner_list += f"<tr style='color:{color}'>
+        scanner_list += <td>{s.ip}</td>
+        scanner_list += <td>{s.uuid}</td>
+        scanner_list += <td>{s.friendly_name or ''}</td>
+        scanner_list += <td>{s.mac or ''}</td>
+        scanner_list += <td>{'Online' if s.online else 'Offline'}</td>
+        scanner_list += <td>{s.last_seen.strftime('%Y-%m-%d %H:%M:%S')}</td>
+        scanner_list += <td>{s.xaddr or ''}</td>
+        scanner_list += <td>{s.subscription_id or ''}</td>
+        scanner_list += <td>{s.subscription_expires or ''}</td>
+        scanner_list += <td>{s.manufacturer or ''}</td>
+        scanner_list += <td>{s.model or ''}</td>
+        scanner_list += <td>{s.firmware or ''}</td>
+        scanner_list += <td>{s.serial or ''}</td>
+        scanner_list += </tr>"
 
     logger.info(f"   ---> forming and delivering http-response")
     return web.Response(text=f"""
@@ -74,6 +88,7 @@ async def status_page(request):
             <h2>Active Scanners:</h2>
             <table>
                 <tr><th>Name</th><th>IP</th><th>MAC</th><th>UUID</th><th>Formats</th><th>State</th><th>Last seen</th></tr>
+                <tr><th>IP</th><th>UUID</th><th>Name</th><th>MAC</th><th>State</th><th>Last seen</th><th>XADDR</th><th>Subscr ID</th><th>Subscr Exp</th><th>Manufacturer</th><th>Model</th><th>Firmware</th><th>Serial</th></tr>
                 {scanner_list}
             </table>
         </body>
