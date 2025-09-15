@@ -24,7 +24,7 @@ logger = logging.getLogger("wsd-addon")
 
 # ---------------- WebUI ----------------
 async def status_page(request):
-    logger.info(f"[d/t] [WEBSERVER.status_page] received request for status page")
+    logger.info(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} [WEBSERVER.status_page] received request for status page")
     # Dateien
     files = sorted(SCAN_FOLDER.iterdir(), reverse=True)[:MAX_FILES]
     file_list = ''
@@ -75,7 +75,7 @@ async def status_page(request):
     logger.info(f"   ---> probably delivered http-response")
 
 async def start_http_server():
-    logger.info(f"[d/t] [WEBSERVER:start_http] starting HTTP SOAP Server on Port {HTTP_PORT}")
+    logger.info(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} [WEBSERVER:start_http] starting HTTP SOAP Server on Port {HTTP_PORT}")
     app = web.Application()
  #   app.router.add_post("/wsd/scan", handle_scan_job)
     app.router.add_get("/", status_page)
