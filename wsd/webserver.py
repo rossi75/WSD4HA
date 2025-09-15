@@ -81,15 +81,20 @@ async def status_page(request):
     """, content_type="text/html")
     logger.info(f"   ---> probably delivered http-response")
 
+# ---------------- HTTP Server ----------------
 async def start_http_server():
-    logger.info(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S}[WEBSERVER:start_http] starting HTTP SOAP Server on Port {HTTP_PORT}")
+    logger.info(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S}[WEBSERVER:start_http] configuring HTTP SOAP Server on Port {HTTP_PORT}")
     app = web.Application()
- #   app.router.add_post("/wsd/scan", handle_scan_job)
     app.router.add_get("/", status_page)
+    logger.debug(f"   ---> added endpoint /")
     app.router.add_post("/wsd/notify", notify_handler)
+    logger.debug(f"   ---> added endpoint /wsd/notify")
+#    app.router.add_post("/wsd/scan", handle_scan_job)
+#    logger.debug(f"   ---> added endpoint /wsd/scan")
     
     runner = web.AppRunner(app)
     await runner.setup()
+    logger.debug(f"   ---> runner.setup().web.AppRunner(app)")
     
     # An alle Interfaces binden (0.0.0.0) -> wichtig für Docker / HA
     site = web.TCPSite(runner, "0.0.0.0", HTTP_PORT)
@@ -97,7 +102,7 @@ async def start_http_server():
     logger.info(f"   ---> HTTP SOAP Server should run on Port {HTTP_PORT}")
 
 
-
+# ---------------- NOTIFY handler ----------------
 async def notify_handler(request):
     text = await request.text()
     # quick log
