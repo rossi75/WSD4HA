@@ -22,9 +22,11 @@ class Scanner:
     def __init__(self, uuid, ip="0.0.0.0", xaddr=None):
         self.uuid = uuid
         self.ip = ip
+
+        # WSD Parameters
         self.xaddr = xaddr            # Service-Adresse (aus <wsd:XAddrs>)
-#        self.name = name
-#        self.formats = formats or [] # unnötg?
+        self.subscription_id = None
+        self.subscription_expires = None
 
         # zusätzliche optionale Infos
         self.friendly_name = None
@@ -35,7 +37,6 @@ class Scanner:
         self.manufacturer = None
 
         # Status
-#        self.last_seen = datetime.datetime.now() - datetime.timedelta(seconds=max_age // 2) # last_seen so zurücksetzen, dass wir "halbzeit" erreicht haben
         self.last_seen = datetime.datetime.now() - datetime.timedelta(seconds=OFFLINE_TIMEOUT // 2) # last_seen so zurücksetzen, dass wir "halbzeit" erreicht haben
         self.online = True
         self.offline_since = None
