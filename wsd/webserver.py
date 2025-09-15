@@ -51,7 +51,7 @@ async def status_page(request):
     return web.Response(text=f"""
         <html>
         <head>
-            <title>WSD Add-on Status</title>
+            <title>WSD4HA</title>
             <style>
                 table {{ border-collapse: collapse; width: 100%; }}
                 th, td {{ border: 1px solid #ddd; padding: 8px; }}
@@ -59,7 +59,7 @@ async def status_page(request):
             </style>
         </head>
         <body>
-            <h1>WSD Add-on running</h1>
+            <h1>WSD4HA seems to be running</h1>
             <h2>Last {MAX_FILES} Scans:</h2>
             <table>
                 <tr><th>Filename</th><th>Date/Time</th><th>Size (KB)</th></tr>
