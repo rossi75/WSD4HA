@@ -14,6 +14,10 @@ import subprocess
 from config import OFFLINE_TIMEOUT, SCAN_FOLDER, HTTP_PORT
 #from globals import SCANNERS, OFFLINE_TIMEOUT, SCAN_FOLDER, MAX_FILES
 from globals import SCANNERS
+#from globals import SCANNERS, list_scanners 
+#from globals import SCANNERS, list_scanners, OFFLINE_TIMEOUT
+from scanner import Scanner
+
 
 logging.basicConfig(level=logging.INFO, format='[%(levelname)s] %(message)s')
 logger = logging.getLogger("wsd-addon")
