@@ -21,7 +21,8 @@ options:
   offline_timeout: 300
   scan_folder: "/share/scans"
   max_files: 50
-  log_level: "INFO"
+#  log_level: "INFO"
+  log_level: []
 schema:
   offline_timeout: int(120,3600)
   scan_folder: str
