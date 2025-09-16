@@ -44,7 +44,7 @@ class Scanner:
 
         logger.info(f"[SCANNER:__init__]    dt.now: {datetime.datetime.now()}")
         logger.info(f"[SCANNER:__init__]     delta: {datetime.timedelta(seconds=OFFLINE_TIMEOUT //2)}")
-        logger.info(f"[SCANNER:__init__] last_seen: {self.last_seen"})
+        logger.info(f"[SCANNER:__init__] last_seen: {self.last_seen}")
 
     # Scanner ist noch online
     # Aufruf mit SCANNER[uuid].update()
