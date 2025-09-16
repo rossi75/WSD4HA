@@ -2,7 +2,8 @@ import datetime
 import socket
 import logging
 import sys
-from globals import SCANNERS, list_scanners, NAMESPACES
+#from globals import SCANNERS, list_scanners, NAMESPACES
+from globals import SCANNERS, list_scanners, NAMESPACES, ScannerStatus
 #from config import WSD_OFFLINE_TIMEOUT
 from config import OFFLINE_TIMEOUT
 #from config import WSD_HTTP_PORT, WSD_OFFLINE_TIMEOUT, WSD_SCAN_FOLDER
@@ -19,7 +20,8 @@ logger = logging.getLogger("wsd-addon")
 # ---------------- Scanner-Datenstruktur ----------------
 class Scanner:
 #    def __init__(self, name, ip, mac=None, uuid=None, formats=None, location=None, max_age=OFFLINE_TIMEOUT, xaddr=None):
-    def __init__(self, uuid, ip="0.0.0.0", xaddr=None):
+#    def __init__(self, uuid, ip="0.0.0.0", xaddr=None):
+    def __init__(self, uuid, ip="0.0.0.0"):
         self.uuid = uuid
         self.ip = ip
 
@@ -38,7 +40,7 @@ class Scanner:
 
         # Status
         self.last_seen = datetime.datetime.now() - datetime.timedelta(seconds=OFFLINE_TIMEOUT // 2) # last_seen so zurücksetzen, dass wir "halbzeit" erreicht haben
-        self.online = True
+        self.state = ScannerStatus.ONLINE
         self.offline_since = None
         self.remove_after = None  # Zeitpunkt zum Löschen
 
@@ -49,7 +51,8 @@ class Scanner:
     def update(self):
         self.last_seen = datetime.datetime.now()
 #        self.max_age = max_age
-        self.online = True
+#        self.online = True
+        self.state = ScannerStatus.ONLINE
         self.offline_since = None
         self.remove_after = None
 #        logger.info(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} [SCANNER:upd] {self.ip} ({self.friendly_name or self.name})")
@@ -59,18 +62,20 @@ class Scanner:
     # wird aufgerufen wenn ein Scanner offline gesetzt wird
     # Aufruf mit SCANNER[uuid].mark_offline()
     def mark_offline(self):
-        if self.online:
-            self.online = False
+#        if self.online:
+#            self.online = False
+        self.state = ScannerStatus.OFFLINE
         if not self.offline_since:
             self.offline_since = datetime.datetime.now()
 #            self.remove_after = self.offline_since + datetime.timedelta(seconds=self.max_age)
             self.remove_after = self.offline_since + datetime.timedelta(seconds=OFFLINE_TIMEOUT)
 #        logger.info(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} [SCANNER:m_offl] {self.ip} ({self.friendly_name or self.name})")
         logger.info(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} [SCANNER:m_offl] marked {self.friendly_name} ({self.ip}) with UUID {self.uuid} as offline")
-        logger.debug(f"   -->        online: {self.online}")
+#        logger.debug(f"   -->        online: {self.online}")
+        logger.debug(f"   -->         state: {self.state}")
         logger.debug(f"   --> offline_since: {self.offline_since}")
         logger.debug(f"   -->  remove_after: {self.remove_after}")
-        logger.debug(f"   -->   debug xaddr: {self.xaddr}")
+#        logger.debug(f"   -->   debug xaddr: {self.xaddr}")
 
     # Fragt Scanner-Metadaten per WS-Transfer/Get ab
     # def fetch_metadata(self):
