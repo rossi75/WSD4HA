@@ -27,4 +27,4 @@ schema:
   offline_timeout: int(120,3600)
   scan_folder: str
   max_files: int
-  log_level: list(INFO|DEBUG)
+  log_level: list(INFO|DEBUG|WARNING)
