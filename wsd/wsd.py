@@ -20,7 +20,7 @@ from scanner import Scanner
 from config import OFFLINE_TIMEOUT, LOCAL_IP, HTTP_PORT
 #from scanner import Scanner, fetch_metadata
 import uuid
-import templates
+from templates import SOAP_PROBE_TEMPLATE
 #import aiohttp
 #from datetime import datetime, timedelta
 
