@@ -59,7 +59,7 @@ class Scanner:
 
     # wird aufgerufen wenn ein Scanner offline gesetzt wird
     # Aufruf mit SCANNER[uuid].mark_offline()
-    def mark_offline(self):
+    def mark_absent(self):
         self.state = ScannerStatus.OFFLINE
         if not self.offline_since:
             self.offline_since = datetime.datetime.now()
