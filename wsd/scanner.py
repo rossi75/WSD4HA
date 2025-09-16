@@ -35,6 +35,7 @@ class Scanner:
         self.serial = None
         self.model = None
         self.manufacturer = None
+        self.related_uuids = []
 
         # Status
         self.last_seen = datetime.datetime.now() - datetime.timedelta(seconds=OFFLINE_TIMEOUT // 2) # last_seen so zurücksetzen, dass wir "halbzeit" erreicht haben
