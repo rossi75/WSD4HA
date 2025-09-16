@@ -11,7 +11,8 @@ import re
 import xml.etree.ElementTree as ET
 import subprocess
 #from state import SCANNERS
-from globals import SCANNERS, list_scanners, NAMESPACES
+#from globals import SCANNERS, list_scanners, NAMESPACES
+from globals import SCANNERS, list_scanners, NAMESPACES, ScannerStatus
 #from globals import SCANNERS, list_scanners, OFFLINE_TIMEOUT
 from scanner import Scanner
 #from config import OFFLINE_TIMEOUT
@@ -29,7 +30,7 @@ logger = logging.getLogger("wsd-addon")
 import time
 import threading
 
-PROBE_INTERVAL = 30  # Sekunden
+PROBE_INTERVAL = 30  # Sekunden ==> wird später der OFFLINE_TIMEOUT
 
 # ---------------- WSD SOAP Parser ----------------
 def parse_wsd_packet(data: bytes):
@@ -223,7 +224,7 @@ async def probe_monitor():
                 except Exception as e:
 #                    scanner["status"] = "error"
 #                    scanner["error"] = str(e)
-                    scanner.status = "error"
+                    scanner.status = ScannerStatus.
                     scanner.error = str(e)
  
         logger.debug(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} [WSD:Probe] goodbye")
