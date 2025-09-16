@@ -326,6 +326,7 @@ def parse_probe(xml: str, scanners: dict):
             scanners[uuid].related_uuids.add("{scanner.uuid}")       # = set()
             scanners[uuid].status = ScannerStatus.PROBE_PARSED                       # das neue Gerät > hat die Probe bestanden, wird nun weiter konnektiert
             scanner.status = ScannerStatus.ONLINE                                    # das alte Gerät > ist weiterhin online, wird nicht mehr bearbeitet
+            marry_endpoints(scanner, scanners[uuid])
             logger.info(f"[WSD:probe_parser] Discovered new scanner endpoint with {uuid} @ {ip} as child from {scanner.uuid}")
         else:
 #            scanner = scanners[uuid]
@@ -337,6 +338,8 @@ def parse_probe(xml: str, scanners: dict):
             logger.info(f"[WSD:probe_parser] Updated scanner {uuid} -> {xaddr}")
 
     return scanners
+
+
 # ---------------- WSD SOAP Parser ----------------
 def parse_wsd_packet(data: bytes):
     try:
@@ -351,3 +354,11 @@ def parse_wsd_packet(data: bytes):
         logger.debug(f"[WSD] Error while parsing: {e}")
         return None
 
+
+# ---------------- marry two endpoints ----------------
+def link_endpoints(scanner_a, scanner_b):
+    """
+    Stellt sicher, dass zwei Scanner-Objekte sich gegenseitig kennen.
+    """
+    scanner_a.add_related_uuid(scanner_b.uuid)
+    scanner_b.add_related_uuid(scanner_a.uuid)
