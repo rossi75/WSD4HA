@@ -3,20 +3,18 @@
 #import socket
 import logging
 import sys
+from enum import Enum
 #import os
 
-# -----------------  global configuration  -----------------
+# -----------------  Logging  -----------------
 logging.basicConfig(level=logging.INFO, format='[%(levelname)s] %(message)s')
 logger = logging.getLogger("wsd-addon")
 
 # -----------------  global configuration  -----------------
-#from globals import SCANNERS, list_scanners, OFFLINE_TIMEOUT, SCAN_FOLDER, MAX_FILES
-
 #OFFLINE_TIMEOUT = int(os.environ.get("OFFLINE_TIMEOUT", 300))  # Sekunden
 #SCAN_FOLDER = Path(os.environ.get("SCAN_FOLDER", "/share/scans"))
 #SCAN_FOLDER.mkdir(parents=True, exist_ok=True)
 #MAX_FILES = int(os.environ.get("MAX_FILES", 5))
-
 
 # -----------------  define SCANNERS dict  -----------------
 SCANNERS = {}
@@ -29,6 +27,14 @@ NAMESPACES = {
     "wse": "http://schemas.xmlsoap.org/ws/2004/08/eventing",
     "wscn": "http://schemas.microsoft.com/windows/2006/08/wdp/scan"  # optional
 }
+
+# -----------------  define ScannerStati  -----------------
+class ScannerStatus(str, Enum):
+    DISCOVERED = "discovered"
+    PROBING = "probing"
+    ONLINE = "online"
+    ABSENT = "absent"
+    TO_REMOVE = "to_remove"
 
 # -----------------  Nach jedem Update: Liste loggen  -----------------
 def list_scanners():
