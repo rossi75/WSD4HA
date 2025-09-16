@@ -208,16 +208,18 @@ async def probe_monitor():
 
         for uuid, scanner in SCANNERS.items():
             logger.info(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} [WSD:Probe] Timer-Check for {uuid} ({scanner.ip})...")
-            scanner.state = ScannerStatus.ONLINE
-            status = scanner.state
+#            scanner.state = ScannerStatus.ONLINE
+            status = scanner.state.value
             age = (now - scanner.last_seen).total_seconds()
+            logger.info(f"   -->    status = {status}")
             logger.info(f"   --> last_seen = {scanner.last_seen}")
             logger.info(f"   -->       age = {age}")
-            logger.info(f"   -->    status = {status}")
 #            logger.debug(f"   -->       age = {age}")
 
-            if status in ("discovered", "absent") and age > OFFLINE_TIMEOUT:
+#            if status in ("discovered", "online") and age > OFFLINE_TIMEOUT:
+            if (status in ("discovered")) or (status in ("online") and age > OFFLINE_TIMEOUT):
                 logger.info(f"[WSD:probe_mon]   LogPoint A")
+                scanner.status = ScannerStatus.PROBING
                 try:
                     logger.info(f"[WSD:probe_mon]   LogPoint B")
                     send_probe(uuid)
