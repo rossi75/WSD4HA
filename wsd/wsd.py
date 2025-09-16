@@ -1,49 +1,25 @@
-import os
 import asyncio
-#from aiohttp import web
 import aiohttp
-from pathlib import Path
 import datetime
-import socket
 import logging
-import sys
+import os
 import re
-import xml.etree.ElementTree as ET
+import socket
 import subprocess
-#from state import SCANNERS
-#from globals import SCANNERS, list_scanners, NAMESPACES
-from globals import SCANNERS, list_scanners, NAMESPACES, ScannerStatus
-#from globals import SCANNERS, list_scanners, OFFLINE_TIMEOUT
-from scanner import Scanner
-#from config import OFFLINE_TIMEOUT
-#from config import OFFLINE_TIMEOUT, LOCAL_IP
-from config import OFFLINE_TIMEOUT, LOCAL_IP, HTTP_PORT
-#from scanner import Scanner, fetch_metadata
+import sys
 import uuid
+import xml.etree.ElementTree as ET
+from config import OFFLINE_TIMEOUT, LOCAL_IP, HTTP_PORT
+from globals import SCANNERS, list_scanners, NAMESPACES, ScannerStatus
+from pathlib import Path
+from scanner import Scanner
 from templates import SOAP_PROBE_TEMPLATE
-#import aiohttp
-#from datetime import datetime, timedelta
-#from utils import pick_best_xaddr  # deine vorhandene Hilfsfunktion
 
 logging.basicConfig(level=logging.INFO, format='[%(levelname)s] %(message)s')
 logger = logging.getLogger("wsd-addon")
 
 import time
 import threading
-
-# ---------------- WSD SOAP Parser ----------------
-def parse_wsd_packet(data: bytes):
-    try:
-        xml = ET.fromstring(data.decode("utf-8", errors="ignore"))
-        action = xml.find(".//{http://schemas.xmlsoap.org/ws/2004/08/addressing}Action")
-        uuid = xml.find(".//{http://schemas.xmlsoap.org/ws/2004/08/addressing}Address")
-        return {
-            "action": action.text if action is not None else None,
-            "uuid": uuid.text if uuid is not None else None,
-        }
-    except Exception as e:
-        logger.debug(f"[WSD] Error while parsing: {e}")
-        return None
 
 # ---------------- XADDR filtern ----------------
 def pick_best_xaddr(xaddrs: str) -> str:
@@ -275,7 +251,6 @@ async def send_probe(scanner):
         "User-Agent": "WSDAPI",
     }
 
-#    for xaddr in scanner.xaddr:
     url = f"http://{scanner.ip}:80/StableWSDiscoveryEndpoint/schemas-xmlsoap-org_ws_2005_04_discovery"
 
     logger.info(f"   ---> URL: {url}")
@@ -362,3 +337,17 @@ def parse_probe(xml: str, scanners: dict):
             logger.info(f"[WSD:probe_parser] Updated scanner {uuid} -> {xaddr}")
 
     return scanners
+# ---------------- WSD SOAP Parser ----------------
+def parse_wsd_packet(data: bytes):
+    try:
+        xml = ET.fromstring(data.decode("utf-8", errors="ignore"))
+        action = xml.find(".//{http://schemas.xmlsoap.org/ws/2004/08/addressing}Action")
+        uuid = xml.find(".//{http://schemas.xmlsoap.org/ws/2004/08/addressing}Address")
+        return {
+            "action": action.text if action is not None else None,
+            "uuid": uuid.text if uuid is not None else None,
+        }
+    except Exception as e:
+        logger.debug(f"[WSD] Error while parsing: {e}")
+        return None
+
