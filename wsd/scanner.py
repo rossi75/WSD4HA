@@ -166,6 +166,7 @@ class Scanner:
 
 
     def add_related_uuid(self, other_uuid: str):
+        logger.info(f"[SCANNER:relate] marry UUID {self.uuid} with {other_uuid}")
         """
         Verknüpft diesen Scanner mit einer weiteren UUID.
         """
