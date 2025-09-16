@@ -23,6 +23,7 @@ import uuid
 from templates import SOAP_PROBE_TEMPLATE
 #import aiohttp
 #from datetime import datetime, timedelta
+#from utils import pick_best_xaddr  # deine vorhandene Hilfsfunktion
 
 logging.basicConfig(level=logging.INFO, format='[%(levelname)s] %(message)s')
 logger = logging.getLogger("wsd-addon")
@@ -77,7 +78,7 @@ def pick_best_xaddr(xaddrs: str) -> str:
 
 
 # ---------------- Message handler ----------------
-async def message_processor(data, addr):
+async def discovery_processor(data, addr):
     logger.info(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} [Message] Processing sth")
     logger.debug(f" [Message]    ---> received data {data}")
     logger.debug(f" [Message]    ---> received addr {addr}")
@@ -181,7 +182,7 @@ async def UDP_listener_3702():
         while True:
             logger.debug(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} [WSD:recv_loop] waiting for UDP data")
             data, addr = await loop.sock_recvfrom(sock, 8192)
-            await message_processor(data, addr)   # ausgelagerte Verarbeitung
+            await discovery_processor(data, addr)   # ausgelagerte Verarbeitung
             await asyncio.sleep(1)
 
     # asyncio.create_task(recv_loop())
@@ -298,7 +299,7 @@ async def send_probe(scanner):
 
 # ---------------- Scanner Subscribe ----------------
 #async def subscribe_to_scanner(scanner, my_notify_url: str, expires_seconds: int = 3600):
-async def subscribe_to_scanner(scanner, my_notify_url: str):
+async def _subscribe_to_scanner(scanner, my_notify_url: str):
     logger.info(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} [WSD:Subscribe] trying to subscribe to {scanner.xaddr}")
     """
     Versucht eine Subscribe-Request an scanner.xaddr zu senden.
@@ -393,3 +394,56 @@ async def subscribe_to_scanner(scanner, my_notify_url: str):
     logger.info(f"   ---> Subscription ID: {scanner.subscription_id}")
     logger.info(f"   ---> Subscription expires: {scanner.subscription_expires}")
 
+
+# ---------------- Probe Parser ----------------
+def parse_probe(xml: str, scanners: dict):
+    """
+    Parse ProbeMatch response and update/create Scanner objects.
+
+    Args:
+        xml (str): SOAP XML response as string
+        scanners (dict): Dictionary {uuid: Scanner}
+
+    Returns:
+        dict: updated scanners
+    """
+    try:
+        scanner.status = ScannerStatus.PROBE_PARSE
+        root = ET.fromstring(xml)
+    except ET.ParseError as e:
+        logger.error(f"[probe_match_parser] XML ParseError: {e}")
+        return scanners
+
+    for pm in root.findall(".//wsd:ProbeMatch", NAMESPACE):
+        uuid_elem = pm.find(".//wsa:Address", NAMESPACE)
+        types_elem = pm.find(".//wsd:Types", NAMESPACE)
+        xaddrs_elem = pm.find(".//wsd:XAddrs", NAMESPACE)
+
+        if uuid_elem is None or types_elem is None or xaddrs_elem is None:
+            logger.warning("[probe_match_parser] Incomplete ProbeMatch, skipping")
+            scanner.status = ScannerStatus.ERROR
+            continue
+
+        uuid = uuid_elem.text.strip()
+        types = types_elem.text.strip().split()
+        xaddr = pick_best_xaddr(xaddrs_elem.text.strip())
+
+        # Nur Scanner akzeptieren
+        if not any("ScanDeviceType" in t for t in types):
+            logger.info(f"[probe_match_parser] Skipping non-scanner device {uuid}")
+            scanner.status = ScannerStatus.ERROR
+            continue
+
+        # neuer oder vorhandener Scanner?
+        if uuid not in scanners:
+            logger.info(f"[WSD:probe_parser] New scanner discovered: {uuid} @ {xaddr}")
+            scanners[uuid] = Scanner(uuid=uuid, ip=xaddr, xaddr=[xaddr])
+            scanners[uuid].status = ScannerStatus.PROBE_PARSED
+        else:
+            scanner = scanners[uuid]
+            scanner.ip = xaddr  # update IP
+            scanner.xaddr = [xaddr]
+            scanner.status = ScannerStatus.PROBE_PARSED
+            logger.info(f"[WSD:probe_parser] Updated scanner {uuid} -> {xaddr}")
+
+    return scanners
