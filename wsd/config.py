@@ -41,56 +41,52 @@ logging.basicConfig(level=logging.INFO, format='[%(levelname)s] %(message)s')
 
 logger = logging.getLogger("wsd-addon")
 
-logger.info(f"**********************************************************")
+logger.info(f" ")
+logger.info(f"***********************************************************")
 logger.info(f"Starting up WSD Scanner Service")
 logger.info(f"{datetime.datetime.now():%d.%m.%Y, %H:%M:%S}")
+logger.info(f"***********************************************************")
 logger.info(f"---------------------  Configuration  ---------------------")
 # ---------------- Optionen aus Environment ----------------
 # ---------------- Logging ----------------
 logger.info(f"Loglevel: {LOG_LEVEL}")
 
-#WSD_SCAN_FOLDER = Path(os.environ.get("WSD_SCAN_FOLDER", "/share/scans"))
-#WSD_MAX_FILES = int(os.environ.get("WSD_MAX_FILES", 5))
-#WSD_HTTP_PORT = int(os.environ.get("WSD_HTTP_PORT", 8080))
-#WSD_OFFLINE_TIMEOUT = int(os.environ.get("WSD_OFFLINE_TIMEOUT", 300))  # Sekunden
-#WSD_HTTP_PORT = int(os.environ.get("HTTP_PORT", 8080))
-HTTP_PORT = 8110
+# ---------------- Logging ----------------
+raw = int(os.environ.get("HTTP_PORT", 8110))
+logger.debug(f"HTTP-Port from Environment: {raw}")
+try:
+    HTTP_PORT = int(raw)  # Sekunden
+except ValueError:
+    HTTP_PORT = 8110  # Fallback vom Fallback
+    logger.debug(f"Reset to fallback Port (should never reach this point)")
 logger.info(f"HTTP-Port for UI: {HTTP_PORT}")
 
-#OFFLINE_TIMEOUT = int(os.environ.get("OFFLINE_TIMEOUT", 300))  # Sekunden
-#OFFLINE_TIMEOUT = os.environ.get("OFFLINE_TIMEOUT", 300)  # Sekunden
+# ---------------- Logging ----------------
 raw = os.environ.get("OFFLINE_TIMEOUT", 300)  # Sekunden
-logger.info(f"Offline Timeout raw: {raw}")
+logger.debug(f"OFFLINE_TIMEOUT from Environment: {raw}")
 try:
     OFFLINE_TIMEOUT = int(raw)  # Sekunden
 except ValueError:
     OFFLINE_TIMEOUT = 300  # Fallback vom Fallback
-logger.info(f"Offline Timeout: {OFFLINE_TIMEOUT}s")
-
+    logger.debug(f"Reset to fallback Timeout (should never reach this point)")
 if OFFLINE_TIMEOUT < 120:
-    logger.warning("OFFLINE_TIMEOUT zu klein, auf 120 gesetzt")
     OFFLINE_TIMEOUT = 120
+    logger.warning("OFFLINE_TIMEOUT too small, set to minimal value 120 seconds")
 logger.info(f"Offline Timeout: {OFFLINE_TIMEOUT}s")
 
-OFFLINE_TIMEOUT = 120
-logger.info(f"Offline Timeout: {OFFLINE_TIMEOUT}s")
-
-# [INFO] Scan-Path: {{ options.scan_folder }} = ???
+# ---------------- Logging ----------------
 SCAN_FOLDER = Path(os.environ.get("SCAN_FOLDER", "/share/scans"))
 SCAN_FOLDER.mkdir(parents=True, exist_ok=True)
 logger.info(f"Scan-Path: {SCAN_FOLDER}")
 
-#MAX_FILES = int(os.environ.get("MAX_FILES", 5))
-raw = os.environ.get("MAX_FILES", 5)
-logger.info(f"max scanned files to show raw: {raw}")
-logger.info(f"OS_ENV: {os.environ.get("MAX_FILES", 5)}")
-
+# ---------------- Logging ----------------
+raw = int(os.environ.get("MAX_FILES", 50))
+logger.debug(f"MAX-Files from Environment: {raw}")
 try:
     MAX_FILES = int(raw)
 except ValueError:
     MAX_FILES = 50 # Fallback vom Fallback
-
-#logger.info(f"Offline Timeout: {OFFLINE_TIMEOUT}s")
+    logger.debug(f"Reset to fallback value (should never reach this point)")
 logger.info(f"max scanned files to show: {MAX_FILES}")
 
 # ---------------- lokale IP abfragen ----------------
