@@ -14,7 +14,8 @@ import subprocess
 #from config import OFFLINE_TIMEOUT, SCAN_FOLDER, HTTP_PORT
 from config import OFFLINE_TIMEOUT, SCAN_FOLDER, HTTP_PORT, MAX_FILES
 #from globals import SCANNERS, OFFLINE_TIMEOUT, SCAN_FOLDER, MAX_FILES
-from globals import SCANNERS, NAMESPACES
+#from globals import SCANNERS, NAMESPACES
+from globals import SCANNERS, NAMESPACES, ScannerStatus
 #from globals import SCANNERS, list_scanners 
 #from globals import SCANNERS, list_scanners, OFFLINE_TIMEOUT
 from scanner import Scanner
@@ -46,9 +47,10 @@ async def status_page(request):
     now = datetime.datetime.now()
     for s in SCANNERS.values():
         delta = (now - s.last_seen).total_seconds()
-        if delta > OFFLINE_TIMEOUT:
-            s.online = False
-        color = "green" if s.online else ("orange" if delta < 2*OFFLINE_TIMEOUT else "red")
+#        if delta > OFFLINE_TIMEOUT:
+#            s.online = False
+#            s.state = False
+#        color = "green" if s.online else ("orange" if delta < 2*OFFLINE_TIMEOUT else "red")
 #        formats = ", ".join(s.formats)
         #formats = ", ".join(s.types)
 #        scanner_list += f"<tr style='color:{color}'>
@@ -57,7 +59,8 @@ async def status_page(request):
         scanner_list += "<td>" + str(s.uuid) + "</td>"
         scanner_list += "<td>" + str(s.friendly_name or '') + "</td>"
         scanner_list += "<td>" + str(s.mac or '') + "</td>"
-        scanner_list += "<td>" + str('Online' if s.online else 'Offline') + "</td>"
+ #       scanner_list += "<td>" + str('Online' if s.online else 'Offline') + "</td>"
+        scanner_list += "<td>" + str(s.state) + "</td>"
         scanner_list += "<td>" + str(s.last_seen.strftime('%Y-%m-%d %H:%M:%S')) + "</td>"
         scanner_list += "<td>" + str(s.xaddr or '') + "</td>"
         scanner_list += "<td>" + str(s.subscription_id or '') + "</td>"
