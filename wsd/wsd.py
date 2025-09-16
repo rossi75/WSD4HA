@@ -208,7 +208,6 @@ async def probe_monitor():
 
         for uuid, scanner in SCANNERS.items():
             logger.info(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} [WSD:Probe] Timer-Check for {uuid} ({scanner.ip})...")
-#            scanner.state = ScannerStatus.ONLINE
             status = scanner.state.value
             age = (now - scanner.last_seen).total_seconds()
             logger.info(f"   -->    status = {status}")
@@ -216,21 +215,60 @@ async def probe_monitor():
             logger.info(f"   -->       age = {age}")
 #            logger.debug(f"   -->       age = {age}")
 
-#            if status in ("discovered", "online") and age > OFFLINE_TIMEOUT:
-            if (status in ("discovered")) or (status in ("online") and age > OFFLINE_TIMEOUT):
+            if status in ("discovered"):
                 logger.info(f"[WSD:probe_mon]   LogPoint A")
                 scanner.status = ScannerStatus.PROBING
                 try:
                     logger.info(f"[WSD:probe_mon]   LogPoint B")
                     send_probe(uuid)
                     scanner.status = ScannerStatus.ONLINE
+    #                    logger.debug(f"   -->    status = {status}")
                     logger.info(f"   -->    status = {status}")
                 except Exception as e:
-#                    scanner["status"] = "error"
-#                    scanner["error"] = str(e)
                     scanner.status = ScannerStatus.ABSENT
-                    scanner.error = str(e)
- 
+#                    logger.warning(f"Could not reach scanner with UUID {uuid} and IP {ip}, response is {str(e)}")
+
+            if status in ("online"):
+                # Halbzeit-Check
+                if age > OFFLINE_TIMEOUT / 2 and age <= (OFFLINE_TIMEOUT / 2 + 30):
+                    logger.info(f"[WSD:Probe] --> proceeding Halbzeit-Check")
+                    try:
+                        send_probe(uuid)
+                        scanner.update()
+    #                    logger.debug(f"   -->    status = {status}")
+                        logger.info(f"   -->    status = {status}")
+                    except Exception as e:
+                        logger.warning(f"Could not reach scanner with UUID {uuid} and IP {ip}, response is {str(e)}")
+    
+                # 3/4-Check
+                if age > (OFFLINE_TIMEOUT * 0.75) and age <= (OFFLINE_TIMEOUT * 0.75 + 30):
+                    logger.info(f"[WSD:Heartbeat] --> proceeding Viertel-Check")
+                    try:
+                        send_probe(uuid)
+                        scanner.update()
+    #                    logger.debug(f"   -->    status = {status}")
+                        logger.info(f"   -->    status = {status}")
+                    except Exception as e:
+                        logger.warning(f"Could not reach scanner with UUID {uuid} and IP {ip}, response is {str(e)}")
+    
+                # Timeout überschritten → offline markieren
+                if age > OFFLINE_TIMEOUT:
+                    logger.info(f"[WSD:Heartbeat] --> mark as offline")
+                    scanner.mark_absent()
+
+            # Nach Ablauf von Timeout+Offline → entfernen
+            if status in ("absent") and now >= scanner.remove_after
+                logger.info(f"[WSD:Heartbeat] --> Marking {scanner.ip} ({scanner.friendly_name}) to remove")
+                to_remove.append(scanner)
+    
+        # welche Scanner sollen entfernt werden?
+        logger.debug(f"[WSD:Heartbeat] checking for Scanners to remove from known list")
+        for s in to_remove:
+            logger.warning(f"[Heartbeat]     --> Removing {scanner.ip} ({scanner.friendly_name}) from list")
+            del SCANNERS[scanner.uuid]
+            list_scanners()
+
+        
         logger.debug(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} [WSD:Probe] goodbye")
         #await asyncio.sleep(30)
         await asyncio.sleep(12)
