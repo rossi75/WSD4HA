@@ -53,13 +53,15 @@ logger.info(f"---------------------  Configuration  ---------------------")
 logger.info(f"Loglevel: {LOG_LEVEL}")
 
 # ---------------- Logging ----------------
-raw = int(os.environ.get("HTTP_PORT", 8110))
-logger.debug(f"HTTP-Port from Environment: {raw}")
+raw = int(os.environ.get("HTTP_PORT", 8111))
+logger.info(f"HTTP-Port from Environment: {raw}")
+raw = int(os.getenviron("HTTP_PORT", 8112))
+logger.info(f"HTTP-Port from Environment: {raw}")
 try:
     HTTP_PORT = int(raw)  # Sekunden
 except ValueError:
     HTTP_PORT = 8110  # Fallback vom Fallback
-    logger.debug(f"Reset to fallback Port (should never reach this point)")
+    logger.info(f"Reset to fallback Port (should never reach this point)")
 logger.info(f"HTTP-Port for UI: {HTTP_PORT}")
 
 # ---------------- Logging ----------------
