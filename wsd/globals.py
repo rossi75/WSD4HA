@@ -32,11 +32,13 @@ NAMESPACES = {
 class ScannerStatus(str, Enum):
     DISCOVERED = "discovered"
     PROBING = "probing"
-    PROBE_PARSE = "parsing_probe"
+    PROBE_PARSING = "parsing_probe"
+    PROBE_PARSED = "probe_parsed"
     METADATA_FETCH = "fetching_metadata"
     ONLINE = "online"
     ABSENT = "absent"
     TO_REMOVE = "to_remove"
+    ERROR = "error"
 
 # -----------------  Nach jedem Update: Liste loggen  -----------------
 def list_scanners():
