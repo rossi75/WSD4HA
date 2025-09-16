@@ -22,11 +22,14 @@ options:
   offline_timeout: 300
   scan_folder: "/share/scans"
   max_files: 50
+  log_level: "INFO"
 schema:
   offline_timeout: int(120,3600)
   scan_folder: str
   max_files: int
+  log_level: list(INFO|DEBUG|WARNING|ERROR)
 environment:
   OFFLINE_TIMEOUT: "{{ options.offline_timeout }}"
   SCAN_FOLDER: "{{ options.scan_folder }}"
   MAX_FILES: "{{ options.max_files }}"
+  LOG_LEVEL: "{{ options.log_level }}"
