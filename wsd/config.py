@@ -36,29 +36,19 @@ LOG_LEVEL = os.environ.get("LOG_LEVEL", "INFO").upper()
 #    level=getattr(logging, LOG_LEVEL, logging.INFO),
 #    format="%(asctime)s [%(levelname)s] %(message)s",
 #)
-
 # festes Loglevel
 logging.basicConfig(level=logging.INFO, format='[%(levelname)s] %(message)s')
+
+logger = logging.getLogger("wsd-addon")
 
 logger.info(f"**********************************************************")
 logger.info(f"Starting up WSD Scanner Service")
 logger.info(f"{datetime.datetime.now():%d.%m.%Y, %H:%M:%S}")
 logger.info(f"---------------------  Configuration  ---------------------")
+# ---------------- Optionen aus Environment ----------------
 # ---------------- Logging ----------------
-#LOG_LEVEL = os.environ.get("LOG_LEVEL", "INFO").upper()
 logger.info(f"Loglevel: {LOG_LEVEL}")
 
-# dynamisches loglevel
-#logging.basicConfig(
-#    level=getattr(logging, LOG_LEVEL, logging.INFO),
-#    format="%(asctime)s [%(levelname)s] %(message)s",
-#)
-
-# festes Loglevel
-#logging.basicConfig(level=logging.INFO, format='[%(levelname)s] %(message)s')
-logger = logging.getLogger("wsd-addon")
-
-# ---------------- Optionen aus Environment ----------------
 #WSD_SCAN_FOLDER = Path(os.environ.get("WSD_SCAN_FOLDER", "/share/scans"))
 #WSD_MAX_FILES = int(os.environ.get("WSD_MAX_FILES", 5))
 #WSD_HTTP_PORT = int(os.environ.get("WSD_HTTP_PORT", 8080))
