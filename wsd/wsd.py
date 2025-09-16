@@ -257,7 +257,7 @@ async def probe_monitor():
                     scanner.mark_absent()
 
             # Nach Ablauf von Timeout+Offline → entfernen
-            if status in ("absent") and now >= scanner.remove_after
+            if status in ("absent") and now >= scanner.remove_after:
                 logger.info(f"[WSD:Heartbeat] --> Marking {scanner.ip} ({scanner.friendly_name}) to remove")
                 to_remove.append(scanner)
     
