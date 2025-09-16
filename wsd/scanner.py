@@ -38,7 +38,7 @@ class Scanner:
 
         # Status
         self.last_seen = datetime.datetime.now() - datetime.timedelta(seconds=OFFLINE_TIMEOUT // 2) # last_seen so zurücksetzen, dass wir "halbzeit" erreicht haben
-        self.state = ScannerStatus.ONLINE
+        self.state = ScannerStatus.DISCOVERED
         self.offline_since = None
         self.remove_after = None  # Zeitpunkt zum Löschen
 
