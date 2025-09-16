@@ -204,7 +204,7 @@ async def check_scanner(scanner):
 # ---------------- Scanner Probe ----------------
 async def probe_monitor():
     while True:
-        logger.debug(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} [WSD:Probe] wake-up")
+        logger.info(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} [WSD:Probe] wake-up")
 
         now = time.time()
         for uuid, scanner in SCANNERS.items():
@@ -233,7 +233,6 @@ async def probe_monitor():
         await asyncio.sleep(12)
         logger.debug(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} [WSD:Probe] back in town")
 #        time.sleep(5)
-
 
 # ---------------- Scanner Heartbeat ----------------
 async def heartbeat_monitor():
