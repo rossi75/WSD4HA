@@ -52,11 +52,9 @@ logger.info(f"---------------------  Configuration  ---------------------")
 # ---------------- Logging ----------------
 logger.info(f"Loglevel: {LOG_LEVEL}")
 
-# ---------------- Logging ----------------
+# ---------------- HTTP-Port ----------------
 raw = int(os.environ.get("HTTP_PORT", 8111))
-logger.info(f"HTTP-Port from Environment: {raw}")
-raw = int(os.getenviron("HTTP_PORT", 8112))
-logger.info(f"HTTP-Port from Environment: {raw}")
+logger.debug(f"HTTP-Port from Environment: {raw}")
 try:
     HTTP_PORT = int(raw)  # Sekunden
 except ValueError:
@@ -64,8 +62,8 @@ except ValueError:
     logger.info(f"Reset to fallback Port (should never reach this point)")
 logger.info(f"HTTP-Port for UI: {HTTP_PORT}")
 
-# ---------------- Logging ----------------
-raw = os.environ.get("OFFLINE_TIMEOUT", 300)  # Sekunden
+# ---------------- OFFLINE_TIMEOUT ----------------
+raw = int(os.environ.get("OFFLINE_TIMEOUT", 300))  # Sekunden
 logger.debug(f"OFFLINE_TIMEOUT from Environment: {raw}")
 try:
     OFFLINE_TIMEOUT = int(raw)  # Sekunden
@@ -77,12 +75,12 @@ if OFFLINE_TIMEOUT < 120:
     logger.warning("OFFLINE_TIMEOUT too small, set to minimal value 120 seconds")
 logger.info(f"Offline Timeout: {OFFLINE_TIMEOUT}s")
 
-# ---------------- Logging ----------------
+# ---------------- SCAN-Folder Path ----------------
 SCAN_FOLDER = Path(os.environ.get("SCAN_FOLDER", "/share/scans"))
 SCAN_FOLDER.mkdir(parents=True, exist_ok=True)
 logger.info(f"Scan-Path: {SCAN_FOLDER}")
 
-# ---------------- Logging ----------------
+# ---------------- Max Files to show in GUI ----------------
 raw = int(os.environ.get("MAX_FILES", 50))
 logger.debug(f"MAX-Files from Environment: {raw}")
 try:
