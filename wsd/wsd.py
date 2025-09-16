@@ -439,13 +439,18 @@ def parse_probe(xml: str, scanners: dict):
 
         # neuer oder vorhandener Scanner?
         if uuid not in scanners:
-            logger.info(f"[WSD:probe_parser] New scanner discovered: {uuid} @ {xaddr}")
-            scanners[uuid] = Scanner(uuid=uuid, ip=xaddr, xaddr=[xaddr])
+#            scanners[uuid] = Scanner(uuid=uuid, ip=xaddr, xaddr=[xaddr])
+#            scanners[uuid] = Scanner(uuid=uuid, ip=xaddr, xaddr=xaddr)
+#            scanners[uuid].related_uuids = set()
+#            scanners[uuid].status = ScannerStatus.PROBE_PARSED
+            scanners[uuid] = Scanner(uuid=uuid, ip=xaddr, xaddr=xaddr)
             scanners[uuid].related_uuids = set()
             scanners[uuid].status = ScannerStatus.PROBE_PARSED
+            logger.info(f"[WSD:probe_parser] New scanner discovered: {uuid} @ {xaddr}")
         else:
-            scanner = scanners[uuid]
-            scanner.xaddr = [xaddr]
+#            scanner = scanners[uuid]
+#            scanner.xaddr = [xaddr]
+            scanners[uuid].xaddr = xaddr
             scanner.status = ScannerStatus.PROBE_PARSED
             logger.info(f"[WSD:probe_parser] Updated scanner {uuid} -> {xaddr}")
 
