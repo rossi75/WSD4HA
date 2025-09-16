@@ -255,6 +255,9 @@ async def probe_monitor():
             if status in ("absent") and now >= scanner.remove_after:
                 logger.info(f"[WSD:Heartbeat] --> Marking {scanner.ip} ({scanner.friendly_name}) to remove")
                 to_remove.append(scanner)
+
+            logger.info(f"   -->    status: {status}")
+#            logger.debug(f"   -->    status = {status}")
     
         # welche Scanner sollen entfernt werden?
         logger.debug(f"[WSD:Heartbeat] checking for Scanners to remove from known list")
@@ -262,9 +265,6 @@ async def probe_monitor():
             logger.warning(f"[Heartbeat]     --> Removing {scanner.ip} ({scanner.friendly_name}) from list")
             del SCANNERS[scanner.uuid]
             list_scanners()
-
-        logger.info(f"   -->    status: {status}")
-#        logger.debug(f"   -->    status = {status}")
           
         logger.debug(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} [WSD:Probe] goodbye")
         #await asyncio.sleep(30)
