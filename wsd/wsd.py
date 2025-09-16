@@ -218,7 +218,8 @@ async def probe_monitor():
             logger.debug(f"   -->       age = {age}")
 
 #            if status in ("discovered", "stale") and now - last_seen > PROBE_INTERVAL:
-            if status in ("discovered", "stale") and now - last_seen > OFFLINE_TIMEOUT:
+#            if status in ("discovered", "absent") and now - last_seen > OFFLINE_TIMEOUT:
+            if status in ("discovered", "absent") and age > OFFLINE_TIMEOUT:
                 try:
                     send_probe(uuid)
                 except Exception as e:
