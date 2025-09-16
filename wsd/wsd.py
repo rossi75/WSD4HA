@@ -407,11 +407,14 @@ def parse_probe(xml: str, scanners: dict):
     Returns:
         dict: updated scanners
     """
+    scanner.status = ScannerStatus.PROBE_PARSING
+    affected = []
+
     try:
-        scanner.status = ScannerStatus.PROBE_PARSE
         root = ET.fromstring(xml)
     except ET.ParseError as e:
-        logger.error(f"[probe_match_parser] XML ParseError: {e}")
+        logger.error(f"[WSD:probe_parser] XML ParseError: {e}")
+        scanner.status = ScannerStatus.ERROR
         return scanners
 
     for pm in root.findall(".//wsd:ProbeMatch", NAMESPACE):
@@ -420,7 +423,7 @@ def parse_probe(xml: str, scanners: dict):
         xaddrs_elem = pm.find(".//wsd:XAddrs", NAMESPACE)
 
         if uuid_elem is None or types_elem is None or xaddrs_elem is None:
-            logger.warning("[probe_match_parser] Incomplete ProbeMatch, skipping")
+            logger.warning("[WSD:probe_parser] Incomplete ProbeMatch, skipping")
             scanner.status = ScannerStatus.ERROR
             continue
 
@@ -430,7 +433,7 @@ def parse_probe(xml: str, scanners: dict):
 
         # Nur Scanner akzeptieren
         if not any("ScanDeviceType" in t for t in types):
-            logger.info(f"[probe_match_parser] Skipping non-scanner device {uuid}")
+            logger.info(f"[WSD:probe_parser] Skipping non-scanner device {uuid}")
             scanner.status = ScannerStatus.ERROR
             continue
 
@@ -438,10 +441,10 @@ def parse_probe(xml: str, scanners: dict):
         if uuid not in scanners:
             logger.info(f"[WSD:probe_parser] New scanner discovered: {uuid} @ {xaddr}")
             scanners[uuid] = Scanner(uuid=uuid, ip=xaddr, xaddr=[xaddr])
+            scanners[uuid].related_uuids = set()
             scanners[uuid].status = ScannerStatus.PROBE_PARSED
         else:
             scanner = scanners[uuid]
-            scanner.ip = xaddr  # update IP
             scanner.xaddr = [xaddr]
             scanner.status = ScannerStatus.PROBE_PARSED
             logger.info(f"[WSD:probe_parser] Updated scanner {uuid} -> {xaddr}")
