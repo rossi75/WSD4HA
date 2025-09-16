@@ -60,7 +60,7 @@ async def status_page(request):
         scanner_list += "<td>" + str(s.friendly_name or '') + "</td>"
         scanner_list += "<td>" + str(s.mac or '') + "</td>"
  #       scanner_list += "<td>" + str('Online' if s.online else 'Offline') + "</td>"
-        scanner_list += "<td>" + str(s.state) + "</td>"
+        scanner_list += "<td>" + str(s.state.value) + "</td>"
         scanner_list += "<td>" + str(s.last_seen.strftime('%Y-%m-%d %H:%M:%S')) + "</td>"
         scanner_list += "<td>" + str(s.xaddr or '') + "</td>"
         scanner_list += "<td>" + str(s.subscription_id or '') + "</td>"
