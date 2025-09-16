@@ -1,7 +1,5 @@
 # contains the templates used for the requests
 
-
-
 SOAP_PROBE_TEMPLATE = """<?xml version="1.0" encoding="utf-8"?>
 <soap:Envelope
   xmlns:soap="http://www.w3.org/2003/05/soap-envelope"
@@ -17,3 +15,22 @@ SOAP_PROBE_TEMPLATE = """<?xml version="1.0" encoding="utf-8"?>
   </soap:Body>
 </soap:Envelope>
 """
+
+SOAP_TRANSFER_GET_TEMPLATE = """<?xml version="1.0" encoding="utf-8"?>
+<soap:Envelope xmlns:soap="http://www.w3.org/2003/05/soap-envelope"
+               xmlns:wsa="http://schemas.xmlsoap.org/ws/2004/08/addressing">
+  <soap:Header>
+    <wsa:To>{device_uuid}</wsa:To>
+    <wsa:Action>http://schemas.xmlsoap.org/ws/2004/09/transfer/Get</wsa:Action>
+    <wsa:MessageID>urn:uuid:{msg_id}</wsa:MessageID>
+    <wsa:ReplyTo>
+      <wsa:Address>http://schemas.xmlsoap.org/ws/2004/08/addressing/role/anonymous</wsa:Address>
+    </wsa:ReplyTo>
+    <wsa:From>
+      <wsa:Address>{client_uuid}</wsa:Address>
+    </wsa:From>
+  </soap:Header>
+  <soap:Body/>
+</soap:Envelope>
+"""
+
