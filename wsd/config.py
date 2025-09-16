@@ -34,11 +34,11 @@ LOG_LEVEL = os.environ.get("LOG_LEVEL", "INFO").upper()
 LOG_LEVEL = os.environ.get("LOG_LEVEL", "DEBUG").upper()
 LOG_LEVEL = os.environ.get("LOG_LEVEL", "debug")
 # dynamisches loglevel
-logging.basicConfig(level=LOG_LEVEL, format='[%(levelname)s] %(message)s')
-#logging.basicConfig(
-#    level=getattr(logging, LOG_LEVEL, logging.INFO),
+logging.basicConfig(
+    level=getattr(logging, LOG_LEVEL, logging.INFO),
+    format="[%(levelname)s] %(message)s",
+)
 #    format="%(asctime)s [%(levelname)s] %(message)s",
-#)
 # festes Loglevel
 #logging.basicConfig(level=logging.INFO, format='[%(levelname)s] %(message)s')
 
