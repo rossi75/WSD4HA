@@ -51,32 +51,23 @@ class Scanner:
 #    def update(self, max_age=OFFLINE_TIMEOUT):
     def update(self):
         self.last_seen = datetime.datetime.now()
-#        self.max_age = max_age
-#        self.online = True
         self.state = ScannerStatus.ONLINE
         self.offline_since = None
         self.remove_after = None
-#        logger.info(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} [SCANNER:upd] {self.ip} ({self.friendly_name or self.name})")
         logger.info(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} [SCANNER:upd] Seen {self.friendly_name} ({self.ip}) with UUID {self.uuid}")
         logger.debug(f"   --> new last_seen: {self.last_seen}")
 
     # wird aufgerufen wenn ein Scanner offline gesetzt wird
     # Aufruf mit SCANNER[uuid].mark_offline()
     def mark_offline(self):
-#        if self.online:
-#            self.online = False
         self.state = ScannerStatus.OFFLINE
         if not self.offline_since:
             self.offline_since = datetime.datetime.now()
-#            self.remove_after = self.offline_since + datetime.timedelta(seconds=self.max_age)
             self.remove_after = self.offline_since + datetime.timedelta(seconds=OFFLINE_TIMEOUT)
-#        logger.info(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} [SCANNER:m_offl] {self.ip} ({self.friendly_name or self.name})")
         logger.info(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} [SCANNER:m_offl] marked {self.friendly_name} ({self.ip}) with UUID {self.uuid} as offline")
-#        logger.debug(f"   -->        online: {self.online}")
         logger.debug(f"   -->         state: {self.state}")
         logger.debug(f"   --> offline_since: {self.offline_since}")
         logger.debug(f"   -->  remove_after: {self.remove_after}")
-#        logger.debug(f"   -->   debug xaddr: {self.xaddr}")
 
     # Fragt Scanner-Metadaten per WS-Transfer/Get ab
     # def fetch_metadata(self):
