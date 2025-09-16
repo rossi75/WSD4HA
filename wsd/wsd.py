@@ -208,9 +208,11 @@ async def probe_monitor():
         now = time.time()
         for uuid, scanner in SCANNERS.items():
             logger.info(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} [WSD:Probe] Timer-Check for {uuid} ({scanner.ip})...")
+            scanner.state = ScannerStatus.ONLINE
 #            status = scanner.get("status")
 #            last_seen = scanner.get("last_seen", 0)
-            status = scanner.status
+#            status = scanner.status
+            status = scanner.state
             last_seen = scanner.last_seen
             age = (now - scanner.last_seen).total_seconds()
             logger.info(f"   --> last_seen = {scanner.last_seen}")
@@ -221,6 +223,7 @@ async def probe_monitor():
             if status in ("discovered", "absent") and age > OFFLINE_TIMEOUT:
                 try:
                     send_probe(uuid)
+                    scanner.status = ScannerStatus.ONLINE
                 except Exception as e:
 #                    scanner["status"] = "error"
 #                    scanner["error"] = str(e)
