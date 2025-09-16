@@ -19,9 +19,7 @@ logger = logging.getLogger("wsd-addon")
 
 # ---------------- Scanner-Datenstruktur ----------------
 class Scanner:
-#    def __init__(self, name, ip, mac=None, uuid=None, formats=None, location=None, max_age=OFFLINE_TIMEOUT, xaddr=None):
-#    def __init__(self, uuid, ip="0.0.0.0", xaddr=None):
-    def __init__(self, uuid, ip="0.0.0.0"):
+    def __init__(self, uuid, ip="0.0.0.0", xaddr=None):
         self.uuid = uuid
         self.ip = ip
 
