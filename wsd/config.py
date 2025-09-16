@@ -32,12 +32,13 @@ NAMESPACES = {
 # ---------------- Logging ----------------
 LOG_LEVEL = os.environ.get("LOG_LEVEL", "INFO").upper()
 # dynamisches loglevel
+logging.basicConfig(level=LOG_LEVEL, format='[%(levelname)s] %(message)s')
 #logging.basicConfig(
 #    level=getattr(logging, LOG_LEVEL, logging.INFO),
 #    format="%(asctime)s [%(levelname)s] %(message)s",
 #)
 # festes Loglevel
-logging.basicConfig(level=logging.INFO, format='[%(levelname)s] %(message)s')
+#logging.basicConfig(level=logging.INFO, format='[%(levelname)s] %(message)s')
 
 logger = logging.getLogger("wsd-addon")
 
