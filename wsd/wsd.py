@@ -189,7 +189,7 @@ async def UDP_listener_3702():
     await recv_loop()
 
 # ---------------- Scanner Probe ----------------
-async def probe_monitor():
+async def state_monitor():
     while True:
         logger.debug(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} [WSD:Probe] wake-up")
         to_remove = []
@@ -208,12 +208,21 @@ async def probe_monitor():
                 logger.info(f"[WSD:probe_mon] Fresh discovered, now probing...")
                 try:
                     logger.info(f"[WSD:probe_mon]   LogPoint B")
-                    scanner.state = ScannerStatus.PROBING
                     asyncio.create_task(send_probe(scanner))
                     logger.info(f"[WSD:probe_mon]   LogPoint C")
                 except Exception as e:
-                    scanner.state = ScannerStatus.ABSENT
-#                    logger.warning(f"Could not reach scanner with UUID {uuid} and IP {ip}, response is {str(e)}")
+                    scanner.state = ScannerStatus.ERROR
+                    logger.warning(f"Anything went wrong while probing the UUID {uuid} @ {ip}, response is {str(e)}")
+
+            if status in ("parsing_probe"):
+                logger.info(f"[WSD:probe_mon] probe done, parsing probe...")
+                try:
+                    logger.info(f"[WSD:probe_mon]   LogPoint E")
+                    asyncio.create_task(parse_probe(scanner))
+                    logger.info(f"[WSD:probe_mon]   LogPoint F")
+                except Exception as e:
+                    scanner.state = ScannerStatus.ERROR
+                    logger.warning(f"Anything went wrong while parsing the Probe from UUID {uuid} @ {ip}, response is {str(e)}")
 
             if status in ("online"):
                 # Halbzeit-Check
@@ -235,10 +244,10 @@ async def probe_monitor():
                     except Exception as e:
                         logger.warning(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} Could not reach scanner with UUID {uuid} and IP {ip}. Last seen at {scanner.last_seen}. Response is {str(e)}")
     
-                # Timeout überschritten → offline markieren
-                if age > OFFLINE_TIMEOUT:
-                    logger.info(f"[WSD:Heartbeat] --> mark as offline")
-                    scanner.mark_absent()
+            # Timeout überschritten → offline markieren, damit werden alle Zwischenstati erschlagen, für den Fall dass was hängen geblieben ist und auch für ERROR
+            if age > OFFLINE_TIMEOUT:
+                logger.info(f"[WSD:Heartbeat] --> mark as offline")
+                scanner.mark_absent()
 
             # Nach Ablauf von Timeout+Offline → entfernen
             if status in ("absent") and now >= scanner.remove_after:
@@ -285,9 +294,6 @@ async def send_probe(scanner):
             async with session.post(url, data=xml, headers=headers, timeout=5) as resp:
                 if resp.status == 200:
                     body = await resp.text()
-                    # TODO: parse ProbeMatches aus body
-                    scanner.status = ScannerStatus.ONLINE
-                    logger.info(f"[WSD:send_probe] {scanner.friendly_name or scanner.ip} lebt noch")
 #                    logger.debug(f"ProbeMatch von {scanner.ip}:\n{body}")
                     logger.info(f"ProbeMatch von {scanner.ip}:\n{body}")
         except Exception as e:
@@ -297,103 +303,7 @@ async def send_probe(scanner):
 #    logger.debug(f"   ---> Statuscode: {resp.status}")
     logger.info(f"   ---> Statuscode: {resp.status}")
 
-# ---------------- Scanner Subscribe ----------------
-#async def subscribe_to_scanner(scanner, my_notify_url: str, expires_seconds: int = 3600):
-async def _subscribe_to_scanner(scanner, my_notify_url: str):
-    logger.info(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} [WSD:Subscribe] trying to subscribe to {scanner.xaddr}")
-    """
-    Versucht eine Subscribe-Request an scanner.xaddr zu senden.
-    - scanner.xaddr must be a service URL (z.B. http://192.168.0.3:8018/wsd/scan)
-    - my_notify_url muss vom Scanner erreichbar sein (http://<HA_IP>:<port>/wsd/notify)
-    Rückgabe: dict mit keys {"ok":bool, "identifier":str|None, "expires":datetime|None, "status":int}
-    """
-
-    if not scanner.xaddr:
-        logger.warning(f"   ! missing xaddr !")
-        return {"ok": False, "reason": "no xaddr", "identifier": None}
-
-    logger.info(f"   ---> forming SOAP request")
-
-    headers = {"Content-Type": "application/soap+xml; charset=utf-8", "User-Agent": "WSD-Client"}
-    message_uuid = str(uuid.uuid4())
-    soap = f"""<?xml version="1.0" encoding="utf-8"?>
-    <s:Envelope xmlns:s="http://www.w3.org/2003/05/soap-envelope"
-                xmlns:wsa="http://schemas.xmlsoap.org/ws/2004/08/addressing"
-                xmlns:wse="http://schemas.xmlsoap.org/ws/2004/08/eventing">
-      <s:Header>
-        <wsa:To>{scanner.xaddr}</wsa:To>
-        <wsa:Action>http://schemas.xmlsoap.org/ws/2004/08/eventing/Subscribe</wsa:Action>
-        <wsa:MessageID>urn:uuid:{message_uuid}</wsa:MessageID>
-        <wsa:ReplyTo>
-          <wsa:Address>http://schemas.xmlsoap.org/ws/2004/08/addressing/role/anonymous</wsa:Address>
-        </wsa:ReplyTo>
-      </s:Header>
-      <s:Body>
-        <wse:Subscribe>
-          <wse:Delivery Mode="http://schemas.xmlsoap.org/ws/2004/08/eventing/DeliveryModes/Push">
-            <wse:NotifyTo>
-              <wsa:Address>{my_notify_url}</wsa:Address>
-            </wse:NotifyTo>
-          </wse:Delivery>
-          <wse:Expires>PT{OFFLINE_TIMEOUT}S</wse:Expires>
-        </wse:Subscribe>
-      </s:Body>
-    </s:Envelope>"""
-
-    logger.info(f"   ---> SOAP request:")
-    logger.info({soap})
-
-    async with aiohttp.ClientSession() as session:
-        try:
-            logger.info(f"   ---> sending SOAP request")
-            async with session.post(scanner.xaddr, data=soap.encode("utf-8"), headers=headers, timeout=10) as resp:
-                status = resp.status
-                text = await resp.text()
-        except Exception as e:
-            logger.warning(f"   ---> anything went wrong in sending SOAP request: {e}")
-            return {"ok": False, "reason": f"http error: {e}", "identifier": None}
-
-#    logger.debug(f"   ---> Response:")
-#    logger.debug(f"{text}")
-    logger.info(f"   ---> Status: {status}")
-    logger.info(f"   ---> Response:")
-    logger.info(f"{text}")
-    
-    # parse response for Identifier and Expires
-    try:
-        logger.info(f"   ---> extracting values from answer")
-        root = ET.fromstring(text)
-        logger.debug(f"   ---> raw: {root}")
-
-        ident_elem = root.find(".//wse:Identifier", NAMESPACES)
-        expires_elem = root.find(".//wse:Expires", NAMESPACES)
-        
-        logger.debug(f"   ---> Identifier: {ident_elem}")
-        logger.debug(f"   ---> Expires: {expires_elem}")
-        
-        identifier = ident_elem.text.strip() if ident_elem is not None and ident_elem.text else None
-        expires_dt = None
-
-        if expires_elem is not None and expires_elem.text:
-            # expect PT1234S - convert roughly
-            txt = expires_elem.text.strip()
-            if txt.startswith("PT") and txt.endswith("S"):
-                secs = int(txt[2:-1])
-                expires_dt = datetime.now() + timedelta(seconds=secs)
-        
-        # store subscription details on scanner instance
-        if identifier:
-            scanner.subscription_id = identifier
-            scanner.subscription_expires = expires_dt
-        return {"ok": True, "identifier": identifier, "expires": expires_dt, "status": status}
-
-    except Exception as e:
-        logger.warning(f"   ---> anything went wrong in extracting SOAP response: {e}")
-        return {"ok": False, "reason": f"xml parse error: {e}", "identifier": None}
-
-    logger.info(f"   ---> Subscription ID: {scanner.subscription_id}")
-    logger.info(f"   ---> Subscription expires: {scanner.subscription_expires}")
-
+    return {body}
 
 # ---------------- Probe Parser ----------------
 def parse_probe(xml: str, scanners: dict):
@@ -407,6 +317,7 @@ def parse_probe(xml: str, scanners: dict):
     Returns:
         dict: updated scanners
     """
+    logger.info(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} [WSD:parse_probe] parsing probe from {scanner.uuid} @ {scanner.ip}")
     scanner.status = ScannerStatus.PROBE_PARSING
     affected = []
 
