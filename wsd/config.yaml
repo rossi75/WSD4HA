@@ -1,5 +1,5 @@
 name: WSD4HA
-version: "0.00.4__"
+version: "0.00.4"
 slug: wsd_scanner
 #description: "Minimaler WSD-Server für den Scanneranteil am Samsung C480W [und ggf andere Scanner]"
 description: "Minimal WSD-Server for Samsung C480W [and probably other Scanners]"
@@ -22,10 +22,9 @@ options:
   offline_timeout: 300
   scan_folder: "/share/scans"
   max_files: 50
-#  log_level: "INFO"
+  log_level: "INFO"
 schema:
   offline_timeout: int(120,3600)
   scan_folder: str
   max_files: int
-#  log_level: list(INFO|DEBUG|WARNING|ERROR)
-  log_level: list(INFO|DEBUG|WARNING|ERROR)?
+  log_level: list(INFO|DEBUG)
