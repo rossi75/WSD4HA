@@ -224,7 +224,7 @@ async def probe_monitor():
                 except Exception as e:
 #                    scanner["status"] = "error"
 #                    scanner["error"] = str(e)
-                    scanner.status = ScannerStatus.
+                    scanner.status = ScannerStatus.ABSENT
                     scanner.error = str(e)
  
         logger.debug(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} [WSD:Probe] goodbye")
@@ -282,7 +282,7 @@ async def heartbeat_monitor():
 
 # ---------------- Send Scanner Probe ----------------
 async def send_probe(scanner):
-    logger.info(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} [WSD:send_probe] sending probe for {scanner.uuid}")
+    logger.info(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} [WSD:send_probe] sending probe for {scanner.uuid} @ {scanner.ip}")
     msg_id = uuid.uuid4()
     xml = SOAP_PROBE_TEMPLATE.format(msg_id=msg_id)
 
@@ -310,7 +310,7 @@ async def send_probe(scanner):
 #                        print(f"ProbeMatch von {scanner['ip']}:\n{body}")
                         logger.info(f"ProbeMatch von {scanner.ip}:\n{body}")
             except Exception as e:
-                print(f"Probe fehlgeschlagen bei {url}: {e}")
+                logger.info(f"   ---> Probe fehlgeschlagen bei {url}: {e}")
 
         logger.info(f"   ---> Statuscode: {resp.status}")
 
