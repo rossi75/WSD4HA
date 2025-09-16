@@ -218,12 +218,10 @@ async def probe_monitor():
 
             if status in ("discovered"):
                 logger.info(f"[WSD:probe_mon]   LogPoint A")
-                scanner.status = ScannerStatus.PROBING
                 try:
                     logger.info(f"[WSD:probe_mon]   LogPoint B")
-                    send_probe(uuid)
-                    scanner.status = ScannerStatus.ONLINE
-    #                    logger.debug(f"   -->    status = {status}")
+                    asyncio.create_task(send_probe(uuid))
+#                    logger.debug(f"   -->    status = {status}")
                     logger.info(f"   -->    status = {status}")
                 except Exception as e:
                     scanner.status = ScannerStatus.ABSENT
@@ -234,23 +232,23 @@ async def probe_monitor():
                 if age > OFFLINE_TIMEOUT / 2 and age <= (OFFLINE_TIMEOUT / 2 + 30):
                     logger.info(f"[WSD:Probe] --> proceeding Halbzeit-Check")
                     try:
-                        send_probe(uuid)
+                        asyncio.create_task(send_probe(uuid))
                         scanner.update()
     #                    logger.debug(f"   -->    status = {status}")
                         logger.info(f"   -->    status = {status}")
                     except Exception as e:
-                        logger.warning(f"Could not reach scanner with UUID {uuid} and IP {ip}, response is {str(e)}")
+                        logger.warning(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} Could not reach scanner with UUID {uuid} and IP {ip}. Last seen at {scanner.last_seen}. Response is {str(e)}")
     
                 # 3/4-Check
                 if age > (OFFLINE_TIMEOUT * 0.75) and age <= (OFFLINE_TIMEOUT * 0.75 + 30):
                     logger.info(f"[WSD:Heartbeat] --> proceeding Viertel-Check")
                     try:
-                        send_probe(uuid)
+                        asyncio.create_task(send_probe(uuid))
                         scanner.update()
     #                    logger.debug(f"   -->    status = {status}")
                         logger.info(f"   -->    status = {status}")
                     except Exception as e:
-                        logger.warning(f"Could not reach scanner with UUID {uuid} and IP {ip}, response is {str(e)}")
+                        logger.warning(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} Could not reach scanner with UUID {uuid} and IP {ip}. Last seen at {scanner.last_seen}. Response is {str(e)}")
     
                 # Timeout überschritten → offline markieren
                 if age > OFFLINE_TIMEOUT:
@@ -272,7 +270,7 @@ async def probe_monitor():
         
         logger.debug(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} [WSD:Probe] goodbye")
         #await asyncio.sleep(30)
-        await asyncio.sleep(12)
+        await asyncio.sleep(OFFLINE_TIMEOUT / 4)
         logger.debug(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} [WSD:Probe] back in town")
 #        time.sleep(5)
 
@@ -325,18 +323,17 @@ async def heartbeat_monitor():
 # ---------------- Send Scanner Probe ----------------
 async def send_probe(scanner):
     logger.info(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} [WSD:send_probe] sending probe for {scanner.uuid} @ {scanner.ip}")
+    scanner.status = ScannerStatus.PROBING
     msg_id = uuid.uuid4()
     xml = SOAP_PROBE_TEMPLATE.format(msg_id=msg_id)
 
     headers = {
         "Content-Type": "application/soap+xml",
-#        "User-Agent": "WSD4HA",
+        #"User-Agent": "WSD4HA",
         "User-Agent": "WSDAPI",
     }
 
-#    for xaddr in scanner["xaddrs"]:
     for xaddr in scanner.xaddr:
-#        url = f"http://{scanner['ip']}:80/StableWSDiscoveryEndpoint/schemas-xmlsoap-org_ws_2005_04_discovery"
         url = f"http://{scanner.ip}:80/StableWSDiscoveryEndpoint/schemas-xmlsoap-org_ws_2005_04_discovery"
         
         logger.info(f"   ---> URL: {url}")
@@ -349,13 +346,16 @@ async def send_probe(scanner):
                     if resp.status == 200:
                         body = await resp.text()
                         # TODO: parse ProbeMatches aus body
-#                        print(f"ProbeMatch von {scanner['ip']}:\n{body}")
+                        scanner.status = ScannerStatus.ONLINE
+                        logger.info(f"[WSD:send_probe] {scanner.friendly_name or scanner.ip} lebt noch")
+#                        logger.debug(f"ProbeMatch von {scanner.ip}:\n{body}")
                         logger.info(f"ProbeMatch von {scanner.ip}:\n{body}")
             except Exception as e:
+                scanner.status = ScannerStatus.ABSENT
                 logger.info(f"   ---> Probe fehlgeschlagen bei {url}: {e}")
 
+#        logger.debug(f"   ---> Statuscode: {resp.status}")
         logger.info(f"   ---> Statuscode: {resp.status}")
-
 
 # ---------------- Scanner Subscribe ----------------
 #async def subscribe_to_scanner(scanner, my_notify_url: str, expires_seconds: int = 3600):
