@@ -99,8 +99,6 @@ async def status_page(request):
     """, content_type="text/html")
     logger.info(f"   ---> probably delivered http-response")
 
-#                <tr><th>Name</th><th>IP</th><th>MAC</th><th>UUID</th><th>Formats</th><th>State</th><th>Last seen</th></tr>
-
 # ---------------- HTTP Server ----------------
 async def start_http_server():
     logger.info(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S}[WEBSERVER:start_http] configuring HTTP/SOAP Server on Port {HTTP_PORT}")
@@ -119,8 +117,7 @@ async def start_http_server():
     # An alle Interfaces binden (0.0.0.0) -> wichtig für Docker / HA
     site = web.TCPSite(runner, "0.0.0.0", HTTP_PORT)
     await site.start()
-    logger.info(f"   ---> HTTP/SOAP Server should run on Port {HTTP_PORT}")
-
+    logger.info(f"HTTP/SOAP Server is running on Port {HTTP_PORT}")
 
 # ---------------- NOTIFY handler ----------------
 async def notify_handler(request):
