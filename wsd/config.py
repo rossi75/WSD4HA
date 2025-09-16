@@ -28,7 +28,23 @@ NAMESPACES = {
 # + nach einem abgang diesen im log ausführlich ausgeben
 # + neuer scanner wird zu oft erkannt
 
+
+
+logger.info(f"**********************************************************")
+logger.info(f"Starting up WSD Scanner Service")
+logger.info(f"{datetime.datetime.now():%d.%m.%Y, %H:%M:%S}")
+logger.info(f"---------------------  Configuration  ---------------------")
 # ---------------- Logging ----------------
+LOG_LEVEL = os.environ.get("LOG_LEVEL", "INFO").upper()
+logger.info(f"Loglevel: {LOG_LEVEL}")
+
+# dynamisches loglevel
+#logging.basicConfig(
+#    level=getattr(logging, LOG_LEVEL, logging.INFO),
+#    format="%(asctime)s [%(levelname)s] %(message)s",
+#)
+
+# festes Loglevel
 logging.basicConfig(level=logging.INFO, format='[%(levelname)s] %(message)s')
 logger = logging.getLogger("wsd-addon")
 
@@ -39,38 +55,43 @@ logger = logging.getLogger("wsd-addon")
 #WSD_OFFLINE_TIMEOUT = int(os.environ.get("WSD_OFFLINE_TIMEOUT", 300))  # Sekunden
 #WSD_HTTP_PORT = int(os.environ.get("HTTP_PORT", 8080))
 HTTP_PORT = 8110
+logger.info(f"HTTP-Port for UI: {HTTP_PORT}")
 
 #OFFLINE_TIMEOUT = int(os.environ.get("OFFLINE_TIMEOUT", 300))  # Sekunden
 #OFFLINE_TIMEOUT = os.environ.get("OFFLINE_TIMEOUT", 300)  # Sekunden
 raw = os.environ.get("OFFLINE_TIMEOUT", 300)  # Sekunden
+logger.info(f"Offline Timeout raw: {raw}")
 try:
     OFFLINE_TIMEOUT = int(raw)  # Sekunden
 except ValueError:
     OFFLINE_TIMEOUT = 300  # Fallback vom Fallback
+logger.info(f"Offline Timeout: {OFFLINE_TIMEOUT}s")
+
+if OFFLINE_TIMEOUT < 120:
+    logger.warning("OFFLINE_TIMEOUT zu klein, auf 120 gesetzt")
+    OFFLINE_TIMEOUT = 120
+logger.info(f"Offline Timeout: {OFFLINE_TIMEOUT}s")
+
+OFFLINE_TIMEOUT = 120
+logger.info(f"Offline Timeout: {OFFLINE_TIMEOUT}s")
 
 # [INFO] Scan-Path: {{ options.scan_folder }} = ???
 SCAN_FOLDER = Path(os.environ.get("SCAN_FOLDER", "/share/scans"))
 SCAN_FOLDER.mkdir(parents=True, exist_ok=True)
+logger.info(f"Scan-Path: {SCAN_FOLDER}")
 
 #MAX_FILES = int(os.environ.get("MAX_FILES", 5))
 raw = os.environ.get("MAX_FILES", 5)
+logger.info(f"max scanned files to show raw: {raw}")
+logger.info(f"OS_ENV: {os.environ.get("MAX_FILES", 5)}")
+
 try:
     MAX_FILES = int(raw)
 except ValueError:
     MAX_FILES = 50 # Fallback vom Fallback
 
-logger.info(f"**********************************************************")
-logger.info(f"Starting up WSD Scanner Service")
-logger.info(f"{datetime.datetime.now():%d.%m.%Y, %H:%M:%S}")
-logger.info(f"---------------------  Configuration  ---------------------")
-if OFFLINE_TIMEOUT < 120:
-    logger.warning("OFFLINE_TIMEOUT zu klein, auf 120 gesetzt")
-    OFFLINE_TIMEOUT = 120
-OFFLINE_TIMEOUT = 120
-logger.info(f"Offline Timeout: {OFFLINE_TIMEOUT}s")
-logger.info(f"Scan-Path: {SCAN_FOLDER}")
+#logger.info(f"Offline Timeout: {OFFLINE_TIMEOUT}s")
 logger.info(f"max scanned files to show: {MAX_FILES}")
-logger.info(f"HTTP-Port for UI: {HTTP_PORT}")
 
 # ---------------- lokale IP abfragen ----------------
 def get_local_ip():
