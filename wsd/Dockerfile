@@ -29,7 +29,7 @@ COPY config.py .
 COPY scanner.py .
 COPY wsd.py .
 COPY webserver.py .
-COpY templates.py .
+COPY templates.py .
 #COPY translations/en.yaml ./translations
 
 VOLUME ["/share/scans"]
