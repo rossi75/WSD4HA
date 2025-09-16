@@ -187,19 +187,6 @@ async def UDP_listener_3702():
     # asyncio.create_task(recv_loop())
     await recv_loop()
 
-
-# ---------------- Scanner Keepalive checken ----------------
-async def check_scanne_r(scanner):
-    try:
-#        await fetch_metadata(scanner)  # nutzt SOAP-Get
-        await scanner.fetch_metadata()  # nutzt SOAP-Get
-#        scanner.update(scanner.max_age)
-        scanner.update(OFFLINE_TIMEOUT)
-        logger.info(f"[WSD:Heartbeat OK] {scanner.friendly_name or scanner.ip} lebt noch")
-    except Exception as e:
-        logger.warning(f"[WSD:Heartbeat FAIL] {scanner.friendly_name or scanner.ip}: {e}")
-
-
 # ---------------- Scanner Probe ----------------
 async def probe_monitor():
     while True:
@@ -217,11 +204,12 @@ async def probe_monitor():
 #            logger.debug(f"   -->       age = {age}")
 
             if status in ("discovered"):
-                logger.info(f"[WSD:probe_mon]   LogPoint A")
+                logger.info(f"[WSD:probe_mon] Fresh discovered, now probing...")
                 try:
                     logger.info(f"[WSD:probe_mon]   LogPoint B")
-#                    asyncio.create_task(send_probe(uuid))
+                    scanner.state = ScannerStatus.PROBING
                     asyncio.create_task(send_probe(scanner))
+                    logger.info(f"[WSD:probe_mon]   LogPoint C")
                 except Exception as e:
                     scanner.state = ScannerStatus.ABSENT
 #                    logger.warning(f"Could not reach scanner with UUID {uuid} and IP {ip}, response is {str(e)}")
@@ -284,29 +272,29 @@ async def send_probe(scanner):
         "User-Agent": "WSDAPI",
     }
 
-    for xaddr in scanner.xaddr:
-        url = f"http://{scanner.ip}:80/StableWSDiscoveryEndpoint/schemas-xmlsoap-org_ws_2005_04_discovery"
-        
-        logger.info(f"   ---> URL: {url}")
-        logger.info(f"   ---> XML:")
-        logger.info({xml})
-        
-        async with aiohttp.ClientSession() as session:
-            try:
-                async with session.post(url, data=xml, headers=headers, timeout=5) as resp:
-                    if resp.status == 200:
-                        body = await resp.text()
-                        # TODO: parse ProbeMatches aus body
-                        scanner.status = ScannerStatus.ONLINE
-                        logger.info(f"[WSD:send_probe] {scanner.friendly_name or scanner.ip} lebt noch")
-#                        logger.debug(f"ProbeMatch von {scanner.ip}:\n{body}")
-                        logger.info(f"ProbeMatch von {scanner.ip}:\n{body}")
-            except Exception as e:
-                scanner.status = ScannerStatus.ABSENT
-                logger.info(f"   ---> Probe fehlgeschlagen bei {url}: {e}")
+#    for xaddr in scanner.xaddr:
+    url = f"http://{scanner.ip}:80/StableWSDiscoveryEndpoint/schemas-xmlsoap-org_ws_2005_04_discovery"
 
-#        logger.debug(f"   ---> Statuscode: {resp.status}")
-        logger.info(f"   ---> Statuscode: {resp.status}")
+    logger.info(f"   ---> URL: {url}")
+    logger.info(f"   ---> XML:")
+    logger.info({xml})
+    
+    async with aiohttp.ClientSession() as session:
+        try:
+            async with session.post(url, data=xml, headers=headers, timeout=5) as resp:
+                if resp.status == 200:
+                    body = await resp.text()
+                    # TODO: parse ProbeMatches aus body
+                    scanner.status = ScannerStatus.ONLINE
+                    logger.info(f"[WSD:send_probe] {scanner.friendly_name or scanner.ip} lebt noch")
+#                    logger.debug(f"ProbeMatch von {scanner.ip}:\n{body}")
+                    logger.info(f"ProbeMatch von {scanner.ip}:\n{body}")
+        except Exception as e:
+            scanner.status = ScannerStatus.ABSENT
+            logger.info(f"   ---> Probe fehlgeschlagen bei {url}: {e}")
+
+#    logger.debug(f"   ---> Statuscode: {resp.status}")
+    logger.info(f"   ---> Statuscode: {resp.status}")
 
 # ---------------- Scanner Subscribe ----------------
 #async def subscribe_to_scanner(scanner, my_notify_url: str, expires_seconds: int = 3600):
