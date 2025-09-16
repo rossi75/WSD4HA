@@ -20,6 +20,7 @@ logger = logging.getLogger("wsd-addon")
 # ---------------- Scanner-Datenstruktur ----------------
 class Scanner:
     def __init__(self, uuid, ip="0.0.0.0", xaddr=None):
+        logger.info(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} [SCANNER:__init__] New instance of Scanner with:")
         self.uuid = uuid
         self.ip = ip
 
@@ -35,17 +36,18 @@ class Scanner:
         self.serial = None
         self.model = None
         self.manufacturer = None
-        self.related_uuids = []
+        self.related_uuids = set()
 
         # Status
-        self.last_seen = datetime.datetime.now() - datetime.timedelta(seconds=OFFLINE_TIMEOUT // 2) # last_seen so zurücksetzen, dass wir "halbzeit" erreicht haben
+#        self.last_seen = datetime.datetime.now() - datetime.timedelta(seconds=OFFLINE_TIMEOUT // 2) # last_seen so zurücksetzen, dass wir "halbzeit" erreicht haben
+        self.last_seen = datetime.datetime.now()                 # braucht nicht angepasst werden, weil wir ja jetzt die statemachine haben
         self.state = ScannerStatus.DISCOVERED
         self.offline_since = None
         self.remove_after = None  # Zeitpunkt zum Löschen
 
-        logger.debug(f"[SCANNER:__init__]    dt.now: {datetime.datetime.now()}")
-        logger.debug(f"[SCANNER:__init__]     delta: {datetime.timedelta(seconds=OFFLINE_TIMEOUT //2)}")
-        logger.debug(f"[SCANNER:__init__] last_seen: {self.last_seen}")
+        logger.debug(f"[SCANNER:__init__]  UUID: {self.uuid}")
+        logger.debug(f"[SCANNER:__init__]    IP: {self.ip}")
+        logger.debug(f"[SCANNER:__init__] XADDR: {self.xaddr}")
 
     # Scanner ist noch online
     # Aufruf mit SCANNER[uuid].update()
@@ -161,3 +163,11 @@ class Scanner:
         logger.info(f"    -->       Serial: {self.serial}")
         logger.info(f"    -->        Model: {self.model}")
         logger.info(f"    --> Manufacturer: {self.manufacturer}")
+
+
+    def add_related_uuid(self, other_uuid: str):
+        """
+        Verknüpft diesen Scanner mit einer weiteren UUID.
+        """
+        if other_uuid and other_uuid != self.uuid:
+            self.related_uuids.add(other_uuid)
