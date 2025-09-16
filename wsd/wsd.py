@@ -7,6 +7,8 @@ import re
 import socket
 import subprocess
 import sys
+import time
+import threading
 import uuid
 import xml.etree.ElementTree as ET
 from config import OFFLINE_TIMEOUT, LOCAL_IP, HTTP_PORT
@@ -15,11 +17,9 @@ from pathlib import Path
 from scanner import Scanner
 from templates import SOAP_PROBE_TEMPLATE
 
+
 logging.basicConfig(level=logging.INFO, format='[%(levelname)s] %(message)s')
 logger = logging.getLogger("wsd-addon")
-
-import time
-import threading
 
 # ---------------- XADDR filtern ----------------
 def pick_best_xaddr(xaddrs: str) -> str:
@@ -191,7 +191,7 @@ async def state_monitor():
                     logger.info(f"[WSD:probe_mon]   LogPoint F")
                 except Exception as e:
                     scanner.state = ScannerStatus.ERROR
-                    logger.warning(f"Anything went wrong while parsing the Probe from UUID {uuid} @ {ip}, response is {str(e)}")
+                    logger.warning(f"Anything went wrong while parsing the XML-Probe from UUID {uuid} @ {ip}, response is {str(e)}")
 
             if status in ("online"):
                 # Halbzeit-Check
@@ -241,6 +241,7 @@ async def state_monitor():
 # ---------------- Send Scanner Probe ----------------
 async def send_probe(scanner):
     logger.info(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} [WSD:send_probe] sending probe for {scanner.uuid} @ {scanner.ip}")
+
     scanner.status = ScannerStatus.PROBING
     msg_id = uuid.uuid4()
     xml = SOAP_PROBE_TEMPLATE.format(msg_id=msg_id)
@@ -272,6 +273,51 @@ async def send_probe(scanner):
     logger.info(f"   ---> Statuscode: {resp.status}")
 
     return {body}
+
+
+# ---------------- Send Transfer_Get ----------------
+async def send_transfer_get(scanner, client_uuid):
+    logger.info(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} [WSD:transfer_get] sending Transfer/Get to {scanner.uuid} @ {scanner.ip}")
+
+    scanner.status = ScannerStatus.GET_PARSING
+    msg_id = uuid.uuid4()
+    xml = SOAP_TRANSFER_GET_TEMPLATE.format(
+        device_uuid=scanner.uuid,
+        msg_id=msg_id,
+        client_uuid=client_uuid
+    )
+
+    headers = {
+        "Content-Type": "application/soap+xml",
+        "User-Agent": "WSDAPI",
+    }
+
+    url = scanner.xaddr  # z.B. http://192.168.0.3:8018/wsd
+
+    logger.info(f"   ---> URL: {url}")
+    logger.info(f"   ---> XML:")
+    logger.info({xml})
+
+    async with aiohttp.ClientSession() as session:
+        try:
+            async with session.post(url, data=xml, headers=headers, timeout=5) as resp:
+                if resp.status == 200:
+                    body = await resp.text()
+                    scanner.status = ScannerStatus.GET_PARSING
+                    parse_transfer_get(scanner, body)
+                else:
+                    logger.error(f"[WSD:transfer_get] HTTP {resp.status}")
+        except Exception as e:
+            logger.error(f"[WSD:transfer_get] failed for {scanner.uuid}: {e}")
+            scanner.status = ScannerStatus.ERROR
+            
+
+
+
+
+
+
+
 
 # ---------------- Probe Parser ----------------
 def parse_probe(xml: str, scanners: dict):
@@ -354,6 +400,44 @@ def parse_wsd_packet(data: bytes):
         logger.debug(f"[WSD] Error while parsing: {e}")
         return None
 
+
+# ---------------- Transfer/GET Parser ----------------
+def parse_transfer_get(scanner, xml_body):
+    root = ET.fromstring(xml_body)
+
+    ns = {
+        "wsx": "http://schemas.xmlsoap.org/ws/2004/09/mex",
+        "wsdp": "http://schemas.xmlsoap.org/ws/2006/02/devprof",
+        "wsa": "http://schemas.xmlsoap.org/ws/2004/08/addressing",
+    }
+
+    # FriendlyName
+    fn_elem = root.find(".//wsdp:FriendlyName", ns)
+    if fn_elem is not None:
+        scanner.friendly_name = fn_elem.text.strip()
+
+    # SerialNumber
+    sn_elem = root.find(".//wsdp:SerialNumber", ns)
+    if sn_elem is not None:
+        scanner.serial_number = sn_elem.text.strip()
+
+    # Firmware
+    fw_elem = root.find(".//wsdp:FirmwareVersion", ns)
+    if fw_elem is not None:
+        scanner.firmware = fw_elem.text.strip()
+
+    # Hosted Services (Scan, Print, …)
+    scanner.services = {}
+    for hosted in root.findall(".//wsdp:Hosted", ns):
+        addr_elem = hosted.find(".//wsa:Address", ns)
+        type_elem = hosted.find(".//wsdp:Types", ns)
+        if addr_elem is not None and type_elem is not None:
+            addr = addr_elem.text.strip()
+            types = type_elem.text.strip()
+            if "ScannerServiceType" in types:
+                scanner.services["scan"] = addr
+            elif "PrinterServiceType" in types:
+                scanner.services["print"] = addr
 
 # ---------------- marry two endpoints ----------------
 def link_endpoints(scanner_a, scanner_b):
