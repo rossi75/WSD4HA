@@ -265,6 +265,7 @@ async def send_probe(scanner):
                     body = await resp.text()
 #                    logger.debug(f"ProbeMatch von {scanner.ip}:\n{body}")
                     logger.info(f"ProbeMatch von {scanner.ip}:\n{body}")
+                    parse_probe(body, scanners)
         except Exception as e:
             scanner.status = ScannerStatus.ABSENT
             logger.info(f"   ---> Probe fehlgeschlagen bei {url}: {e}")
@@ -403,34 +404,35 @@ def parse_wsd_packet(data: bytes):
 
 # ---------------- Transfer/GET Parser ----------------
 def parse_transfer_get(scanner, xml_body):
+    scanner.status = ScannerStatus.GET_PARSING
     root = ET.fromstring(xml_body)
 
-    ns = {
-        "wsx": "http://schemas.xmlsoap.org/ws/2004/09/mex",
-        "wsdp": "http://schemas.xmlsoap.org/ws/2006/02/devprof",
-        "wsa": "http://schemas.xmlsoap.org/ws/2004/08/addressing",
-    }
+#    ns = {
+#        "wsx": "http://schemas.xmlsoap.org/ws/2004/09/mex",
+#        "wsdp": "http://schemas.xmlsoap.org/ws/2006/02/devprof",
+#        "wsa": "http://schemas.xmlsoap.org/ws/2004/08/addressing",
+#    }
 
     # FriendlyName
-    fn_elem = root.find(".//wsdp:FriendlyName", ns)
+    fn_elem = root.find(".//wsdp:FriendlyName", NAMESPACE)
     if fn_elem is not None:
         scanner.friendly_name = fn_elem.text.strip()
 
     # SerialNumber
-    sn_elem = root.find(".//wsdp:SerialNumber", ns)
+    sn_elem = root.find(".//wsdp:SerialNumber", NAMESPACE)
     if sn_elem is not None:
         scanner.serial_number = sn_elem.text.strip()
 
     # Firmware
-    fw_elem = root.find(".//wsdp:FirmwareVersion", ns)
+    fw_elem = root.find(".//wsdp:FirmwareVersion", NAMESPACE)
     if fw_elem is not None:
         scanner.firmware = fw_elem.text.strip()
 
     # Hosted Services (Scan, Print, …)
     scanner.services = {}
-    for hosted in root.findall(".//wsdp:Hosted", ns):
-        addr_elem = hosted.find(".//wsa:Address", ns)
-        type_elem = hosted.find(".//wsdp:Types", ns)
+    for hosted in root.findall(".//wsdp:Hosted", NAMESPACE):
+        addr_elem = hosted.find(".//wsa:Address", NAMESPACE)
+        type_elem = hosted.find(".//wsdp:Types", NAMESPACE)
         if addr_elem is not None and type_elem is not None:
             addr = addr_elem.text.strip()
             types = type_elem.text.strip()
@@ -438,6 +440,9 @@ def parse_transfer_get(scanner, xml_body):
                 scanner.services["scan"] = addr
             elif "PrinterServiceType" in types:
                 scanner.services["print"] = addr
+
+    scanner.status = ScannerStatus.GET_PARSED
+
 
 # ---------------- marry two endpoints ----------------
 def link_endpoints(scanner_a, scanner_b):
