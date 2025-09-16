@@ -42,9 +42,9 @@ class Scanner:
         self.offline_since = None
         self.remove_after = None  # Zeitpunkt zum Löschen
 
-        logger.info(f"[SCANNER:__init__]    dt.now: {datetime.datetime.now()}")
-        logger.info(f"[SCANNER:__init__]     delta: {datetime.timedelta(seconds=OFFLINE_TIMEOUT //2)}")
-        logger.info(f"[SCANNER:__init__] last_seen: {self.last_seen}")
+        logger.debug(f"[SCANNER:__init__]    dt.now: {datetime.datetime.now()}")
+        logger.debug(f"[SCANNER:__init__]     delta: {datetime.timedelta(seconds=OFFLINE_TIMEOUT //2)}")
+        logger.debug(f"[SCANNER:__init__] last_seen: {self.last_seen}")
 
     # Scanner ist noch online
     # Aufruf mit SCANNER[uuid].update()
@@ -54,7 +54,7 @@ class Scanner:
         self.state = ScannerStatus.ONLINE
         self.offline_since = None
         self.remove_after = None
-        logger.info(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} [SCANNER:upd] Seen {self.friendly_name} ({self.ip}) with UUID {self.uuid}")
+        logger.info(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} [SCANNER:upd] Updated timestamps for {self.friendly_name} ({self.ip}) with UUID {self.uuid}")
         logger.debug(f"   --> new last_seen: {self.last_seen}")
 
     # wird aufgerufen wenn ein Scanner offline gesetzt wird
