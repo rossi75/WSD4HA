@@ -134,8 +134,9 @@ async def message_processor(data, addr):
             SCANNERS[uuid] = Scanner(uuid=uuid, ip=ip, xaddr=xaddr)
             logger.info(f"[WSD:HELLO] New Scanner: {SCANNERS[uuid].uuid} ({ip})")
         else:
-            SCANNERS[uuid].update()
-            logger.info(f"[WSD:HELLO] known Scanner updated/back again: {SCANNERS[uuid].friendly_name} ({ip})")
+            if SCANNERS[uuid].state.value == "online":
+                SCANNERS[uuid].update()
+            logger.info(f"[WSD:HELLO] known Scanner seen again: {SCANNERS[uuid].friendly_name} ({ip})")
 
             # ===>> wird nun vom probe_monitor() erledigt
 #            res = await subscribe_to_scanner(SCANNERS[uuid], my_notify_url=f"http://{LOCAL_IP}:{HTTP_PORT}/wsd/notify")
