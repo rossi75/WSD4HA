@@ -131,7 +131,6 @@ async def message_processor(data, addr):
         if "ScanDeviceType" not in types_text:
             logger.info(f"[WSD:HELLO] Ignored non-scanner device UUID={uuid} Types={types_text}")
             return
-            #continue
 
         if uuid not in SCANNERS:
             SCANNERS[uuid] = Scanner(uuid=uuid, ip=ip, xaddr=xaddr)
@@ -204,7 +203,7 @@ async def check_scanner(scanner):
 # ---------------- Scanner Probe ----------------
 async def probe_monitor():
     while True:
-        logger.info(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} [WSD:Probe] wake-up")
+        logger.debug(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} [WSD:Probe] wake-up")
 
         now = time.time()
         for uuid, scanner in SCANNERS.items():
