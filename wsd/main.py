@@ -16,7 +16,8 @@ async def main():
     await asyncio.gather(
         start_http_server(),
         UDP_listener_3702(),
-        heartbeat_monitor(),
+#        heartbeat_monitor(),
+        probe_monitor(),
     )
 
 if __name__ == "__main__":
