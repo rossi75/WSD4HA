@@ -31,6 +31,7 @@ NAMESPACES = {
 
 # ---------------- Logging ----------------
 LOG_LEVEL = os.environ.get("LOG_LEVEL", "INFO").upper()
+LOG_LEVEL = os.environ.get("LOG_LEVEL", "DEBUG").upper()
 # dynamisches loglevel
 logging.basicConfig(level=LOG_LEVEL, format='[%(levelname)s] %(message)s')
 #logging.basicConfig(
@@ -53,13 +54,13 @@ logger.info(f"---------------------  Configuration  ---------------------")
 logger.info(f"Loglevel: {LOG_LEVEL}")
 
 # ---------------- HTTP-Port ----------------
-raw = int(os.environ.get("HTTP_PORT", 8111))
+raw = int(os.environ.get("HTTP_PORT", 8110))
 logger.debug(f"HTTP-Port from Environment: {raw}")
 try:
     HTTP_PORT = int(raw)  # Sekunden
 except ValueError:
     HTTP_PORT = 8110  # Fallback vom Fallback
-    logger.info(f"Reset to fallback Port (should never reach this point)")
+    logger.debug(f"Reset to fallback Port (should never reach this point)")
 logger.info(f"HTTP-Port for UI: {HTTP_PORT}")
 
 # ---------------- OFFLINE_TIMEOUT ----------------
