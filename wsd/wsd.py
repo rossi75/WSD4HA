@@ -30,8 +30,6 @@ logger = logging.getLogger("wsd-addon")
 import time
 import threading
 
-PROBE_INTERVAL = 30  # Sekunden ==> wird später der OFFLINE_TIMEOUT
-
 # ---------------- WSD SOAP Parser ----------------
 def parse_wsd_packet(data: bytes):
     try:
@@ -211,21 +209,20 @@ async def probe_monitor():
         for uuid, scanner in SCANNERS.items():
             logger.info(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} [WSD:Probe] Timer-Check for {uuid} ({scanner.ip})...")
             scanner.state = ScannerStatus.ONLINE
-#            status = scanner.get("status")
-#            last_seen = scanner.get("last_seen", 0)
-#            status = scanner.status
             status = scanner.state
-#            last_seen = scanner.last_seen
             age = (now - scanner.last_seen).total_seconds()
             logger.info(f"   --> last_seen = {scanner.last_seen}")
-            logger.debug(f"   -->       age = {age}")
+            logger.info(f"   -->       age = {age}")
+            logger.info(f"   -->    status = {status}")
+#            logger.debug(f"   -->       age = {age}")
 
-#            if status in ("discovered", "stale") and now - last_seen > PROBE_INTERVAL:
-#            if status in ("discovered", "absent") and now - last_seen > OFFLINE_TIMEOUT:
             if status in ("discovered", "absent") and age > OFFLINE_TIMEOUT:
+                logger.info(f"[WSD:probe_mon]   LogPoint A")
                 try:
+                    logger.info(f"[WSD:probe_mon]   LogPoint B")
                     send_probe(uuid)
                     scanner.status = ScannerStatus.ONLINE
+                    logger.info(f"   -->    status = {status}")
                 except Exception as e:
 #                    scanner["status"] = "error"
 #                    scanner["error"] = str(e)
