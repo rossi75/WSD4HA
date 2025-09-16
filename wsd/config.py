@@ -32,6 +32,7 @@ NAMESPACES = {
 # ---------------- Logging ----------------
 LOG_LEVEL = os.environ.get("LOG_LEVEL", "INFO").upper()
 LOG_LEVEL = os.environ.get("LOG_LEVEL", "DEBUG").upper()
+LOG_LEVEL = os.environ.get("LOG_LEVEL", "debug")
 # dynamisches loglevel
 logging.basicConfig(level=LOG_LEVEL, format='[%(levelname)s] %(message)s')
 #logging.basicConfig(
