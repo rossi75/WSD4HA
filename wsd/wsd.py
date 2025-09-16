@@ -139,13 +139,6 @@ async def discovery_processor(data, addr):
                 SCANNERS[uuid].update()
             logger.info(f"[WSD:HELLO] known Scanner seen again: {SCANNERS[uuid].friendly_name} ({ip})")
 
-            # ===>> wird nun vom probe_monitor() erledigt
-#            res = await subscribe_to_scanner(SCANNERS[uuid], my_notify_url=f"http://{LOCAL_IP}:{HTTP_PORT}/wsd/notify")
-#            if res["ok"]:
-#                logger.info("   ---> subscribed id=%s expires=%s", res["identifier"], res["expires"])
-#            else:
-#                logger.warning("   ---> subscribe failed: %s", res.get("reason"))
-
         list_scanners()
 
     elif action_text == "Bye":
@@ -354,14 +347,17 @@ def parse_probe(xml: str, scanners: dict):
 #            scanners[uuid] = Scanner(uuid=uuid, ip=xaddr, xaddr=xaddr)
 #            scanners[uuid].related_uuids = set()
 #            scanners[uuid].status = ScannerStatus.PROBE_PARSED
-            scanners[uuid] = Scanner(uuid=uuid, ip=xaddr, xaddr=xaddr)
-            scanners[uuid].related_uuids = set()
-            scanners[uuid].status = ScannerStatus.PROBE_PARSED
-            logger.info(f"[WSD:probe_parser] New scanner discovered: {uuid} @ {xaddr}")
+            scanners[uuid] = Scanner(uuid=uuid, ip=scanner.ip, xaddr=xaddr)
+            scanners[uuid].related_uuids.add("{scanner.uuid}")       # = set()
+            scanners[uuid].status = ScannerStatus.PROBE_PARSED                       # das neue Gerät > hat die Probe bestanden, wird nun weiter konnektiert
+            scanner.status = ScannerStatus.ONLINE                                    # das alte Gerät > ist weiterhin online, wird nicht mehr bearbeitet
+            logger.info(f"[WSD:probe_parser] Discovered new scanner endpoint with {uuid} @ {ip} as child from {scanner.uuid}")
         else:
 #            scanner = scanners[uuid]
 #            scanner.xaddr = [xaddr]
-            scanners[uuid].xaddr = xaddr
+#            scanners[uuid].xaddr = xaddr
+            scanner.xaddr = xaddr
+            scanner.related_uuids.add("{scanner.uuid}")       # = set()
             scanner.status = ScannerStatus.PROBE_PARSED
             logger.info(f"[WSD:probe_parser] Updated scanner {uuid} -> {xaddr}")
 
