@@ -32,6 +32,8 @@ NAMESPACES = {
 class ScannerStatus(str, Enum):
     DISCOVERED = "discovered"
     PROBING = "probing"
+    PROBE_PARSE = "parsing_probe"
+    METADATA_FETCH = "fetching_metadata"
     ONLINE = "online"
     ABSENT = "absent"
     TO_REMOVE = "to_remove"
