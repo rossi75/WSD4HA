@@ -203,7 +203,7 @@ async def check_scanner(scanner):
 async def probe_monitor():
     while True:
         logger.debug(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} [WSD:Probe] wake-up")
-
+        to_remove = []
         now = datetime.datetime.now()
 
         for uuid, scanner in SCANNERS.items():
