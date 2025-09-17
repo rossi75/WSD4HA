@@ -265,7 +265,9 @@ async def send_probe(scanner):
                     body = await resp.text()
 #                    logger.debug(f"ProbeMatch von {scanner.ip}:\n{body}")
                     logger.info(f"ProbeMatch von {scanner.ip}:\n{body}")
-                    parse_probe(body, scanners)
+#                    parse_probe(body, scanners) --> rennt nicht
+                    parse_probe(body, scanner)
+#                    parse_probe(body, SCANNERS)
         except Exception as e:
             scanner.status = ScannerStatus.ABSENT
             logger.info(f"   ---> Probe fehlgeschlagen bei {url}: {e}")
