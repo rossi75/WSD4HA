@@ -340,11 +340,12 @@ def parse_probe(xml: str, uuid: str):
         dict: updated scanners
     """
 #    logger.info(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} [WSD:parse_probe] parsing probe from {scanner.uuid} @ {scanner.ip}")
-    logger.info(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} [WSD:parse_probe] parsing probe from {uuid} @ {SCANNER[uuid].ip}")
+#    logger.info(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} [WSD:parse_probe] parsing probe from {uuid} @ {SCANNER[uuid].ip}")
+    logger.info(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} [WSD:parse_probe] parsing probe from {uuid} @ {SCANNERS[uuid].ip}")
     logger.debug(f"XML:\n{body}")
     
 #    scanner.status = ScannerStatus.PROBE_PARSING
-    SCANNER[uuid].status = ScannerStatus.PROBE_PARSING
+    SCANNERS[uuid].status = ScannerStatus.PROBE_PARSING
     affected = []
 
     try:
@@ -352,8 +353,8 @@ def parse_probe(xml: str, uuid: str):
     except ET.ParseError as e:
         logger.error(f"[WSD:probe_parser] XML ParseError: {e}")
 #        scanner.status = ScannerStatus.ERROR
-        SCANNER[uuid].status = ScannerStatus.ERROR
-        return scanners
+        SCANNERS[uuid].status = ScannerStatus.ERROR
+#        return scanners
         return
 
     for pm in root.findall(".//wsd:ProbeMatch", NAMESPACE):
@@ -362,7 +363,7 @@ def parse_probe(xml: str, uuid: str):
         if uuid_elem is None or types_elem is None or xaddrs_elem is None:
             logger.warning("[WSD:probe_parser] Incomplete ProbeMatch, skipping")
 #            scanner.status = ScannerStatus.ERROR
-            SCANNER[uuid].status = ScannerStatus.ERROR
+            SCANNERd[uuid].status = ScannerStatus.ERROR
             continue
 
         probe_uuid = uuid_elem.text.strip()
@@ -410,9 +411,9 @@ def parse_probe(xml: str, uuid: str):
 #            scanner.xaddr = xaddr
 #            scanner.related_uuids.add("{scanner.uuid}")       # = set()
 #            scanner.status = ScannerStatus.PROBE_PARSED
-            SCANNER[uuid].xaddr = xaddr
-            SCANNER[uuid].related_uuids.add("{scanner.uuid}")       # = set()
-            SCANNER[uuid].status = ScannerStatus.PROBE_PARSED
+            SCANNERS[uuid].xaddr = xaddr
+            SCANNERS[uuid].related_uuids.add("{scanner.uuid}")       # = set()
+            SCANNERS[uuid].status = ScannerStatus.PROBE_PARSED
             logger.info(f"[WSD:probe_parser] Updated scanner {uuid} -> {xaddr}")
 
 #    return scanners
