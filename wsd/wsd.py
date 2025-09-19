@@ -269,7 +269,7 @@ async def send_probe(scanner):
 #                    parse_probe(body, scanners) --> rennt nicht
 #                    parse_probe(body, scanner)
 #                    parse_probe(body, SCANNERS)
-                    parse_probe(body, scanner.uuid)
+                    parse_probe(body, {scanner.uuid})
         except Exception as e:
             scanner.status = ScannerStatus.ABSENT
             logger.info(f"   ---> Probe fehlgeschlagen bei {url}: {e}")
