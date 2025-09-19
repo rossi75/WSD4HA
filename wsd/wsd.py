@@ -187,7 +187,8 @@ async def state_monitor():
                 logger.info(f"[WSD:probe_mon] probe done, parsing probe...")
                 try:
                     logger.info(f"[WSD:probe_mon]   LogPoint E")
-                    asyncio.create_task(parse_probe(scanner))
+#                    asyncio.create_task(parse_probe(scanner))
+                    asyncio.create_task(parse_probe(body))
                     logger.info(f"[WSD:probe_mon]   LogPoint F")
                 except Exception as e:
                     scanner.state = ScannerStatus.ERROR
@@ -268,7 +269,7 @@ async def send_probe(scanner):
 #                    parse_probe(body, scanners) --> rennt nicht
 #                    parse_probe(body, scanner)
 #                    parse_probe(body, SCANNERS)
-                    parse_probe(body)
+                    parse_probe(body, scanner.uuid)
         except Exception as e:
             scanner.status = ScannerStatus.ABSENT
             logger.info(f"   ---> Probe fehlgeschlagen bei {url}: {e}")
@@ -324,70 +325,97 @@ async def send_transfer_get(scanner, client_uuid):
 
 
 # ---------------- Probe Parser ----------------
-def parse_probe(xml: str, scanners: dict):
+#def parse_probe(xml: str, scanners: dict):
+#def parse_probe(xml: str):
+def parse_probe(xml: str, uuid: str):
     """
     Parse ProbeMatch response and update/create Scanner objects.
 
     Args:
         xml (str): SOAP XML response as string
         scanners (dict): Dictionary {uuid: Scanner}
+        
 
     Returns:
         dict: updated scanners
     """
     logger.info(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} [WSD:parse_probe] parsing probe from {scanner.uuid} @ {scanner.ip}")
-    scanner.status = ScannerStatus.PROBE_PARSING
+    logger.debug(f"XML:\n{body}")
+#    scanner.status = ScannerStatus.PROBE_PARSING
+    SCANNER[uuid].status = ScannerStatus.PROBE_PARSING
     affected = []
 
     try:
         root = ET.fromstring(xml)
     except ET.ParseError as e:
         logger.error(f"[WSD:probe_parser] XML ParseError: {e}")
-        scanner.status = ScannerStatus.ERROR
+#        scanner.status = ScannerStatus.ERROR
+        SCANNER[uuid].status = ScannerStatus.ERROR
         return scanners
+        return
 
     for pm in root.findall(".//wsd:ProbeMatch", NAMESPACE):
         uuid_elem = pm.find(".//wsa:Address", NAMESPACE)
-        types_elem = pm.find(".//wsd:Types", NAMESPACE)
-        xaddrs_elem = pm.find(".//wsd:XAddrs", NAMESPACE)
 
         if uuid_elem is None or types_elem is None or xaddrs_elem is None:
             logger.warning("[WSD:probe_parser] Incomplete ProbeMatch, skipping")
-            scanner.status = ScannerStatus.ERROR
+#            scanner.status = ScannerStatus.ERROR
+            SCANNER[uuid].status = ScannerStatus.ERROR
             continue
 
-        uuid = uuid_elem.text.strip()
+        probe_uuid = uuid_elem.text.strip()
+#        scanner[uuid].status = ScannerStatus.PROBE_PARSING
+
+        types_elem = pm.find(".//wsd:Types", NAMESPACE)
         types = types_elem.text.strip().split()
+
+        xaddrs_elem = pm.find(".//wsd:XAddrs", NAMESPACE)
         xaddr = pick_best_xaddr(xaddrs_elem.text.strip())
 
         # Nur Scanner akzeptieren
         if not any("ScanDeviceType" in t for t in types):
-            logger.info(f"[WSD:probe_parser] Skipping non-scanner device {uuid}")
-            scanner.status = ScannerStatus.ERROR
+#            logger.info(f"[WSD:probe_parser] Skipping non-scanner device {uuid}")
+            logger.info(f"[WSD:probe_parser] Skipping non-scanner device {probe_uuid}")
+#            scanner.status = ScannerStatus.ERROR
+ #           scanner[uuid].status = ScannerStatus.ERROR
+#            SCANNER[uuid].status = ScannerStatus.ERROR
             continue
 
         # neuer oder vorhandener Scanner?
-        if uuid not in scanners:
+#        if uuid not in scanners:
+#        if uuid not in SCANNERS:
+        if probe_uuid not in SCANNERS:
 #            scanners[uuid] = Scanner(uuid=uuid, ip=xaddr, xaddr=[xaddr])
 #            scanners[uuid] = Scanner(uuid=uuid, ip=xaddr, xaddr=xaddr)
 #            scanners[uuid].related_uuids = set()
 #            scanners[uuid].status = ScannerStatus.PROBE_PARSED
-            scanners[uuid] = Scanner(uuid=uuid, ip=scanner.ip, xaddr=xaddr)
-            scanners[uuid].related_uuids.add("{scanner.uuid}")       # = set()
-            scanners[uuid].status = ScannerStatus.PROBE_PARSED                       # das neue Gerät > hat die Probe bestanden, wird nun weiter konnektiert
-            scanner.status = ScannerStatus.ONLINE                                    # das alte Gerät > ist weiterhin online, wird nicht mehr bearbeitet
-            marry_endpoints(scanner, scanners[uuid])
-            logger.info(f"[WSD:probe_parser] Discovered new scanner endpoint with {uuid} @ {ip} as child from {scanner.uuid}")
+#            scanners[uuid] = Scanner(uuid=uuid, ip=scanner.ip, xaddr=xaddr)
+#            scanners[uuid].related_uuids.add("{scanner.uuid}")       # = set()
+#            scanners[uuid].status = ScannerStatus.PROBE_PARSED                       # das neue Gerät > hat die Probe bestanden, wird nun weiter konnektiert
+#            scanner.status = ScannerStatus.ONLINE                                    # das alte Gerät > ist weiterhin online, wird nicht mehr bearbeitet
+            SCANNERS[probe_uuid] = Scanner(uuid=probe_uuid, ip=scanner.ip, xaddr=xaddr)
+            SCANNERS[probe_uuid].related_uuids.add("{scanner.uuid}")       # = set()
+            SCANNERS[probe_uuid].status = ScannerStatus.PROBE_PARSED                       # das neue Gerät > hat die Probe bestanden, wird nun weiter konnektiert
+            SCANNERS[uuid].status = ScannerStatus.ONLINE                                    # das alte Gerät > ist weiterhin online, wird nicht mehr bearbeitet
+ #           marry_endpoints(scanner, scanners[uuid])
+            marry_endpoints(SCANNER[uuid], SCANNER[probe_[uuid])
+#            logger.info(f"[WSD:probe_parser] Discovered new scanner endpoint with {uuid} @ {ip} as child from {scanner.uuid}")
+            logger.info(f"[WSD:probe_parser] Discovered new scanner endpoint with {probe_uuid} @ {ip} as child from {uuid}")
         else:
 #            scanner = scanners[uuid]
 #            scanner.xaddr = [xaddr]
 #            scanners[uuid].xaddr = xaddr
-            scanner.xaddr = xaddr
-            scanner.related_uuids.add("{scanner.uuid}")       # = set()
-            scanner.status = ScannerStatus.PROBE_PARSED
+#            scanner.xaddr = xaddr
+#            scanner.related_uuids.add("{scanner.uuid}")       # = set()
+#            scanner.status = ScannerStatus.PROBE_PARSED
+            SCANNER[uuid].xaddr = xaddr
+            SCANNER[uuid].related_uuids.add("{scanner.uuid}")       # = set()
+            SCANNER[uuid].status = ScannerStatus.PROBE_PARSED
             logger.info(f"[WSD:probe_parser] Updated scanner {uuid} -> {xaddr}")
 
-    return scanners
+#    return scanners
+#    return probe_uuid or uuid
+    return
 
 
 # ---------------- WSD SOAP Parser ----------------
