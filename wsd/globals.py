@@ -29,7 +29,8 @@ NAMESPACES = {
 }
 
 # -----------------  define ScannerStati  -----------------
-class ScannerStatus(str, Enum):
+#class ScannerStatus(str, Enum):
+class STATE(str, Enum):
     DISCOVERED = "discovered"
     PROBING = "probing"
     PROBE_PARSING = "parsing_probe"
