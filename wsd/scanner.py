@@ -3,7 +3,7 @@ import socket
 import logging
 import sys
 #from globals import SCANNERS, list_scanners, NAMESPACES
-from globals import SCANNERS, list_scanners, NAMESPACES, ScannerStatus
+from globals import SCANNERS, list_scanners, NAMESPACES, STATE
 #from config import WSD_OFFLINE_TIMEOUT
 from config import OFFLINE_TIMEOUT
 #from config import WSD_HTTP_PORT, WSD_OFFLINE_TIMEOUT, WSD_SCAN_FOLDER
@@ -41,7 +41,7 @@ class Scanner:
         # Status
 #        self.last_seen = datetime.datetime.now() - datetime.timedelta(seconds=OFFLINE_TIMEOUT // 2) # last_seen so zurücksetzen, dass wir "halbzeit" erreicht haben
         self.last_seen = datetime.datetime.now()                 # braucht nicht angepasst werden, weil wir ja jetzt die statemachine haben
-        self.state = ScannerStatus.DISCOVERED
+        self.state = STATE.DISCOVERED
         self.offline_since = None
         self.remove_after = None  # Zeitpunkt zum Löschen
 
