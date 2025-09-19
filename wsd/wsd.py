@@ -12,7 +12,7 @@ import threading
 import uuid
 import xml.etree.ElementTree as ET
 from config import OFFLINE_TIMEOUT, LOCAL_IP, HTTP_PORT
-from globals import SCANNERS, list_scanners, NAMESPACES, ScannerStatus
+from globals import SCANNERS, list_scanners, NAMESPACES, STATE
 from pathlib import Path
 from scanner import Scanner
 from templates import SOAP_PROBE_TEMPLATE
@@ -180,7 +180,7 @@ async def state_monitor():
                     asyncio.create_task(send_probe(scanner))
                     logger.info(f"[WSD:probe_mon]   LogPoint C")
                 except Exception as e:
-                    scanner.state = ScannerStatus.ERROR
+                    scanner.state = STATE.ERROR
                     logger.warning(f"Anything went wrong while probing the UUID {uuid} @ {ip}, response is {str(e)}")
 
             if status in ("parsing_probe"):
@@ -191,7 +191,7 @@ async def state_monitor():
                     asyncio.create_task(parse_probe(body))
                     logger.info(f"[WSD:probe_mon]   LogPoint F")
                 except Exception as e:
-                    scanner.state = ScannerStatus.ERROR
+                    scanner.state = STATE.ERROR
                     logger.warning(f"Anything went wrong while parsing the XML-Probe from UUID {uuid} @ {ip}, response is {str(e)}")
 
             if status in ("online"):
@@ -202,7 +202,7 @@ async def state_monitor():
                         asyncio.create_task(send_probe(uuid))
                         scanner.update()
                     except Exception as e:
-                        scanner.state = ScannerStatus.ABSENT
+                        scanner.state = STATE.ABSENT
                         logger.warning(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} Could not reach scanner with UUID {uuid} and IP {ip}. Last seen at {scanner.last_seen}. Response is {str(e)}")
     
                 # 3/4-Check
@@ -243,7 +243,7 @@ async def state_monitor():
 async def send_probe(scanner):
     logger.info(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} [WSD:send_probe] sending probe for {scanner.uuid} @ {scanner.ip}")
 
-    scanner.status = ScannerStatus.PROBING
+    scanner.status = STATE.PROBING
     msg_id = uuid.uuid4()
     xml = SOAP_PROBE_TEMPLATE.format(msg_id=msg_id)
 
@@ -269,7 +269,7 @@ async def send_probe(scanner):
                     parse_probe(body, scanner.uuid)
         except Exception as e:
             logger.info(f"   ---> Probe fehlgeschlagen bei {url}: {e}")
-            scanner.status = ScannerStatus.ABSENT
+            scanner.status = STATE.ABSENT
 
 #    logger.debug(f"   ---> Statuscode: {resp.status}")
     logger.info(f"   ---> Statuscode: {resp.status}")
@@ -281,7 +281,7 @@ async def send_probe(scanner):
 async def send_transfer_get(scanner, client_uuid):
     logger.info(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} [WSD:transfer_get] sending Transfer/Get to {scanner.uuid} @ {scanner.ip}")
 
-    scanner.status = ScannerStatus.GET_PARSING
+    scanner.status = STATE.GET_PARSING
     msg_id = uuid.uuid4()
     xml = SOAP_TRANSFER_GET_TEMPLATE.format(
         device_uuid=scanner.uuid,
@@ -305,13 +305,13 @@ async def send_transfer_get(scanner, client_uuid):
             async with session.post(url, data=xml, headers=headers, timeout=5) as resp:
                 if resp.status == 200:
                     body = await resp.text()
-                    scanner.status = ScannerStatus.GET_PARSING
+                    scanner.status = STATE.GET_PARSING
                     parse_transfer_get(scanner, body)
                 else:
                     logger.error(f"[WSD:transfer_get] HTTP {resp.status}")
         except Exception as e:
             logger.error(f"[WSD:transfer_get] failed for {scanner.uuid}: {e}")
-            scanner.status = ScannerStatus.ERROR
+            scanner.status = STATE.ERROR
             
 
 
@@ -342,7 +342,7 @@ def parse_probe(xml: str, uuid: str):
     logger.debug(f"XML:\n{body}")
     
 #    scanner.status = ScannerStatus.PROBE_PARSING
-    SCANNERS[uuid].status = ScannerStatus.PROBE_PARSING
+    SCANNERS[uuid].status = STATE.PROBE_PARSING
     affected = []
 
     try:
@@ -350,7 +350,7 @@ def parse_probe(xml: str, uuid: str):
     except ET.ParseError as e:
         logger.error(f"[WSD:probe_parser] XML ParseError: {e}")
 #        scanner.status = ScannerStatus.ERROR
-        SCANNERS[uuid].status = ScannerStatus.ERROR
+        SCANNERS[uuid].status = STATE.ERROR
 #        return scanners
         return
 
@@ -360,7 +360,7 @@ def parse_probe(xml: str, uuid: str):
         if uuid_elem is None or types_elem is None or xaddrs_elem is None:
             logger.warning("[WSD:probe_parser] Incomplete ProbeMatch, skipping")
 #            scanner.status = ScannerStatus.ERROR
-            SCANNERd[uuid].status = ScannerStatus.ERROR
+            SCANNERd[uuid].status = STATE.ERROR
             continue
 
         probe_uuid = uuid_elem.text.strip()
@@ -395,8 +395,8 @@ def parse_probe(xml: str, uuid: str):
 #            scanner.status = ScannerStatus.ONLINE                                    # das alte Gerät > ist weiterhin online, wird nicht mehr bearbeitet
             SCANNERS[probe_uuid] = Scanner(uuid=probe_uuid, ip=scanner.ip, xaddr=xaddr)
             SCANNERS[probe_uuid].related_uuids.add("{scanner.uuid}")       # = set()
-            SCANNERS[probe_uuid].status = ScannerStatus.PROBE_PARSED                       # das neue Gerät > hat die Probe bestanden, wird nun weiter konnektiert
-            SCANNERS[uuid].status = ScannerStatus.ONLINE                                    # das alte Gerät > ist weiterhin online, wird nicht mehr bearbeitet
+            SCANNERS[probe_uuid].status = STATE.PROBE_PARSED                       # das neue Gerät > hat die Probe bestanden, wird nun weiter konnektiert
+            SCANNERS[uuid].status = STATE.ONLINE                                    # das alte Gerät > ist weiterhin online, wird nicht mehr bearbeitet
  #           marry_endpoints(scanner, scanners[uuid])
             marry_endpoints(SCANNERS[uuid], SCANNERS[probe_uuid])
 #            logger.info(f"[WSD:probe_parser] Discovered new scanner endpoint with {uuid} @ {ip} as child from {scanner.uuid}")
@@ -411,7 +411,7 @@ def parse_probe(xml: str, uuid: str):
             SCANNERS[uuid].xaddr = xaddr
 #            SCANNERS[uuid].related_uuids.add(scanner.uuid)       # = set()
             SCANNERS[uuid].related_uuids.add(uuid)       # = set()
-            SCANNERS[uuid].status = ScannerStatus.PROBE_PARSED
+            SCANNERS[uuid].status = STATE.PROBE_PARSED
             logger.info(f"[WSD:probe_parser] Updated scanner {uuid} -> {xaddr}")
 
 #    return scanners
@@ -436,7 +436,7 @@ def parse_wsd_packet(data: bytes):
 
 # ---------------- Transfer/GET Parser ----------------
 def parse_transfer_get(scanner, xml_body):
-    scanner.status = ScannerStatus.GET_PARSING
+    scanner.status = STATE.GET_PARSING
     root = ET.fromstring(xml_body)
 
 #    ns = {
@@ -473,7 +473,7 @@ def parse_transfer_get(scanner, xml_body):
             elif "PrinterServiceType" in types:
                 scanner.services["print"] = addr
 
-    scanner.status = ScannerStatus.GET_PARSED
+    scanner.status = STATE.GET_PARSED
 
 
 # ---------------- marry two endpoints ----------------
