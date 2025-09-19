@@ -398,7 +398,7 @@ def parse_probe(xml: str, uuid: str):
             SCANNERS[probe_uuid].status = ScannerStatus.PROBE_PARSED                       # das neue Gerät > hat die Probe bestanden, wird nun weiter konnektiert
             SCANNERS[uuid].status = ScannerStatus.ONLINE                                    # das alte Gerät > ist weiterhin online, wird nicht mehr bearbeitet
  #           marry_endpoints(scanner, scanners[uuid])
-            marry_endpoints(SCANNER[uuid], SCANNER[probe_[uuid])
+            marry_endpoints(SCANNER[uuid], SCANNER[probe_uuid])
 #            logger.info(f"[WSD:probe_parser] Discovered new scanner endpoint with {uuid} @ {ip} as child from {scanner.uuid}")
             logger.info(f"[WSD:probe_parser] Discovered new scanner endpoint with {probe_uuid} @ {ip} as child from {uuid}")
         else:
