@@ -101,7 +101,7 @@ async def status_page(request):
 
 # ---------------- HTTP Server ----------------
 async def start_http_server():
-    logger.info(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S}[WEBSERVER:start_http] configuring HTTP/SOAP Server on Port {HTTP_PORT}")
+    logger.info(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} [WEBSERVER:start_http] configuring HTTP/SOAP Server on Port {HTTP_PORT}")
     app = web.Application()
     app.router.add_get("/", status_page)
     logger.debug(f"   ---> added endpoint /")
@@ -123,7 +123,7 @@ async def start_http_server():
 async def notify_handler(request):
     text = await request.text()
     # quick log
-    logger.info(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S}[WEBSERVER:NOTIFY] received notification payload: %s", text[:600])
+    logger.info(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} [WEBSERVER:NOTIFY] received notification payload: %s", text[:600])
     try:
         root = ET.fromstring(text)
     except Exception as e:
