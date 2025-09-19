@@ -412,7 +412,8 @@ def parse_probe(xml: str, uuid: str):
 #            scanner.related_uuids.add("{scanner.uuid}")       # = set()
 #            scanner.status = ScannerStatus.PROBE_PARSED
             SCANNERS[uuid].xaddr = xaddr
-            SCANNERS[uuid].related_uuids.add(scanner.uuid)       # = set()
+#            SCANNERS[uuid].related_uuids.add(scanner.uuid)       # = set()
+            SCANNERS[uuid].related_uuids.add(uuid)       # = set()
             SCANNERS[uuid].status = ScannerStatus.PROBE_PARSED
             logger.info(f"[WSD:probe_parser] Updated scanner {uuid} -> {xaddr}")
 
