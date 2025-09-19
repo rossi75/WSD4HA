@@ -187,7 +187,6 @@ async def state_monitor():
                 logger.info(f"[WSD:probe_mon] probe done, parsing probe...")
                 try:
                     logger.info(f"[WSD:probe_mon]   LogPoint E")
-#                    asyncio.create_task(parse_probe(scanner))
                     asyncio.create_task(parse_probe(body))
                     logger.info(f"[WSD:probe_mon]   LogPoint F")
                 except Exception as e:
@@ -234,10 +233,17 @@ async def state_monitor():
             del SCANNERS[scanner.uuid]
             list_scanners()
           
-        logger.debug(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} [WSD:Probe] goodbye")
+        logger.debug(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} [WSD:sleep] goodbye")
         #await asyncio.sleep(30)
-        await asyncio.sleep(OFFLINE_TIMEOUT / 4)
-        logger.debug(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} [WSD:Probe] back in town")
+        if any (SCANNER.state not in {"absent", "online", "to_remove", "error"}
+        #    for SCANNER in scanners.values()):
+         #       logger.info(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} [WSD:sleep] short nap")
+            logger.info(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} [WSD:sleep] short nap")
+            await asyncio.sleep(2)
+        else
+            await asyncio.sleep(OFFLINE_TIMEOUT / 4)
+ #       await asyncio.sleep(OFFLINE_TIMEOUT / 4)
+        logger.debug(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} [WSD:sleep] back in town")
 
 # ---------------- Send Scanner Probe ----------------
 async def send_probe(scanner):
