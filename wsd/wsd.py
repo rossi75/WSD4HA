@@ -394,7 +394,8 @@ def parse_probe(xml: str, uuid: str):
 #            scanners[uuid].status = ScannerStatus.PROBE_PARSED                       # das neue Gerät > hat die Probe bestanden, wird nun weiter konnektiert
 #            scanner.status = ScannerStatus.ONLINE                                    # das alte Gerät > ist weiterhin online, wird nicht mehr bearbeitet
             SCANNERS[probe_uuid] = Scanner(uuid=probe_uuid, ip=scanner.ip, xaddr=xaddr)
-            SCANNERS[probe_uuid].related_uuids.add("{scanner.uuid}")       # = set()
+#            SCANNERS[probe_uuid].related_uuids.add("{scanner.uuid}")       # = set()
+            SCANNERS[probe_uuid].related_uuids.add(uuid)       # = set()
             SCANNERS[probe_uuid].status = STATE.PROBE_PARSED                       # das neue Gerät > hat die Probe bestanden, wird nun weiter konnektiert
             SCANNERS[uuid].status = STATE.ONLINE                                    # das alte Gerät > ist weiterhin online, wird nicht mehr bearbeitet
  #           marry_endpoints(scanner, scanners[uuid])
