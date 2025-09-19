@@ -256,8 +256,7 @@ async def send_probe(scanner):
     url = f"http://{scanner.ip}:80/StableWSDiscoveryEndpoint/schemas-xmlsoap-org_ws_2005_04_discovery"
 
     logger.info(f"   ---> URL: {url}")
-    logger.info(f"   ---> XML:")
-    logger.info({xml})
+    logger.info(f"   ---> XML:\n{xml}")
     
     async with aiohttp.ClientSession() as session:
         try:
@@ -266,10 +265,8 @@ async def send_probe(scanner):
                     body = await resp.text()
 #                    logger.debug(f"ProbeMatch von {scanner.ip}:\n{body}")
                     logger.info(f"ProbeMatch von {scanner.ip}:\n{body}")
-#                    parse_probe(body, scanners) --> rennt nicht
-#                    parse_probe(body, scanner)
-#                    parse_probe(body, SCANNERS)
-                    parse_probe(body, {scanner.uuid})
+#                    parse_probe(body, {scanner.uuid})
+                    parse_probe(body, scanner.uuid)
         except Exception as e:
             logger.info(f"   ---> Probe fehlgeschlagen bei {url}: {e}")
             scanner.status = ScannerStatus.ABSENT
