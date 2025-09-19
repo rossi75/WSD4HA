@@ -339,8 +339,10 @@ def parse_probe(xml: str, uuid: str):
     Returns:
         dict: updated scanners
     """
-    logger.info(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} [WSD:parse_probe] parsing probe from {scanner.uuid} @ {scanner.ip}")
+#    logger.info(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} [WSD:parse_probe] parsing probe from {scanner.uuid} @ {scanner.ip}")
+    logger.info(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} [WSD:parse_probe] parsing probe from {uuid} @ {SCANNER[uuid].ip}")
     logger.debug(f"XML:\n{body}")
+    
 #    scanner.status = ScannerStatus.PROBE_PARSING
     SCANNER[uuid].status = ScannerStatus.PROBE_PARSING
     affected = []
