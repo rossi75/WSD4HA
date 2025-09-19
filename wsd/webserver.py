@@ -15,7 +15,8 @@ import subprocess
 from config import OFFLINE_TIMEOUT, SCAN_FOLDER, HTTP_PORT, MAX_FILES
 #from globals import SCANNERS, OFFLINE_TIMEOUT, SCAN_FOLDER, MAX_FILES
 #from globals import SCANNERS, NAMESPACES
-from globals import SCANNERS, NAMESPACES, ScannerStatus
+#from globals import SCANNERS, NAMESPACES, ScannerStatus
+from globals import SCANNERS, NAMESPACES, STATE
 #from globals import SCANNERS, list_scanners 
 #from globals import SCANNERS, list_scanners, OFFLINE_TIMEOUT
 from scanner import Scanner
