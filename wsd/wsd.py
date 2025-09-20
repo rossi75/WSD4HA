@@ -369,15 +369,15 @@ def parse_probe(xml: str, probed_uuid: str):
         # UUID (without urn:uuid:)
         uuid = None
         uuid_elem = pm.find(".//wsa:Address", NAMESPACES)
-        probe_uuid = uuid_elem.text.strip()
-        if probe_uuid is not None and probe_uuid.text:
-            uuid_text = probe_uuid.text.strip()
-            if uuid_text.startswith("urn:uuid:"):
-                probe_uuid = uuid_text.replace("urn:uuid:", "")
+        if uuid_elem is not None and uuid_elem.text:
+            probe_uuid = uuid_elem.text.strip()
+            if probe_uuid.startswith("urn:uuid:"):
+                probe_uuid = probe_uuid.replace("urn:uuid:", "")
             else:
                 probe_uuid = uuid_text
 
         # Nur Scanner akzeptieren
+        types = None
         types_elem = pm.find(".//wsd:Types", NAMESPACES)
         types = types_elem.text.strip().split()
         if not any("ScanDeviceType" in t for t in types):
@@ -385,10 +385,13 @@ def parse_probe(xml: str, probed_uuid: str):
 #            SCANNERS[uuid].status = ScannerStatus.ERROR
             continue
 
+        # die Serviceadresse finden
+        xaddr = None
         xaddrs_elem = pm.find(".//wsd:XAddrs", NAMESPACES)
         xaddr = pick_best_xaddr(xaddrs_elem.text.strip())
 
-        if uuid_elem is None or types_elem is None or xaddrs_elem is None:
+#        if uuid_elem is None or types_elem is None or xaddrs_elem is None:
+        if uuid is None or types is None or xaddrs is None:
             logger.warning("[WSD:probe_parser] Incomplete ProbeMatch, skipping UUID {probe_uuid}")
             SCANNERS[probed_uuid].state = STATE.ERROR
             continue
