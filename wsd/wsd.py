@@ -249,7 +249,7 @@ async def state_monitor():
 async def send_probe(scanner):
     logger.info(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} [WSD:send_probe] sending probe for {scanner.uuid} @ {scanner.ip}")
 
-    scanner.status = STATE.PROBING
+    scanner.state = STATE.PROBING
     msg_id = uuid.uuid4()
     xml = SOAP_PROBE_TEMPLATE.format(msg_id=msg_id)
 
@@ -264,19 +264,24 @@ async def send_probe(scanner):
     logger.info(f"   ---> URL: {url}")
     logger.debug(f"   ---> XML:\n{xml}")
 
+    body = ""
+
     async with aiohttp.ClientSession() as session:
         try:
             async with session.post(url, data=xml, headers=headers, timeout=5) as resp:
                 if resp.status == 200:
                     body = await resp.text()
 #                    logger.debug(f"ProbeMatch von {scanner.ip}:\n{body}")
-                    logger.info(f"ProbeMatch von {scanner.ip}:\n{body}")
-                    parse_probe(body, scanner.uuid)
+#                    parse_probe(body, scanner.uuid)
                 else:
                     logger.warning(f"Probe failed with status {resp.status}")
+                    scanner.state = STATE.ABSENT
         except Exception as e:
             logger.info(f"   ---> Probe fehlgeschlagen bei {url}: {e}")
-            scanner.status = STATE.ABSENT
+            scanner.state = STATE.ABSENT
+
+    logger.info(f"ProbeMatch von {scanner.ip}:\n{body}")
+    parse_probe(body, scanner.uuid)
 
 #    logger.debug(f"   ---> Statuscode: {resp.status}")
     logger.info(f"   ---> Statuscode: {resp.status}")
@@ -285,7 +290,7 @@ async def send_probe(scanner):
 async def send_transfer_get(scanner, client_uuid):
     logger.info(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} [WSD:transfer_get] sending Transfer/Get to {scanner.uuid} @ {scanner.ip}")
 
-    scanner.status = STATE.GET_PARSING
+    scanner.state = STATE.GET_PENDING
     msg_id = uuid.uuid4()
     xml = SOAP_TRANSFER_GET_TEMPLATE.format(
         device_uuid=scanner.uuid,
@@ -304,18 +309,23 @@ async def send_transfer_get(scanner, client_uuid):
     logger.info(f"   ---> XML:")
     logger.info({xml})
 
-    scanner.status = STATE.GET_PARSING
+    body = ""
+
     async with aiohttp.ClientSession() as session:
         try:
             async with session.post(url, data=xml, headers=headers, timeout=5) as resp:
                 if resp.status == 200:
                     body = await resp.text()
-                    parse_transfer_get(scanner, body)
+#                    parse_transfer_get(scanner, body)
                 else:
-                    logger.error(f"[WSD:transfer_get] HTTP {resp.status}")
+                    logger.error(f"[WSD:transfer_get] TransferGet failed with Status {resp.status}")
+                    scanner.state = STATE.ERROR
         except Exception as e:
             logger.error(f"[WSD:transfer_get] failed for {scanner.uuid}: {e}")
-            scanner.status = STATE.ERROR
+            scanner.state = STATE.ERROR
+
+    logger.info(f"TransferGet von {scanner.ip}:\n{body}")
+    parse_transfer_get(scanner, body)
 
 # ---------------- Probe Parser ----------------
 def parse_probe(xml: str, probed_uuid: str):
@@ -336,9 +346,7 @@ def parse_probe(xml: str, probed_uuid: str):
         root = ET.fromstring(xml)
     except ET.ParseError as e:
         logger.error(f"[WSD:probe_parser] XML ParseError: {e}")
-#        scanner.status = ScannerStatus.ERROR
         SCANNERS[probed_uuid].state = STATE.ERROR
-#        return scanners
         return
 
     for pm in root.findall(".//wsd:ProbeMatch", NAMESPACES):
@@ -398,7 +406,7 @@ def parse_wsd_packet(data: bytes):
 
 # ---------------- Transfer/GET Parser ----------------
 def parse_transfer_get(scanner, xml_body):
-    scanner.status = STATE.GET_PARSING
+    scanner.state = STATE.GET_PARSING
     root = ET.fromstring(xml_body)
 
 #    ns = {
@@ -435,7 +443,7 @@ def parse_transfer_get(scanner, xml_body):
             elif "PrinterServiceType" in types:
                 scanner.services["print"] = addr
 
-    scanner.status = STATE.GET_PARSED
+    scanner.state = STATE.GET_PARSED
 
 
 # ---------------- marry two endpoints ----------------
