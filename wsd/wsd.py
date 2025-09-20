@@ -317,7 +317,7 @@ async def send_transfer_get(tf_g_uuid: str):
     }
 
 #    url = scanner.xaddr  # z.B. http://192.168.0.3:8018/wsd
-    url = SCANNER[tf_g_uuid].xaddr  # z.B. http://192.168.0.3:8018/wsd
+    url = SCANNERS[tf_g_uuid].xaddr  # z.B. http://192.168.0.3:8018/wsd
 
     logger.info(f"   ---> URL: {url}")
     logger.info(f"   ---> XML:")
@@ -333,14 +333,14 @@ async def send_transfer_get(tf_g_uuid: str):
 #                    parse_transfer_get(scanner, body)
                 else:
                     logger.error(f"[WSD:transfer_get] TransferGet failed with Status {resp.status}")
-                    SCANNER[tf_g_uuid].state = STATE.ERROR
+                    SCANNERS[tf_g_uuid].state = STATE.ERROR
         except Exception as e:
 #            logger.error(f"[WSD:transfer_get] failed for {scanner.uuid}: {e}")
 #            scanner.state = STATE.ERROR
-            logger.error(f"[WSD:transfer_get] failed for {SCANNER[tf_g_uuid].uuid}: {e}")
-            SCANNER[tf_g_uuid].state = STATE.ERROR
+            logger.error(f"[WSD:transfer_get] failed for {SCANNERS[tf_g_uuid].uuid}: {e}")
+            SCANNERS[tf_g_uuid].state = STATE.ERROR
  
-    logger.info(f"TransferGet von {SCANNER[tf_g_uuid].ip}:\n{body}")
+    logger.info(f"TransferGet von {SCANNERS[tf_g_uuid].ip}:\n{body}")
     parse_transfer_get(scanner, body)
 
 # ---------------- Probe Parser ----------------
