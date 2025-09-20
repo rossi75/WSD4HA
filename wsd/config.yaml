@@ -1,5 +1,5 @@
 name: WSD4HA
-version: "0.00.5"
+version: "0.00.5_"
 slug: wsd_scanner
 description: "Minimal WSD-Server for Samsung C480W [and probably other Scanners]"
 url: https://github.com/rossi75/WSD4HA
