@@ -233,7 +233,7 @@ async def state_monitor():
                 logger.info(f"[WSD:Heartbeat] --> Marking {scanner.ip} ({scanner.friendly_name}) to remove")
                 to_remove.append(scanner)
 
-            logger.info(f"   -->    status: {status}")
+            logger.info(f"   -->    status: {SCANNERS[uuid].state.value}")
 #            logger.debug(f"   -->    status = {status}")
     
         # welche Scanner sollen entfernt werden?
