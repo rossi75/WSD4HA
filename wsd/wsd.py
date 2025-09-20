@@ -342,7 +342,7 @@ def parse_probe(xml: str, uuid: str):
     
     SCANNERS[uuid].status = STATE.PROBE_PARSING
     affected = []
-
+   
     try:
         root = ET.fromstring(xml)
     except ET.ParseError as e:
@@ -353,27 +353,28 @@ def parse_probe(xml: str, uuid: str):
         return
 
     for pm in root.findall(".//wsd:ProbeMatch", NAMESPACES):
-        uuid_elem = pm.find(".//wsa:Address", NAMESPACES)
 
-        if uuid_elem is None or types_elem is None or xaddrs_elem is None:
-            logger.warning("[WSD:probe_parser] Incomplete ProbeMatch, skipping")
-#            scanner.status = ScannerStatus.ERROR
-            SCANNERd[uuid].status = STATE.ERROR
-            continue
+        uuid_elem = pm.find(".//wsa:Address", NAMESPACES)
 
         probe_uuid = uuid_elem.text.strip()
 
         types_elem = pm.find(".//wsd:Types", NAMESPACES)
         types = types_elem.text.strip().split()
-
-        xaddrs_elem = pm.find(".//wsd:XAddrs", NAMESPACES)
-        xaddr = pick_best_xaddr(xaddrs_elem.text.strip())
-
         # Nur Scanner akzeptieren
         if not any("ScanDeviceType" in t for t in types):
             logger.info(f"[WSD:probe_parser] Skipping non-scanner device {probe_uuid}")
 #            SCANNERS[uuid].status = ScannerStatus.ERROR
             continue
+
+        xaddrs_elem = pm.find(".//wsd:XAddrs", NAMESPACES)
+        xaddr = pick_best_xaddr(xaddrs_elem.text.strip())
+
+        if uuid_elem is None or types_elem is None or xaddrs_elem is None:
+            logger.warning("[WSD:probe_parser] Incomplete ProbeMatch, skipping UUID {probe_uuid}")
+#            scanner.status = ScannerStatus.ERROR
+            SCANNERS[uuid].status = STATE.ERROR
+            continue
+
 
         # neuer oder vorhandener Scanner?
         if probe_uuid not in SCANNERS:
