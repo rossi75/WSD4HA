@@ -277,19 +277,16 @@ async def send_probe(scanner):
                 if resp.status == 200:
                     body = await resp.text()
 #                    logger.debug(f"ProbeMatch von {scanner.ip}:\n{body}")
-#                    logger.info(f"ProbeMatch von {scanner.ip}:\n{body}")
-
-#                    parse_probe(body, {scanner.uuid})
+                    logger.info(f"ProbeMatch von {scanner.ip}:\n{body}")
                     parse_probe(body, scanner.uuid)
+                else:
+                    logger.warning(f"Probe failed with status {resp.status}")
         except Exception as e:
             logger.info(f"   ---> Probe fehlgeschlagen bei {url}: {e}")
             scanner.status = STATE.ABSENT
 
 #    logger.debug(f"   ---> Statuscode: {resp.status}")
     logger.info(f"   ---> Statuscode: {resp.status}")
-
-#    return {body}
-
 
 # ---------------- Send Transfer_Get ----------------
 async def send_transfer_get(scanner, client_uuid):
@@ -314,30 +311,20 @@ async def send_transfer_get(scanner, client_uuid):
     logger.info(f"   ---> XML:")
     logger.info({xml})
 
+    scanner.status = STATE.GET_PARSING
     async with aiohttp.ClientSession() as session:
         try:
             async with session.post(url, data=xml, headers=headers, timeout=5) as resp:
                 if resp.status == 200:
                     body = await resp.text()
-                    scanner.status = STATE.GET_PARSING
                     parse_transfer_get(scanner, body)
                 else:
                     logger.error(f"[WSD:transfer_get] HTTP {resp.status}")
         except Exception as e:
             logger.error(f"[WSD:transfer_get] failed for {scanner.uuid}: {e}")
             scanner.status = STATE.ERROR
-            
-
-
-
-
-
-
-
 
 # ---------------- Probe Parser ----------------
-#def parse_probe(xml: str, scanners: dict):
-#def parse_probe(xml: str):
 def parse_probe(xml: str, uuid: str):
     """
     Parse ProbeMatch response and update/create Scanner objects.
@@ -350,12 +337,9 @@ def parse_probe(xml: str, uuid: str):
     Returns:
         dict: updated scanners
     """
-#    logger.info(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} [WSD:parse_probe] parsing probe from {scanner.uuid} @ {scanner.ip}")
-#    logger.info(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} [WSD:parse_probe] parsing probe from {uuid} @ {SCANNER[uuid].ip}")
     logger.info(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} [WSD:parse_probe] parsing probe from {uuid} @ {SCANNERS[uuid].ip}")
-    logger.debug(f"XML:\n{body}")
+    logger.debug(f"XML:\n{xml}")
     
-#    scanner.status = ScannerStatus.PROBE_PARSING
     SCANNERS[uuid].status = STATE.PROBE_PARSING
     affected = []
 
@@ -378,7 +362,6 @@ def parse_probe(xml: str, uuid: str):
             continue
 
         probe_uuid = uuid_elem.text.strip()
-#        scanner[uuid].status = ScannerStatus.PROBE_PARSING
 
         types_elem = pm.find(".//wsd:Types", NAMESPACE)
         types = types_elem.text.strip().split()
@@ -388,11 +371,10 @@ def parse_probe(xml: str, uuid: str):
 
         # Nur Scanner akzeptieren
         if not any("ScanDeviceType" in t for t in types):
-#            logger.info(f"[WSD:probe_parser] Skipping non-scanner device {uuid}")
             logger.info(f"[WSD:probe_parser] Skipping non-scanner device {probe_uuid}")
 #            scanner.status = ScannerStatus.ERROR
  #           scanner[uuid].status = ScannerStatus.ERROR
-#            SCANNER[uuid].status = ScannerStatus.ERROR
+#            SCANNERS[uuid].status = ScannerStatus.ERROR
             continue
 
         # neuer oder vorhandener Scanner?
@@ -410,11 +392,10 @@ def parse_probe(xml: str, uuid: str):
             SCANNERS[probe_uuid] = Scanner(uuid=probe_uuid, ip=scanner.ip, xaddr=xaddr)
 #            SCANNERS[probe_uuid].related_uuids.add("{scanner.uuid}")       # = set()
             SCANNERS[probe_uuid].related_uuids.add(uuid)       # = set()
-            SCANNERS[probe_uuid].status = STATE.PROBE_PARSED                       # das neue Gerät > hat die Probe bestanden, wird nun weiter konnektiert
-            SCANNERS[uuid].status = STATE.ONLINE                                    # das alte Gerät > ist weiterhin online, wird nicht mehr bearbeitet
+            SCANNERS[probe_uuid].state = STATE.PROBE_PARSED                       # das neue Gerät > hat die Probe bestanden, wird nun weiter konnektiert
+            SCANNERS[uuid].state = STATE.ONLINE                                    # das alte Gerät > ist weiterhin online, wird nicht mehr bearbeitet
  #           marry_endpoints(scanner, scanners[uuid])
             marry_endpoints(SCANNERS[uuid], SCANNERS[probe_uuid])
-#            logger.info(f"[WSD:probe_parser] Discovered new scanner endpoint with {uuid} @ {ip} as child from {scanner.uuid}")
             logger.info(f"[WSD:probe_parser] Discovered new scanner endpoint with {probe_uuid} @ {ip} as child from {uuid}")
         else:
 #            scanner = scanners[uuid]
