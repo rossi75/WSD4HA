@@ -30,7 +30,7 @@ class Scanner:
         self.subscription_expires = None
 
         # zusätzliche optionale Infos
-        self.friendly_name = None
+        self.friendly_name = "NoName"
         self.mac = None
         self.firmware = None
         self.serial = None
