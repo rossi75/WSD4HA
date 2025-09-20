@@ -54,7 +54,8 @@ class Scanner:
 #    def update(self, max_age=OFFLINE_TIMEOUT):
     def update(self):
         self.last_seen = datetime.datetime.now()
-        self.state = ScannerStatus.ONLINE
+#        self.state = ScannerStatus.ONLINE
+        self.state = STATE.ONLINE
         self.offline_since = None
         self.remove_after = None
         logger.info(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} [SCANNER:upd] Updated timestamps for {self.friendly_name} ({self.ip}) with UUID {self.uuid}")
@@ -63,7 +64,8 @@ class Scanner:
     # wird aufgerufen wenn ein Scanner offline gesetzt wird
     # Aufruf mit SCANNER[uuid].mark_offline()
     def mark_absent(self):
-        self.state = ScannerStatus.ABSENT
+#        self.state = ScannerStatus.ABSENT
+        self.state = STATE.ABSENT
         if not self.offline_since:
             self.offline_since = datetime.datetime.now()
             self.remove_after = self.offline_since + datetime.timedelta(seconds=OFFLINE_TIMEOUT)
