@@ -1,6 +1,6 @@
 # contains the templates used for the requests
 
-SOAP_PROBE_TEMPLATE = """<?xml version="1.0" encoding="utf-8"?>
+TEMPLATE_SOAP_PROBE = """<?xml version="1.0" encoding="utf-8"?>
 <soap:Envelope
   xmlns:soap="http://www.w3.org/2003/05/soap-envelope"
   xmlns:wsa="http://schemas.xmlsoap.org/ws/2004/08/addressing"
@@ -16,7 +16,7 @@ SOAP_PROBE_TEMPLATE = """<?xml version="1.0" encoding="utf-8"?>
 </soap:Envelope>
 """
 
-SOAP_TRANSFER_GET_TEMPLATE = """<?xml version="1.0" encoding="utf-8"?>
+TEMPLATE_SOAP_TRANSFER_GET = """<?xml version="1.0" encoding="utf-8"?>
 <soap:Envelope xmlns:soap="http://www.w3.org/2003/05/soap-envelope"
                xmlns:wsa="http://schemas.xmlsoap.org/ws/2004/08/addressing">
   <soap:Header>
