@@ -332,16 +332,15 @@ async def send_transfer_get(tf_g_uuid: str):
                     body = await resp.text()
 #                    parse_transfer_get(scanner, body)
                 else:
-                    logger.error(f"[WSD:transfer_get] TransferGet failed with Status {resp.status}")
                     SCANNERS[tf_g_uuid].state = STATE.ERROR
+                    logger.error(f"[WSD:transfer_get] TransferGet failed with Statuscode {resp.status}")
         except Exception as e:
-#            logger.error(f"[WSD:transfer_get] failed for {scanner.uuid}: {e}")
-#            scanner.state = STATE.ERROR
             logger.error(f"[WSD:transfer_get] failed for {SCANNERS[tf_g_uuid].uuid}: {e}")
             SCANNERS[tf_g_uuid].state = STATE.ERROR
  
     logger.info(f"TransferGet von {SCANNERS[tf_g_uuid].ip}:\n{body}")
-    parse_transfer_get(scanner, body)
+#    parse_transfer_get(scanner, body)
+    parse_transfer_get(body, tf_g_uuid)
 
 # ---------------- Probe Parser ----------------
 def parse_probe(xml: str, probed_uuid: str):
@@ -435,39 +434,48 @@ def parse_wsd_packet(data: bytes):
 
 
 # ---------------- Transfer/GET Parser ----------------
-def parse_transfer_get(scanner, xml_body):
-    scanner.state = STATE.GET_PARSING
+def parse_transfer_get(xml_body, tf_g_uuid):
+    logger.info(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} [WSD:parse_probe] parsing transfer_get from {tf_g__uuid} @ {SCANNERS[tf_g_uuid].ip}")
+    logger.debug(f"XML:\n{xml}")
+
+    SCANNERS[tf_g_uuid].state = STATE.GET_PARSING
     root = ET.fromstring(xml_body)
 
     # FriendlyName
     fn_elem = root.find(".//wsdp:FriendlyName", NAMESPACES)
     if fn_elem is not None:
-        scanner.friendly_name = fn_elem.text.strip()
+        SCANNERS[tf_g_uuid].friendly_name = fn_elem.text.strip()
 
     # SerialNumber
     sn_elem = root.find(".//wsdp:SerialNumber", NAMESPACES)
     if sn_elem is not None:
-        scanner.serial_number = sn_elem.text.strip()
+        SCANNERS[tf_g_uuid].serial_number = sn_elem.text.strip()
 
     # Firmware
     fw_elem = root.find(".//wsdp:FirmwareVersion", NAMESPACES)
     if fw_elem is not None:
-        scanner.firmware = fw_elem.text.strip()
+        SCANNERS[tf_g_uuid].firmware = fw_elem.text.strip()
 
     # Hosted Services (Scan, Print, …)
-    scanner.services = {}
+    SCANNERS[tf_g_uuid].services = {}
     for hosted in root.findall(".//wsdp:Hosted", NAMESPACES):
         addr_elem = hosted.find(".//wsa:Address", NAMESPACES)
         type_elem = hosted.find(".//wsdp:Types", NAMESPACES)
         if addr_elem is not None and type_elem is not None:
             addr = addr_elem.text.strip()
             types = type_elem.text.strip()
+            logger.info(f"  ADDR: {addr}")
+            logger.info(f" TYPES: {types}")
             if "ScannerServiceType" in types:
-                scanner.services["scan"] = addr
-            elif "PrinterServiceType" in types:
-                scanner.services["print"] = addr
+                SCANNERS[tf_g_uuid].services["scan"] = addr
+            #elif "PrinterServiceType" in types:
+            #    SCANNERS[tf_g_uuid].services["print"] = addr
 
-    scanner.state = STATE.GET_PARSED
+    logger.info(f"   ---> FN: {SCANNERS[tf_g_uuid].friendly_name}")
+    logger.info(f"   ---> SN: {SCANNERS[tf_g_uuid].serial_number}")
+    logger.info(f"   ---> FW: {SCANNERS[tf_g_uuid].firmware}")
+
+    SCANNERS[tf_g_uuid].state = STATE.GET_PARSED
 
 
 # ---------------- marry two endpoints ----------------
