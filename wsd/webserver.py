@@ -9,24 +9,9 @@ import sys
 import re
 import xml.etree.ElementTree as ET
 import subprocess
-#from wsd import UDP_listener_3702, heartbeat_monitor, handle_scan_job
-#from config import WSD_HTTP_PORT, WSD_OFFLINE_TIMEOUT, WSD_SCAN_FOLDER
-#from config import OFFLINE_TIMEOUT, SCAN_FOLDER, HTTP_PORT
 from config import OFFLINE_TIMEOUT, SCAN_FOLDER, HTTP_PORT, MAX_FILES
-#from globals import SCANNERS, OFFLINE_TIMEOUT, SCAN_FOLDER, MAX_FILES
-#from globals import SCANNERS, NAMESPACES
-#from globals import SCANNERS, NAMESPACES, ScannerStatus
 from globals import SCANNERS, NAMESPACES, STATE
-#from globals import SCANNERS, list_scanners 
-#from globals import SCANNERS, list_scanners, OFFLINE_TIMEOUT
 from scanner import Scanner
-#from scan_job import handle_scan_job
-
-#NAMESPACES_NOTIFY = {
-#    "s": "http://www.w3.org/2003/05/soap-envelope",
-#    "wse": "http://schemas.xmlsoap.org/ws/2004/08/eventing",
-#    "wscn": "http://schemas.microsoft.com/windows/2006/08/wdp/scan",  # optional
-#}
 
 logging.basicConfig(level=logging.INFO, format='[%(levelname)s] %(message)s')
 logger = logging.getLogger("wsd-addon")
@@ -60,7 +45,6 @@ async def status_page(request):
         scanner_list += "<td>" + str(s.uuid) + "</td>"
         scanner_list += "<td>" + str(s.friendly_name or '') + "</td>"
         scanner_list += "<td>" + str(s.mac or '') + "</td>"
- #       scanner_list += "<td>" + str('Online' if s.online else 'Offline') + "</td>"
         scanner_list += "<td>" + str(s.state.value) + "</td>"
         scanner_list += "<td>" + str(s.last_seen.strftime('%Y-%m-%d %H:%M:%S')) + "</td>"
         scanner_list += "<td>" + str(s.xaddr or '') + "</td>"
@@ -72,7 +56,7 @@ async def status_page(request):
         scanner_list += "<td>" + str(s.serial or '') + "</td>"
         scanner_list += "</tr>"
 
-    logger.info(f"   ---> forming and delivering http-response")
+    logger.debug(f"   ---> probably delivered http-response")
     return web.Response(text=f"""
         <html>
         <head>
@@ -98,7 +82,6 @@ async def status_page(request):
         </body>
         </html>
     """, content_type="text/html")
-    logger.info(f"   ---> probably delivered http-response")
 
 # ---------------- HTTP Server ----------------
 async def start_http_server():
