@@ -352,8 +352,8 @@ def parse_probe(xml: str, uuid: str):
 #        return scanners
         return
 
-    for pm in root.findall(".//wsd:ProbeMatch", NAMESPACE):
-        uuid_elem = pm.find(".//wsa:Address", NAMESPACE)
+    for pm in root.findall(".//wsd:ProbeMatch", NAMESPACES):
+        uuid_elem = pm.find(".//wsa:Address", NAMESPACES)
 
         if uuid_elem is None or types_elem is None or xaddrs_elem is None:
             logger.warning("[WSD:probe_parser] Incomplete ProbeMatch, skipping")
@@ -363,50 +363,30 @@ def parse_probe(xml: str, uuid: str):
 
         probe_uuid = uuid_elem.text.strip()
 
-        types_elem = pm.find(".//wsd:Types", NAMESPACE)
+        types_elem = pm.find(".//wsd:Types", NAMESPACES)
         types = types_elem.text.strip().split()
 
-        xaddrs_elem = pm.find(".//wsd:XAddrs", NAMESPACE)
+        xaddrs_elem = pm.find(".//wsd:XAddrs", NAMESPACES)
         xaddr = pick_best_xaddr(xaddrs_elem.text.strip())
 
         # Nur Scanner akzeptieren
         if not any("ScanDeviceType" in t for t in types):
             logger.info(f"[WSD:probe_parser] Skipping non-scanner device {probe_uuid}")
-#            scanner.status = ScannerStatus.ERROR
- #           scanner[uuid].status = ScannerStatus.ERROR
 #            SCANNERS[uuid].status = ScannerStatus.ERROR
             continue
 
         # neuer oder vorhandener Scanner?
-#        if uuid not in scanners:
-#        if uuid not in SCANNERS:
         if probe_uuid not in SCANNERS:
-#            scanners[uuid] = Scanner(uuid=uuid, ip=xaddr, xaddr=[xaddr])
-#            scanners[uuid] = Scanner(uuid=uuid, ip=xaddr, xaddr=xaddr)
-#            scanners[uuid].related_uuids = set()
-#            scanners[uuid].status = ScannerStatus.PROBE_PARSED
-#            scanners[uuid] = Scanner(uuid=uuid, ip=scanner.ip, xaddr=xaddr)
-#            scanners[uuid].related_uuids.add("{scanner.uuid}")       # = set()
-#            scanners[uuid].status = ScannerStatus.PROBE_PARSED                       # das neue Gerät > hat die Probe bestanden, wird nun weiter konnektiert
-#            scanner.status = ScannerStatus.ONLINE                                    # das alte Gerät > ist weiterhin online, wird nicht mehr bearbeitet
             SCANNERS[probe_uuid] = Scanner(uuid=probe_uuid, ip=scanner.ip, xaddr=xaddr)
-#            SCANNERS[probe_uuid].related_uuids.add("{scanner.uuid}")       # = set()
-            SCANNERS[probe_uuid].related_uuids.add(uuid)       # = set()
+#            SCANNERS[probe_uuid].related_uuids.add(uuid)       # = set()
             SCANNERS[probe_uuid].state = STATE.PROBE_PARSED                       # das neue Gerät > hat die Probe bestanden, wird nun weiter konnektiert
             SCANNERS[uuid].state = STATE.ONLINE                                    # das alte Gerät > ist weiterhin online, wird nicht mehr bearbeitet
- #           marry_endpoints(scanner, scanners[uuid])
-            marry_endpoints(SCANNERS[uuid], SCANNERS[probe_uuid])
+#            marry_endpoints(SCANNERS[uuid], SCANNERS[probe_uuid])
+            marry_endpoints(uuid, probe_uuid)
             logger.info(f"[WSD:probe_parser] Discovered new scanner endpoint with {probe_uuid} @ {ip} as child from {uuid}")
         else:
-#            scanner = scanners[uuid]
-#            scanner.xaddr = [xaddr]
-#            scanners[uuid].xaddr = xaddr
-#            scanner.xaddr = xaddr
-#            scanner.related_uuids.add("{scanner.uuid}")       # = set()
-#            scanner.status = ScannerStatus.PROBE_PARSED
             SCANNERS[uuid].xaddr = xaddr
-#            SCANNERS[uuid].related_uuids.add(scanner.uuid)       # = set()
-            SCANNERS[uuid].related_uuids.add(uuid)       # = set()
+#            SCANNERS[uuid].related_uuids.add(uuid)       # = set()
             SCANNERS[uuid].status = STATE.PROBE_PARSED
             logger.info(f"[WSD:probe_parser] Updated scanner {uuid} -> {xaddr}")
 
@@ -442,25 +422,25 @@ def parse_transfer_get(scanner, xml_body):
 #    }
 
     # FriendlyName
-    fn_elem = root.find(".//wsdp:FriendlyName", NAMESPACE)
+    fn_elem = root.find(".//wsdp:FriendlyName", NAMESPACES)
     if fn_elem is not None:
         scanner.friendly_name = fn_elem.text.strip()
 
     # SerialNumber
-    sn_elem = root.find(".//wsdp:SerialNumber", NAMESPACE)
+    sn_elem = root.find(".//wsdp:SerialNumber", NAMESPACES)
     if sn_elem is not None:
         scanner.serial_number = sn_elem.text.strip()
 
     # Firmware
-    fw_elem = root.find(".//wsdp:FirmwareVersion", NAMESPACE)
+    fw_elem = root.find(".//wsdp:FirmwareVersion", NAMESPACES)
     if fw_elem is not None:
         scanner.firmware = fw_elem.text.strip()
 
     # Hosted Services (Scan, Print, …)
     scanner.services = {}
-    for hosted in root.findall(".//wsdp:Hosted", NAMESPACE):
-        addr_elem = hosted.find(".//wsa:Address", NAMESPACE)
-        type_elem = hosted.find(".//wsdp:Types", NAMESPACE)
+    for hosted in root.findall(".//wsdp:Hosted", NAMESPACES):
+        addr_elem = hosted.find(".//wsa:Address", NAMESPACES)
+        type_elem = hosted.find(".//wsdp:Types", NAMESPACES)
         if addr_elem is not None and type_elem is not None:
             addr = addr_elem.text.strip()
             types = type_elem.text.strip()
