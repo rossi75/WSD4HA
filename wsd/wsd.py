@@ -235,8 +235,15 @@ async def state_monitor():
           
         logger.debug(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} [WSD:sleep] goodbye")
         #await asyncio.sleep(30)
-        if any (SCANNERS.state not in {"absent", "online", "to_remove", "error"}):
-        #    for SCANNER in scanners.values()):
+#        if any (SCANNERS.state not in {"absent", "online", "to_remove", "error"}):
+#        if any (scanner.state not in {STATE.ABSENT,
+        if any (SCANNER.state not in {STATE.ABSENT,
+                                      STATE.ONLINE,
+                                      STATE.TO_REMOVE,
+                                      STATE.ERROR}
+                for scanner in SCANNERS.values()):
+ 
+            #    for SCANNER in scanners.values()):
          #       logger.info(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} [WSD:sleep] short nap")
             logger.info(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} [WSD:sleep] short nap")
             await asyncio.sleep(2)
