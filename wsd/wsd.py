@@ -436,7 +436,7 @@ def parse_wsd_packet(data: bytes):
 # ---------------- Transfer/GET Parser ----------------
 def parse_transfer_get(xml_body, tf_g_uuid):
     logger.info(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} [WSD:parse_probe] parsing transfer_get from {tf_g_uuid} @ {SCANNERS[tf_g_uuid].ip}")
-    logger.debug(f"XML:\n{xml}")
+    logger.debug(f"XML:\n{xml_body}")
 
     SCANNERS[tf_g_uuid].state = STATE.GET_PARSING
     root = ET.fromstring(xml_body)
