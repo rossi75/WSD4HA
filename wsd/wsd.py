@@ -340,7 +340,7 @@ def parse_probe(xml: str, probed_uuid: str):
     logger.info(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} [WSD:parse_probe] parsing probe from {probed_uuid} @ {SCANNERS[probed_uuid].ip}")
     logger.debug(f"XML:\n{xml}")
     
-    SCANNERS[uuid].state = STATE.PROBE_PARSING
+    SCANNERS[probed_uuid].state = STATE.PROBE_PARSING
    
     try:
         root = ET.fromstring(xml)
