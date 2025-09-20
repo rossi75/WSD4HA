@@ -298,12 +298,11 @@ async def send_probe(scanner):
 
 # ---------------- Send Transfer_Get ----------------
 #async def send_transfer_get(scanner):
-async def send_transfer_get(uuid: str):
-#    logger.info(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} [WSD:transfer_get] sending Transfer/Get to {scanner.uuid} @ {scanner.ip}")
-    logger.info(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} [WSD:transfer_get] sending Transfer/Get to {uuid} @ {SCANNERS[uuid].ip}")
+async def send_transfer_get(tf_g_uuid: str):
+    logger.info(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} [WSD:transfer_get] sending Transfer/Get to {tf_g_uuid} @ {SCANNERS[tf_g_uuid].ip}")
 
 #    scanner.state = STATE.GET_PENDING
-    SCANNERS[uuid].state = STATE.GET_PENDING
+    SCANNERS[tf_g_uuid].state = STATE.GET_PENDING
     msg_id = uuid.uuid4()
     xml = SOAP_TRANSFER_GET_TEMPLATE.format(
 #        device_uuid=scanner.uuid,
@@ -318,7 +317,7 @@ async def send_transfer_get(uuid: str):
     }
 
 #    url = scanner.xaddr  # z.B. http://192.168.0.3:8018/wsd
-    url = SCANNER[uuid].xaddr  # z.B. http://192.168.0.3:8018/wsd
+    url = SCANNER[tf_g_uuid].xaddr  # z.B. http://192.168.0.3:8018/wsd
 
     logger.info(f"   ---> URL: {url}")
     logger.info(f"   ---> XML:")
@@ -334,14 +333,14 @@ async def send_transfer_get(uuid: str):
 #                    parse_transfer_get(scanner, body)
                 else:
                     logger.error(f"[WSD:transfer_get] TransferGet failed with Status {resp.status}")
-                    SCANNER[uuid].state = STATE.ERROR
+                    SCANNER[tf_g_uuid].state = STATE.ERROR
         except Exception as e:
 #            logger.error(f"[WSD:transfer_get] failed for {scanner.uuid}: {e}")
 #            scanner.state = STATE.ERROR
-            logger.error(f"[WSD:transfer_get] failed for {SCANNER[uuid].uuid}: {e}")
-            SCANNER[uuid].state = STATE.ERROR
+            logger.error(f"[WSD:transfer_get] failed for {SCANNER[tf_g_uuid].uuid}: {e}")
+            SCANNER[tf_g_uuid].state = STATE.ERROR
  
-    logger.info(f"TransferGet von {SCANNER[uuid].ip}:\n{body}")
+    logger.info(f"TransferGet von {SCANNER[tf_g_uuid].ip}:\n{body}")
     parse_transfer_get(scanner, body)
 
 # ---------------- Probe Parser ----------------
@@ -418,6 +417,7 @@ def parse_probe(xml: str, probed_uuid: str):
             SCANNERS[probed_uuid].state = STATE.PROBE_PARSED
             logger.info(f"[WSD:probe_parser] Updated scanner {probed_uuid} -> {xaddr}")
 
+    list_scanners()
 
 # ---------------- WSD SOAP Parser ----------------
 def parse_wsd_packet(data: bytes):
