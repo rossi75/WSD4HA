@@ -370,7 +370,7 @@ def parse_probe(xml: str, probed_uuid: str):
         uuid = None
         uuid_elem = pm.find(".//wsa:Address", NAMESPACES)
         probe_uuid = uuid_elem.text.strip()
-        if probe_uuid is not None and uuid_raw.text:
+        if probe_uuid is not None and probe_uuid.text:
             uuid_text = probe_uuid.text.strip()
             if uuid_text.startswith("urn:uuid:"):
                 probe_uuid = uuid_text.replace("urn:uuid:", "")
