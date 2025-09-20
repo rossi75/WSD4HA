@@ -165,7 +165,7 @@ async def state_monitor():
         now = datetime.datetime.now()
 
         for uuid, scanner in SCANNERS.items():
-            logger.info(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} [WSD:Probe] Timer-Check for {uuid} ({scanner.ip})...")
+            logger.info(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} [WSD:Probe] Checking Timer and State for {uuid} ({scanner.ip})...")
             status = scanner.state.value
             age = (now - scanner.last_seen).total_seconds()
             logger.info(f"   -->    status: {status}")
@@ -186,7 +186,8 @@ async def state_monitor():
                 logger.info(f"[WSD:probe_mon] probe parsed, get details...")
                 try:
                     logger.info(f"[WSD:probe_mon]   LogPoint E")
-                    asyncio.create_task(send_transfer_get(scanner))
+                    #asyncio.create_task(send_transfer_get(scanner))
+                    asyncio.create_task(send_transfer_get(uuid))
                     logger.info(f"[WSD:probe_mon]   LogPoint F")
                 except Exception as e:
                     scanner.state = STATE.ERROR
@@ -296,7 +297,8 @@ async def send_probe(scanner):
     logger.info(f"   ---> Statuscode: {resp.status}")
 
 # ---------------- Send Transfer_Get ----------------
-async def send_transfer_get(uuid):
+#async def send_transfer_get(scanner):
+async def send_transfer_get(uuid: str):
 #    logger.info(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} [WSD:transfer_get] sending Transfer/Get to {scanner.uuid} @ {scanner.ip}")
     logger.info(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} [WSD:transfer_get] sending Transfer/Get to {uuid} @ {SCANNERS[uuid].ip}")
 
