@@ -120,14 +120,14 @@ async def discovery_processor(data, addr):
     elif action_text == "Bye":
         logger.info(f"[WSD:BYE] Bye for uuid: {uuid}")
         if uuid in SCANNERS:
-            logger.info(f"[WSD:BYE] Scanner offline: {SCANNERS[uuid].friendly_name} ({ip})")
+            logger.warning(f"[WSD:BYE] Scanner offline: {SCANNERS[uuid].friendly_name} ({ip})")
             del SCANNERS[uuid]
         list_scanners()
 
     else:
         logger.warning(f"[WSD:Message] received unrecognized operation {action_text} from {ip}")
 
-    logger.info(f"[WSD:Message] done")
+    logger.debug(f"[WSD:Message] done")
 
 
 # ---------------- UDP listener ----------------
@@ -435,7 +435,7 @@ def parse_wsd_packet(data: bytes):
 
 # ---------------- Transfer/GET Parser ----------------
 def parse_transfer_get(xml_body, tf_g_uuid):
-    logger.info(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} [WSD:parse_probe] parsing transfer_get from {tf_g__uuid} @ {SCANNERS[tf_g_uuid].ip}")
+    logger.info(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} [WSD:parse_probe] parsing transfer_get from {tf_g_uuid} @ {SCANNERS[tf_g_uuid].ip}")
     logger.debug(f"XML:\n{xml}")
 
     SCANNERS[tf_g_uuid].state = STATE.GET_PARSING
