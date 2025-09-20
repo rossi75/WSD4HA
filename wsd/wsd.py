@@ -391,8 +391,11 @@ def parse_probe(xml: str, probed_uuid: str):
         xaddr = pick_best_xaddr(xaddrs_elem.text.strip())
 
 #        if uuid_elem is None or types_elem is None or xaddrs_elem is None:
-        if uuid is None or types is None or xaddrs is None:
-            logger.warning("[WSD:probe_parser] Incomplete ProbeMatch, skipping UUID {probe_uuid}")
+        if uuid is None or types is None or xaddr is None:
+            logger.warning(f"[WSD:probe_parser] Incomplete ProbeMatch, skipping UUID {probe_uuid}")
+            logger.warning(f"   --->  UUID: {uuid}")
+            logger.warning(f"   ---> TYPES: {types}")
+            logger.warning(f"   ---> XADDR: {xaddr}")
             SCANNERS[probed_uuid].state = STATE.ERROR
             continue
 
