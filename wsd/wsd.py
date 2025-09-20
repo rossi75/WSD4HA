@@ -171,7 +171,26 @@ async def state_monitor():
             logger.info(f"   -->    status: {status}")
             logger.info(f"   --> last_seen: {scanner.last_seen}")
             logger.info(f"   -->       age: {age}")
-#            logger.debug(f"   -->       age = {age}")
+
+#            if status in ("parsing_probe"):
+#                logger.info(f"[WSD:probe_mon] probe done, parsing probe...")
+#                try:
+#                    logger.info(f"[WSD:probe_mon]   LogPoint E")
+#                    asyncio.create_task(parse_probe(body))
+#                    logger.info(f"[WSD:probe_mon]   LogPoint F")
+#                except Exception as e:
+#                    scanner.state = STATE.ERROR
+#                    logger.warning(f"Anything went wrong while parsing the XML-Probe from UUID {uuid} @ {ip}, response is {str(e)}")
+
+            if status in ("probe_parsed"):
+                logger.info(f"[WSD:probe_mon] probe parsed, get details...")
+                try:
+                    logger.info(f"[WSD:probe_mon]   LogPoint E")
+                    asyncio.create_task(send_transfer_get(scanner))
+                    logger.info(f"[WSD:probe_mon]   LogPoint F")
+                except Exception as e:
+                    scanner.state = STATE.ERROR
+                    logger.warning(f"Anything went wrong while parsing the XML-Probe from UUID {uuid} @ {ip}, response is {str(e)}")
 
             if status in ("discovered"):
                 logger.info(f"[WSD:probe_mon] Fresh discovered, now probing...")
@@ -182,16 +201,6 @@ async def state_monitor():
                 except Exception as e:
                     scanner.state = STATE.ERROR
                     logger.warning(f"Anything went wrong while probing the UUID {uuid} @ {ip}, response is {str(e)}")
-
-            if status in ("parsing_probe"):
-                logger.info(f"[WSD:probe_mon] probe done, parsing probe...")
-                try:
-                    logger.info(f"[WSD:probe_mon]   LogPoint E")
-                    asyncio.create_task(parse_probe(body))
-                    logger.info(f"[WSD:probe_mon]   LogPoint F")
-                except Exception as e:
-                    scanner.state = STATE.ERROR
-                    logger.warning(f"Anything went wrong while parsing the XML-Probe from UUID {uuid} @ {ip}, response is {str(e)}")
 
             if status in ("online"):
                 # Halbzeit-Check
@@ -287,15 +296,18 @@ async def send_probe(scanner):
     logger.info(f"   ---> Statuscode: {resp.status}")
 
 # ---------------- Send Transfer_Get ----------------
-async def send_transfer_get(scanner, client_uuid):
-    logger.info(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} [WSD:transfer_get] sending Transfer/Get to {scanner.uuid} @ {scanner.ip}")
+async def send_transfer_get(uuid):
+#    logger.info(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} [WSD:transfer_get] sending Transfer/Get to {scanner.uuid} @ {scanner.ip}")
+    logger.info(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} [WSD:transfer_get] sending Transfer/Get to {uuid} @ {SCANNERS[uuid].ip}")
 
-    scanner.state = STATE.GET_PENDING
+#    scanner.state = STATE.GET_PENDING
+    SCANNERS[uuid].state = STATE.GET_PENDING
     msg_id = uuid.uuid4()
     xml = SOAP_TRANSFER_GET_TEMPLATE.format(
-        device_uuid=scanner.uuid,
+#        device_uuid=scanner.uuid,
+        device_uuid=uuid,
         msg_id=msg_id,
-        client_uuid=client_uuid
+        client_uuid=uuid
     )
 
     headers = {
@@ -303,7 +315,8 @@ async def send_transfer_get(scanner, client_uuid):
         "User-Agent": "WSDAPI",
     }
 
-    url = scanner.xaddr  # z.B. http://192.168.0.3:8018/wsd
+#    url = scanner.xaddr  # z.B. http://192.168.0.3:8018/wsd
+    url = SCANNER[uuid].xaddr  # z.B. http://192.168.0.3:8018/wsd
 
     logger.info(f"   ---> URL: {url}")
     logger.info(f"   ---> XML:")
@@ -319,12 +332,14 @@ async def send_transfer_get(scanner, client_uuid):
 #                    parse_transfer_get(scanner, body)
                 else:
                     logger.error(f"[WSD:transfer_get] TransferGet failed with Status {resp.status}")
-                    scanner.state = STATE.ERROR
+                    SCANNER[uuid].state = STATE.ERROR
         except Exception as e:
-            logger.error(f"[WSD:transfer_get] failed for {scanner.uuid}: {e}")
-            scanner.state = STATE.ERROR
-
-    logger.info(f"TransferGet von {scanner.ip}:\n{body}")
+#            logger.error(f"[WSD:transfer_get] failed for {scanner.uuid}: {e}")
+#            scanner.state = STATE.ERROR
+            logger.error(f"[WSD:transfer_get] failed for {SCANNER[uuid].uuid}: {e}")
+            SCANNER[uuid].state = STATE.ERROR
+ 
+    logger.info(f"TransferGet von {SCANNER[uuid].ip}:\n{body}")
     parse_transfer_get(scanner, body)
 
 # ---------------- Probe Parser ----------------
