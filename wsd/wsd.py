@@ -351,13 +351,20 @@ def parse_probe(xml: str, probed_uuid: str):
 
     for pm in root.findall(".//wsd:ProbeMatch", NAMESPACES):
 
+        # UUID (without urn:uuid:)
+        uuid = None
         uuid_elem = pm.find(".//wsa:Address", NAMESPACES)
-
         probe_uuid = uuid_elem.text.strip()
+        if probe_uuid is not None and uuid_raw.text:
+            uuid_text = probe_uuid.text.strip()
+            if uuid_text.startswith("urn:uuid:"):
+                probe_uuid = uuid_text.replace("urn:uuid:", "")
+            else:
+                probe_uuid = uuid_text
 
+        # Nur Scanner akzeptieren
         types_elem = pm.find(".//wsd:Types", NAMESPACES)
         types = types_elem.text.strip().split()
-        # Nur Scanner akzeptieren
         if not any("ScanDeviceType" in t for t in types):
             logger.info(f"[WSD:probe_parser] Skipping non-scanner device {probe_uuid}")
 #            SCANNERS[uuid].status = ScannerStatus.ERROR
@@ -409,12 +416,6 @@ def parse_transfer_get(scanner, xml_body):
     scanner.state = STATE.GET_PARSING
     root = ET.fromstring(xml_body)
 
-#    ns = {
-#        "wsx": "http://schemas.xmlsoap.org/ws/2004/09/mex",
-#        "wsdp": "http://schemas.xmlsoap.org/ws/2006/02/devprof",
-#        "wsa": "http://schemas.xmlsoap.org/ws/2004/08/addressing",
-#    }
-
     # FriendlyName
     fn_elem = root.find(".//wsdp:FriendlyName", NAMESPACES)
     if fn_elem is not None:
@@ -447,9 +448,12 @@ def parse_transfer_get(scanner, xml_body):
 
 
 # ---------------- marry two endpoints ----------------
-def link_endpoints(scanner_a, scanner_b):
+#def link_endpoints(scanner_a, scanner_b):
+def marry_endpoints(uuid_a: str, uuid_b: str):
     """
     Stellt sicher, dass zwei Scanner-Objekte sich gegenseitig kennen.
     """
-    scanner_a.add_related_uuid(scanner_b.uuid)
-    scanner_b.add_related_uuid(scanner_a.uuid)
+#    scanner_a.add_related_uuid(scanner_b.uuid)
+#    scanner_b.add_related_uuid(scanner_a.uuid)
+    SCANNERS[uuid_a].related_uuids += uuid_b
+    SCANNERS[uuid_b].related_uuids += uuid_a
