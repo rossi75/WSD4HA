@@ -306,7 +306,8 @@ async def send_transfer_get(tf_g_uuid: str):
     msg_id = uuid.uuid4()
     xml = TEMPLATE_SOAP_TRANSFER_GET.format(
 #        device_uuid=scanner.uuid,
-        device_uuid=uuid,
+#        device_uuid=uuid,
+        device_uuid=tf_g_uuid,
         msg_id=msg_id,
         client_uuid=uuid
     )
