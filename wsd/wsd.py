@@ -15,7 +15,7 @@ from config import OFFLINE_TIMEOUT, LOCAL_IP, HTTP_PORT
 from globals import SCANNERS, list_scanners, NAMESPACES, STATE
 from pathlib import Path
 from scanner import Scanner
-from templates import SOAP_PROBE_TEMPLATE
+from templates import TEMPLATE_SOAP_PROBE, TEMPLATE_SOAP_TRANSFER_GET
 
 
 logging.basicConfig(level=logging.INFO, format='[%(levelname)s] %(message)s')
@@ -261,7 +261,7 @@ async def send_probe(scanner):
 
     scanner.state = STATE.PROBING
     msg_id = uuid.uuid4()
-    xml = SOAP_PROBE_TEMPLATE.format(msg_id=msg_id)
+    xml = TEMPLATE_SOAP_PROBE.format(msg_id=msg_id)
 
     headers = {
         "Content-Type": "application/soap+xml",
@@ -304,7 +304,7 @@ async def send_transfer_get(tf_g_uuid: str):
 #    scanner.state = STATE.GET_PENDING
     SCANNERS[tf_g_uuid].state = STATE.GET_PENDING
     msg_id = uuid.uuid4()
-    xml = SOAP_TRANSFER_GET_TEMPLATE.format(
+    xml = TEMPLATE_SOAP_TRANSFER_GET.format(
 #        device_uuid=scanner.uuid,
         device_uuid=uuid,
         msg_id=msg_id,
