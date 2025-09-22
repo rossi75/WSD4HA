@@ -20,14 +20,16 @@ RUN pip install --no-cache-dir -r requirements.txt
 #COPY webserver.py /app/
 
 COPY config.yaml .
+COPY config.py .
 COPY globals.py .
 COPY main.py .
-COPY config.py .
+COPY parse.py .
 COPY scanner.py .
-COPY wsd.py .
-COPY webserver.py .
+COPY send.py .
 COPY templates.py .
-#COPY translations/en.yaml ./translations
+COPY translations/en.yaml ./translations
+COPY webserver.py .
+COPY wsd.py .
 
 VOLUME ["/share/scans"]
 EXPOSE 8110
