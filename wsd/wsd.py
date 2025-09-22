@@ -304,10 +304,6 @@ async def send_transfer_get(tf_g_uuid: str):
     
     SCANNERS[tf_g_uuid].state = STATE.GET_PENDING
     msg_id = uuid.uuid4()
-    logger.info(f"   --->A MSG_ID: {msg_id}")
-#    msg_id = f"urn:uuid:{uuid.uuid4()}",
-    msg_id = f"{uuid.uuid4()}",
-    logger.info(f"   --->B MSG_ID: {msg_id}")
 
     xml = TEMPLATE_SOAP_TRANSFER_GET.format(
         to_device_uuid=tf_g_uuid,
@@ -320,7 +316,6 @@ async def send_transfer_get(tf_g_uuid: str):
         "User-Agent": "WSDAPI",
     }
 
-#    url = scanner.xaddr  # z.B. http://192.168.0.3:8018/wsd
     url = SCANNERS[tf_g_uuid].xaddr  # z.B. http://192.168.0.3:8018/wsd
 
     logger.info(f"   --->    FROM: {FROM_UUID}")
