@@ -28,11 +28,18 @@ FROM_UUID = None
             
 # -----------------  define NAMESPACE  -----------------
 NAMESPACES = {
+    "df": "http://schemas.microsoft.com/windows/2008/09/devicefoundation",
+    "pnpx": "http://schemas.microsoft.com/windows/pnpx/2005/10",
+    "sca": "http://schemas.microsoft.com/windows/2006/08/wdp/scan",
     "soap": "http://www.w3.org/2003/05/soap-envelope",
+    "ss": "http://www.samsung.com/wsd",
+    "wprt": "http://schemas.microsoft.com/windows/2006/08/wdp/print",
     "wsa": "http://schemas.xmlsoap.org/ws/2004/08/addressing",
     "wsd": "http://schemas.xmlsoap.org/ws/2005/04/discovery",
+    "wsdp": "http://schemas.xmlsoap.org/ws/2006/02/devprof",
     "wse": "http://schemas.xmlsoap.org/ws/2004/08/eventing",
-    "wscn": "http://schemas.microsoft.com/windows/2006/08/wdp/scan"  # optional
+    "wscn": "http://schemas.microsoft.com/windows/2006/08/wdp/scan",
+    "xop": "http://www.w3.org/2004/08/xop/include"
 }
 
 # -----------------  define ScannerStati  -----------------
@@ -40,14 +47,39 @@ NAMESPACES = {
 class STATE(str, Enum):
     DISCOVERED = "discovered"
     PROBING = "probing"
-    PROBE_PARSING = "parsing_probe"
-    PROBE_PARSED = "probe_parsed"
-    GET_PENDING = "get_in_progress"
-    GET_PARSING = "parsing_get"
-    GET_PARSED = "get_parsed"
+    PROBE_PARSING = "Probe matched, parsing Probe"
+    PROBE_PARSED = "Probe/Match parsed"
+    TF_GET_PENDING = "Transfer/Get in progress"
+    TF_GET_PARSING = "parsing Transfer/Get"
+    TF_GET_PARSED = "Transfer/Get parsed"
+    SUBSCRIBING_SCAN_AVAIL_EVT = "Subscribing ScanAvailableEvent"
+    CHK_SCAN_AVAIL_EVT = "Checking ScanAvailableEvent"
+    SUBSCRIBED_SCAN_AVAIL_EVT = "Subscribed ScanAvailableEvent"
+    SUBSCRIBING_SCAN_STAT_COND_EVT = "Subscribing ScannerStatusConditionEvent"
+    CHK_SCAN_STAT_COND_EVT = "Checking ScannerStatusConditionEvent"
+    SUBSCRIBED_SCAN_STAT_COND_EVT = "Subscribed ScannerStatusConditionEvent"
+    SUBSCRIBING_SCAN_STAT_COND_CLR_EVT = "Subscribing ScannerStatusConditionClearEvent"
+    CHK_SCAN_STAT_COND_CLR_EVT = "Checking ScannerStatusConditionClearEvent"
+    SUBSCRIBED_SCAN_STAT_COND_CLR_EVT = "Subscribed ScannerStatusConditionClearEvent"
+    SUBSCRIBING_SCAN_ELEM_CHG_EVT = "Subscribing ScannerElementChangeEvent"
+    CHK_SCAN_ELEM_CHG_EVT = "Checking ScannerElementChangeEvent"
+    SUBSCRIBED_SCAN_ELEM_CHG_EVT = "Subscribed ScannerElementChangeEvent"
+    GET_SCAN_DESCR = "Requesting ScannerDescription"
+    CHK_SCAN_DESCR= "Checking ScannerDescription"
+    DONE_SCAN_DESCR= "Done ScannerDescription"
+    GET_SCAN_SCAN_TICK = "Requesting DefaultScannerTicket"
+    CHK_SCAN_SCAN_TICK= "Checking DefaultScannerTicket"
+    DONE_SCAN_SCAN_TICK= "Done DefaultScannerTicket"
+    GET_SCAN_CONF = "Requesting ScannerConfiguration"
+    CHK_SCAN_CONF= "Checking ScannerConfiguration"
+    DONE_SCAN_CONF= "Done ScannerConfiguration"
+    GET_SCAN_ELEM = "Requesting ScannerElements"
+    CHK_SCAN_DESCR= "Checking ScannerElements"
+    DONE_SCAN_DESCR= "Done ScannerElements"
     ONLINE = "online"
+    RECV_SCAN = "receiving a Scan"
     ABSENT = "absent"
-    TO_REMOVE = "to_remove"
+    TO_REMOVE = "to remove"
     ERROR = "error"
 
 # -----------------  Nach jedem Update: Liste loggen  -----------------
@@ -57,5 +89,5 @@ def list_scanners():
     for i, s in enumerate(SCANNERS.values(), start=1):
         logger.info(f"[{i}] {s.friendly_name} IP={s.ip} UUID={s.uuid} State={s.state.value}")
         logger.info(f"      --->     XADDR: {s.xaddr}")
-        logger.info(f"      ---> last_seen: {s.last_seen}")
+        logger.debug(f"      ---> last_seen: {s.last_seen}")
         logger.info(f"      --->    Status: {s.state.value}")
