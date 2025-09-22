@@ -318,11 +318,11 @@ async def send_transfer_get(tf_g_uuid: str):
 #    url = scanner.xaddr  # z.B. http://192.168.0.3:8018/wsd
     url = SCANNERS[tf_g_uuid].xaddr  # z.B. http://192.168.0.3:8018/wsd
 
-    logger.info(f"   ---> FROM: {FROM_UUID}")
-    logger.info(f"   --->   TO: {tf_g_uuid}")
-    logger.info(f"   --->  MSG: {msg}")
-    logger.info(f"   --->  URL: {url}")
-    logger.info(f"   --->  XML:\n{xml}")
+    logger.info(f"   --->    FROM: {FROM_UUID}")
+    logger.info(f"   --->      TO: {tf_g_uuid}")
+    logger.info(f"   --->  MSG_ID: {msg_id}")
+    logger.info(f"   --->     URL: {url}")
+    logger.info(f"   --->     XML:\n{xml}")
 
     body = ""
 
