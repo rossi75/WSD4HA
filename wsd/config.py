@@ -68,7 +68,7 @@ logger.info(f"HTTP-Port for UI: {HTTP_PORT}")
 # ---------------- HTTP-Port ----------------
 FROM_UUID = f"urn:uuid:{uuid.uuid4()}"
 #logger.info("[GLOBAL:uuid] set FROM_UUID: {FROM_UUID}")
-logger.info("set FROM_UUID: {FROM_UUID}")
+logger.info(f"set FROM_UUID: {FROM_UUID}")
 
 # ---------------- OFFLINE_TIMEOUT ----------------
 raw = int(os.environ.get("OFFLINE_TIMEOUT", 300))  # Sekunden
