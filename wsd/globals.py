@@ -5,6 +5,7 @@ import logging
 import sys
 from enum import Enum
 #import os
+import uuid
 
 # -----------------  Logging  -----------------
 logging.basicConfig(level=logging.INFO, format='[%(levelname)s] %(message)s')
@@ -19,6 +20,11 @@ logger = logging.getLogger("wsd-addon")
 # -----------------  define SCANNERS dict  -----------------
 SCANNERS = {}
 
+# -----------------  define FROM_UUID  -----------------
+FROM_UUID = f"urn:uuid:{uuid.uuid4()}"
+logger.info("[GLOBAL:uuid] set FROM_UUID: {FROM_UUID}")
+
+            
 # -----------------  define NAMESPACE  -----------------
 NAMESPACES = {
     "soap": "http://www.w3.org/2003/05/soap-envelope",
