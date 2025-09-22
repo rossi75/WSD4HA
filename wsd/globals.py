@@ -21,8 +21,9 @@ logger = logging.getLogger("wsd-addon")
 SCANNERS = {}
 
 # -----------------  define FROM_UUID  -----------------
-FROM_UUID = f"urn:uuid:{uuid.uuid4()}"
-logger.info("[GLOBAL:uuid] set FROM_UUID: {FROM_UUID}")
+FROM_UUID = None
+#FROM_UUID = f"urn:uuid:{uuid.uuid4()}"
+#logger.info("[GLOBAL:uuid] set FROM_UUID: {FROM_UUID}")
 
             
 # -----------------  define NAMESPACE  -----------------
