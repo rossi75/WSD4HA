@@ -12,7 +12,7 @@ import threading
 import uuid
 import xml.etree.ElementTree as ET
 from config import OFFLINE_TIMEOUT, LOCAL_IP, HTTP_PORT
-from globals import SCANNERS, list_scanners, NAMESPACES, STATE
+from globals import SCANNERS, list_scanners, NAMESPACES, STATE, FROM_UUID
 from pathlib import Path
 from scanner import Scanner
 from templates import TEMPLATE_SOAP_PROBE, TEMPLATE_SOAP_TRANSFER_GET
@@ -300,16 +300,13 @@ async def send_probe(scanner):
 #async def send_transfer_get(scanner):
 async def send_transfer_get(tf_g_uuid: str):
     logger.info(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} [WSD:transfer_get] sending Transfer/Get to {tf_g_uuid} @ {SCANNERS[tf_g_uuid].ip}")
-
-#    scanner.state = STATE.GET_PENDING
+    
     SCANNERS[tf_g_uuid].state = STATE.GET_PENDING
     msg_id = uuid.uuid4()
     xml = TEMPLATE_SOAP_TRANSFER_GET.format(
-#        device_uuid=scanner.uuid,
-#        device_uuid=uuid,
-        device_uuid=tf_g_uuid,
+        to_device_uuid=tf_g_uuid,
         msg_id=msg_id,
-        client_uuid=uuid
+        from_uuid=FROM_UUID
     )
 
     headers = {
@@ -320,9 +317,11 @@ async def send_transfer_get(tf_g_uuid: str):
 #    url = scanner.xaddr  # z.B. http://192.168.0.3:8018/wsd
     url = SCANNERS[tf_g_uuid].xaddr  # z.B. http://192.168.0.3:8018/wsd
 
-    logger.info(f"   ---> URL: {url}")
-    logger.info(f"   ---> XML:")
-    logger.info({xml})
+    logger.info(f"   ---> FROM: {from_uuid}")
+    logger.info(f"   --->   TO: {tf_g_uuid}")
+    logger.info(f"   --->  MSG: {msg}")
+    logger.info(f"   --->  URL: {url}")
+    logger.info(f"   --->  XML:\n{xml}")
 
     body = ""
 
