@@ -168,3 +168,32 @@ def parse_transfer_get(xml_body, tf_g_uuid):
     SCANNERS[tf_g_uuid].state = STATE.TF_GET_PARSED
 
 
+def pick_best_xaddr(xaddrs: str) -> str:
+    """
+    Wählt aus einer Liste von XAddrs den besten Kandidaten:
+    - bevorzugt IPv4
+    - ignoriert IPv6, wenn IPv4 vorhanden ist
+    - nimmt den Hostnamen, falls keine IP vorhanden ist
+    """
+    logger.debug(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S}[WSD:XADDR] received {xaddrs}")
+    if not xaddrs:
+        return None
+
+    candidates = xaddrs.split()
+
+    ipv4 = None
+    hostname = None
+
+    for addr in candidates:
+        if addr.startswith("http://["):  
+            # IPv6 -> ignorieren
+            continue
+        elif addr.startswith("http://") and any(c.isdigit() for c in addr.split("/")[2].split(":")[0]):
+            # IPv4 gefunden
+            ipv4 = addr
+        else:
+            # vermutlich Hostname
+            hostname = addr
+
+    logger.debug(f"[WSD:XADDR] extracted {ipv4 or hostname or None}")
+    return ipv4 or hostname or None
