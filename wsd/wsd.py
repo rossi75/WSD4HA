@@ -173,23 +173,10 @@ async def state_monitor():
             logger.info(f"   --> last_seen: {scanner.last_seen}")
             logger.info(f"   -->       age: {age}")
 
-#            if status in ("parsing_probe"):
-#                logger.info(f"[WSD:probe_mon] probe done, parsing probe...")
-#                try:
-#                    logger.info(f"[WSD:probe_mon]   LogPoint E")
-#                    asyncio.create_task(parse_probe(body))
-#                    logger.info(f"[WSD:probe_mon]   LogPoint F")
-#                except Exception as e:
-#                    scanner.state = STATE.ERROR
-#                    logger.warning(f"Anything went wrong while parsing the XML-Probe from UUID {uuid} @ {ip}, response is {str(e)}")
-
             if status in ("probe_parsed"):
                 logger.info(f"[WSD:probe_mon] probe parsed, get endpoint details...")
                 try:
-                    logger.info(f"[WSD:probe_mon]   LogPoint E")
-                    #asyncio.create_task(send_transfer_get(scanner))
                     asyncio.create_task(send_transfer_get(uuid))
-                    logger.info(f"[WSD:probe_mon]   LogPoint F")
                 except Exception as e:
                     scanner.state = STATE.ERROR
                     logger.warning(f"Anything went wrong while parsing the XML-Probe from UUID {uuid} @ {ip}, response is {str(e)}")
@@ -234,8 +221,7 @@ async def state_monitor():
                 logger.info(f"[WSD:Heartbeat] --> Marking {scanner.ip} ({scanner.friendly_name}) to remove")
                 to_remove.append(scanner)
 
-            logger.info(f"   -->    status: {SCANNERS[uuid].state.value}")
-#            logger.debug(f"   -->    status = {status}")
+            logger.info(f"   =====> status: {SCANNERS[uuid].state.value}")
     
         # welche Scanner sollen entfernt werden?
         logger.debug(f"[WSD:Heartbeat] checking for Scanners to remove from known list")
@@ -298,7 +284,6 @@ async def send_probe(scanner):
     logger.info(f"   ---> Statuscode: {resp.status}")
 
 # ---------------- Send Transfer_Get ----------------
-#async def send_transfer_get(scanner):
 async def send_transfer_get(tf_g_uuid: str):
     logger.info(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} [WSD:transfer_get] sending Transfer/Get to {tf_g_uuid} @ {SCANNERS[tf_g_uuid].ip}")
     
@@ -331,7 +316,6 @@ async def send_transfer_get(tf_g_uuid: str):
             async with session.post(url, data=xml, headers=headers, timeout=5) as resp:
                 if resp.status == 200:
                     body = await resp.text()
-#                    parse_transfer_get(scanner, body)
                 else:
                     SCANNERS[tf_g_uuid].state = STATE.ERROR
                     logger.error(f"[WSD:transfer_get] TransferGet failed with Statuscode {resp.status}")
@@ -341,8 +325,7 @@ async def send_transfer_get(tf_g_uuid: str):
             SCANNERS[tf_g_uuid].state = STATE.ERROR
             return None
  
-    logger.info(f"TransferGet von {SCANNERS[tf_g_uuid].ip}:\n{body}")
-#    parse_transfer_get(scanner, body)
+    logger.debug(f"TransferGet von {SCANNERS[tf_g_uuid].ip}:\n{body}")
     parse_transfer_get(body, tf_g_uuid)
 
 # ---------------- Probe Parser ----------------
@@ -385,7 +368,6 @@ def parse_probe(xml: str, probed_uuid: str):
         types = types_elem.text.strip().split()
         if not any("ScanDeviceType" in t for t in types):
             logger.info(f"[WSD:probe_parser] Skipping non-scanner device {probe_uuid}")
-#            SCANNERS[uuid].status = ScannerStatus.ERROR
             continue
 
         # die Serviceadresse finden
@@ -393,7 +375,6 @@ def parse_probe(xml: str, probed_uuid: str):
         xaddrs_elem = pm.find(".//wsd:XAddrs", NAMESPACES)
         xaddr = pick_best_xaddr(xaddrs_elem.text.strip())
 
-#        if uuid_elem is None or types_elem is None or xaddrs_elem is None:
         if probe_uuid is None or types is None or xaddr is None:
             logger.warning(f"[WSD:parse_probe] Incomplete ProbeMatch, skipping UUID {probe_uuid}")
             logger.warning(f"   --->  UUID: {probe_uuid}")
@@ -405,17 +386,13 @@ def parse_probe(xml: str, probed_uuid: str):
 
         # neuer oder vorhandener Scanner?
         if probe_uuid not in SCANNERS:
-#            SCANNERS[probe_uuid] = Scanner(uuid=probe_uuid, ip=scanner.ip, xaddr=xaddr)
             SCANNERS[probe_uuid] = Scanner(uuid=probe_uuid, ip=SCANNERS[probed_uuid].ip, xaddr=xaddr)
-#            SCANNERS[probe_uuid].related_uuids.add(uuid)       # = set()
             SCANNERS[probe_uuid].state = STATE.PROBE_PARSED                       # das neue Gerät > hat die Probe bestanden, wird nun weiter konnektiert
             SCANNERS[probed_uuid].state = STATE.ONLINE                                    # das alte Gerät > ist weiterhin online, wird nicht mehr bearbeitet
-#            marry_endpoints(SCANNERS[uuid], SCANNERS[probe_uuid])
             marry_endpoints(probed_uuid, probe_uuid)
             logger.info(f"[WSD:probe_parser] Discovered new scanner endpoint with {probe_uuid} @ {SCANNER[probed_uuid].ip} as child from {probed_uuid}")
         else:
             SCANNERS[probed_uuid].xaddr = xaddr
-#            SCANNERS[uuid].related_uuids.add(uuid)       # = set()
             SCANNERS[probed_uuid].state = STATE.PROBE_PARSED
             logger.info(f"[WSD:probe_parser] Updated scanner {probed_uuid} -> {xaddr}")
 
@@ -448,23 +425,32 @@ def parse_transfer_get(xml_body: bytes, tf_g_uuid):
         root = ET.fromstring(xml_body.decode("utf-8", errors="ignore"))
         logger.info(f"extracted xml_body to root")
     except Exception as e:
-        logger.debug(f"[WSD] Error while parsing transfer_get: {e}")
+        logger.warning(f"[WSD] Error while parsing transfer_get: {e}")
+        SCANNERS[tf_g_uuid].state = STATE.ERROR
         return None
+
+    logger.info(f"[WSD:parse_tg]   LogPoint K")
 
     # FriendlyName
     fn_elem = root.find(".//wsdp:FriendlyName", NAMESPACES)
     if fn_elem is not None:
         SCANNERS[tf_g_uuid].friendly_name = fn_elem.text.strip()
 
+    logger.info(f"[WSD:parse_tg]   LogPoint J")
+
     # SerialNumber
     sn_elem = root.find(".//wsdp:SerialNumber", NAMESPACES)
     if sn_elem is not None:
         SCANNERS[tf_g_uuid].serial_number = sn_elem.text.strip()
 
+    logger.info(f"[WSD:parse_tg]   LogPoint L")
+
     # Firmware
     fw_elem = root.find(".//wsdp:FirmwareVersion", NAMESPACES)
     if fw_elem is not None:
         SCANNERS[tf_g_uuid].firmware = fw_elem.text.strip()
+
+    logger.info(f"[WSD:parse_tg]   LogPoint M")
 
     # Hosted Services (Scan, Print, …)
     SCANNERS[tf_g_uuid].services = {}
