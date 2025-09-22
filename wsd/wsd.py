@@ -174,7 +174,8 @@ async def state_monitor():
             logger.info(f"   --> last_seen: {scanner.last_seen}")
             logger.info(f"   -->       age: {age}")
 
-            if status in ("probe_parsed"):
+#            if status in ("probe_parsed"):
+            if scanner.state in PROBE_PARSED:
                 logger.info(f"[WSD:probe_mon] probe parsed, get endpoint details...")
                 try:
                     asyncio.create_task(send_transfer_get(uuid))
