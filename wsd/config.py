@@ -9,6 +9,7 @@ import sys
 import re
 import xml.etree.ElementTree as ET
 import subprocess
+import uuid
 from globals import SCANNERS, list_scanners, FROM_UUID
 
 
@@ -45,8 +46,8 @@ logger = logging.getLogger("wsd-addon")
 
 logger.info(f" ")
 logger.info(f"***********************************************************")
-logger.info(f"Starting up WSD Scanner Service")
-logger.info(f"{datetime.datetime.now():%d.%m.%Y, %H:%M:%S}")
+logger.info(f"*             Starting up WSD Scanner Service             *")
+logger.info(f"*                   {datetime.datetime.now():%d.%m.%Y, %H:%M:%S}                  *")
 logger.info(f"***********************************************************")
 logger.info(f"---------------------  Configuration  ---------------------")
 # ---------------- Optionen aus Environment ----------------
