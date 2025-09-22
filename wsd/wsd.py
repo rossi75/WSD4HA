@@ -11,8 +11,9 @@ import time
 import threading
 import uuid
 import xml.etree.ElementTree as ET
-from config import OFFLINE_TIMEOUT, LOCAL_IP, HTTP_PORT
-from globals import SCANNERS, list_scanners, NAMESPACES, STATE, FROM_UUID
+from config import OFFLINE_TIMEOUT, LOCAL_IP, HTTP_PORT, FROM_UUID
+#from globals import SCANNERS, list_scanners, NAMESPACES, STATE, FROM_UUID
+from globals import SCANNERS, list_scanners, NAMESPACES, STATE
 from pathlib import Path
 from scanner import Scanner
 from templates import TEMPLATE_SOAP_PROBE, TEMPLATE_SOAP_TRANSFER_GET
@@ -302,8 +303,12 @@ async def send_transfer_get(tf_g_uuid: str):
     logger.info(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} [WSD:transfer_get] sending Transfer/Get to {tf_g_uuid} @ {SCANNERS[tf_g_uuid].ip}")
     
     SCANNERS[tf_g_uuid].state = STATE.GET_PENDING
-    #msg_id = uuid.uuid4()
-    msg_id = f"urn:uuid:{uuid.uuid4()}",
+    msg_id = uuid.uuid4()
+    logger.info(f"   --->A MSG_ID: {msg_id}")
+#    msg_id = f"urn:uuid:{uuid.uuid4()}",
+    msg_id = f"{uuid.uuid4()}",
+    logger.info(f"   --->B MSG_ID: {msg_id}")
+
     xml = TEMPLATE_SOAP_TRANSFER_GET.format(
         to_device_uuid=tf_g_uuid,
         msg_id=msg_id,
