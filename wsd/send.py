@@ -16,6 +16,7 @@ from globals import SCANNERS, list_scanners, NAMESPACES, STATE
 from pathlib import Path
 from scanner import Scanner
 from templates import TEMPLATE_SOAP_PROBE, TEMPLATE_SOAP_TRANSFER_GET
+from parse import parse_wsd_packet, parse_probe, parse_transfer_get
 
 # ---------------- Send Scanner Probe ----------------
 async def send_probe(scanner):
