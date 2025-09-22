@@ -92,7 +92,7 @@ async def discovery_processor(data, addr):
 
     # exctract XAddrs
 #    xaddrs_elem = root.find(".//{http://schemas.xmlsoap.org/ws/2005/04/discovery}XAddrs")
-    xaddrs_elem = root.find(".//wsd:XAddrs")
+    xaddrs_elem = root.find(".//wsd:XAddrs", NAMESPACES)
     xaddr = ""
     if xaddrs_elem is not None and xaddrs_elem.text:
 #        xaddr = pick_best_xaddr(xaddrs_elem.text.strip()) + "/scan"
@@ -270,8 +270,6 @@ async def send_probe(scanner):
             async with session.post(url, data=xml, headers=headers, timeout=5) as resp:
                 if resp.status == 200:
                     body = await resp.text()
-#                    logger.debug(f"ProbeMatch von {scanner.ip}:\n{body}")
-#                    parse_probe(body, scanner.uuid)
                 else:
                     logger.warning(f"Probe failed with status {resp.status}")
                     scanner.state = STATE.ABSENT
@@ -406,8 +404,8 @@ def parse_wsd_packet(data: bytes):
         xml = ET.fromstring(data.decode("utf-8", errors="ignore"))
 #        action = xml.find(".//{http://schemas.xmlsoap.org/ws/2004/08/addressing}Action")
 #        uuid = xml.find(".//{http://schemas.xmlsoap.org/ws/2004/08/addressing}Address")
-        action = xml.find(".//wsa:Action")
-        uuid = xml.find(".//wsa:Address")
+        action = xml.find(".//wsa:Action", NAMESPACES)
+        uuid = xml.find(".//wsa:Address", NAMESPACES)
         return {
             "action": action.text if action is not None else None,
             "uuid": uuid.text if uuid is not None else None,
