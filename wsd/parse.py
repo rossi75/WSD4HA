@@ -1,1 +1,170 @@
+import asyncio
+import aiohttp
+import datetime
+import logging
+import os
+import re
+import socket
+import subprocess
+import sys
+import time
+import threading
+import uuid
+import xml.etree.ElementTree as ET
+from config import OFFLINE_TIMEOUT, LOCAL_IP, HTTP_PORT, FROM_UUID
+#from globals import SCANNERS, list_scanners, NAMESPACES, STATE, FROM_UUID
+from globals import SCANNERS, list_scanners, NAMESPACES, STATE
+from pathlib import Path
+from scanner import Scanner
+from templates import TEMPLATE_SOAP_PROBE, TEMPLATE_SOAP_TRANSFER_GET
+
+
+
+# ---------------- Probe Parser ----------------
+def parse_probe(xml: str, probed_uuid: str):
+    """
+    Parse ProbeMatch response and update/create Scanner objects.
+
+    Args:
+        xml (str): SOAP XML response as string
+        scanners (dict): Dictionary {uuid: Scanner}
+        
+    """
+    logger.info(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} [WSD:parse_probe] parsing probe from {probed_uuid} @ {SCANNERS[probed_uuid].ip}")
+    logger.debug(f"XML:\n{xml}")
+    
+    SCANNERS[probed_uuid].state = STATE.PROBE_PARSING
+   
+    try:
+        root = ET.fromstring(xml)
+    except ET.ParseError as e:
+        logger.error(f"[WSD:probe_parser] XML ParseError: {e}")
+        SCANNERS[probed_uuid].state = STATE.ERROR
+        return
+
+    for pm in root.findall(".//wsd:ProbeMatch", NAMESPACES):
+
+        # UUID (without urn:uuid:)
+        probe_uuid = None
+        uuid_elem = pm.find(".//wsa:Address", NAMESPACES)
+        if uuid_elem is not None and uuid_elem.text:
+            probe_uuid = uuid_elem.text.strip()
+            if probe_uuid.startswith("urn:uuid:"):
+                probe_uuid = probe_uuid.replace("urn:uuid:", "")
+            else:
+                probe_uuid = uuid_text
+
+        # Nur Scanner akzeptieren
+        types = None
+        types_elem = pm.find(".//wsd:Types", NAMESPACES)
+        types = types_elem.text.strip().split()
+        if not any("ScanDeviceType" in t for t in types):
+            logger.info(f"[WSD:probe_parser] Skipping non-scanner device {probe_uuid}")
+            continue
+
+        # die Serviceadresse finden
+        xaddr = None
+        xaddrs_elem = pm.find(".//wsd:XAddrs", NAMESPACES)
+        xaddr = pick_best_xaddr(xaddrs_elem.text.strip())
+
+        if probe_uuid is None or types is None or xaddr is None:
+            logger.warning(f"[WSD:parse_probe] Incomplete ProbeMatch, skipping UUID {probe_uuid}")
+            logger.warning(f"   --->  UUID: {probe_uuid}")
+            logger.warning(f"   ---> TYPES: {types}")
+            logger.warning(f"   ---> XADDR: {xaddr}")
+            SCANNERS[probed_uuid].state = STATE.ERROR
+            continue
+
+
+        # neuer oder vorhandener Scanner?
+        if probe_uuid not in SCANNERS:
+            SCANNERS[probe_uuid] = Scanner(uuid=probe_uuid, ip=SCANNERS[probed_uuid].ip, xaddr=xaddr)
+            SCANNERS[probe_uuid].state = STATE.PROBE_PARSED                       # das neue Gerät > hat die Probe bestanden, wird nun weiter konnektiert
+            SCANNERS[probed_uuid].state = STATE.ONLINE                                    # das alte Gerät > ist weiterhin online, wird nicht mehr bearbeitet
+            marry_endpoints(probed_uuid, probe_uuid)
+            logger.info(f"[WSD:probe_parser] Discovered new scanner endpoint with {probe_uuid} @ {SCANNER[probed_uuid].ip} as child from {probed_uuid}")
+        else:
+            SCANNERS[probed_uuid].xaddr = xaddr
+            SCANNERS[probed_uuid].state = STATE.PROBE_PARSED
+            logger.info(f"[WSD:probe_parser] Updated scanner {probed_uuid} -> {xaddr}")
+
+    list_scanners()
+
+
+# ---------------- WSD SOAP Parser ----------------
+def parse_wsd_packet(data: bytes):
+    try:
+        xml = ET.fromstring(data.decode("utf-8", errors="ignore"))
+#        action = xml.find(".//{http://schemas.xmlsoap.org/ws/2004/08/addressing}Action")
+#        uuid = xml.find(".//{http://schemas.xmlsoap.org/ws/2004/08/addressing}Address")
+        action = xml.find(".//wsa:Action", NAMESPACES)
+        uuid = xml.find(".//wsa:Address", NAMESPACES)
+        return {
+            "action": action.text if action is not None else None,
+            "uuid": uuid.text if uuid is not None else None,
+        }
+    except Exception as e:
+        logger.debug(f"[WSD] Error while parsing: {e}")
+        return None
+
+
+# ---------------- Transfer/GET Parser ----------------
+#def parse_transfer_get(xml_body: bytes, tf_g_uuid):
+def parse_transfer_get(xml_body, tf_g_uuid):
+    logger.info(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} [WSD:parse_probe] parsing transfer_get from {tf_g_uuid} @ {SCANNERS[tf_g_uuid].ip}")
+    logger.info(f"XML:\n{xml_body}")
+
+    SCANNERS[tf_g_uuid].state = STATE.TF_GET_PARSING
+
+    try:
+        root = ET.fromstring(xml_body)
+    except Exception as e:
+        logger.warning(f"[WSD] Error while parsing transfer_get: {e}")
+        SCANNERS[tf_g_uuid].state = STATE.ERROR
+        return None
+
+    logger.info(f"[WSD:parse_tg]   LogPoint K")
+
+    # FriendlyName
+    fn_elem = root.find(".//wsdp:FriendlyName", NAMESPACES)
+    if fn_elem is not None:
+        SCANNERS[tf_g_uuid].friendly_name = fn_elem.text.strip()
+
+    logger.info(f"[WSD:parse_tg]   LogPoint J")
+
+    # SerialNumber
+    sn_elem = root.find(".//wsdp:SerialNumber", NAMESPACES)
+    if sn_elem is not None:
+        SCANNERS[tf_g_uuid].serial_number = sn_elem.text.strip()
+
+    logger.info(f"[WSD:parse_tg]   LogPoint L")
+
+    # Firmware
+    fw_elem = root.find(".//wsdp:FirmwareVersion", NAMESPACES)
+    if fw_elem is not None:
+        SCANNERS[tf_g_uuid].firmware = fw_elem.text.strip()
+
+    logger.info(f"[WSD:parse_tg]   LogPoint M")
+
+    # Hosted Services (Scan, Print, …)
+    SCANNERS[tf_g_uuid].services = {}
+    for hosted in root.findall(".//wsdp:Hosted", NAMESPACES):
+        addr_elem = hosted.find(".//wsa:Address", NAMESPACES)
+        type_elem = hosted.find(".//wsdp:Types", NAMESPACES)
+        if addr_elem is not None and type_elem is not None:
+            addr = addr_elem.text.strip()
+            types = type_elem.text.strip()
+            logger.info(f"  ADDR: {addr}")
+            logger.info(f" TYPES: {types}")
+            if "ScannerServiceType" in types:
+                SCANNERS[tf_g_uuid].services["scan"] = addr
+            #elif "PrinterServiceType" in types:
+            #    SCANNERS[tf_g_uuid].services["print"] = addr
+
+    logger.info(f"   ---> FN: {SCANNERS[tf_g_uuid].friendly_name}")
+    logger.info(f"   ---> SN: {SCANNERS[tf_g_uuid].serial_number}")
+    logger.info(f"   ---> FW: {SCANNERS[tf_g_uuid].firmware}")
+
+    SCANNERS[tf_g_uuid].state = STATE.TF_GET_PARSED
+
 
