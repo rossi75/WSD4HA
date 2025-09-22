@@ -12,13 +12,13 @@ import threading
 import uuid
 import xml.etree.ElementTree as ET
 from config import OFFLINE_TIMEOUT, LOCAL_IP, HTTP_PORT, FROM_UUID
-#from globals import SCANNERS, list_scanners, NAMESPACES, STATE, FROM_UUID
 from globals import SCANNERS, list_scanners, NAMESPACES, STATE
 from pathlib import Path
 from scanner import Scanner
 from templates import TEMPLATE_SOAP_PROBE, TEMPLATE_SOAP_TRANSFER_GET
 
-
+logging.basicConfig(level=logging.INFO, format='[%(levelname)s] %(message)s')
+logger = logging.getLogger("wsd-addon")
 
 # ---------------- Probe Parser ----------------
 def parse_probe(xml: str, probed_uuid: str):
