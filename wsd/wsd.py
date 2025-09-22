@@ -183,7 +183,7 @@ async def state_monitor():
 #                    logger.warning(f"Anything went wrong while parsing the XML-Probe from UUID {uuid} @ {ip}, response is {str(e)}")
 
             if status in ("probe_parsed"):
-                logger.info(f"[WSD:probe_mon] probe parsed, get details...")
+                logger.info(f"[WSD:probe_mon] probe parsed, get endpoint details...")
                 try:
                     logger.info(f"[WSD:probe_mon]   LogPoint E")
                     #asyncio.create_task(send_transfer_get(scanner))
@@ -335,9 +335,11 @@ async def send_transfer_get(tf_g_uuid: str):
                 else:
                     SCANNERS[tf_g_uuid].state = STATE.ERROR
                     logger.error(f"[WSD:transfer_get] TransferGet failed with Statuscode {resp.status}")
+                    return None
         except Exception as e:
             logger.error(f"[WSD:transfer_get] failed for {SCANNERS[tf_g_uuid].uuid}: {e}")
             SCANNERS[tf_g_uuid].state = STATE.ERROR
+            return None
  
     logger.info(f"TransferGet von {SCANNERS[tf_g_uuid].ip}:\n{body}")
 #    parse_transfer_get(scanner, body)
@@ -435,12 +437,19 @@ def parse_wsd_packet(data: bytes):
 
 
 # ---------------- Transfer/GET Parser ----------------
-def parse_transfer_get(xml_body, tf_g_uuid):
+def parse_transfer_get(xml_body: bytes, tf_g_uuid):
     logger.info(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} [WSD:parse_probe] parsing transfer_get from {tf_g_uuid} @ {SCANNERS[tf_g_uuid].ip}")
-    logger.debug(f"XML:\n{xml_body}")
+    logger.info(f"XML:\n{xml_body}")
 
     SCANNERS[tf_g_uuid].state = STATE.GET_PARSING
-    root = ET.fromstring(xml_body)
+#    root = ET.fromstring(xml_body)
+
+    try:
+        root = ET.fromstring(xml_body.decode("utf-8", errors="ignore"))
+        logger.info(f"extracted xml_body to root")
+    except Exception as e:
+        logger.debug(f"[WSD] Error while parsing transfer_get: {e}")
+        return None
 
     # FriendlyName
     fn_elem = root.find(".//wsdp:FriendlyName", NAMESPACES)
