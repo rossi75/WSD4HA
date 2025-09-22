@@ -302,7 +302,8 @@ async def send_transfer_get(tf_g_uuid: str):
     logger.info(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} [WSD:transfer_get] sending Transfer/Get to {tf_g_uuid} @ {SCANNERS[tf_g_uuid].ip}")
     
     SCANNERS[tf_g_uuid].state = STATE.GET_PENDING
-    msg_id = uuid.uuid4()
+    #msg_id = uuid.uuid4()
+    msg_id = f"urn:uuid:{uuid.uuid4()}",
     xml = TEMPLATE_SOAP_TRANSFER_GET.format(
         to_device_uuid=tf_g_uuid,
         msg_id=msg_id,
