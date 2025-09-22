@@ -414,16 +414,15 @@ def parse_wsd_packet(data: bytes):
 
 
 # ---------------- Transfer/GET Parser ----------------
-def parse_transfer_get(xml_body: bytes, tf_g_uuid):
+#def parse_transfer_get(xml_body: bytes, tf_g_uuid):
+def parse_transfer_get(xml_body, tf_g_uuid):
     logger.info(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} [WSD:parse_probe] parsing transfer_get from {tf_g_uuid} @ {SCANNERS[tf_g_uuid].ip}")
     logger.info(f"XML:\n{xml_body}")
 
     SCANNERS[tf_g_uuid].state = STATE.GET_PARSING
-#    root = ET.fromstring(xml_body)
 
     try:
         root = ET.fromstring(xml_body.decode("utf-8", errors="ignore"))
-        logger.info(f"extracted xml_body to root")
     except Exception as e:
         logger.warning(f"[WSD] Error while parsing transfer_get: {e}")
         SCANNERS[tf_g_uuid].state = STATE.ERROR
