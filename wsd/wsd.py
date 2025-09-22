@@ -56,7 +56,7 @@ def pick_best_xaddr(xaddrs: str) -> str:
 
 # ---------------- Message handler ----------------
 async def discovery_processor(data, addr):
-    logger.info(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} [Message] Processing sth")
+    logger.info(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} [WSD:Disc_Proc] Processing something from {addr[0]}")
     logger.debug(f" [Message]    ---> received data {data}")
     logger.debug(f" [Message]    ---> received addr {addr}")
     ip = addr[0] if addr else "?"
@@ -91,16 +91,17 @@ async def discovery_processor(data, addr):
         types_text = " ".join(t.split(":")[-1] for t in types_elem.text.split())
 
     # exctract XAddrs
-    xaddrs_elem = root.find(".//{http://schemas.xmlsoap.org/ws/2005/04/discovery}XAddrs")
+#    xaddrs_elem = root.find(".//{http://schemas.xmlsoap.org/ws/2005/04/discovery}XAddrs")
+    xaddrs_elem = root.find(".//wsd:XAddrs")
     xaddr = ""
     if xaddrs_elem is not None and xaddrs_elem.text:
-        xaddr = pick_best_xaddr(xaddrs_elem.text.strip()) + "/scan"
+#        xaddr = pick_best_xaddr(xaddrs_elem.text.strip()) + "/scan"
+        xaddr = pick_best_xaddr(xaddrs_elem.text.strip())
 
-    logger.info(f"[WSD:DISCOVERY] received from {ip}")
-    logger.info(f"    -->   UUID: {uuid}")
+    logger.debug(f"    -->   UUID: {uuid}")
     logger.info(f"    --> Action: {action_text}")
-    logger.info(f"    -->  Types: {types_text}")
-    logger.info(f"    -->  XADDR: {xaddr}")
+    logger.debug(f"    -->  Types: {types_text}")
+    logger.debug(f"    -->  XADDR: {xaddr}")
 
     if action_text == "Hello":
         # Nur Scanner berücksichtigen
@@ -233,6 +234,7 @@ async def state_monitor():
         logger.debug(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} [WSD:sleep] goodbye")
         if any (scanner.state not in {STATE.ABSENT,
                                       STATE.ONLINE,
+                                      STATE.RECV_SCAN,
                                       STATE.TO_REMOVE,
                                       STATE.ERROR}
                 for scanner in SCANNERS.values()):
@@ -287,7 +289,7 @@ async def send_probe(scanner):
 async def send_transfer_get(tf_g_uuid: str):
     logger.info(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} [WSD:transfer_get] sending Transfer/Get to {tf_g_uuid} @ {SCANNERS[tf_g_uuid].ip}")
     
-    SCANNERS[tf_g_uuid].state = STATE.GET_PENDING
+    SCANNERS[tf_g_uuid].state = STATE.TF_GET_PENDING
     msg_id = uuid.uuid4()
 
     xml = TEMPLATE_SOAP_TRANSFER_GET.format(
@@ -402,8 +404,10 @@ def parse_probe(xml: str, probed_uuid: str):
 def parse_wsd_packet(data: bytes):
     try:
         xml = ET.fromstring(data.decode("utf-8", errors="ignore"))
-        action = xml.find(".//{http://schemas.xmlsoap.org/ws/2004/08/addressing}Action")
-        uuid = xml.find(".//{http://schemas.xmlsoap.org/ws/2004/08/addressing}Address")
+#        action = xml.find(".//{http://schemas.xmlsoap.org/ws/2004/08/addressing}Action")
+#        uuid = xml.find(".//{http://schemas.xmlsoap.org/ws/2004/08/addressing}Address")
+        action = xml.find(".//wsa:Action")
+        uuid = xml.find(".//wsa:Address")
         return {
             "action": action.text if action is not None else None,
             "uuid": uuid.text if uuid is not None else None,
@@ -419,7 +423,7 @@ def parse_transfer_get(xml_body, tf_g_uuid):
     logger.info(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} [WSD:parse_probe] parsing transfer_get from {tf_g_uuid} @ {SCANNERS[tf_g_uuid].ip}")
     logger.info(f"XML:\n{xml_body}")
 
-    SCANNERS[tf_g_uuid].state = STATE.GET_PARSING
+    SCANNERS[tf_g_uuid].state = STATE.TF_GET_PARSING
 
     try:
         root = ET.fromstring(xml_body)
@@ -470,7 +474,7 @@ def parse_transfer_get(xml_body, tf_g_uuid):
     logger.info(f"   ---> SN: {SCANNERS[tf_g_uuid].serial_number}")
     logger.info(f"   ---> FW: {SCANNERS[tf_g_uuid].firmware}")
 
-    SCANNERS[tf_g_uuid].state = STATE.GET_PARSED
+    SCANNERS[tf_g_uuid].state = STATE.TF_GET_PARSED
 
 
 # ---------------- marry two endpoints ----------------
