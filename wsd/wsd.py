@@ -422,7 +422,7 @@ def parse_transfer_get(xml_body, tf_g_uuid):
     SCANNERS[tf_g_uuid].state = STATE.GET_PARSING
 
     try:
-        root = ET.fromstring(xml_body.decode("utf-8", errors="ignore"))
+        root = ET.fromstring(xml_body)
     except Exception as e:
         logger.warning(f"[WSD] Error while parsing transfer_get: {e}")
         SCANNERS[tf_g_uuid].state = STATE.ERROR
