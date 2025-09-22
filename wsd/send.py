@@ -18,6 +18,9 @@ from scanner import Scanner
 from templates import TEMPLATE_SOAP_PROBE, TEMPLATE_SOAP_TRANSFER_GET
 from parse import parse_wsd_packet, parse_probe, parse_transfer_get
 
+logging.basicConfig(level=logging.INFO, format='[%(levelname)s] %(message)s')
+logger = logging.getLogger("wsd-addon")
+
 # ---------------- Send Scanner Probe ----------------
 async def send_probe(scanner):
     logger.info(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} [WSD:send_probe] sending probe for {scanner.uuid} @ {scanner.ip}")
