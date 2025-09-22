@@ -175,7 +175,7 @@ async def state_monitor():
             logger.info(f"   -->       age: {age}")
 
 #            if status in ("probe_parsed"):
-            if scanner.state in PROBE_PARSED:
+            if scanner.state in STATE.PROBE_PARSED:
                 logger.info(f"[WSD:probe_mon] probe parsed, get endpoint details...")
                 try:
                     asyncio.create_task(send_transfer_get(uuid))
@@ -183,7 +183,8 @@ async def state_monitor():
                     scanner.state = STATE.ERROR
                     logger.warning(f"Anything went wrong while parsing the XML-Probe from UUID {uuid} @ {ip}, response is {str(e)}")
 
-            if status in ("discovered"):
+#            if status in ("discovered"):
+            if scanner.state in STATE.DISCOVERED:
                 logger.info(f"[WSD:probe_mon] Fresh discovered, now probing...")
                 try:
                     logger.info(f"[WSD:probe_mon]   LogPoint B")
@@ -193,7 +194,8 @@ async def state_monitor():
                     scanner.state = STATE.ERROR
                     logger.warning(f"Anything went wrong while probing the UUID {uuid} @ {ip}, response is {str(e)}")
 
-            if status in ("online"):
+#            if status in ("online"):
+            if scanner.state in STATE.ONLINE:
                 # Halbzeit-Check
                 if age > OFFLINE_TIMEOUT / 2 and age <= (OFFLINE_TIMEOUT / 2 + 30):
                     logger.info(f"[WSD:Probe] --> proceeding Halbzeit-Check")
