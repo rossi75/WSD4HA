@@ -9,7 +9,7 @@ import sys
 import re
 import xml.etree.ElementTree as ET
 import subprocess
-from globals import SCANNERS, list_scanners 
+from globals import SCANNERS, list_scanners, FROM_UUID
 
 
 NAMESPACES = {
@@ -62,6 +62,12 @@ except ValueError:
     HTTP_PORT = 8110  # Fallback vom Fallback
     logger.debug(f"Reset to fallback Port (should never reach this point)")
 logger.info(f"HTTP-Port for UI: {HTTP_PORT}")
+
+
+# ---------------- HTTP-Port ----------------
+FROM_UUID = f"urn:uuid:{uuid.uuid4()}"
+#logger.info("[GLOBAL:uuid] set FROM_UUID: {FROM_UUID}")
+logger.info("set FROM_UUID: {FROM_UUID}")
 
 # ---------------- OFFLINE_TIMEOUT ----------------
 raw = int(os.environ.get("OFFLINE_TIMEOUT", 300))  # Sekunden
