@@ -165,7 +165,7 @@ async def state_monitor():
     while True:
         logger.debug(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} [WSD:Probe] wake-up")
         to_remove = []
-        now = datetime.datetime.now()
+        now = datetime.datetime.now().replace(microsecond=0)
 
         for uuid, scanner in SCANNERS.items():
             logger.info(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} [WSD:Probe] Checking Timer and State for {uuid} ({scanner.ip})...")
@@ -175,7 +175,6 @@ async def state_monitor():
             logger.info(f"   --> last_seen: {scanner.last_seen}")
             logger.info(f"   -->       age: {age}")
 
-#            if status in ("probe_parsed"):
             if scanner.state in STATE.PROBE_PARSED:
                 logger.info(f"[WSD:probe_mon] probe parsed, get endpoint details...")
                 try:
@@ -184,7 +183,6 @@ async def state_monitor():
                     scanner.state = STATE.ERROR
                     logger.warning(f"Anything went wrong while parsing the XML-Probe from UUID {uuid} @ {ip}, response is {str(e)}")
 
-#            if status in ("discovered"):
             if scanner.state in STATE.DISCOVERED:
                 logger.info(f"[WSD:probe_mon] Fresh discovered, now probing...")
                 try:
@@ -195,10 +193,10 @@ async def state_monitor():
                     scanner.state = STATE.ERROR
                     logger.warning(f"Anything went wrong while probing the UUID {uuid} @ {ip}, response is {str(e)}")
 
-#            if status in ("online"):
             if scanner.state in STATE.ONLINE:
                 # Halbzeit-Check
                 if age > OFFLINE_TIMEOUT / 2 and age <= (OFFLINE_TIMEOUT / 2 + 30):
+#                if age > OFFLINE_TIMEOUT / 2 and age <= (OFFLINE_TIMEOUT ):
                     logger.info(f"[WSD:Probe] --> proceeding Halbzeit-Check")
                     try:
                         asyncio.create_task(send_probe(uuid))
@@ -209,6 +207,7 @@ async def state_monitor():
     
                 # 3/4-Check
                 if age > (OFFLINE_TIMEOUT * 0.75) and age <= (OFFLINE_TIMEOUT * 0.75 + 30):
+#                if age > (OFFLINE_TIMEOUT * 0.75) and age <= (OFFLINE_TIMEOUT * 0.75):
                     logger.info(f"[WSD:Heartbeat] --> proceeding Viertel-Check")
                     try:
                         asyncio.create_task(send_probe(uuid))
