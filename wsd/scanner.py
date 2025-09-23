@@ -31,7 +31,6 @@ class Scanner:
         self.related_uuids = set()
 
         # Status
-#        self.last_seen = datetime.datetime.now()                 # braucht nicht angepasst werden, weil wir ja jetzt die statemachine haben
         self.last_seen = datetime.datetime.now().replace(microsecond=0)
         self.state = STATE.DISCOVERED
         self.offline_since = None
@@ -44,7 +43,6 @@ class Scanner:
     # Scanner ist noch online
     # Aufruf mit SCANNER[uuid].update()
     def update(self):
-#        self.last_seen = datetime.datetime.now()
         self.last_seen = datetime.datetime.now().replace(microsecond=0)
         self.state = STATE.ONLINE
         self.offline_since = None
@@ -57,7 +55,6 @@ class Scanner:
     def mark_absent(self):
         self.state = STATE.ABSENT
         if not self.offline_since:
-#            self.offline_since = datetime.datetime.now()
             self.offline_since = datetime.datetime.now().replace(microsecond=0)
             self.remove_after = self.offline_since + datetime.timedelta(seconds=OFFLINE_TIMEOUT)
         logger.info(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} [SCANNER:m_offl] marked {self.friendly_name} ({self.ip}) with UUID {self.uuid} as offline")
