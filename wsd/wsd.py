@@ -171,9 +171,9 @@ async def state_monitor():
             logger.info(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} [WSD:Probe] Checking Timer and State for {uuid} ({scanner.ip})...")
             status = scanner.state.value
             age = (now - scanner.last_seen).total_seconds()
-            logger.info(f"   -->    status: {status}")
+            logger.info(f"   -->     state: {status}")
             logger.info(f"   --> last_seen: {scanner.last_seen}")
-            logger.info(f"   -->       age: {age}")
+            logger.info(f"   -->       age: {age} seconds")
 
             if scanner.state in STATE.PROBE_PARSED:
                 logger.info(f"[WSD:probe_mon] probe parsed, get endpoint details...")
@@ -216,7 +216,7 @@ async def state_monitor():
                         logger.warning(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} Could not reach scanner with UUID {uuid} and IP {ip}. Last seen at {scanner.last_seen}. Response is {str(e)}")
     
             # Timeout überschritten → offline markieren, damit werden alle Zwischenstati erschlagen, für den Fall dass was hängen geblieben ist und auch für ERROR
-            if age > OFFLINE_TIMEOUT:
+            if age > OFFLINE_TIMEOUT and scanner.state not in {STATE.ABSENT, STATE.TO_REMOVE}:
                 logger.info(f"[WSD:Heartbeat] --> mark as offline")
                 scanner.mark_absent()
 
@@ -225,7 +225,7 @@ async def state_monitor():
                 logger.info(f"[WSD:Heartbeat] --> Marking {scanner.ip} ({scanner.friendly_name}) to remove")
                 to_remove.append(scanner)
 
-            logger.info(f"   =====> status: {SCANNERS[uuid].state.value}")
+            logger.info(f"    =====> state: {SCANNERS[uuid].state.value}")
     
         # welche Scanner sollen entfernt werden?
         logger.debug(f"[WSD:Heartbeat] checking for Scanners to remove from known list")
