@@ -62,10 +62,18 @@ class Scanner:
         logger.debug(f"   --> offline_since: {self.offline_since}")
         logger.debug(f"   -->  remove_after: {self.remove_after}")
 
-    def add_related_uuid(self, other_uuid: str):
+    def _add_related_uuid(self, other_uuid: str):
         logger.info(f"[SCANNER:relate] marry UUID {self.uuid} with {other_uuid}")
         """
         Verknüpft diesen Scanner mit einer weiteren UUID.
         """
         if other_uuid and other_uuid != self.uuid:
             self.related_uuids.add(other_uuid)
+
+# ---------------- marry two endpoints ----------------
+def marry_endpoints(uuid_a: str, uuid_b: str):
+    """
+    Stellt sicher, dass zwei Scanner-Objekte sich gegenseitig kennen.
+    """
+    SCANNERS[uuid_a].related_uuids += uuid_b
+    SCANNERS[uuid_b].related_uuids += uuid_a
