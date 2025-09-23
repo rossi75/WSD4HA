@@ -250,7 +250,7 @@ async def state_monitor():
 
 # ---------------- marry two endpoints ----------------
 #def link_endpoints(scanner_a, scanner_b):
-def marry_endpoints(uuid_a: str, uuid_b: str):
+def _marry_endpoints(uuid_a: str, uuid_b: str):
     """
     Stellt sicher, dass zwei Scanner-Objekte sich gegenseitig kennen.
     """
