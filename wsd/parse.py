@@ -20,6 +20,21 @@ from templates import TEMPLATE_SOAP_PROBE, TEMPLATE_SOAP_TRANSFER_GET
 logging.basicConfig(level=logging.INFO, format='[%(levelname)s] %(message)s')
 logger = logging.getLogger("wsd-addon")
 
+# ---------------- WSD SOAP Parser ----------------
+def parse_wsd_packet(data: bytes):
+    try:
+        xml = ET.fromstring(data.decode("utf-8", errors="ignore"))
+        action = xml.find(".//wsa:Action", NAMESPACES)
+        uuid = xml.find(".//wsa:Address", NAMESPACES)
+        return {
+            "action": action.text if action is not None else None,
+            "uuid": uuid.text if uuid is not None else None,
+        }
+    except Exception as e:
+        logger.debug(f"[WSD] Error while parsing: {e}")
+        return None
+
+
 # ---------------- Probe Parser ----------------
 def parse_probe(xml: str, probed_uuid: str):
     """
@@ -90,26 +105,7 @@ def parse_probe(xml: str, probed_uuid: str):
 
     list_scanners()
 
-
-# ---------------- WSD SOAP Parser ----------------
-def parse_wsd_packet(data: bytes):
-    try:
-        xml = ET.fromstring(data.decode("utf-8", errors="ignore"))
-#        action = xml.find(".//{http://schemas.xmlsoap.org/ws/2004/08/addressing}Action")
-#        uuid = xml.find(".//{http://schemas.xmlsoap.org/ws/2004/08/addressing}Address")
-        action = xml.find(".//wsa:Action", NAMESPACES)
-        uuid = xml.find(".//wsa:Address", NAMESPACES)
-        return {
-            "action": action.text if action is not None else None,
-            "uuid": uuid.text if uuid is not None else None,
-        }
-    except Exception as e:
-        logger.debug(f"[WSD] Error while parsing: {e}")
-        return None
-
-
 # ---------------- Transfer/GET Parser ----------------
-#def parse_transfer_get(xml_body: bytes, tf_g_uuid):
 def parse_transfer_get(xml_body, tf_g_uuid):
     logger.info(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} [WSD:parse_probe] parsing transfer_get from {tf_g_uuid} @ {SCANNERS[tf_g_uuid].ip}")
     logger.info(f"XML:\n{xml_body}")
@@ -154,12 +150,12 @@ def parse_transfer_get(xml_body, tf_g_uuid):
         if addr_elem is not None and type_elem is not None:
             addr = addr_elem.text.strip()
             types = type_elem.text.strip()
-            logger.info(f"  ADDR: {addr}")
             logger.info(f" TYPES: {types}")
             if "ScannerServiceType" in types:
-                SCANNERS[tf_g_uuid].services["scan"] = addr
-            #elif "PrinterServiceType" in types:
-            #    SCANNERS[tf_g_uuid].services["print"] = addr
+                SCANNERS[tf_g_uuid].xaddr = addr
+            logger.info(f"  ADDR: {SCANNERS[tf_g_uuid].xaddr}")
+                
+#                SCANNERS[tf_g_uuid].services["scan"] = addr
 
     logger.info(f"   ---> FN: {SCANNERS[tf_g_uuid].friendly_name}")
     logger.info(f"   ---> SN: {SCANNERS[tf_g_uuid].serial_number}")
