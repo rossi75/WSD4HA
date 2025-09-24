@@ -107,8 +107,8 @@ def parse_probe(xml: str, probed_uuid: str):
 
 # ---------------- Transfer/GET Parser ----------------
 def parse_transfer_get(xml_body, tf_g_uuid):
-    logger.info(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} [PARSE:parse_t_g] parsing transfer_get from {tf_g_uuid} @ {SCANNERS[tf_g_uuid].ip}")
-    logger.info(f"XML:\n{xml_body}")
+    logger.info(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} [PARSE:parse_t_g] parsing transfer_get from {SCANNERS[tf_g_uuid].friendly_name} @ {SCANNERS[tf_g_uuid].ip}")
+    logger.debug(f"XML:\n{xml_body}")
 
     SCANNERS[tf_g_uuid].state = STATE.TF_GET_PARSING
 
