@@ -65,7 +65,7 @@ async def discovery_processor(data, addr):
     try:
         root = ET.fromstring(data.decode("utf-8", errors="ignore"))
     except Exception:
-        logger.warning("[WSD:hm] Exception while reading from ET")
+        logger.error("[WSD:hm] Exception while reading from ET")
         return
 
     # UUID (without urn:uuid:)
