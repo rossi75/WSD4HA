@@ -14,18 +14,21 @@ startup: services
 init: false
 ports:
   8110/tcp: 8110
+  5357/tcp: 5357
 host_network: true
 map:
 #  - "{{ options.scan_folder }}:rw"
   - config:rw
 options:
   offline_timeout: 300
+  displayname: "Scan to Home Assistant"
   scan_folder: "/share/scans"
   max_files: 50
 #  log_level: "INFO"
   log_level: []
 schema:
   offline_timeout: int(120,3600)
+  displayname: str
   scan_folder: str
   max_files: int
   log_level: list(INFO|DEBUG|WARNING)
