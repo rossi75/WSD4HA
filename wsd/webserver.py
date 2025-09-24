@@ -9,7 +9,7 @@ import sys
 import re
 import xml.etree.ElementTree as ET
 import subprocess
-from config import OFFLINE_TIMEOUT, SCAN_FOLDER, HTTP_PORT, MAX_FILES
+from config import OFFLINE_TIMEOUT, SCAN_FOLDER, HTTP_PORT, MAX_FILES, NOTIFY_PORT
 from globals import SCANNERS, NAMESPACES, STATE
 from scanner import Scanner
 
@@ -89,8 +89,8 @@ async def start_http_server():
     app = web.Application()
     app.router.add_get("/", status_page)
     logger.debug(f"   ---> added endpoint /")
-    app.router.add_post("/wsd/notify", notify_handler)
-    logger.debug(f"   ---> added endpoint /wsd/notify")
+#    app.router.add_post("/wsd/notify", notify_handler)
+#    logger.debug(f"   ---> added endpoint /wsd/notify")
 #    app.router.add_post("/wsd/scan", handle_scan_job)
 #    logger.debug(f"   ---> added endpoint /wsd/scan")
     
@@ -107,7 +107,7 @@ async def start_http_server():
 async def notify_handler(request):
     text = await request.text()
     # quick log
-    logger.info(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} [WEBSERVER:NOTIFY] received notification payload: %s", text[:600])
+    logger.info(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} [WEBSERVER:NOTIFY] received notification payload: \n {text[:600]}")
     try:
         root = ET.fromstring(text)
     except Exception as e:
@@ -125,5 +125,34 @@ async def notify_handler(request):
     logger.info(f"WEBSERVER:[NOTIFY] identifier={ident.text if ident is not None else None}, events={events}")
 
     # Acknowledge (200 OK). Some implement a SOAP response; many accept simple 200.
-    return web.Response(status=200, text="OK")
+    return web.Response(status=200, text="alles juut")
 
+def _create_notify_app():
+    app = web.Application()
+    app.router.add_post("/", notify_handler)
+    return app
+
+
+async def start_notify_server():
+    logger.info(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} [WEBSERVER:start_notify] configuring Notify Server on Port {NOTIFY_PORT}")
+    # parallel zum UI starten
+#from notify_server import create_notify_app
+
+#    loop = asyncio.get_event_loop()
+#    loop.create_task(web._run_app(create_notify_app(), port=5357))
+
+
+
+
+    app = web.Application()
+    app.router.add_get("/", status_page)
+    logger.debug(f"   ---> added endpoint /")
+
+    runner = web.AppRunner(app)
+    await runner.setup()
+    logger.debug(f"   ---> runner.setup().web.AppRunner(app)")
+
+    # An alle Interfaces binden (0.0.0.0) -> wichtig für Docker / HA
+    site = web.TCPSite(runner, "0.0.0.0", NOTIFY_PORT)
+    await site.start()
+    logger.info(f"Notify Server is running on Port {NOTIFY_PORT}")
