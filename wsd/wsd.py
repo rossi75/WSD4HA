@@ -257,13 +257,3 @@ async def state_monitor():
         logger.debug(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} [WSD:sleep] back in town")
 
 
-# ---------------- marry two endpoints ----------------
-#def link_endpoints(scanner_a, scanner_b):
-def _marry_endpoints(uuid_a: str, uuid_b: str):
-    """
-    Stellt sicher, dass zwei Scanner-Objekte sich gegenseitig kennen.
-    """
-#    scanner_a.add_related_uuid(scanner_b.uuid)
-#    scanner_b.add_related_uuid(scanner_a.uuid)
-    SCANNERS[uuid_a].related_uuids += uuid_b
-    SCANNERS[uuid_b].related_uuids += uuid_a
