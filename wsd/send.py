@@ -138,7 +138,7 @@ async def send_subscr_ScanAvailableEvent(sae_uuid: str):
         "User-Agent": "WSDAPI",
     }
 
-    url = SCANNERS[tf_g_uuid].xaddr  # z.B. http://192.168.0.3:8018/wsd
+    url = SCANNERS[sae_uuid].xaddr  # z.B. http://192.168.0.3:8018/wsd
 
     logger.debug(f"   --->      TO: {sae_uuid}")
     logger.debug(f"   --->  MSG_ID: {msg_id}")
