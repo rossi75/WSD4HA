@@ -18,9 +18,11 @@ class Scanner:
 
         # WSD Parameters
         self.xaddr = xaddr            # Service-Adresse (aus <wsd:XAddrs>)
-        self.destination_token = None
         self.subscription_timeout = ""
         self.subscription_expires = None
+        self.subscription_id = None
+        self.subscription_ref = None
+        self.destination_token = None
 
         # zusätzliche optionale Infos
         self.friendly_name = "NoName"
