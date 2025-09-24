@@ -77,6 +77,8 @@ class STATE(str, Enum):
     CHK_SCAN_STATE = "Checking ScannerState"
     DONE_SCAN_STATE = "Done ScannerState"                                                  # 46
     ONLINE = "online"
+    ONLINE_CHK_1_2 = "online"                                                              # Hälfte der Zeit is rum
+    ONLINE_CHK_3_4 = "online"                                                              # 3/4 der Zeit is rum
     RECV_SCAN = "receiving a Scan"
     ABSENT = "absent"
     TO_REMOVE = "to remove"
