@@ -11,6 +11,7 @@ import time
 import threading
 import uuid
 import xml.etree.ElementTree as ET
+from datetime import timedelta
 from config import OFFLINE_TIMEOUT, LOCAL_IP, HTTP_PORT, FROM_UUID
 from globals import SCANNERS, list_scanners, NAMESPACES, STATE
 from pathlib import Path
