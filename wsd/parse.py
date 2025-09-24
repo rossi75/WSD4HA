@@ -216,8 +216,6 @@ def _parse_subscribe(subscr_uuid, xml_body):
     SCANNERS[subscr_uuid].state = STATE.SUBSCRIBED_SCAN_AVAIL_EVT
 
 
-
-
 # ---------------- Subscribe Parser ----------------
 #def parse_subscribe(xml_body: str) -> dict:
 def parse_subscribe(subscr_uuid, xml_body):
@@ -237,12 +235,12 @@ def parse_subscribe(subscr_uuid, xml_body):
         SCANNERS[subscr_uuid].state = STATE.ERROR
         return None
 
-    result = {
-        "expires_sec": None,
-        "subscription_id": None,
-        "subscription_ref": None,
-        "destination_token": None,
-    }
+ #   result = {
+ #       "expires_sec": None,
+ #       "subscription_id": None,
+ #       "subscription_ref": None,
+ #       "destination_token": None,
+ #   }
 
     # Expires (Duration -> Sekunden)
     expires_elem = root.find(".//wse:Expires", NAMESPACE)
@@ -275,7 +273,9 @@ def parse_subscribe(subscr_uuid, xml_body):
     logger.info(f"   --->      ref_id: {SCANNERS[subscr_uuid].subscription_ref}")
     logger.info(f"   --->  dest_token: {SCANNERS[subscr_uuid].destination_token}")
 
-    return result
+    SCANNERS[subscr_uuid].state = STATE.SUBSCRIBED_SCAN_AVAIL_EVT
+
+#    return result
 
 
 # ---------------- parse w3c timer ----------------
