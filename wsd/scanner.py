@@ -12,7 +12,7 @@ logger = logging.getLogger("wsd-addon")
 # ---------------- Scanner-Datenstruktur ----------------
 class Scanner:
     def __init__(self, uuid, ip = "0.0.0.0", xaddr = None):
-        logger.info(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} [SCANNER:__init__] New instance of Scanner with:")
+        logger.info(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} [SCANNER:__init__] New instance of Scanner")
         self.uuid = uuid
         self.ip = ip
 
@@ -48,17 +48,17 @@ class Scanner:
         self.state = STATE.ONLINE
         self.offline_since = None
         self.remove_after = None
-        logger.info(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} [SCANNER:upd] Updated timestamps for {self.friendly_name} ({self.ip}) with UUID {self.uuid}")
+        logger.info(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} [SCANNER:upd] Updated timestamps for {self.friendly_name} @ {self.ip} with UUID {self.uuid}")
         logger.debug(f"   ---> new last_seen: {self.last_seen}")
 
     # Scannerservice ist noch online
     # Aufruf mit SCANNER[uuid].updateservice()
     def updateservice(self, timeout = 3600):
-        self.subscription_expires = datetime.datetime.now().replace(microsecond=0) + 3600
+        self.subscription_expires = datetime.datetime.now().replace(microsecond=0) + timeout # später den PT-Wert decodieren
         self.state = STATE.ONLINE
         self.offline_since = None
         self.remove_after = None
-        logger.info(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} [SCANNER:updsvc] Updated timestamps for scanner subscription {self.friendly_name} ({self.ip}) with UUID {self.uuid}")
+        logger.info(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} [SCANNER:updsvc] Updated timestamps for scanner subscription {self.friendly_name} @ {self.ip} with UUID {self.uuid}")
         logger.info(f"   ---> new subscribtion expires: {self.subscription_expires}")
 
     # wird aufgerufen wenn ein Scanner offline gesetzt wird
@@ -68,18 +68,10 @@ class Scanner:
         if not self.offline_since:
             self.offline_since = datetime.datetime.now().replace(microsecond=0)
             self.remove_after = self.offline_since + datetime.timedelta(seconds=OFFLINE_TIMEOUT)
-        logger.info(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} [SCANNER:m_offl] marked {self.friendly_name} ({self.ip}) with UUID {self.uuid} as offline")
+        logger.info(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} [SCANNER:m_offl] marked {self.friendly_name} @ {self.ip} as offline")
         logger.debug(f"   -->         state: {self.state}")
         logger.debug(f"   --> offline_since: {self.offline_since}")
         logger.debug(f"   -->  remove_after: {self.remove_after}")
-
-    def _add_related_uuid(self, other_uuid: str):
-        logger.info(f"[SCANNER:relate] marry UUID {self.uuid} with {other_uuid}")
-        """
-        Verknüpft diesen Scanner mit einer weiteren UUID.
-        """
-        if other_uuid and other_uuid != self.uuid:
-            self.related_uuids.add(other_uuid)
 
 # ---------------- marry two endpoints ----------------
 def marry_endpoints(uuid_a: str, uuid_b: str):
