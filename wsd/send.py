@@ -48,10 +48,10 @@ async def send_probe(scanner):
                 if resp.status == 200:
                     body = await resp.text()
                 else:
-                    logger.warning(f"Probe failed with status {resp.status}")
+                    logger.error(f"Probe failed with status {resp.status}")
                     scanner.state = STATE.ABSENT
         except Exception as e:
-            logger.info(f"   ---> Probe fehlgeschlagen bei {url}: {e}")
+            logger.error(f"   ---> Probe fehlgeschlagen bei {url}: {e}")
             scanner.state = STATE.ABSENT
 
     logger.debug(f"ProbeMatch von {scanner.ip}:\n{body}")
