@@ -174,14 +174,11 @@ def parse_subscribe(subscr_uuid, xml_body):
         SCANNERS[subscr_uuid].state = STATE.ERROR
         return None
 
-    logger.info(f"Logpoint   A")
-
     # Expires (Duration -> Sekunden)
     expires_elem = root.find(".//wse:Expires", NAMESPACES)
     logger.info(f"   ---> expires_elem: {expires_elem.text.strip()}")
     if expires_elem is not None and expires_elem.text:
         try:
-            logger.info(f"Logpoint   C")
             SCANNERS[subscr_uuid].subscription_timeout = expires_elem.text.strip()
             SCANNERS[subscr_uuid].subscription_expires = datetime.datetime.now().replace(microsecond=0) + parse_w3c_duration(expires_elem.text.strip())
         except Exception as e:
@@ -189,13 +186,10 @@ def parse_subscribe(subscr_uuid, xml_body):
             SCANNERS[subscr_uuid].state = STATE.ERROR
             return None
 
-    logger.info(f"Logpoint   B")
-
     # Subscription ID (Header Identifier)
     subscr_id = ""
     subscr_id_elem = root.find(".//soap:Header/wse:Identifier", NAMESPACES)
     if subscr_id_elem is not None and subscr_id_elem.text:
-#        SCANNERS[subscr_uuid].subscription_id = subscr_id_elem.text.strip()
         subscr_id = subscr_id_elem.text.strip()
         if subscr_id.startswith("urn:"):
             subscr_id = subscr_id.replace("urn:", "")
@@ -207,12 +201,14 @@ def parse_subscribe(subscr_uuid, xml_body):
     ref_id = ""
     ref_id_elem = root.find(".//wsa:ReferenceParameters/wse:Identifier", NAMESPACES)
     if ref_id_elem is not None and ref_id_elem.text:
-#        SCANNERS[subscr_uuid].subscription_ref = ref_id_elem.text.strip()
         ref_id = ref_id_elem.text.strip()
+        logger.info(f"   --->      ref_id: {SCANNERS[subscr_uuid].subscription_ref}")
         if ref_id.startswith("urn:"):
             ref_id = ref_id.replace("urn:", "")
+        logger.info(f"   --->      ref_id: {SCANNERS[subscr_uuid].subscription_ref}")
         if ref_id.startswith("uuid:"):
             ref_id = ref_id.replace("uuid:", "")
+        logger.info(f"   --->      ref_id: {SCANNERS[subscr_uuid].subscription_ref}")
         SCANNERS[subscr_uuid].subscription_ref = ref_id_elem.text.strip()
 
     # DestinationToken
@@ -257,7 +253,7 @@ def parse_w3c_duration(duration: str) -> int:
     seconds = int(d['days']) * 86400 + int(d['hours']) * 3600 + int(d['minutes']) * 60 + int(d['seconds'])
     
     logger.debug(f"[PARSE:w3c_dur]   ---> d: {d}")
-    logger.info(f"[PARSE:w3c_dur]   ---> seconds: {seconds}")
+    logger.debug(f"[PARSE:w3c_dur]   ---> seconds: {seconds}")
 
     return timedelta(seconds = seconds)
 
