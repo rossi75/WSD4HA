@@ -168,7 +168,7 @@ async def state_monitor():
         now = datetime.datetime.now().replace(microsecond=0)
 
         for uuid, scanner in SCANNERS.items():
-            logger.info(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} [WSD:state_mon] Checking Timer and State for {SCANNERS[uuid].friendly_name} @ {scanner.ip}...")
+            logger.info(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} [WSD:state_mon] Checking Timer and State for {scanner.friendly_name} @ {scanner.ip}...")
             status = scanner.state.value
             age = (now - scanner.last_seen).total_seconds()
             logger.info(f"   -->     state: {status}")
@@ -185,7 +185,7 @@ async def state_monitor():
                         scanner.update()
                     except Exception as e:
                         scanner.state = STATE.ABSENT
-                        logger.warning(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} Could not reach scanner with UUID {uuid} and IP {ip}. Last seen at {scanner.last_seen}. Response is {str(e)}")
+                        logger.warning(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} Could not reach scanner with {scanner.friendly_name} @ {scanner.ip}. Last seen at {scanner.last_seen}. Response is {str(e)}")
     
                 # 3/4-Check
                 if age > (OFFLINE_TIMEOUT * 0.75) and age <= (OFFLINE_TIMEOUT * 0.75 + 30):
@@ -195,7 +195,7 @@ async def state_monitor():
                         asyncio.create_task(send_probe(uuid))
                         scanner.update()
                     except Exception as e:
-                        logger.warning(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} Could not reach scanner {SCANNERS[uuid].friendly_name} @ {ip}. Last seen at {scanner.last_seen}. Response is {str(e)}")
+                        logger.warning(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} Could not reach scanner {scanner.friendly_name} @ {scanner.ip}. Last seen at {scanner.last_seen}. Response is {str(e)}")
     
             if scanner.state in STATE.TF_GET_PARSED:
                 logger.info(f"[WSD:state_mon] Transfer/Get parsed, subscribing to EP...")
@@ -203,7 +203,8 @@ async def state_monitor():
                     asyncio.create_task(send_subscr_ScanAvailableEvent(uuid))
                 except Exception as e:
                     scanner.state = STATE.ERROR
-                    logger.warning(f"Anything went wrong while parsing the subscribe attempt from {SCANNERS[uuid].friendly_name} @ {ip}, response is {str(e)}")
+#                    logger.warning(f"Anything went wrong while parsing the subscribe attempt from {SCANNERS[uuid].friendly_name} @ {scanner.ip}, response is {str(e)}")
+                    logger.warning(f"Anything went wrong while parsing the subscribe attempt from {scanner.friendly_name} @ {scanner.ip}, response is {str(e)}")
 
             if scanner.state in STATE.PROBE_PARSED:
                 logger.info(f"[WSD:state_mon] probe parsed, get endpoint details...")
@@ -211,7 +212,7 @@ async def state_monitor():
                     asyncio.create_task(send_transfer_get(uuid))
                 except Exception as e:
                     scanner.state = STATE.ERROR
-                    logger.warning(f"Anything went wrong while parsing the XML-Probe from UUID {uuid} @ {ip}, response is {str(e)}")
+                    logger.warning(f"Anything went wrong while parsing the XML-Probe from {scanner.friendly_name} @ {scanner.ip}, response is {str(e)}")
 
             if scanner.state in STATE.DISCOVERED:
                 logger.info(f"[WSD:state_mon] Fresh discovered, now probing...")
@@ -221,7 +222,7 @@ async def state_monitor():
 #                    logger.info(f"[WSD:probe_mon]   LogPoint C")
                 except Exception as e:
                     scanner.state = STATE.ERROR
-                    logger.warning(f"Anything went wrong while probing the UUID {uuid} @ {ip}, response is {str(e)}")
+                    logger.warning(f"Anything went wrong while probing {scanner.friendly_name} @ {scanner.ip}, response is {str(e)}")
 
             # Timeout überschritten → offline markieren, damit werden alle Zwischenstati erschlagen, für den Fall dass was hängen geblieben ist und auch für ERROR
             if age > OFFLINE_TIMEOUT and scanner.state not in {STATE.ABSENT, STATE.TO_REMOVE}:
@@ -230,7 +231,7 @@ async def state_monitor():
 
             # Nach Ablauf von Timeout+Offline → entfernen
             if status in ("absent") and now >= scanner.remove_after:
-                logger.info(f"[WSD:Heartbeat] --> Marking {SCANNERS[uuid].friendly_name} @ {ip} to remove")
+                logger.info(f"[WSD:Heartbeat] --> Marking {SCANNERS[uuid].friendly_name} @ {scannerip} to remove")
                 to_remove.append(scanner)
 
             logger.info(f"    =====> state: {SCANNERS[uuid].state.value}")
@@ -238,7 +239,7 @@ async def state_monitor():
         # welche Scanner sollen entfernt werden?
         logger.debug(f"[WSD:Heartbeat] checking for Scanners to remove from known list")
         for s in to_remove:
-            logger.warning(f"[Heartbeat]     --> Removing {SCANNERS[uuid].friendly_name} @ {ip} from list")
+            logger.warning(f"[Heartbeat]     --> Removing {scanner.friendly_name} @ {scanner.ip} from list")
             del SCANNERS[scanner.uuid]
             list_scanners()
           
