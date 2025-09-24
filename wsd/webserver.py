@@ -19,6 +19,7 @@ logger = logging.getLogger("wsd-addon")
 # ---------------- WebUI ----------------
 async def status_page(request):
     logger.info(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} [WEBSERVER:status_page] received request for status page")
+
     # Dateien
     files = sorted(SCAN_FOLDER.iterdir(), reverse=True)[:MAX_FILES]
     file_list = ''
@@ -85,7 +86,7 @@ async def status_page(request):
 
 # ---------------- HTTP Server ----------------
 async def start_http_server():
-    logger.info(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} [WEBSERVER:start_http] configuring HTTP/SOAP Server on Port {HTTP_PORT}")
+    logger.info(f"[WEBSERVER:start_http] configuring HTTP/SOAP Server on Port {HTTP_PORT}")
     app = web.Application()
     app.router.add_get("/", status_page)
     logger.debug(f"   ---> added endpoint /")
@@ -127,22 +128,15 @@ async def notify_handler(request):
     # Acknowledge (200 OK). Some implement a SOAP response; many accept simple 200.
     return web.Response(status=200, text="alles juut")
 
-def _create_notify_app():
-    app = web.Application()
-    app.router.add_post("/", notify_handler)
-    return app
 
-
+# ---------------- NOTIFY Server ----------------
 async def start_notify_server():
-    logger.info(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} [WEBSERVER:start_notify] configuring Notify Server on Port {NOTIFY_PORT}")
+    logger.info(f"[WEBSERVER:start_notify] configuring Notify Server on Port {NOTIFY_PORT}")
     # parallel zum UI starten
 #from notify_server import create_notify_app
 
 #    loop = asyncio.get_event_loop()
 #    loop.create_task(web._run_app(create_notify_app(), port=5357))
-
-
-
 
     app = web.Application()
     app.router.add_get("/", status_page)
