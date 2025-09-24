@@ -1,0 +1,25 @@
+configuration:
+  offline_timeout:
+    name: Timeout
+    description: >-
+      Zeitinervall nachdem ein Probe Request ungültig wird. DHCP-like, also wird nach der Hälfte der Zeit ein neuer Probe Request gesendet
+  displayname:
+    name: Displayziel
+    description: >-
+      Eintrag der im Scanner als Ziel auftauchen soll
+  scan_folder:
+    name: Scan Verzeichnis
+    description: >-
+      Pfad zum Verzeichnis in dem die Scans gespeichert werden
+  max_files:
+    name: Max. Anzahl Dateien
+    description: >-
+      Wie viele eingescannte Dokumente sollen im Web-UI angezeigt werden?
+  log_level:
+    name: Log level
+    description: >-
+      Wie viele Informationen möchten wir im Log sehen?
+network:
+  8110/tcp: WSD4HA Webserver
+  5357/tcp: WSD4HA Fileserver
+#  3702/udp: port to receive the WSD notifications
