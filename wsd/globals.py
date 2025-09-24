@@ -87,7 +87,7 @@ def list_scanners():
     logger.info("[SCANNERS] registered Scanners:")
 
     for i, s in enumerate(SCANNERS.values(), start=1):
-        logger.info(f"[{i}] {s.friendly_name} IP={s.ip} UUID={s.uuid} State={s.state.value}")
+        logger.info(f"[{i}] {s.friendly_name} @ {s.ip}   UUID={s.uuid}")
         logger.info(f"      --->     XADDR: {s.xaddr}")
-        logger.debug(f"      ---> last_seen: {s.last_seen}")
         logger.info(f"      --->    Status: {s.state.value}")
+        logger.debug(f"      ---> last_seen: {s.last_seen}")
