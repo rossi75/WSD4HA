@@ -163,41 +163,23 @@ async def UDP_listener_3702():
 # ---------------- Scanner Probe ----------------
 async def state_monitor():
     while True:
-        logger.debug(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} [WSD:Probe] wake-up")
+        logger.debug(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} [WSD:state_mon] wake-up")
         to_remove = []
         now = datetime.datetime.now().replace(microsecond=0)
 
         for uuid, scanner in SCANNERS.items():
-            logger.info(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} [WSD:Probe] Checking Timer and State for {uuid} ({scanner.ip})...")
+            logger.info(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} [WSD:state_mon] Checking Timer and State for {uuid} ({scanner.ip})...")
             status = scanner.state.value
             age = (now - scanner.last_seen).total_seconds()
             logger.info(f"   -->     state: {status}")
             logger.info(f"   --> last_seen: {scanner.last_seen}")
             logger.info(f"   -->       age: {age} seconds")
 
-            if scanner.state in STATE.PROBE_PARSED:
-                logger.info(f"[WSD:probe_mon] probe parsed, get endpoint details...")
-                try:
-                    asyncio.create_task(send_transfer_get(uuid))
-                except Exception as e:
-                    scanner.state = STATE.ERROR
-                    logger.warning(f"Anything went wrong while parsing the XML-Probe from UUID {uuid} @ {ip}, response is {str(e)}")
-
-            if scanner.state in STATE.DISCOVERED:
-                logger.info(f"[WSD:probe_mon] Fresh discovered, now probing...")
-                try:
-                    logger.info(f"[WSD:probe_mon]   LogPoint B")
-                    asyncio.create_task(send_probe(scanner))
-                    logger.info(f"[WSD:probe_mon]   LogPoint C")
-                except Exception as e:
-                    scanner.state = STATE.ERROR
-                    logger.warning(f"Anything went wrong while probing the UUID {uuid} @ {ip}, response is {str(e)}")
-
             if scanner.state in STATE.ONLINE:
                 # Halbzeit-Check
                 if age > OFFLINE_TIMEOUT / 2 and age <= (OFFLINE_TIMEOUT / 2 + 30):
 #                if age > OFFLINE_TIMEOUT / 2 and age <= (OFFLINE_TIMEOUT ):
-                    logger.info(f"[WSD:Probe] --> proceeding Halbzeit-Check")
+                    logger.warning(f"[WSD:Hearbeat] --> proceeding Halbzeit-Check")
                     try:
                         asyncio.create_task(send_probe(uuid))
                         scanner.update()
@@ -208,16 +190,42 @@ async def state_monitor():
                 # 3/4-Check
                 if age > (OFFLINE_TIMEOUT * 0.75) and age <= (OFFLINE_TIMEOUT * 0.75 + 30):
 #                if age > (OFFLINE_TIMEOUT * 0.75) and age <= (OFFLINE_TIMEOUT * 0.75):
-                    logger.info(f"[WSD:Heartbeat] --> proceeding Viertel-Check")
+                    logger.warning(f"[WSD:Heartbeat] --> proceeding Viertel-Check")
                     try:
                         asyncio.create_task(send_probe(uuid))
                         scanner.update()
                     except Exception as e:
                         logger.warning(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} Could not reach scanner with UUID {uuid} and IP {ip}. Last seen at {scanner.last_seen}. Response is {str(e)}")
     
+            if scanner.state in STATE.TF_GET_PARSED:
+                logger.info(f"[WSD:state_mon] transfer_get parsed, subscribing to EP...")
+                try:
+                    asyncio.create_task(send_subscr_ScanAvailableEvent(uuid))
+                except Exception as e:
+                    scanner.state = STATE.ERROR
+                    logger.warning(f"Anything went wrong while parsing the subscribe attempt from UUID {uuid} @ {ip}, response is {str(e)}")
+
+            if scanner.state in STATE.PROBE_PARSED:
+                logger.info(f"[WSD:state_mon] probe parsed, get endpoint details...")
+                try:
+                    asyncio.create_task(send_transfer_get(uuid))
+                except Exception as e:
+                    scanner.state = STATE.ERROR
+                    logger.warning(f"Anything went wrong while parsing the XML-Probe from UUID {uuid} @ {ip}, response is {str(e)}")
+
+            if scanner.state in STATE.DISCOVERED:
+                logger.info(f"[WSD:state_mon] Fresh discovered, now probing...")
+                try:
+#                    logger.info(f"[WSD:state_mon]   LogPoint B")
+                    asyncio.create_task(send_probe(scanner))
+#                    logger.info(f"[WSD:probe_mon]   LogPoint C")
+                except Exception as e:
+                    scanner.state = STATE.ERROR
+                    logger.warning(f"Anything went wrong while probing the UUID {uuid} @ {ip}, response is {str(e)}")
+
             # Timeout überschritten → offline markieren, damit werden alle Zwischenstati erschlagen, für den Fall dass was hängen geblieben ist und auch für ERROR
             if age > OFFLINE_TIMEOUT and scanner.state not in {STATE.ABSENT, STATE.TO_REMOVE}:
-                logger.info(f"[WSD:Heartbeat] --> mark as offline")
+                logger.warning(f"[WSD:Heartbeat] --> mark as offline")
                 scanner.mark_absent()
 
             # Nach Ablauf von Timeout+Offline → entfernen
@@ -234,7 +242,6 @@ async def state_monitor():
             del SCANNERS[scanner.uuid]
             list_scanners()
           
-        logger.debug(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} [WSD:sleep] goodbye")
         if any (scanner.state not in {STATE.ABSENT,
                                       STATE.ONLINE,
                                       STATE.RECV_SCAN,
@@ -244,6 +251,7 @@ async def state_monitor():
             logger.debug(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} [WSD:sleep] short nap")
             await asyncio.sleep(2)
         else:
+            logger.debug(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} [WSD:sleep] goodbye")
             await asyncio.sleep(OFFLINE_TIMEOUT / 4)
         logger.debug(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} [WSD:sleep] back in town")
 
