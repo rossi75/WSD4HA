@@ -54,7 +54,7 @@ async def send_probe(scanner):
             logger.info(f"   ---> Probe fehlgeschlagen bei {url}: {e}")
             scanner.state = STATE.ABSENT
 
-    logger.info(f"ProbeMatch von {scanner.ip}:\n{body}")
+    logger.debug(f"ProbeMatch von {scanner.ip}:\n{body}")
     parse_probe(body, scanner.uuid)
 
 #    logger.debug(f"   ---> Statuscode: {resp.status}")
