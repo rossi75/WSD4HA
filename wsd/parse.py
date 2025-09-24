@@ -192,13 +192,27 @@ def parse_subscribe(subscr_uuid, xml_body):
     logger.info(f"Logpoint   B")
 
     # Subscription ID (Header Identifier)
+    subscr_id = ""
     subscr_id_elem = root.find(".//soap:Header/wse:Identifier", NAMESPACES)
     if subscr_id_elem is not None and subscr_id_elem.text:
-        SCANNERS[subscr_uuid].subscription_id = subscr_id_elem.text.strip()
-
+#        SCANNERS[subscr_uuid].subscription_id = subscr_id_elem.text.strip()
+        subscr_id = subscr_id_elem.text.strip()
+        if subscr_id.startswith("urn:"):
+            subscr_id = subscr_id.replace("urn:", "")
+        if subscr_id.startswith("uuid:"):
+            subscr_id = subscr_id.replace("uuid:", "")
+        SCANNERS[subscr_uuid].subscription_id = subscr_id
+                
     # ReferenceParameters -> Identifier
+    ref_id = ""
     ref_id_elem = root.find(".//wsa:ReferenceParameters/wse:Identifier", NAMESPACES)
     if ref_id_elem is not None and ref_id_elem.text:
+#        SCANNERS[subscr_uuid].subscription_ref = ref_id_elem.text.strip()
+        ref_id = ref_id_elem.text.strip()
+        if ref_id.startswith("urn:"):
+            ref_id = ref_id.replace("urn:", "")
+        if ref_id.startswith("uuid:"):
+            ref_id = ref_id.replace("uuid:", "")
         SCANNERS[subscr_uuid].subscription_ref = ref_id_elem.text.strip()
 
     # DestinationToken
