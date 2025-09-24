@@ -30,7 +30,7 @@ NAMESPACES = {
 # + neuer scanner wird zu oft erkannt
 
 # ---------------- Logging ----------------
-LOG_LEVEL = os.environ.get("LOG_LEVEL", "INFO").upper()
+#LOG_LEVEL = os.environ.get("LOG_LEVEL", "INFO").upper()
 LOG_LEVEL = os.environ.get("LOG_LEVEL", "DEBUG").upper()
 # dynamisches loglevel
 #logging.basicConfig(
@@ -61,8 +61,18 @@ try:
     HTTP_PORT = int(raw)  # Sekunden
 except ValueError:
     HTTP_PORT = 8110  # Fallback vom Fallback
-    logger.debug(f"Reset to fallback Port (should never reach this point)")
+    logger.debug(f"HTTP-Port Reset to fallback value 8110 (should never reach this point)")
 logger.info(f"HTTP-Port for UI: {HTTP_PORT}")
+
+# ---------------- NOTIFY-Port ----------------
+raw = int(os.environ.get("NOTIFY_PORT", 5357))
+logger.debug(f"NOTIFY-Port from Environment: {raw}")
+try:
+    NOTIFY_PORT = int(raw)  # Sekunden
+except ValueError:
+    NOTIFY_PORT = 5357  # Fallback vom Fallback
+    logger.debug(f"NOTIFY-Port Reset to fallback value 5357 (should never reach this point)")
+logger.info(f"NOTIFY-Port for Scan Events: {NOTIFY_PORT}")
 
 # ---------------- UUID ----------------
 FROM_UUID = f"{uuid.uuid4()}"
