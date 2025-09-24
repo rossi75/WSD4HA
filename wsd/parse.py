@@ -164,6 +164,7 @@ def parse_transfer_get(xml_body, tf_g_uuid):
     SCANNERS[tf_g_uuid].state = STATE.TF_GET_PARSED
 
 
+# ---------------- Pick Best XADDR from String ----------------
 def pick_best_xaddr(xaddrs: str) -> str:
     """
     Wählt aus einer Liste von XAddrs den besten Kandidaten:
