@@ -198,7 +198,7 @@ async def state_monitor():
                         logger.warning(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} Could not reach scanner {SCANNERS[uuid].friendly_name} @ {ip}. Last seen at {scanner.last_seen}. Response is {str(e)}")
     
             if scanner.state in STATE.TF_GET_PARSED:
-                logger.info(f"[WSD:state_mon] transfer_get parsed, subscribing to EP...")
+                logger.info(f"[WSD:state_mon] Transfer/Get parsed, subscribing to EP...")
                 try:
                     asyncio.create_task(send_subscr_ScanAvailableEvent(uuid))
                 except Exception as e:
