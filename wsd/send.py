@@ -57,9 +57,7 @@ async def send_probe(scanner):
     logger.debug(f"ProbeMatch von {scanner.ip}:\n{body}")
     parse_probe(body, scanner.uuid)
 
-#    logger.debug(f"   ---> Statuscode: {resp.status}")
-    logger.info(f"   ---> Statuscode: {resp.status}")
-
+    logger.debug(f"   ---> Statuscode: {resp.status}")
 
 # ---------------- Send Transfer_Get ----------------
 async def send_transfer_get(tf_g_uuid: str):
@@ -121,6 +119,7 @@ async def send_subscr_ScanAvailableEvent(sae_uuid: str):
     
     SCANNERS[sae_uuid].state = STATE.SUBSCRIBING_SCAN_AVAIL_EVT
     msg_id = uuid.uuid4()
+    ref_id = uuid.uuid4()
 
     xml = TEMPLATE_SUBSCRIBE_SAE.format(
         to_device_uuid = sae_uuid,
@@ -128,9 +127,9 @@ async def send_subscr_ScanAvailableEvent(sae_uuid: str):
         from_uuid = FROM_UUID,
         xaddr = SCANNERS[sae_uuid].xaddr,
         EndTo_addr = "http://192.168.0.10:5357/asdjkfhewjkhauiscndiausdnue",
-#        scan_to_name = "Scan To Home Assistant"
         scan_to_name = DISPLAY,
-        Ref_ID = "680be7cf-bc5a-409d-ad1d-4d6d96b5cb4f",
+#        Ref_ID = "680be7cf-bc5a-409d-ad1d-4d6d96b5cb4f",
+        Ref_ID = ref_id,
     )
 
     headers = {
@@ -147,7 +146,7 @@ async def send_subscr_ScanAvailableEvent(sae_uuid: str):
     logger.debug(f"   --->    NAME: {DISPLAY}")
     #logger.debug(f"   --->  REF_ID: {msg_id}")
     logger.info(f"   --->     URL: {url}")
-    logger.info(f"   --->     XML:\n{xml}")
+    logger.debug(f"   --->     XML:\n{xml}")
 
     body = ""
 
@@ -165,6 +164,6 @@ async def send_subscr_ScanAvailableEvent(sae_uuid: str):
             SCANNERS[tf_g_uuid].state = STATE.ERROR
             return None
  
-    logger.info(f"ScanAvailableEvents von {SCANNERS[sae_uuid].ip}:\n{body}")
+    logger.info(f"received ScanAvailableEvents from {SCANNERS[sae_uuid].ip} as XML:\n{body}")
     parse_subscribe(sae_uuid, body)
 
