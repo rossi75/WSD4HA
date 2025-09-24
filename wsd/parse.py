@@ -243,7 +243,7 @@ def parse_subscribe(subscr_uuid, xml_body):
  #   }
 
     # Expires (Duration -> Sekunden)
-    expires_elem = root.find(".//wse:Expires", NAMESPACE)
+    expires_elem = root.find(".//wse:Expires", NAMESPACES)
     if expires_elem is not None and expires_elem.text:
         try:
             SCANNERS[subscr_uuid].subscription_timeout = expires_elem
@@ -252,17 +252,17 @@ def parse_subscribe(subscr_uuid, xml_body):
             logger.warning(f"[PARSE:subscr] Could not parse Expires: {e}")
 
     # Subscription ID (Header Identifier)
-    subscr_id_elem = root.find(".//soap:Header/wse:Identifier", NAMESPACE)
+    subscr_id_elem = root.find(".//soap:Header/wse:Identifier", NAMESPACES)
     if subscr_id_elem is not None and subscr_id_elem.text:
         SCANNERS[subscr_uuid].subscription_id = subscr_id_elem.text.strip()
 
     # ReferenceParameters -> Identifier
-    ref_id_elem = root.find(".//wsa:ReferenceParameters/wse:Identifier", NAMESPACE)
+    ref_id_elem = root.find(".//wsa:ReferenceParameters/wse:Identifier", NAMESPACES)
     if ref_id_elem is not None and ref_id_elem.text:
         SCANNERS[subscr_uuid].subscription_ref = ref_id_elem.text.strip()
 
     # DestinationToken
-    dest_token_elem = root.find(".//wscn:DestinationToken", NAMESPACE)
+    dest_token_elem = root.find(".//wscn:DestinationToken", NAMESPACES)
     if dest_token_elem is not None and dest_token_elem.text:
         SCANNERS[subscr_uuid].destination_token = dest_token_elem.text.strip()
 
