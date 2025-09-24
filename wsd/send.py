@@ -164,6 +164,6 @@ async def send_subscr_ScanAvailableEvent(sae_uuid: str):
             SCANNERS[tf_g_uuid].state = STATE.ERROR
             return None
  
-    logger.info(f"received ScanAvailableEvents from {SCANNERS[sae_uuid].ip} as XML:\n{body}")
+#    logger.debug(f"received ScanAvailableEvents from {SCANNERS[sae_uuid].ip} as XML:\n{body}")
     parse_subscribe(sae_uuid, body)
 
