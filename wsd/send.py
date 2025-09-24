@@ -23,7 +23,7 @@ logger = logging.getLogger("wsd-addon")
 
 # ---------------- Send Scanner Probe ----------------
 async def send_probe(scanner):
-    logger.info(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} [WSD:send_probe] sending probe for {scanner.uuid} @ {scanner.ip}")
+    logger.info(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} [SEND:send_probe] sending probe for {scanner.uuid} @ {scanner.ip}")
 
     scanner.state = STATE.PROBING
     msg_id = uuid.uuid4()
@@ -63,7 +63,7 @@ async def send_probe(scanner):
 
 # ---------------- Send Transfer_Get ----------------
 async def send_transfer_get(tf_g_uuid: str):
-    logger.info(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} [WSD:transfer_get] sending Transfer/Get to {tf_g_uuid} @ {SCANNERS[tf_g_uuid].ip}")
+    logger.info(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} [SEND:transfer_get] sending Transfer/Get to {tf_g_uuid} @ {SCANNERS[tf_g_uuid].ip}")
     
     SCANNERS[tf_g_uuid].state = STATE.TF_GET_PENDING
     msg_id = uuid.uuid4()
@@ -81,11 +81,11 @@ async def send_transfer_get(tf_g_uuid: str):
 
     url = SCANNERS[tf_g_uuid].xaddr  # z.B. http://192.168.0.3:8018/wsd
 
-    logger.info(f"   --->    FROM: {FROM_UUID}")
-    logger.info(f"   --->      TO: {tf_g_uuid}")
-    logger.info(f"   --->  MSG_ID: {msg_id}")
-    logger.info(f"   --->     URL: {url}")
-    logger.info(f"   --->     XML:\n{xml}")
+    logger.debug(f"   --->    FROM: {FROM_UUID}")
+    logger.debug(f"   --->      TO: {tf_g_uuid}")
+    logger.debug(f"   --->  MSG_ID: {msg_id}")
+    logger.debug(f"   --->     URL: {url}")
+    logger.debug(f"   --->     XML:\n{xml}")
 
     body = ""
 
@@ -117,7 +117,7 @@ async def send_subscr_ScanAvailableEvent(sae_uuid: str):
     # EndTo_addr = adress that needs to be reachable by the scanner  ==>  <wsa:Address>http://192.168.0.1:5357/6ccf7716-4dc8-47bf-aca4-5a2ae5a959ca</wsa:Address>
     # scan_to_name = Option selected by the user to start the scanning  ==>  "Scan to Home Assistant"
     # Ref_ID = one more senseless ID  ==>  <wse:Identifier>urn:uuid:680be7cf-bc5a-409d-ad1d-4d6d96b5cb4f</wse:Identifier>
-    logger.info(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} [SEND:sae] subscribing ScanAvailableEvent to {sae_uuid} @ {SCANNERS[sae_uuid].ip}")
+    logger.info(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} [SEND:subscr_sae] subscribing ScanAvailableEvent to {sae_uuid} @ {SCANNERS[sae_uuid].ip}")
     
     SCANNERS[sae_uuid].state = STATE.SUBSCRIBING_SCAN_AVAIL_EVT
     msg_id = uuid.uuid4()
