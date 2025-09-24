@@ -111,7 +111,8 @@ TEMPLATE_SUBSCRIBE_SAE = """<?xml version="1.0" encoding="utf-8"?>
           <sca:ClientContext>
             Scan
           </sca:ClientContext>
-      </sca:ScanDestination>
+        </sca:ScanDestination>
+      </sca:ScanDestinations>
     </wse:Subscribe>
   </soap:Body>
 </soap:Envelope>
