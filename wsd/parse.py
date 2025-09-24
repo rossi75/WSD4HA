@@ -156,7 +156,7 @@ def parse_transfer_get(xml_body, tf_g_uuid):
     SCANNERS[tf_g_uuid].state = STATE.TF_GET_PARSED
 
 # !!! ---------------- Subscribe Parser not !! ----------------
-def parse_subscribe(subscr_uuid, xml_body):
+def _parse_subscribe(subscr_uuid, xml_body):
     logger.info(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} [PARSE:parse_subscribe] parsing SubscribeResponse for {SCANNERS[subscr_uuid].friendly_name} at {SCANNERS[subscr_uuid].ip}")
     logger.info(f"XML:\n{xml_body}")
 
@@ -219,16 +219,23 @@ def parse_subscribe(subscr_uuid, xml_body):
 
 
 # ---------------- Subscribe Parser ----------------
-def parse_subscribe(xml_body: str) -> dict:
+#def parse_subscribe(xml_body: str) -> dict:
+def parse_subscribe(subscr_uuid, xml_body):
     """
     Parse SubscribeResponse and extract:
         expires_sec, subscription_id, subscription_ref, destination_token
     """
+    logger.info(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} [PARSE:parse_subscribe] parsing SubscribeResponse for {SCANNERS[subscr_uuid].friendly_name} at {SCANNERS[subscr_uuid].ip}")
+    logger.info(f"XML:\n{xml_body}")
+
+    SCANNERS[subscr_uuid].state = STATE.CHK_SCAN_AVAIL_EVT
+
     try:
         root = ET.fromstring(xml_body)
     except ET.ParseError as e:
-        logger.error(f"[WSD:parse_subscribe_response] XML ParseError: {e}")
-        return {}
+        logger.warning(f"[PARSE:subscr] Error while parsing subscribe response: {e}")
+        SCANNERS[subscr_uuid].state = STATE.ERROR
+        return None
 
     result = {
         "expires_sec": None,
@@ -241,30 +248,33 @@ def parse_subscribe(xml_body: str) -> dict:
     expires_elem = root.find(".//wse:Expires", NAMESPACE)
     if expires_elem is not None and expires_elem.text:
         try:
-            result["expires_sec"] = parse_w3c_duration(expires_elem.text.strip())
+            SCANNERS[subscr_uuid].subscription_timeout = expires_elem
+            SCANNERS[subscr_uuid].subscription_expires = datetime.datetime.now().replace(microsecond=0) + parse_w3c_duration(expires_elem.text.strip())
         except Exception as e:
-            logger.warning(f"[WSD:parse_subscribe_response] Could not parse Expires: {e}")
+            logger.warning(f"[PARSE:subscr] Could not parse Expires: {e}")
 
     # Subscription ID (Header Identifier)
-    sub_id_elem = root.find(".//soap:Header/wse:Identifier", NAMESPACE)
-    if sub_id_elem is not None and sub_id_elem.text:
-        result["subscription_id"] = sub_id_elem.text.strip()
+    subscr_id_elem = root.find(".//soap:Header/wse:Identifier", NAMESPACE)
+    if subscr_id_elem is not None and subscr_id_elem.text:
+        SCANNERS[subscr_uuid].subscription_id = subscr_id_elem.text.strip()
 
     # ReferenceParameters -> Identifier
     ref_id_elem = root.find(".//wsa:ReferenceParameters/wse:Identifier", NAMESPACE)
     if ref_id_elem is not None and ref_id_elem.text:
-        result["subscription_ref"] = ref_id_elem.text.strip()
+        SCANNERS[subscr_uuid].subscription_ref = ref_id_elem.text.strip()
 
     # DestinationToken
     dest_token_elem = root.find(".//wscn:DestinationToken", NAMESPACE)
     if dest_token_elem is not None and dest_token_elem.text:
-        result["destination_token"] = dest_token_elem.text.strip()
+        SCANNERS[subscr_uuid].destination_token = dest_token_elem.text.strip()
 
-    logger.info(
-        f"[WSD:parse_subscribe_response] Expires={result['expires_sec']}s "
-        f"SubID={result['subscription_id']} RefID={result['subscription_ref']} "
-        f"Token={result['destination_token']}"
-    )
+    logger.info(f"   --->        UUID: {subscr_uuid}")
+    logger.info(f"   --->     timeout: {SCANNERS[subscr_uuid].subscription_timeout}")
+    logger.info(f"   --->     expires: {SCANNERS[subscr_uuid].subscription_expires}")
+    logger.info(f"   --->   subscr_id: {SCANNERS[subscr_uuid].subscription_id}")
+    logger.info(f"   --->      ref_id: {SCANNERS[subscr_uuid].subscription_ref}")
+    logger.info(f"   --->  dest_token: {SCANNERS[subscr_uuid].destination_token}")
+
     return result
 
 
