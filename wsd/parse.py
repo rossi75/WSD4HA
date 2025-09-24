@@ -177,7 +177,7 @@ def parse_subscribe(subscr_uuid, xml_body):
 
     # Expires (Duration -> Sekunden)
     expires_elem = root.find(".//wse:Expires", NAMESPACES)
-    logger.info(f"   ---> expires_elem: {expires_elem}")
+    logger.info(f"   ---> expires_elem: {expires_elem.text.strip()}")
     if expires_elem is not None and expires_elem.text:
         try:
             logger.info(f"Logpoint   C")
@@ -236,12 +236,15 @@ def parse_w3c_duration(duration: str) -> int:
         return 0
     d = m.groupdict(default='0')
     logger.info(f"[PARSE:w3c_dur]   ---> d: {d}")
-    return (
-        int(d['days'])   * 86400 +
-        int(d['hours'])  * 3600  +
-        int(d['minutes']) * 60   +
-        int(d['seconds'])
-    )
+    seconds = int(d['days']) * 86400 + int(d['hours']) * 3600 + int(d['minutes']) * 60 + int(d['seconds'])
+    logger.info(f"[PARSE:w3c_dur]   ---> seconds: {d}")
+    return seconds
+#    return (
+#        int(d['days'])   * 86400 +
+#        int(d['hours'])  * 3600  +
+#        int(d['minutes']) * 60   +
+ #       int(d['seconds'])
+ #   )
 
 # ---------------- Pick Best XADDR from String ----------------
 def pick_best_xaddr(xaddrs: str) -> str:
