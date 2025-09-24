@@ -70,10 +70,12 @@ FROM_UUID = f"{uuid.uuid4()}"
 logger.info(f"FROM_UUID: {FROM_UUID}")
 
 # ---------------- Display Entry ----------------
-raw = int(os.environ.get("DISPLAY_ENTRY", "Scan to HA FB"))
+#raw = int(os.environ.get("DISPLAY_ENTRY", "Scan to HA FB"))
+raw = os.environ.get("DISPLAY_ENTRY", "Scan to HA FB")
 logger.info(f"Display Entry from Environment: {raw}")
 try:
-    DISPLAY = int(raw)  # Sekunden
+#    DISPLAY = int(raw)  # Sekunden
+    DISPLAY = raw  # Sekunden
 except ValueError:
     DISPLAY = "Scan to Homeassistant FB"  # Fallback vom Fallback
     logger.debug(f"Reset to fallback Display setting (should never reach this point)")
