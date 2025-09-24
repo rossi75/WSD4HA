@@ -155,69 +155,7 @@ def parse_transfer_get(xml_body, tf_g_uuid):
 
     SCANNERS[tf_g_uuid].state = STATE.TF_GET_PARSED
 
-# !!! ---------------- Subscribe Parser not !! ----------------
-def _parse_subscribe(subscr_uuid, xml_body):
-    logger.info(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} [PARSE:parse_subscribe] parsing SubscribeResponse for {SCANNERS[subscr_uuid].friendly_name} at {SCANNERS[subscr_uuid].ip}")
-    logger.info(f"XML:\n{xml_body}")
-
-    SCANNERS[subscr_uuid].state = STATE.CHK_SCAN_AVAIL_EVT
-
-    try:
-        root = ET.fromstring(xml_body)
-    except Exception as e:
-        logger.warning(f"[PARSE:subscr] Error while parsing subscribe: {e}")
-        SCANNERS[subscr_uuid].state = STATE.ERROR
-        return None
-
-    logger.info(f"[PARSE:parse_subscr]   LogPoint A")
-
-    # FriendlyName
-    fn_elem = root.find(".//wsdp:FriendlyName", NAMESPACES)
-    if fn_elem is not None:
-        SCANNERS[tf_g_uuid].friendly_name = fn_elem.text.strip()
-
-    logger.info(f"[PARSE:parse_subscr]   LogPoint A")
-
-    # SerialNumber
-    sn_elem = root.find(".//wsdp:SerialNumber", NAMESPACES)
-    if sn_elem is not None:
-        SCANNERS[tf_g_uuid].serial_number = sn_elem.text.strip()
-
-    logger.info(f"[PARSE:parse_subscr]   LogPoint A")
-
-    # Firmware
-    fw_elem = root.find(".//wsdp:FirmwareVersion", NAMESPACES)
-    if fw_elem is not None:
-        SCANNERS[tf_g_uuid].firmware = fw_elem.text.strip()
-
-    logger.info(f"[WSD:parse_tg]   LogPoint M")
-
-    # Hosted Services (Scan, Print, …)
-    SCANNERS[tf_g_uuid].services = {}
-    for hosted in root.findall(".//wsdp:Hosted", NAMESPACES):
-        addr_elem = hosted.find(".//wsa:Address", NAMESPACES)
-        type_elem = hosted.find(".//wsdp:Types", NAMESPACES)
-        if addr_elem is not None and type_elem is not None:
-            addr = addr_elem.text.strip()
-            types = type_elem.text.strip()
-            logger.info(f" TYPES: {types}")
-            if "ScannerServiceType" in types:
-                SCANNERS[tf_g_uuid].xaddr = addr
-            logger.info(f"  ADDR: {SCANNERS[tf_g_uuid].xaddr}")
-
-    logger.info(f"[PARSE:parse_subscr]   LogPoint A")
-
-#                SCANNERS[tf_g_uuid].services["scan"] = addr
-
-#    logger.info(f"   ---> FN: {SCANNERS[tf_g_uuid].friendly_name}")
-#    logger.info(f"   ---> SN: {SCANNERS[tf_g_uuid].serial_number}")
-#    logger.info(f"   ---> FW: {SCANNERS[tf_g_uuid].firmware}")
-
-    SCANNERS[subscr_uuid].state = STATE.SUBSCRIBED_SCAN_AVAIL_EVT
-
-
 # ---------------- Subscribe Parser ----------------
-#def parse_subscribe(xml_body: str) -> dict:
 def parse_subscribe(subscr_uuid, xml_body):
     """
     Parse SubscribeResponse and extract:
@@ -235,6 +173,8 @@ def parse_subscribe(subscr_uuid, xml_body):
         SCANNERS[subscr_uuid].state = STATE.ERROR
         return None
 
+    logger.info(f"Logpoint   A")
+
  #   result = {
  #       "expires_sec": None,
  #       "subscription_id": None,
@@ -244,12 +184,18 @@ def parse_subscribe(subscr_uuid, xml_body):
 
     # Expires (Duration -> Sekunden)
     expires_elem = root.find(".//wse:Expires", NAMESPACES)
+    logger.info(f"   ---> expires_elem: {expires_elem}")
     if expires_elem is not None and expires_elem.text:
         try:
+            logger.info(f"Logpoint   C")
             SCANNERS[subscr_uuid].subscription_timeout = expires_elem
             SCANNERS[subscr_uuid].subscription_expires = datetime.datetime.now().replace(microsecond=0) + parse_w3c_duration(expires_elem.text.strip())
         except Exception as e:
             logger.warning(f"[PARSE:subscr] Could not parse Expires: {e}")
+            SCANNERS[tf_g_uuid].state = STATE.ERROR
+            return None
+
+    logger.info(f"Logpoint   B")
 
     # Subscription ID (Header Identifier)
     subscr_id_elem = root.find(".//soap:Header/wse:Identifier", NAMESPACES)
@@ -285,6 +231,7 @@ def parse_w3c_duration(duration: str) -> int:
     Wandelt W3C/ISO8601 Duration (z.B. 'PT1H30M') in Sekunden um.
     Unterstützt Tage, Stunden, Minuten, Sekunden.
     """
+    logger.info(f"[PARSE:w3c_dur]   ---> duration: {duration}")
     pattern = (
         r'P'                                  # Beginn 'P'
         r'(?:(?P<days>\d+)D)?'                # Tage
@@ -298,6 +245,7 @@ def parse_w3c_duration(duration: str) -> int:
     if not m:
         return 0
     d = m.groupdict(default='0')
+    logger.info(f"[PARSE:w3c_dur]   ---> d: {d}")
     return (
         int(d['days'])   * 86400 +
         int(d['hours'])  * 3600  +
