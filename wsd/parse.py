@@ -221,7 +221,9 @@ def parse_w3c_duration(duration: str) -> int:
     Wandelt W3C/ISO8601 Duration (z.B. 'PT1H30M') in Sekunden um.
     Unterstützt Tage, Stunden, Minuten, Sekunden.
     """
-    logger.info(f"[PARSE:w3c_dur]   ---> duration: {duration}")
+    
+    logger.debug(f"[PARSE:w3c_dur]   ---> duration: {duration}")
+    
     pattern = (
         r'P'                                  # Beginn 'P'
         r'(?:(?P<days>\d+)D)?'                # Tage
@@ -231,20 +233,18 @@ def parse_w3c_duration(duration: str) -> int:
         r'(?:(?P<seconds>\d+)S)?'
         r')?'
     )
+    
     m = re.match(pattern, duration)
     if not m:
         return 0
     d = m.groupdict(default='0')
-    logger.info(f"[PARSE:w3c_dur]   ---> d: {d}")
+    
     seconds = int(d['days']) * 86400 + int(d['hours']) * 3600 + int(d['minutes']) * 60 + int(d['seconds'])
-    logger.info(f"[PARSE:w3c_dur]   ---> seconds: {d}")
-    return seconds
-#    return (
-#        int(d['days'])   * 86400 +
-#        int(d['hours'])  * 3600  +
-#        int(d['minutes']) * 60   +
- #       int(d['seconds'])
- #   )
+    
+    logger.debug(f"[PARSE:w3c_dur]   ---> d: {d}")
+    logger.info(f"[PARSE:w3c_dur]   ---> seconds: {seconds}")
+
+    return timedelta(seconds)
 
 # ---------------- Pick Best XADDR from String ----------------
 def pick_best_xaddr(xaddrs: str) -> str:
