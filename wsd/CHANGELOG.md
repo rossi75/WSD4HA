@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.18.x - 2025-09-24
+- port 5357 should be available for notifications
+- subscribed for scan events
+
 ## 0.0.3_ – 2025-09-11
 - change weather
 
