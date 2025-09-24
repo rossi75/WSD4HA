@@ -11,7 +11,7 @@ import time
 import threading
 import uuid
 import xml.etree.ElementTree as ET
-from config import OFFLINE_TIMEOUT, LOCAL_IP, HTTP_PORT, FROM_UUID
+from config import OFFLINE_TIMEOUT, LOCAL_IP, HTTP_PORT, FROM_UUID, DISPLAY
 from globals import SCANNERS, list_scanners, NAMESPACES, STATE
 from pathlib import Path
 from scanner import Scanner
@@ -128,7 +128,8 @@ async def send_subscr_ScanAvailableEvent(sae_uuid: str):
         from_uuid = FROM_UUID,
         xaddr = SCANNERS[sae_uuid].xaddr,
         EndTo_addr = "http://192.168.0.10:5357/asdjkfhewjkhauiscndiausdnue",
-        scan_to_name = "Scan To Home Assistant"
+#        scan_to_name = "Scan To Home Assistant"
+        scan_to_name = DISPLAY
         Ref_ID = "680be7cf-bc5a-409d-ad1d-4d6d96b5cb4f"
     )
 
@@ -143,7 +144,7 @@ async def send_subscr_ScanAvailableEvent(sae_uuid: str):
     logger.debug(f"   --->  MSG_ID: {msg_id}")
     logger.debug(f"   --->    FROM: {FROM_UUID}")
     #logger.debug(f"   --->  End_To: {msg_id}")
-    #logger.debug(f"   --->    NAME: {msg_id}")
+    logger.debug(f"   --->    NAME: {DISPLAY}")
     #logger.debug(f"   --->  REF_ID: {msg_id}")
     logger.info(f"   --->     URL: {url}")
     logger.info(f"   --->     XML:\n{xml}")
