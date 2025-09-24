@@ -203,7 +203,7 @@ async def state_monitor():
                     asyncio.create_task(send_subscr_ScanAvailableEvent(uuid))
                 except Exception as e:
                     scanner.state = STATE.ERROR
-                    logger.warning(f"Anything went wrong while parsing the subscribe attempt from UUID {uuid} @ {ip}, response is {str(e)}")
+                    logger.warning(f"Anything went wrong while parsing the subscribe attempt from {SCANNERS[uuid].friendly_name} @ {ip}, response is {str(e)}")
 
             if scanner.state in STATE.PROBE_PARSED:
                 logger.info(f"[WSD:state_mon] probe parsed, get endpoint details...")
