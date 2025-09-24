@@ -11,14 +11,15 @@ logger = logging.getLogger("wsd-addon")
 
 # ---------------- Scanner-Datenstruktur ----------------
 class Scanner:
-    def __init__(self, uuid, ip="0.0.0.0", xaddr=None):
+    def __init__(self, uuid, ip = "0.0.0.0", xaddr = None):
         logger.info(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} [SCANNER:__init__] New instance of Scanner with:")
         self.uuid = uuid
         self.ip = ip
 
         # WSD Parameters
         self.xaddr = xaddr            # Service-Adresse (aus <wsd:XAddrs>)
-        self.subscription_id = None
+        self.destination_token = None
+        self.subscription_timeout = ""
         self.subscription_expires = None
 
         # zusätzliche optionale Infos
@@ -48,7 +49,17 @@ class Scanner:
         self.offline_since = None
         self.remove_after = None
         logger.info(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} [SCANNER:upd] Updated timestamps for {self.friendly_name} ({self.ip}) with UUID {self.uuid}")
-        logger.debug(f"   --> new last_seen: {self.last_seen}")
+        logger.debug(f"   ---> new last_seen: {self.last_seen}")
+
+    # Scannerservice ist noch online
+    # Aufruf mit SCANNER[uuid].updateservice()
+    def updateservice(self, timeout = 3600):
+        self.subscription_expires = datetime.datetime.now().replace(microsecond=0) + 3600
+        self.state = STATE.ONLINE
+        self.offline_since = None
+        self.remove_after = None
+        logger.info(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} [SCANNER:updsvc] Updated timestamps for scanner subscription {self.friendly_name} ({self.ip}) with UUID {self.uuid}")
+        logger.info(f"   ---> new subscribtion expires: {self.subscription_expires}")
 
     # wird aufgerufen wenn ein Scanner offline gesetzt wird
     # Aufruf mit SCANNER[uuid].mark_offline()
@@ -77,3 +88,4 @@ def marry_endpoints(uuid_a: str, uuid_b: str):
     """
     SCANNERS[uuid_a].related_uuids += uuid_b
     SCANNERS[uuid_b].related_uuids += uuid_a
+    logger.info(f"[SCANNER:marry_EP] married UUID {uuid_a} with {uuid_b}")
