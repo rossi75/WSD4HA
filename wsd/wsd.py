@@ -17,8 +17,8 @@ from globals import SCANNERS, list_scanners, NAMESPACES, STATE
 from pathlib import Path
 from scanner import Scanner
 from templates import TEMPLATE_SOAP_PROBE, TEMPLATE_SOAP_TRANSFER_GET
-from send import send_probe, send_transfer_get
-from parse import parse_wsd_packet, parse_probe, parse_transfer_get
+from send import send_probe, send_transfer_get, send_subscr_ScanAvailableEvent
+from parse import parse_wsd_packet, parse_probe, parse_transfer_get, parse_subscribe
 
 logging.basicConfig(level=logging.INFO, format='[%(levelname)s] %(message)s')
 logger = logging.getLogger("wsd-addon")
@@ -168,7 +168,7 @@ async def state_monitor():
         now = datetime.datetime.now().replace(microsecond=0)
 
         for uuid, scanner in SCANNERS.items():
-            logger.info(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} [WSD:state_mon] Checking Timer and State for {uuid} ({scanner.ip})...")
+            logger.info(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} [WSD:state_mon] Checking Timer and State for {SCANNERS[uuid].friendly_name} @ {scanner.ip}...")
             status = scanner.state.value
             age = (now - scanner.last_seen).total_seconds()
             logger.info(f"   -->     state: {status}")
@@ -195,7 +195,7 @@ async def state_monitor():
                         asyncio.create_task(send_probe(uuid))
                         scanner.update()
                     except Exception as e:
-                        logger.warning(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} Could not reach scanner with UUID {uuid} and IP {ip}. Last seen at {scanner.last_seen}. Response is {str(e)}")
+                        logger.warning(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} Could not reach scanner {SCANNERS[uuid].friendly_name} @ {ip}. Last seen at {scanner.last_seen}. Response is {str(e)}")
     
             if scanner.state in STATE.TF_GET_PARSED:
                 logger.info(f"[WSD:state_mon] transfer_get parsed, subscribing to EP...")
@@ -230,7 +230,7 @@ async def state_monitor():
 
             # Nach Ablauf von Timeout+Offline → entfernen
             if status in ("absent") and now >= scanner.remove_after:
-                logger.info(f"[WSD:Heartbeat] --> Marking {scanner.ip} ({scanner.friendly_name}) to remove")
+                logger.info(f"[WSD:Heartbeat] --> Marking {SCANNERS[uuid].friendly_name} @ {ip} to remove")
                 to_remove.append(scanner)
 
             logger.info(f"    =====> state: {SCANNERS[uuid].state.value}")
@@ -238,7 +238,7 @@ async def state_monitor():
         # welche Scanner sollen entfernt werden?
         logger.debug(f"[WSD:Heartbeat] checking for Scanners to remove from known list")
         for s in to_remove:
-            logger.warning(f"[Heartbeat]     --> Removing {scanner.ip} ({scanner.friendly_name}) from list")
+            logger.warning(f"[Heartbeat]     --> Removing {SCANNERS[uuid].friendly_name} @ {ip} from list")
             del SCANNERS[scanner.uuid]
             list_scanners()
           
