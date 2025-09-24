@@ -166,5 +166,5 @@ async def send_subscr_ScanAvailableEvent(sae_uuid: str):
             return None
  
     logger.info(f"ScanAvailableEvents von {SCANNERS[sae_uuid].ip}:\n{body}")
-    parse_subscribe(body)
+    parse_subscribe(sae_uuid, body)
 
