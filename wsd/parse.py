@@ -163,6 +163,63 @@ def parse_transfer_get(xml_body, tf_g_uuid):
 
     SCANNERS[tf_g_uuid].state = STATE.TF_GET_PARSED
 
+# ---------------- Subscribe Parser ----------------
+def parse_subscribe(xml_body):
+    logger.info(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} [PARSE:parse_subscribe] parsing SubscribeResponse")
+    logger.info(f"XML:\n{xml_body}")
+
+    SCANNERS[tf_g_uuid].state = STATE.TF_GET_PARSING
+
+    try:
+        root = ET.fromstring(xml_body)
+    except Exception as e:
+        logger.warning(f"[WSD] Error while parsing transfer_get: {e}")
+        SCANNERS[tf_g_uuid].state = STATE.ERROR
+        return None
+
+    logger.info(f"[WSD:parse_tg]   LogPoint K")
+
+    # FriendlyName
+    fn_elem = root.find(".//wsdp:FriendlyName", NAMESPACES)
+    if fn_elem is not None:
+        SCANNERS[tf_g_uuid].friendly_name = fn_elem.text.strip()
+
+    logger.info(f"[WSD:parse_tg]   LogPoint J")
+
+    # SerialNumber
+    sn_elem = root.find(".//wsdp:SerialNumber", NAMESPACES)
+    if sn_elem is not None:
+        SCANNERS[tf_g_uuid].serial_number = sn_elem.text.strip()
+
+    logger.info(f"[WSD:parse_tg]   LogPoint L")
+
+    # Firmware
+    fw_elem = root.find(".//wsdp:FirmwareVersion", NAMESPACES)
+    if fw_elem is not None:
+        SCANNERS[tf_g_uuid].firmware = fw_elem.text.strip()
+
+    logger.info(f"[WSD:parse_tg]   LogPoint M")
+
+    # Hosted Services (Scan, Print, …)
+    SCANNERS[tf_g_uuid].services = {}
+    for hosted in root.findall(".//wsdp:Hosted", NAMESPACES):
+        addr_elem = hosted.find(".//wsa:Address", NAMESPACES)
+        type_elem = hosted.find(".//wsdp:Types", NAMESPACES)
+        if addr_elem is not None and type_elem is not None:
+            addr = addr_elem.text.strip()
+            types = type_elem.text.strip()
+            logger.info(f" TYPES: {types}")
+            if "ScannerServiceType" in types:
+                SCANNERS[tf_g_uuid].xaddr = addr
+            logger.info(f"  ADDR: {SCANNERS[tf_g_uuid].xaddr}")
+                
+#                SCANNERS[tf_g_uuid].services["scan"] = addr
+
+    logger.info(f"   ---> FN: {SCANNERS[tf_g_uuid].friendly_name}")
+    logger.info(f"   ---> SN: {SCANNERS[tf_g_uuid].serial_number}")
+    logger.info(f"   ---> FW: {SCANNERS[tf_g_uuid].firmware}")
+
+    SCANNERS[tf_g_uuid].state = STATE.TF_GET_PARSED
 
 # ---------------- Pick Best XADDR from String ----------------
 def pick_best_xaddr(xaddrs: str) -> str:
