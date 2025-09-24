@@ -64,11 +64,20 @@ except ValueError:
     logger.debug(f"Reset to fallback Port (should never reach this point)")
 logger.info(f"HTTP-Port for UI: {HTTP_PORT}")
 
-
-# ---------------- HTTP-Port ----------------
+# ---------------- UUID ----------------
 FROM_UUID = f"{uuid.uuid4()}"
 #logger.info("[GLOBAL:uuid] set FROM_UUID: {FROM_UUID}")
 logger.info(f"FROM_UUID: {FROM_UUID}")
+
+# ---------------- Display Entry ----------------
+raw = int(os.environ.get("DISPLAY_ENTRY", "Scan to HA FB"))
+logger.info(f"Display Entry from Environment: {raw}")
+try:
+    DISPLAY = int(raw)  # Sekunden
+except ValueError:
+    DISPLAY = "Scan to Homeassistant FB"  # Fallback vom Fallback
+    logger.debug(f"Reset to fallback Display setting (should never reach this point)")
+logger.info(f"Display Entry on Scanner: {DISPLAY}")
 
 # ---------------- OFFLINE_TIMEOUT ----------------
 raw = int(os.environ.get("OFFLINE_TIMEOUT", 300))  # Sekunden
