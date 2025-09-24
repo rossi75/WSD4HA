@@ -202,14 +202,11 @@ def parse_subscribe(subscr_uuid, xml_body):
     ref_id_elem = root.find(".//wsa:ReferenceParameters/wse:Identifier", NAMESPACES)
     if ref_id_elem is not None and ref_id_elem.text:
         ref_id = ref_id_elem.text.strip()
-        logger.info(f"   --->      ref_id: {SCANNERS[subscr_uuid].subscription_ref}")
         if ref_id.startswith("urn:"):
             ref_id = ref_id.replace("urn:", "")
-        logger.info(f"   --->      ref_id: {SCANNERS[subscr_uuid].subscription_ref}")
         if ref_id.startswith("uuid:"):
             ref_id = ref_id.replace("uuid:", "")
-        logger.info(f"   --->      ref_id: {SCANNERS[subscr_uuid].subscription_ref}")
-        SCANNERS[subscr_uuid].subscription_ref = ref_id_elem.text.strip()
+        SCANNERS[subscr_uuid].subscription_ref = ref_id
 
     # DestinationToken
     dest_token_elem = root.find(".//wscn:DestinationToken", NAMESPACES)
