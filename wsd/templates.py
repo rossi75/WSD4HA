@@ -49,7 +49,8 @@ TEMPLATE_SOAP_TRANSFER_GET = """<?xml version="1.0" encoding="utf-8"?>
 """
 
 
-# TEMPLATE_SUBSCRIBE
+# TEMPLATE_SUBSCRIBE_SAE
+# SAE = ScanAvailableEvents
 # provides a template to subscribe to a service
 #
 # Parameters:
@@ -61,7 +62,8 @@ TEMPLATE_SOAP_TRANSFER_GET = """<?xml version="1.0" encoding="utf-8"?>
 # scan_to_name = Option selected by the user to start the scanning  ==>  "Scan to Home Assistant"
 # Ref_ID = one more senseless ID  ==>  <wse:Identifier>urn:uuid:680be7cf-bc5a-409d-ad1d-4d6d96b5cb4f</wse:Identifier>
 
-TEMPLATE_SUBSCRIBE_ScanAvailableEvents = """<?xml version="1.0" encoding="utf-8"?>
+#TEMPLATE_SUBSCRIBE_ScanAvailableEvents = """<?xml version="1.0" encoding="utf-8"?>
+TEMPLATE_SUBSCRIBE_SAE = """<?xml version="1.0" encoding="utf-8"?>
 <soap:Envelope xmlns:soap="http://www.w3.org/2003/05/soap-envelope"
                xmlns:wsa="http://schemas.xmlsoap.org/ws/2004/08/addressing"
                xmlns:wse="http://schemas.xmlsoap.org/ws/2004/08/eventing"
