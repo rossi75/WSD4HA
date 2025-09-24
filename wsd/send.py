@@ -129,8 +129,8 @@ async def send_subscr_ScanAvailableEvent(sae_uuid: str):
         xaddr = SCANNERS[sae_uuid].xaddr,
         EndTo_addr = "http://192.168.0.10:5357/asdjkfhewjkhauiscndiausdnue",
 #        scan_to_name = "Scan To Home Assistant"
-        scan_to_name = DISPLAY
-        Ref_ID = "680be7cf-bc5a-409d-ad1d-4d6d96b5cb4f"
+        scan_to_name = DISPLAY,
+        Ref_ID = "680be7cf-bc5a-409d-ad1d-4d6d96b5cb4f",
     )
 
     headers = {
