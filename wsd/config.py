@@ -77,7 +77,7 @@ try:
 except ValueError:
     DISPLAY = "Scan to Homeassistant FB"  # Fallback vom Fallback
     logger.debug(f"Reset to fallback Display setting (should never reach this point)")
-logger.info(f"Display Entry on Scanner: {DISPLAY}")
+logger.info(f"Destinations Entry on Scanner: {DISPLAY}")
 
 # ---------------- OFFLINE_TIMEOUT ----------------
 raw = int(os.environ.get("OFFLINE_TIMEOUT", 300))  # Sekunden
