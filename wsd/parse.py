@@ -45,7 +45,7 @@ def parse_probe(xml: str, probed_uuid: str):
         scanners (dict): Dictionary {uuid: Scanner}
         
     """
-    logger.info(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} [WSD:parse_probe] parsing probe from {probed_uuid} @ {SCANNERS[probed_uuid].ip}")
+    logger.info(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} [PARSE:parse_probe] parsing probe from {probed_uuid} @ {SCANNERS[probed_uuid].ip}")
     logger.debug(f"XML:\n{xml}")
     
     SCANNERS[probed_uuid].state = STATE.PROBE_PARSING
@@ -53,7 +53,7 @@ def parse_probe(xml: str, probed_uuid: str):
     try:
         root = ET.fromstring(xml)
     except ET.ParseError as e:
-        logger.error(f"[WSD:probe_parser] XML ParseError: {e}")
+        logger.error(f"[PARSE:probe_parser] XML ParseError: {e}")
         SCANNERS[probed_uuid].state = STATE.ERROR
         return
 
@@ -83,7 +83,7 @@ def parse_probe(xml: str, probed_uuid: str):
         xaddr = pick_best_xaddr(xaddrs_elem.text.strip())
 
         if probe_uuid is None or types is None or xaddr is None:
-            logger.warning(f"[WSD:parse_probe] Incomplete ProbeMatch, skipping UUID {probe_uuid}")
+            logger.warning(f"[PARSE:parse_probe] Incomplete ProbeMatch, skipping UUID {probe_uuid}")
             logger.warning(f"   --->  UUID: {probe_uuid}")
             logger.warning(f"   ---> TYPES: {types}")
             logger.warning(f"   ---> XADDR: {xaddr}")
@@ -107,7 +107,7 @@ def parse_probe(xml: str, probed_uuid: str):
 
 # ---------------- Transfer/GET Parser ----------------
 def parse_transfer_get(xml_body, tf_g_uuid):
-    logger.info(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} [WSD:parse_probe] parsing transfer_get from {tf_g_uuid} @ {SCANNERS[tf_g_uuid].ip}")
+    logger.info(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} [PARSE:parse_t_g] parsing transfer_get from {tf_g_uuid} @ {SCANNERS[tf_g_uuid].ip}")
     logger.info(f"XML:\n{xml_body}")
 
     SCANNERS[tf_g_uuid].state = STATE.TF_GET_PARSING
@@ -115,32 +115,24 @@ def parse_transfer_get(xml_body, tf_g_uuid):
     try:
         root = ET.fromstring(xml_body)
     except Exception as e:
-        logger.warning(f"[WSD] Error while parsing transfer_get: {e}")
+        logger.warning(f"[PARSE] Error while parsing transfer_get: {e}")
         SCANNERS[tf_g_uuid].state = STATE.ERROR
         return None
-
-    logger.info(f"[WSD:parse_tg]   LogPoint K")
 
     # FriendlyName
     fn_elem = root.find(".//wsdp:FriendlyName", NAMESPACES)
     if fn_elem is not None:
         SCANNERS[tf_g_uuid].friendly_name = fn_elem.text.strip()
 
-    logger.info(f"[WSD:parse_tg]   LogPoint J")
-
     # SerialNumber
     sn_elem = root.find(".//wsdp:SerialNumber", NAMESPACES)
     if sn_elem is not None:
         SCANNERS[tf_g_uuid].serial_number = sn_elem.text.strip()
 
-    logger.info(f"[WSD:parse_tg]   LogPoint L")
-
     # Firmware
     fw_elem = root.find(".//wsdp:FirmwareVersion", NAMESPACES)
     if fw_elem is not None:
         SCANNERS[tf_g_uuid].firmware = fw_elem.text.strip()
-
-    logger.info(f"[WSD:parse_tg]   LogPoint M")
 
     # Hosted Services (Scan, Print, …)
     SCANNERS[tf_g_uuid].services = {}
@@ -164,34 +156,34 @@ def parse_transfer_get(xml_body, tf_g_uuid):
     SCANNERS[tf_g_uuid].state = STATE.TF_GET_PARSED
 
 # ---------------- Subscribe Parser ----------------
-def parse_subscribe(xml_body):
-    logger.info(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} [PARSE:parse_subscribe] parsing SubscribeResponse")
+def parse_subscribe(subscr_uuid, xml_body):
+    logger.info(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} [PARSE:parse_subscribe] parsing SubscribeResponse for {SCANNERS[subscr_uuid].friendly_name} at {SCANNERS[subscr_uuid].ip}")
     logger.info(f"XML:\n{xml_body}")
 
-    SCANNERS[tf_g_uuid].state = STATE.TF_GET_PARSING
+    SCANNERS[subscr_uuid].state = STATE.CHK_SCAN_AVAIL_EVT
 
     try:
         root = ET.fromstring(xml_body)
     except Exception as e:
-        logger.warning(f"[WSD] Error while parsing transfer_get: {e}")
-        SCANNERS[tf_g_uuid].state = STATE.ERROR
+        logger.warning(f"[PARSE:subscr] Error while parsing subscribe: {e}")
+        SCANNERS[subscr_uuid].state = STATE.ERROR
         return None
 
-    logger.info(f"[WSD:parse_tg]   LogPoint K")
+    logger.info(f"[PARSE:parse_subscr]   LogPoint A")
 
     # FriendlyName
     fn_elem = root.find(".//wsdp:FriendlyName", NAMESPACES)
     if fn_elem is not None:
         SCANNERS[tf_g_uuid].friendly_name = fn_elem.text.strip()
 
-    logger.info(f"[WSD:parse_tg]   LogPoint J")
+    logger.info(f"[PARSE:parse_subscr]   LogPoint A")
 
     # SerialNumber
     sn_elem = root.find(".//wsdp:SerialNumber", NAMESPACES)
     if sn_elem is not None:
         SCANNERS[tf_g_uuid].serial_number = sn_elem.text.strip()
 
-    logger.info(f"[WSD:parse_tg]   LogPoint L")
+    logger.info(f"[PARSE:parse_subscr]   LogPoint A")
 
     # Firmware
     fw_elem = root.find(".//wsdp:FirmwareVersion", NAMESPACES)
@@ -212,14 +204,16 @@ def parse_subscribe(xml_body):
             if "ScannerServiceType" in types:
                 SCANNERS[tf_g_uuid].xaddr = addr
             logger.info(f"  ADDR: {SCANNERS[tf_g_uuid].xaddr}")
-                
+
+    logger.info(f"[PARSE:parse_subscr]   LogPoint A")
+
 #                SCANNERS[tf_g_uuid].services["scan"] = addr
 
-    logger.info(f"   ---> FN: {SCANNERS[tf_g_uuid].friendly_name}")
-    logger.info(f"   ---> SN: {SCANNERS[tf_g_uuid].serial_number}")
-    logger.info(f"   ---> FW: {SCANNERS[tf_g_uuid].firmware}")
+#    logger.info(f"   ---> FN: {SCANNERS[tf_g_uuid].friendly_name}")
+#    logger.info(f"   ---> SN: {SCANNERS[tf_g_uuid].serial_number}")
+#    logger.info(f"   ---> FW: {SCANNERS[tf_g_uuid].firmware}")
 
-    SCANNERS[tf_g_uuid].state = STATE.TF_GET_PARSED
+    SCANNERS[subscr_uuid].state = STATE.SUBSCRIBED_SCAN_AVAIL_EVT
 
 # ---------------- Pick Best XADDR from String ----------------
 def pick_best_xaddr(xaddrs: str) -> str:
