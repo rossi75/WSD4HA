@@ -175,24 +175,17 @@ def parse_subscribe(subscr_uuid, xml_body):
 
     logger.info(f"Logpoint   A")
 
- #   result = {
- #       "expires_sec": None,
- #       "subscription_id": None,
- #       "subscription_ref": None,
- #       "destination_token": None,
- #   }
-
     # Expires (Duration -> Sekunden)
     expires_elem = root.find(".//wse:Expires", NAMESPACES)
     logger.info(f"   ---> expires_elem: {expires_elem}")
     if expires_elem is not None and expires_elem.text:
         try:
             logger.info(f"Logpoint   C")
-            SCANNERS[subscr_uuid].subscription_timeout = expires_elem
+            SCANNERS[subscr_uuid].subscription_timeout = expires_elem.text.strip()
             SCANNERS[subscr_uuid].subscription_expires = datetime.datetime.now().replace(microsecond=0) + parse_w3c_duration(expires_elem.text.strip())
         except Exception as e:
             logger.warning(f"[PARSE:subscr] Could not parse Expires: {e}")
-            SCANNERS[tf_g_uuid].state = STATE.ERROR
+            SCANNERS[subscr_uuid].state = STATE.ERROR
             return None
 
     logger.info(f"Logpoint   B")
@@ -220,9 +213,6 @@ def parse_subscribe(subscr_uuid, xml_body):
     logger.info(f"   --->  dest_token: {SCANNERS[subscr_uuid].destination_token}")
 
     SCANNERS[subscr_uuid].state = STATE.SUBSCRIBED_SCAN_AVAIL_EVT
-
-#    return result
-
 
 # ---------------- parse w3c timer ----------------
 # parse_w3c_duration("PT1H")   # -> 3600
