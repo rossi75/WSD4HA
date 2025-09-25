@@ -150,3 +150,5 @@ async def start_notify_server():
     site = web.TCPSite(runner, "0.0.0.0", NOTIFY_PORT)
     await site.start()
     logger.info(f"Notify Server is running on Port {NOTIFY_PORT}")
+    logger.info(f"-----------------------  Events  -------------------------")
+
