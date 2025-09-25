@@ -10,7 +10,7 @@ import re
 import xml.etree.ElementTree as ET
 import subprocess
 import uuid
-from globals import SCANNERS, list_scanners, FROM_UUID
+from globals import SCANNERS, list_scanners, FROM_UUID, USER_AGENT
 
 
 NAMESPACES = {
@@ -73,6 +73,9 @@ except ValueError:
     NOTIFY_PORT = 5357  # Fallback vom Fallback
     logger.debug(f"NOTIFY-Port Reset to fallback value 5357 (should never reach this point)")
 logger.info(f"NOTIFY-Port for Scan Events: {NOTIFY_PORT}")
+
+# ---------------- User-Agent ----------------
+logger.info(f"User-Agent: {USER_AGENT}")
 
 # ---------------- UUID ----------------
 FROM_UUID = f"{uuid.uuid4()}"
