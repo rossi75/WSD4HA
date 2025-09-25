@@ -21,12 +21,11 @@ logger = logging.getLogger("wsd-addon")
 SCANNERS = {}
 
 # -----------------  define User-Agent  -----------------
-USER_AGENT = None
+#USER_AGENT = "WSD4HA"
+USER_AGENT = "WSDAPI"       # originaler Wert von Microsoft
 
 # -----------------  define FROM_UUID  -----------------
 FROM_UUID = None
-#FROM_UUID = f"urn:uuid:{uuid.uuid4()}"
-#logger.info("[GLOBAL:uuid] set FROM_UUID: {FROM_UUID}")
 
             
 # -----------------  define NAMESPACE  -----------------
