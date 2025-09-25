@@ -146,7 +146,7 @@ async def send_subscr_ScanAvailableEvent(sae_uuid: str):
     logger.debug(f"   --->    NAME: {DISPLAY}")
     #logger.debug(f"   --->  REF_ID: {msg_id}")
     logger.info(f"   --->     URL: {url}")
-    logger.debug(f"   --->     XML:\n{xml}")
+    logger.info(f"   --->     XML:\n{xml}")
 
     body = ""
 
