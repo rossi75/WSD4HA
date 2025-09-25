@@ -20,6 +20,9 @@ logger = logging.getLogger("wsd-addon")
 # -----------------  define SCANNERS dict  -----------------
 SCANNERS = {}
 
+# -----------------  define User-Agent  -----------------
+USER_AGENT = None
+
 # -----------------  define FROM_UUID  -----------------
 FROM_UUID = None
 #FROM_UUID = f"urn:uuid:{uuid.uuid4()}"
