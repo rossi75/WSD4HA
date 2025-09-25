@@ -146,7 +146,7 @@ async def UDP_listener_3702():
     sock.setsockopt(socket.IPPROTO_IP, socket.IP_ADD_MEMBERSHIP, mreq)
     sock.setblocking(False)   # WICHTIG für asyncio!
     logger.info("WSD-Listener running on Port 3702/UDP")
-    logger.info(f"-----------------------  Events  -------------------------")
+#    logger.info(f"-----------------------  Events  -------------------------")
 
     # Daten abholen
     loop = asyncio.get_running_loop()
