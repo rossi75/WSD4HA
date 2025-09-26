@@ -81,8 +81,10 @@ class STATE(str, Enum):
     ONLINE = "online"
     ONLINE_CHK_1_2 = "online"                                                              # Hälfte der Zeit is rum
     ONLINE_CHK_3_4 = "online"                                                              # 3/4 der Zeit is rum
-    SUBSCR_CHK_1_2 = "online"                                                              # Hälfte der Zeit is rum
-    SUBSCR_CHK_3_4 = "online"                                                              # 3/4 der Zeit is rum
+    SUBSCR_RNW_1_2_PENDING = "online"                                                      # Hälfte der Zeit is rum
+    SUBSCR_RNW_1_2_CHK = "online"                                                          # Hälfte der Zeit is rum
+    SUBSCR_RNW_3_4_PENDING = "online"                                                      # 3/4 der Zeit is rum
+    SUBSCR_RNW_3_4_CHK = "online"                                                          # 3/4 der Zeit is rum
     RECV_SCAN = "receiving a Scan"
     ABSENT = "absent"
     TO_REMOVE = "to remove"
