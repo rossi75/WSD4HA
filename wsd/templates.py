@@ -117,3 +117,31 @@ TEMPLATE_SUBSCRIBE_SAE = """<?xml version="1.0" encoding="utf-8"?>
   </soap:Body>
 </soap:Envelope>
 """
+
+
+TEMPLATE_SUBSCRIBE_SAE = """<?xml version="1.0" encoding="utf-8"?>
+<soap:Envelope xmlns:soap="http://www.w3.org/2003/05/soap-envelope"
+               xmlns:wsa="http://schemas.xmlsoap.org/ws/2004/08/addressing"
+               xmlns:wse="http://schemas.xmlsoap.org/ws/2004/08/eventing"
+               xmlns:sca="http://schemas.microsoft.com/windows/2006/08/wdp/scan">
+  <soap:Header>
+    <wsa:To>{xaddr}</wsa:To>
+    <wsa:Action>http://schemas.xmlsoap.org/ws/2004/08/eventing/Renew</wsa:Action>
+    <wsa:MessageID>{msg_id}</wsa:MessageID>
+    <wsa:ReplyTo>
+      <wsa:Address>http://schemas.xmlsoap.org/ws/2004/08/addressing/role/anonymous</wsa:Address>
+    </wsa:ReplyTo>
+    <wsa:From>
+      <wsa:Address>urn:uuid:{from_uuid}</wsa:Address>
+    </wsa:From>
+    <wse:Identifier>urn:uuid:{Ref_ID}</wse:Identifier>
+  </soap:Header>
+  <soap:Body>
+    <wse:Renew>
+      <wse:Expires>
+        PT1H
+      </wse:Expires>
+    </wse:Renew>
+  </soap:Body>
+</soap:Envelope>
+"""
