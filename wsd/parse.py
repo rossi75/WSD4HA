@@ -101,7 +101,7 @@ def parse_probe(xml: str, probed_uuid: str):
             logger.info(f"[WSD:probe_parser] Discovered new scanner endpoint with {probe_uuid} @ {SCANNER[probed_uuid].ip} as child from {probed_uuid}")
         else:
             SCANNERS[probed_uuid].xaddr = xaddr
-            if SCANNERS[probed_uuid].subscription_last_seen not None:
+            if SCANNERS[probed_uuid].subscription_last_seen is not None:
                 SCANNERS[probed_uuid].state = STATE.ONLINE
                 logger.debug(f"   ===>  already found a subscription for {SCANNER[probed_uuid].friendly_name} @ {SCANNER[probed_uuid].ip}, no need to ask for more details")
             else
@@ -151,8 +151,6 @@ def parse_transfer_get(xml_body, tf_g_uuid):
             if "ScannerServiceType" in types:
                 SCANNERS[tf_g_uuid].xaddr = addr
             logger.info(f"  ADDR: {SCANNERS[tf_g_uuid].xaddr}")
-                
-#                SCANNERS[tf_g_uuid].services["scan"] = addr
 
     logger.info(f"   ---> FN: {SCANNERS[tf_g_uuid].friendly_name}")
     logger.info(f"   ---> SN: {SCANNERS[tf_g_uuid].serial_number}")
