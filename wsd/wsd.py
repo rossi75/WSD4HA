@@ -234,9 +234,8 @@ async def state_monitor():
             if scanner.state in STATE.DISCOVERED:
                 logger.info(f"[WSD:state_mon] Fresh discovered, now probing...")
                 try:
-#                    logger.info(f"[WSD:state_mon]   LogPoint B")
-                    asyncio.create_task(send_probe(scanner))
-#                    logger.info(f"[WSD:probe_mon]   LogPoint C")
+#                    asyncio.create_task(send_probe(scanner))
+                    asyncio.create_task(send_probe(uuid))
                 except Exception as e:
                     scanner.state = STATE.ERROR
                     logger.warning(f"Anything went wrong while probing {scanner.friendly_name} @ {scanner.ip}, response is {str(e)}")
