@@ -105,10 +105,13 @@ async def start_http_server():
     logger.info(f"HTTP/SOAP Server is running on Port {HTTP_PORT}")
 
 # ---------------- NOTIFY handler ----------------
+routes = web.RouteTableDef()
+@routes.post('/WSDAPI')      # 👈 Decorator kommt direkt vor die Funktion
 async def notify_handler(request):
+    logger.info(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} [WEBSERVER:NOTIFY] received notification")
+    logger.debug(f"payload: \n {text[:600]}")
+
     text = await request.text()
-    # quick log
-    logger.info(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} [WEBSERVER:NOTIFY] received notification payload: \n {text[:600]}")
     try:
         root = ET.fromstring(text)
     except Exception as e:
@@ -118,6 +121,7 @@ async def notify_handler(request):
     # try to extract identifier / event content
     ident = root.find(".//wse:Identifier", NAMESPACES_NOTIFY)
     body = root.find(".//s:Body", NAMESPACES_NOTIFY)
+    
     # dump body child names for debugging
     events = []
     if body is not None:
