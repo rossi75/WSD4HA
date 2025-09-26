@@ -206,7 +206,7 @@ async def state_monitor():
 
                 # Halbzeit-Check Online
 #                if scanner.state in STATE.ONLINE and age > (SCANNERS[uuid].timeout / 2):
-                if age > (SCANNERS[uuid].timeout / 2) and age < (SCANNERS[uuid].timeout * 0.75):
+                if age > (OFFLINE_TIMEOUT / 2) and age < (OFFLINE_TIMEOUT * 0.75):
                     logger.info(f"[WSD:Hearbeat] --> proceeding Halftime-Check")
                     try:
                         asyncio.create_task(send_probe(uuid))
