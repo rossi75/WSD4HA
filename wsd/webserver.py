@@ -105,10 +105,11 @@ async def start_http_server():
     logger.info(f"HTTP/SOAP Server is running on Port {HTTP_PORT}")
 
 # ---------------- NOTIFY handler ----------------
+#@routes.post('/WSDAPI')      # 👈 Decorator kommt direkt vor die Funktion
 routes = web.RouteTableDef()
-@routes.post('/WSDAPI')      # 👈 Decorator kommt direkt vor die Funktion
+@routes.route('*', '/WSDAPI')
 async def notify_handler(request):
-    logger.info(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} [WEBSERVER:NOTIFY] received notification")
+    logger.info(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} [WEBSERVER:NOTIFY] received {request.method} on {request.path}")
     logger.debug(f"payload: \n {text[:600]}")
 
     text = await request.text()
