@@ -118,7 +118,8 @@ async def send_subscr_ScanAvailableEvent(sae_uuid: str):
     SCANNERS[sae_uuid].state = STATE.SUBSCRIBING_SCAN_AVAIL_EVT
     msg_id = uuid.uuid4()
     ref_id = uuid.uuid4()
-    EndTo_addr = "http://192.168.0.10:5357/asdjkfhewjkhauiscndiausdnue"
+    addr_id = uuid.uuid4()
+    EndTo_addr = "http://192.168.0.10:5357/{addr_id}"
 
     xml = TEMPLATE_SUBSCRIBE_SAE.format(
         to_device_uuid = sae_uuid,
@@ -142,7 +143,7 @@ async def send_subscr_ScanAvailableEvent(sae_uuid: str):
     logger.debug(f"   --->  MSG_ID: {msg_id}")
     logger.debug(f"   --->    FROM: {FROM_UUID}")
     logger.info(f"   --->  End_To: {EndTo_addr}")
-    logger.info(f"   --->    NAME: {DISPLAY}")
+    logger.info(f"   --->  NAMEoD: {DISPLAY}")
     logger.info(f"   --->  REF_ID: {ref_id}")
     logger.info(f"   --->     URL: {url}")
     logger.info(f"   --->     XML:\n{xml}")
