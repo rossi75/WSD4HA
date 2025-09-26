@@ -101,7 +101,11 @@ def parse_probe(xml: str, probed_uuid: str):
             logger.info(f"[WSD:probe_parser] Discovered new scanner endpoint with {probe_uuid} @ {SCANNER[probed_uuid].ip} as child from {probed_uuid}")
         else:
             SCANNERS[probed_uuid].xaddr = xaddr
-            SCANNERS[probed_uuid].state = STATE.PROBE_PARSED
+            if SCANNERS[probed_uuid].subscription_last_seen not None:
+                SCANNERS[probed_uuid].state = STATE.ONLINE
+                logger.debug(f"   ===>  already found a subscription for {SCANNER[probed_uuid].friendly_name} @ {SCANNER[probed_uuid].ip}, no need to ask for more details")
+            else
+                SCANNERS[probed_uuid].state = STATE.PROBE_PARSED
             logger.info(f"[WSD:probe_parser] Updated scanner {probed_uuid} -> {xaddr}")
 
     list_scanners()
