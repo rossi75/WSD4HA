@@ -165,7 +165,16 @@ def parse_subscribe(subscr_uuid, xml_body):
     logger.info(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} [PARSE:parse_subscribe] parsing SubscribeResponse for {SCANNERS[subscr_uuid].friendly_name} at {SCANNERS[subscr_uuid].ip}")
     logger.info(f"XML:\n{xml_body}")
 
-    SCANNERS[subscr_uuid].state = STATE.CHK_SCAN_AVAIL_EVT
+    match SCANNERS[subscr_uuid].state:
+        case STATE.SUBSCRIBING_SCAN_AVAIL_EVT:
+            SCANNERS[subscr_uuid].state = STATE.CHK_SCAN_AVAIL_EVT
+        case STATE.RNW_1_2_PENDING:
+            SCANNERS[subscr_uuid].state = STATE.SUBSCR_RNW_1_2_CHK
+        case STATE.RNW_3_4_PENDING:
+            SCANNERS[subscr_uuid].state = STATE.SUBSCR_RNW_3_4_CHK
+        case _: # Sammelfall
+            logger.warning(f"called function with state {SCANNERS[subscr_uuid].state.value}, but cannot handle this state")
+            SCANNERS[subscr_uuid].state = STATE.ERROR
 
     try:
         root = ET.fromstring(xml_body)
@@ -176,11 +185,13 @@ def parse_subscribe(subscr_uuid, xml_body):
 
     # Expires (Duration -> Sekunden)
     expires_elem = root.find(".//wse:Expires", NAMESPACES)
-    logger.info(f"   ---> expires_elem: {expires_elem.text.strip()}")
     if expires_elem is not None and expires_elem.text:
+        logger.debug(f"   ---> expires_elem: {expires_elem.text.strip()}")
         try:
-            SCANNERS[subscr_uuid].subscription_timeout = expires_elem.text.strip()
-            SCANNERS[subscr_uuid].subscription_expires = datetime.datetime.now().replace(microsecond=0) + parse_w3c_duration(expires_elem.text.strip())
+#            SCANNERS[subscr_uuid].subscription_timeout = expires_elem.text.strip()
+#            SCANNERS[subscr_uuid].subscription_expires = datetime.datetime.now().replace(microsecond=0) + parse_w3c_duration(expires_elem.text.strip())
+            SCANNERS[subscr_uuid].subscription_timeout = parse_w3c_duration(expires_elem.text.strip())
+            SCANNERS[subscr_uuid].subscription_expires = datetime.datetime.now().replace(microsecond=0) + timedelta(seconds = SCANNERS[subscr_uuid].subscription_timeout)
         except Exception as e:
             logger.warning(f"[PARSE:subscr] Could not parse Expires: {e}")
             SCANNERS[subscr_uuid].state = STATE.ERROR
@@ -190,6 +201,7 @@ def parse_subscribe(subscr_uuid, xml_body):
     subscr_id = ""
     subscr_id_elem = root.find(".//soap:Header/wse:Identifier", NAMESPACES)
     if subscr_id_elem is not None and subscr_id_elem.text:
+        logger.debug(f"   ---> subscr_id_elem: {subscr_id_elem.text.strip()}")
         subscr_id = subscr_id_elem.text.strip()
         if subscr_id.startswith("urn:"):
             subscr_id = subscr_id.replace("urn:", "")
@@ -201,6 +213,7 @@ def parse_subscribe(subscr_uuid, xml_body):
     ref_id = ""
     ref_id_elem = root.find(".//wsa:ReferenceParameters/wse:Identifier", NAMESPACES)
     if ref_id_elem is not None and ref_id_elem.text:
+        logger.debug(f"   ---> ref_ui_elem: {ref_id_elem.text.strip()}")
         ref_id = ref_id_elem.text.strip()
         if ref_id.startswith("urn:"):
             ref_id = ref_id.replace("urn:", "")
@@ -211,6 +224,7 @@ def parse_subscribe(subscr_uuid, xml_body):
     # DestinationToken
     dest_token_elem = root.find(".//wscn:DestinationToken", NAMESPACES)
     if dest_token_elem is not None and dest_token_elem.text:
+        logger.debug(f"   ---> dest_token_elem: {dest_token_elem.text.strip()}")
         SCANNERS[subscr_uuid].destination_token = dest_token_elem.text.strip()
 
     logger.info(f"   --->        UUID: {subscr_uuid}")
@@ -220,7 +234,19 @@ def parse_subscribe(subscr_uuid, xml_body):
     logger.info(f"   --->      ref_id: {SCANNERS[subscr_uuid].subscription_ref}")
     logger.info(f"   --->  dest_token: {SCANNERS[subscr_uuid].destination_token}")
 
-    SCANNERS[subscr_uuid].state = STATE.SUBSCRIBED_SCAN_AVAIL_EVT
+#    SCANNERS[subscr_uuid].state = STATE.SUBSCRIBED_SCAN_AVAIL_EVT
+    match SCANNERS[subscr_uuid].state:
+        case STATE.CHK_SCAN_AVAIL_EVT:
+            SCANNERS[subscr_uuid].update()
+        case STATE.SUBSCR_RNW_1_2_CHK:
+            SCANNERS[subscr_uuid].update()
+        case STATE.SUBSCR_RNW_3_4_CHK:
+            SCANNERS[subscr_uuid].update()
+        case STATE.ERROR:
+            SCANNERS[subscr_uuid].state = STATE.ERROR
+        case _: # Sammelfall
+            logger.warning(f"called function with state {SCANNERS[subscr_uuid].state.value}, but cannot handle this state")
+            SCANNERS[subscr_uuid].state = STATE.ERROR
 
 # ---------------- parse w3c timer ----------------
 # parse_w3c_duration("PT1H")   # -> 3600
