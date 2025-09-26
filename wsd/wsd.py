@@ -180,7 +180,7 @@ async def state_monitor():
             
             if scanner.state.value in "online":          # auch die Sub-Stati für renew haben "online" als value
                 # Halbzeit-Check for subscription
-                if scanner.state in STATE.ONLINE and subscr_age > (SCANNERS[uuid].subscription_timeout / 2)
+                if scanner.state in STATE.ONLINE and subscr_age > (SCANNERS[uuid].subscription_timeout / 2):
                     scanner.state = STATE.SUBSCR_RNW_1_2_PENDING
                     logger.warning(f"[WSD:Heartbeat] --> proceeding Halftime-Check for Subscription")
                     try:
