@@ -31,8 +31,6 @@ async def send_probe(scanner):
 
     headers = {
         "Content-Type": "application/soap+xml",
-        #"User-Agent": "WSD4HA",
-#        "User-Agent": "WSDAPI",
         "User-Agent": USER_AGENT
     }
 
@@ -75,8 +73,7 @@ async def send_transfer_get(tf_g_uuid: str):
 
     headers = {
         "Content-Type": "application/soap+xml",
-#        "User-Agent": "WSDAPI",
-        "User-Agent": USER_AGENT,
+        "User-Agent": USER_AGENT
     }
 
     url = SCANNERS[tf_g_uuid].xaddr  # z.B. http://192.168.0.3:8018/wsd
@@ -120,21 +117,22 @@ async def send_subscr_ScanAvailableEvent(sae_uuid: str):
     SCANNERS[sae_uuid].state = STATE.SUBSCRIBING_SCAN_AVAIL_EVT
     msg_id = uuid.uuid4()
     ref_id = uuid.uuid4()
+    EndTo_addr = "http://192.168.0.10:5357/asdjkfhewjkhauiscndiausdnue",
 
     xml = TEMPLATE_SUBSCRIBE_SAE.format(
         to_device_uuid = sae_uuid,
         msg_id = msg_id,
         from_uuid = FROM_UUID,
         xaddr = SCANNERS[sae_uuid].xaddr,
-        EndTo_addr = "http://192.168.0.10:5357/asdjkfhewjkhauiscndiausdnue",
+#        EndTo_addr = "http://192.168.0.10:5357/asdjkfhewjkhauiscndiausdnue",
+        EndTo_addr = EndTo_addr,
         scan_to_name = DISPLAY,
         Ref_ID = ref_id,
     )
 
     headers = {
         "Content-Type": "application/soap+xml",
-#        "User-Agent": "WSDAPI",
-        "User-Agent": USER_AGENT,
+        "User-Agent": USER_AGENT
     }
 
     url = SCANNERS[sae_uuid].xaddr  # z.B. http://192.168.0.3:8018/wsd
@@ -182,13 +180,15 @@ async def send_subscr_renew(renew_uuid: str):
     SCANNERS[renew_uuid].state = STATE.SUBSCRIBING_SCAN_AVAIL_EVT
     msg_id = uuid.uuid4()
     ref_id = uuid.uuid4()
+    EndTo_addr = "http://192.168.0.10:5357/asdjkfhewjkhauiscndiausdnue",
 
     xml = TEMPLATE_SUBSCRIBE_RENEW.format(
         to_device_uuid = renew_uuid,
         msg_id = msg_id,
         from_uuid = FROM_UUID,
         xaddr = SCANNERS[renew_uuid].xaddr,
-        EndTo_addr = "http://192.168.0.10:5357/asdjkfhewjkhauiscndiausdnue",
+#        EndTo_addr = "http://192.168.0.10:5357/asdjkfhewjkhauiscndiausdnue",
+        EndTo_addr = EndTo_addr,
         scan_to_name = DISPLAY,
 #        Ref_ID = "680be7cf-bc5a-409d-ad1d-4d6d96b5cb4f",
         Ref_ID = ref_id,
@@ -196,8 +196,7 @@ async def send_subscr_renew(renew_uuid: str):
 
     headers = {
         "Content-Type": "application/soap+xml",
-
-        "User-Agent": "WSDAPI",
+        "User-Agent": USER_AGENT
     }
 
     url = SCANNERS[renew_uuid].xaddr  # z.B. http://192.168.0.3:8018/wsd
