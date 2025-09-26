@@ -117,7 +117,7 @@ async def send_subscr_ScanAvailableEvent(sae_uuid: str):
     msg_id = uuid.uuid4()
     ref_id = uuid.uuid4()
     addr_id = uuid.uuid4()
-    EndTo_addr = "http://192.168.0.10:5357/"{addr_id}
+    EndTo_addr = "http://192.168.0.10:5357/" + addr_id
 
     xml = TEMPLATE_SUBSCRIBE_SAE.format(
         to_device_uuid = sae_uuid,
