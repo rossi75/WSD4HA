@@ -197,7 +197,7 @@ async def state_monitor():
 #                if scanner.state in (STATE.ONLINE and subscr_age > (SCANNERS[uuid].subscription_timeout * 0.75):
                 if subscr_age > (SCANNERS[uuid].subscription_timeout * 0.75):
                     scanner.state = STATE.SUBSCR_RNW_3_4_PENDING
-                    logger.info(f"[WSD:Heartbeat] --> proceeding 3/4-Check for Subscription")
+                    logger.warning(f"[WSD:Heartbeat] --> proceeding 3/4-Check for Subscription")
                     try:
                         asyncio.create_task(send_subscription_renew(uuid))                # update_subscription() später im parser
                     except Exception as e:
