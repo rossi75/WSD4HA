@@ -12,7 +12,7 @@ import threading
 import uuid
 import xml.etree.ElementTree as ET
 from config import OFFLINE_TIMEOUT, LOCAL_IP, HTTP_PORT, FROM_UUID, DISPLAY
-from globals import SCANNERS, list_scanners, NAMESPACES, STATE
+from globals import SCANNERS, list_scanners, NAMESPACES, STATE, USER_AGENT
 from pathlib import Path
 from scanner import Scanner
 from templates import TEMPLATE_SOAP_PROBE, TEMPLATE_SOAP_TRANSFER_GET, TEMPLATE_SUBSCRIBE_SAE
@@ -32,7 +32,8 @@ async def send_probe(scanner):
     headers = {
         "Content-Type": "application/soap+xml",
         #"User-Agent": "WSD4HA",
-        "User-Agent": "WSDAPI",
+#        "User-Agent": "WSDAPI",
+        "User-Agent": USER_AGENT
     }
 
     url = f"http://{scanner.ip}:80/StableWSDiscoveryEndpoint/schemas-xmlsoap-org_ws_2005_04_discovery"
