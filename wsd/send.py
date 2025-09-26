@@ -22,25 +22,23 @@ logging.basicConfig(level=logging.INFO, format='[%(levelname)s] %(message)s')
 logger = logging.getLogger("wsd-addon")
 
 # ---------------- Send Scanner Probe ----------------
-async def send_probe(uuid: str):
+async def send_probe(probe_uuid: str):
 #    logger.info(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} [SEND:send_probe] sending probe for {SCANNERS[uuid].friendly_name or uuid} @ {SCANNERS[uuid].ip}")
-    logger.info(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} [SEND:send_probe] sending probe for {SCANNERS[uuid].friendly_name} @ {SCANNERS[uuid].ip}")
+    logger.info(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} [SEND:send_probe] sending probe for {SCANNERS[probe_uuid].friendly_name} @ {SCANNERS[probe_uuid].ip}")
 
-    SCANNERS[uuid].state = STATE.PROBING
+    SCANNERS[probe_uuid].state = STATE.PROBING
+
     msg_id = uuid.uuid4()
+    body = ""
     xml = TEMPLATE_SOAP_PROBE.format(msg_id=msg_id)
-
     headers = {
         "Content-Type": "application/soap+xml",
         "User-Agent": USER_AGENT
     }
-
-    url = f"http://{SCANNERS[uuid].ip}:80/StableWSDiscoveryEndpoint/schemas-xmlsoap-org_ws_2005_04_discovery"
+    url = f"http://{SCANNERS[probe_uuid].ip}:80/StableWSDiscoveryEndpoint/schemas-xmlsoap-org_ws_2005_04_discovery"
 
     logger.info(f"   ---> URL: {url}")
     logger.debug(f"   ---> XML:\n{xml}")
-
-    body = ""
 
     async with aiohttp.ClientSession() as session:
         try:
@@ -52,12 +50,15 @@ async def send_probe(uuid: str):
                     SCANNER[uuid].state = STATE.ABSENT
         except Exception as e:
             logger.error(f"   ---> Probe fehlgeschlagen bei {url}: {e}")
-            SCANNER[uuid].state = STATE.ABSENT
+            SCANNER[probe_uuid].state = STATE.ABSENT
 
-    logger.debug(f"ProbeMatch von {scanner.ip}:\n{body}")
-    parse_probe(body, scanner.uuid)
-
+#    logger.debug(f"ProbeMatch von {scanner.ip}:\n{body}")
+#    parse_probe(body, scanner.uuid)
     logger.debug(f"   ---> Statuscode: {resp.status}")
+    logger.debug(f"ProbeMatch von {SCANNERS[probe_uuid].ip}:\n{body}")
+
+    parse_probe(body, probe_uuid)
+
 
 # ---------------- Send Transfer_Get ----------------
 async def send_transfer_get(tf_g_uuid: str):
