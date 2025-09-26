@@ -278,7 +278,8 @@ def parse_w3c_duration(duration: str) -> int:
     logger.debug(f"[PARSE:w3c_dur]   ---> d: {d}")
     logger.debug(f"[PARSE:w3c_dur]   ---> seconds: {seconds}")
 
-    return timedelta(seconds = seconds)
+#    return timedelta(seconds = seconds)
+    return seconds
 
 # ---------------- Pick Best XADDR from String ----------------
 def pick_best_xaddr(xaddrs: str) -> str:
