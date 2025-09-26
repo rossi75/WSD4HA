@@ -166,6 +166,7 @@ async def state_monitor():
         logger.debug(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} [WSD:state_mon] wake-up")
         to_remove = []
         now = datetime.datetime.now().replace(microsecond=0)
+        subscr_age = 0
 
         for uuid, scanner in SCANNERS.items():
             logger.info(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} [WSD:state_mon] Checking State and Timer for {scanner.friendly_name} @ {scanner.ip}...")
