@@ -92,7 +92,7 @@ class STATE(str, Enum):
 
 # -----------------  Nach jedem Update: Liste loggen  -----------------
 def list_scanners():
-    logger.info("[SCANNERS] registered Scanners:")
+    logger.info("[SCANNERS] known Scanners:")
 
     for i, s in enumerate(SCANNERS.values(), start=1):
         logger.info(f"[{i}] {s.friendly_name} @ {s.ip}   UUID={s.uuid}")
