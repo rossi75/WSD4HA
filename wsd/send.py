@@ -62,19 +62,18 @@ async def send_transfer_get(tf_g_uuid: str):
     logger.info(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} [SEND:transfer_get] sending Transfer/Get to {tf_g_uuid} @ {SCANNERS[tf_g_uuid].ip}")
     
     SCANNERS[tf_g_uuid].state = STATE.TF_GET_PENDING
-    msg_id = uuid.uuid4()
 
+    body = ""
+    msg_id = uuid.uuid4()
     xml = TEMPLATE_SOAP_TRANSFER_GET.format(
         to_device_uuid=tf_g_uuid,
         msg_id=msg_id,
         from_uuid=FROM_UUID
     )
-
     headers = {
         "Content-Type": "application/soap+xml",
         "User-Agent": USER_AGENT
     }
-
     url = SCANNERS[tf_g_uuid].xaddr  # z.B. http://192.168.0.3:8018/wsd
 
     logger.debug(f"   --->    FROM: {FROM_UUID}")
@@ -82,8 +81,6 @@ async def send_transfer_get(tf_g_uuid: str):
     logger.debug(f"   --->  MSG_ID: {msg_id}")
     logger.debug(f"   --->     URL: {url}")
     logger.debug(f"   --->     XML:\n{xml}")
-
-    body = ""
 
     async with aiohttp.ClientSession() as session:
         try:
@@ -114,39 +111,38 @@ async def send_subscr_ScanAvailableEvent(sae_uuid: str):
     logger.info(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} [SEND:subscr_sae] subscribing ScanAvailableEvent to {sae_uuid} @ {SCANNERS[sae_uuid].ip}")
     
     SCANNERS[sae_uuid].state = STATE.SUBSCRIBING_SCAN_AVAIL_EVT
+
+    body = ""
     msg_id = uuid.uuid4()
     ref_id = uuid.uuid4()
-    addr_id = uuid.uuid4()
-    EndTo_addr = f"http://192.168.0.10:5357/{addr_id}"
-
+#    addr_id = uuid.uuid4()
+#    EndTo_addr = f"http://192.168.0.10:5357/{addr_id}"
+    EndToAddr = f"http://192.168.0.10:5357/{USER_AGENT}"
+    url = SCANNERS[sae_uuid].xaddr  # z.B. http://192.168.0.3:8018/wsd
     xml = TEMPLATE_SUBSCRIBE_SAE.format(
         to_device_uuid = sae_uuid,
         msg_id = msg_id,
         from_uuid = FROM_UUID,
         xaddr = SCANNERS[sae_uuid].xaddr,
 #        EndTo_addr = "http://192.168.0.10:5357/asdjkfhewjkhauiscndiausdnue",
-        EndTo_addr = EndTo_addr,
+        EndTo_addr = EndToAddr,
         scan_to_name = DISPLAY,
         Ref_ID = ref_id,
     )
-
     headers = {
         "Content-Type": "application/soap+xml",
         "User-Agent": USER_AGENT
     }
 
-    url = SCANNERS[sae_uuid].xaddr  # z.B. http://192.168.0.3:8018/wsd
 
     logger.debug(f"   --->      TO: {sae_uuid}")
     logger.debug(f"   --->  MSG_ID: {msg_id}")
     logger.debug(f"   --->    FROM: {FROM_UUID}")
-    logger.info(f"   --->  End_To: {EndTo_addr}")
+    logger.info(f"   --->  End_To: {EndToAddr}")
     logger.info(f"   --->  NAMEoD: {DISPLAY}")
     logger.info(f"   --->  REF_ID: {ref_id}")
     logger.info(f"   --->     URL: {url}")
     logger.info(f"   --->     XML:\n{xml}")
-
-    body = ""
 
     async with aiohttp.ClientSession() as session:
         try:
@@ -178,39 +174,35 @@ async def send_subscr_renew(renew_uuid: str):
     logger.info(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} [SEND:subscr_rnw] renewing subscrition for {renew_uuid} @ {SCANNERS[renew_uuid].ip}")
     
     SCANNERS[renew_uuid].state = STATE.SUBSCRIBING_SCAN_AVAIL_EVT
-    msg_id = uuid.uuid4()
-    ref_id = uuid.uuid4()
-    EndTo_addr = "http://192.168.0.10:5357/asdjkfhewjkhauiscndiausdnue",
 
+    body = ""
+    msg_id = uuid.uuid4()
+    ref_id = SCANNERS[renew_uuid].subscription_ref
+#    EndTo_addr = "http://192.168.0.10:5357/asdjkfhewjkhauiscndiausdnue",
+    EndToAddr = f"http://192.168.0.10:5357/{USER_AGENT}"
+    url = SCANNERS[renew_uuid].xaddr  # z.B. http://192.168.0.3:8018/wsd
     xml = TEMPLATE_SUBSCRIBE_RENEW.format(
         to_device_uuid = renew_uuid,
         msg_id = msg_id,
         from_uuid = FROM_UUID,
         xaddr = SCANNERS[renew_uuid].xaddr,
-#        EndTo_addr = "http://192.168.0.10:5357/asdjkfhewjkhauiscndiausdnue",
-        EndTo_addr = EndTo_addr,
+        EndTo_addr = EndToAddr,
         scan_to_name = DISPLAY,
-#        Ref_ID = "680be7cf-bc5a-409d-ad1d-4d6d96b5cb4f",
-        Ref_ID = ref_id,
+        Ref_ID = ref_id
     )
-
     headers = {
         "Content-Type": "application/soap+xml",
         "User-Agent": USER_AGENT
     }
 
-    url = SCANNERS[renew_uuid].xaddr  # z.B. http://192.168.0.3:8018/wsd
-
     logger.debug(f"   --->      TO: {renew_uuid}")
     logger.debug(f"   --->  MSG_ID: {msg_id}")
     logger.debug(f"   --->    FROM: {FROM_UUID}")
-    #logger.debug(f"   --->  End_To: {msg_id}")
+    logger.info(f"   --->  End_To: {EndToAddr}")
     logger.debug(f"   --->    NAME: {DISPLAY}")
     #logger.debug(f"   --->  REF_ID: {msg_id}")
     logger.info(f"   --->     URL: {url}")
     logger.info(f"   --->     XML:\n{xml}")
-
-    body = ""
 
     async with aiohttp.ClientSession() as session:
         try:
