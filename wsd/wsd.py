@@ -168,15 +168,16 @@ async def state_monitor():
         now = datetime.datetime.now().replace(microsecond=0)
 
         for uuid, scanner in SCANNERS.items():
-            logger.info(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} [WSD:state_mon] Checking Timer and State for {scanner.friendly_name} @ {scanner.ip}...")
+            logger.info(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} [WSD:state_mon] Checking State and Timer for {scanner.friendly_name} @ {scanner.ip}...")
             status = scanner.state.value
             age = (now - scanner.last_seen).total_seconds()
-            subscr_age = (now - scanner.subscription_last_seen).total_seconds()
             logger.info(f"   -->            state: {status} ({scanner.state})")
             logger.info(f"   -->        last_seen: {scanner.last_seen}")
             logger.info(f"   -->              age: {age} seconds")
-            logger.info(f"   --> subscr_last_seen: {scanner.subscription_last_seen}")
-            logger.info(f"   -->       subscr_age: {subscr_age} seconds")
+            if subscr_age is not None:
+                subscr_age = (now - scanner.subscription_last_seen).total_seconds()
+                logger.info(f"   --> subscr_last_seen: {scanner.subscription_last_seen}")
+                logger.info(f"   -->       subscr_age: {subscr_age} seconds")
             
             if scanner.state.value in "online":          # auch die Sub-Stati für renew haben "online" als value
                 # Halbzeit-Check for subscription
