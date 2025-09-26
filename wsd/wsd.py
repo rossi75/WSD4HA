@@ -171,11 +171,24 @@ async def state_monitor():
             logger.info(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} [WSD:state_mon] Checking Timer and State for {scanner.friendly_name} @ {scanner.ip}...")
             status = scanner.state.value
             age = (now - scanner.last_seen).total_seconds()
-            logger.info(f"   -->     state: {status}")
-            logger.info(f"   --> last_seen: {scanner.last_seen}")
-            logger.info(f"   -->       age: {age} seconds")
+            subscr_age = (now - scanner.subscription_last_seen).total_seconds()
+            logger.info(f"   -->            state: {status} ({scanner.state})")
+            logger.info(f"   -->        last_seen: {scanner.last_seen}")
+            logger.info(f"   -->              age: {age} seconds")
+            logger.info(f"   --> subscr_last_seen: {scanner.subscription_last_seen}")
+            logger.info(f"   -->       subscr_age: {subscr_age} seconds")
+            
+            if scanner.state.value in "online":          # auch die Sub-Stati für renew haben "online" als value
+                # Halbzeit-Check for subscription
+                if scanner.state in STATE.ONLINE and subscr_age > (SCANNERS[uuid].subscription_timeout / 2)
+                    scanner.state = STATE.SUBSCR_RNW_1_2_PENDING
+                    logger.warning(f"[WSD:Heartbeat] --> proceeding Halftime-Check for Subscription")
+                    try:
+                        asyncio.create_task(send_subscription_renew(uuid))                # update_subscription() später im parser
+                    except Exception as e:
+                        scanner.state = STATE.ABSENT
+                        logger.warning(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} Could not reach scanner {scanner.friendly_name} @ {scanner.ip}. Last seen at {scanner.subscription_last_seen}. Response is {str(e)}")
 
-            if scanner.state in STATE.ONLINE:
                 # Halbzeit-Check
                 if age > OFFLINE_TIMEOUT / 2 and age <= (OFFLINE_TIMEOUT / 2 + 30):
 #                if age > OFFLINE_TIMEOUT / 2 and age <= (OFFLINE_TIMEOUT ):
@@ -196,6 +209,8 @@ async def state_monitor():
                         scanner.update()
                     except Exception as e:
                         logger.warning(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} Could not reach scanner {scanner.friendly_name} @ {scanner.ip}. Last seen at {scanner.last_seen}. Response is {str(e)}")
+
+            
     
             if scanner.state in STATE.TF_GET_PARSED:
                 logger.info(f"[WSD:state_mon] Transfer/Get parsed, subscribing to EP...")
