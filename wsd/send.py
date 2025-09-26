@@ -22,10 +22,10 @@ logging.basicConfig(level=logging.INFO, format='[%(levelname)s] %(message)s')
 logger = logging.getLogger("wsd-addon")
 
 # ---------------- Send Scanner Probe ----------------
-async def send_probe(scanner):
-    logger.info(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} [SEND:send_probe] sending probe for {scanner.uuid} @ {scanner.ip}")
+async def send_probe(uuid):
+    logger.info(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} [SEND:send_probe] sending probe for {SCANNERS[uuid].friendly_name or uuid} @ {SCANNERS[uuid].ip}")
 
-    scanner.state = STATE.PROBING
+    SCANNERS[uuid].state = STATE.PROBING
     msg_id = uuid.uuid4()
     xml = TEMPLATE_SOAP_PROBE.format(msg_id=msg_id)
 
@@ -34,7 +34,7 @@ async def send_probe(scanner):
         "User-Agent": USER_AGENT
     }
 
-    url = f"http://{scanner.ip}:80/StableWSDiscoveryEndpoint/schemas-xmlsoap-org_ws_2005_04_discovery"
+    url = f"http://{SCANNERS[uuid].ip}:80/StableWSDiscoveryEndpoint/schemas-xmlsoap-org_ws_2005_04_discovery"
 
     logger.info(f"   ---> URL: {url}")
     logger.debug(f"   ---> XML:\n{xml}")
@@ -48,10 +48,10 @@ async def send_probe(scanner):
                     body = await resp.text()
                 else:
                     logger.error(f"Probe failed with status {resp.status}")
-                    scanner.state = STATE.ABSENT
+                    SCANNER[uuid].state = STATE.ABSENT
         except Exception as e:
             logger.error(f"   ---> Probe fehlgeschlagen bei {url}: {e}")
-            scanner.state = STATE.ABSENT
+            SCANNER[uuid].state = STATE.ABSENT
 
     logger.debug(f"ProbeMatch von {scanner.ip}:\n{body}")
     parse_probe(body, scanner.uuid)
