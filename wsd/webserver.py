@@ -110,9 +110,10 @@ routes = web.RouteTableDef()
 @routes.route('*', '/WSDAPI')
 async def notify_handler(request):
     logger.info(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} [WEBSERVER:NOTIFY] received {request.method} on {request.path}")
-    logger.debug(f"payload: \n {text[:600]}")
 
     text = await request.text()
+    logger.debug(f"payload: \n {text[:600]}")
+
     try:
         root = ET.fromstring(text)
     except Exception as e:
@@ -120,8 +121,8 @@ async def notify_handler(request):
         return web.Response(status=400, text="bad xml")
 
     # try to extract identifier / event content
-    ident = root.find(".//wse:Identifier", NAMESPACES_NOTIFY)
-    body = root.find(".//s:Body", NAMESPACES_NOTIFY)
+    ident = root.find(".//wse:Identifier", NAMESPACES)
+    body = root.find(".//s:Body", NAMESPACES)
     
     # dump body child names for debugging
     events = []
