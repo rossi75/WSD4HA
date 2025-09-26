@@ -174,7 +174,7 @@ async def state_monitor():
             logger.info(f"   -->            state: {status} ({scanner.state})")
             logger.info(f"   -->        last_seen: {scanner.last_seen}")
             logger.info(f"   -->              age: {age} seconds")
-            if subscr_age is not None:
+            if scanner.subscription_last_seen is not None:
                 subscr_age = (now - scanner.subscription_last_seen).total_seconds()
                 logger.info(f"   --> subscr_last_seen: {scanner.subscription_last_seen}")
                 logger.info(f"   -->       subscr_age: {subscr_age} seconds")
