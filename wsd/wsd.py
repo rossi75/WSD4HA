@@ -182,28 +182,41 @@ async def state_monitor():
             
             if scanner.state.value in "online":          # auch die Sub-Stati für renew haben "online" als value
                 # Halbzeit-Check for subscription
-                if scanner.state in STATE.ONLINE and subscr_age > (SCANNERS[uuid].subscription_timeout / 2):
+#                if scanner.state in STATE.ONLINE and subscr_age > (SCANNERS[uuid].subscription_timeout / 2):
+                if subscr_age > (SCANNERS[uuid].subscription_timeout / 2) and subscr_age < (SCANNERS[uuid].subscription_timeout * 0.75):
                     scanner.state = STATE.SUBSCR_RNW_1_2_PENDING
-                    logger.warning(f"[WSD:Heartbeat] --> proceeding Halftime-Check for Subscription")
+                    logger.info(f"[WSD:Heartbeat] --> proceeding Halftime-Check for Subscription")
+                    try:
+                        asyncio.create_task(send_subscription_renew(uuid))                # update_subscription() später im parser
+                    except Exception as e:
+#                        scanner.state = STATE.ABSENT
+#                        scanner.state = STATE.ONLINE
+                        logger.warning(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} Could not reach scanner {scanner.friendly_name} @ {scanner.ip}. Last seen at {scanner.subscription_last_seen}. Response is {str(e)}")
+
+                # 3/4-Check for subscription
+#                if scanner.state in (STATE.ONLINE and subscr_age > (SCANNERS[uuid].subscription_timeout * 0.75):
+                if subscr_age > (SCANNERS[uuid].subscription_timeout * 0.75):
+                    scanner.state = STATE.SUBSCR_RNW_3_4_PENDING
+                    logger.info(f"[WSD:Heartbeat] --> proceeding 3/4-Check for Subscription")
                     try:
                         asyncio.create_task(send_subscription_renew(uuid))                # update_subscription() später im parser
                     except Exception as e:
                         scanner.state = STATE.ABSENT
                         logger.warning(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} Could not reach scanner {scanner.friendly_name} @ {scanner.ip}. Last seen at {scanner.subscription_last_seen}. Response is {str(e)}")
 
-                # Halbzeit-Check
-                if age > OFFLINE_TIMEOUT / 2 and age <= (OFFLINE_TIMEOUT / 2 + 30):
-#                if age > OFFLINE_TIMEOUT / 2 and age <= (OFFLINE_TIMEOUT ):
-                    logger.warning(f"[WSD:Hearbeat] --> proceeding Halbzeit-Check")
+                # Halbzeit-Check Online
+#                if scanner.state in STATE.ONLINE and age > (SCANNERS[uuid].timeout / 2):
+                if age > (SCANNERS[uuid].timeout / 2) and age < (SCANNERS[uuid].timeout * 0.75):
+                    logger.info(f"[WSD:Hearbeat] --> proceeding Halftime-Check")
                     try:
                         asyncio.create_task(send_probe(uuid))
                         scanner.update()
                     except Exception as e:
-                        scanner.state = STATE.ABSENT
+#                        scanner.state = STATE.ABSENT
                         logger.warning(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} Could not reach scanner with {scanner.friendly_name} @ {scanner.ip}. Last seen at {scanner.last_seen}. Response is {str(e)}")
     
-                # 3/4-Check
-                if age > (OFFLINE_TIMEOUT * 0.75) and age <= (OFFLINE_TIMEOUT * 0.75 + 30):
+                # 3/4-Check Online
+                if age > (OFFLINE_TIMEOUT * 0.75):
 #                if age > (OFFLINE_TIMEOUT * 0.75) and age <= (OFFLINE_TIMEOUT * 0.75):
                     logger.warning(f"[WSD:Heartbeat] --> proceeding Viertel-Check")
                     try:
@@ -241,7 +254,7 @@ async def state_monitor():
                     logger.warning(f"Anything went wrong while probing {scanner.friendly_name} @ {scanner.ip}, response is {str(e)}")
 
             # Timeout überschritten → offline markieren, damit werden alle Zwischenstati erschlagen, für den Fall dass was hängen geblieben ist und auch für ERROR
-            if age > OFFLINE_TIMEOUT and scanner.state not in {STATE.ABSENT, STATE.TO_REMOVE}:
+            if (age > OFFLINE_TIMEOUT or (subscr_age > scanner.subscription_timeout) and scanner.state not in {STATE.ABSENT, STATE.TO_REMOVE}:
                 logger.warning(f"[WSD:Heartbeat] --> mark as offline")
                 scanner.mark_absent()
 
