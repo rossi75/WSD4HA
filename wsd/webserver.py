@@ -10,7 +10,7 @@ import re
 import xml.etree.ElementTree as ET
 import subprocess
 from config import OFFLINE_TIMEOUT, SCAN_FOLDER, HTTP_PORT, MAX_FILES, NOTIFY_PORT
-from globals import SCANNERS, NAMESPACES, STATE
+from globals import SCANNERS, NAMESPACES, STATE, USER_AGENT
 from scanner import Scanner
 
 logging.basicConfig(level=logging.INFO, format='[%(levelname)s] %(message)s')
@@ -139,8 +139,8 @@ async def start_notify_server():
 #    loop.create_task(web._run_app(create_notify_app(), port=5357))
 
     app = web.Application()
-    app.router.add_get("/", status_page)
-    logger.debug(f"   ---> added endpoint /")
+    app.router.add_get(f"/{USER_AGENT}", notify_handler)
+    logger.debug(f"   ---> added endpoint /{USER_AGENT}")
 
     runner = web.AppRunner(app)
     await runner.setup()
