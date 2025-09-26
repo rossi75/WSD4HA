@@ -104,7 +104,7 @@ def parse_probe(xml: str, probed_uuid: str):
             if SCANNERS[probed_uuid].subscription_last_seen is not None:
                 SCANNERS[probed_uuid].state = STATE.ONLINE
                 logger.debug(f"   ===>  already found a subscription for {SCANNER[probed_uuid].friendly_name} @ {SCANNER[probed_uuid].ip}, no need to ask for more details")
-            else
+            else:
                 SCANNERS[probed_uuid].state = STATE.PROBE_PARSED
             logger.info(f"[WSD:probe_parser] Updated scanner {probed_uuid} -> {xaddr}")
 
