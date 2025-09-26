@@ -18,7 +18,7 @@ class Scanner:
 
         # WSD Parameters
         self.xaddr = xaddr            # Service-Adresse (aus <wsd:XAddrs>)
-        self.subscription_timeout = ""
+        self.subscription_timeout = 0
         self.subscription_expires = None
         self.subscription_id = None
         self.subscription_ref = None
@@ -54,9 +54,10 @@ class Scanner:
         logger.debug(f"   ---> new last_seen: {self.last_seen}")
 
     # Scannerservice ist noch online
-    # Aufruf mit SCANNER[uuid].updateservice()
-    def updateservice(self, timeout = 3600):
-        self.subscription_expires = datetime.datetime.now().replace(microsecond=0) + timeout # später den PT-Wert decodieren
+    # Aufruf mit SCANNER[uuid].update_subscription()
+#    def update_subscription(self, timeout = 3600):
+    def update_subscription(self):
+        self.subscription_expires = datetime.datetime.now().replace(microsecond=0) + self.subscription_timeout # später den PT-Wert decodieren
         self.state = STATE.ONLINE
         self.offline_since = None
         self.remove_after = None
