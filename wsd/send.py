@@ -23,7 +23,8 @@ logger = logging.getLogger("wsd-addon")
 
 # ---------------- Send Scanner Probe ----------------
 async def send_probe(uuid: str):
-    logger.info(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} [SEND:send_probe] sending probe for {SCANNERS[uuid].friendly_name or uuid} @ {SCANNERS[uuid].ip}")
+#    logger.info(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} [SEND:send_probe] sending probe for {SCANNERS[uuid].friendly_name or uuid} @ {SCANNERS[uuid].ip}")
+    logger.info(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} [SEND:send_probe] sending probe for {SCANNERS[uuid].friendly_name} @ {SCANNERS[uuid].ip}")
 
     SCANNERS[uuid].state = STATE.PROBING
     msg_id = uuid.uuid4()
