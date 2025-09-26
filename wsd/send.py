@@ -23,7 +23,6 @@ logger = logging.getLogger("wsd-addon")
 
 # ---------------- Send Scanner Probe ----------------
 async def send_probe(probe_uuid: str):
-#    logger.info(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} [SEND:send_probe] sending probe for {SCANNERS[uuid].friendly_name or uuid} @ {SCANNERS[uuid].ip}")
     logger.info(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} [SEND:send_probe] sending probe for {SCANNERS[probe_uuid].friendly_name} @ {SCANNERS[probe_uuid].ip}")
 
     SCANNERS[probe_uuid].state = STATE.PROBING
@@ -52,8 +51,6 @@ async def send_probe(probe_uuid: str):
             logger.error(f"   ---> Probe fehlgeschlagen bei {url}: {e}")
             SCANNER[probe_uuid].state = STATE.ABSENT
 
-#    logger.debug(f"ProbeMatch von {scanner.ip}:\n{body}")
-#    parse_probe(body, scanner.uuid)
     logger.debug(f"   ---> Statuscode: {resp.status}")
     logger.debug(f"ProbeMatch von {SCANNERS[probe_uuid].ip}:\n{body}")
 
@@ -120,7 +117,7 @@ async def send_subscr_ScanAvailableEvent(sae_uuid: str):
     msg_id = uuid.uuid4()
     ref_id = uuid.uuid4()
     addr_id = uuid.uuid4()
-    EndTo_addr = "http://192.168.0.10:5357/{addr_id}"
+    EndTo_addr = "http://192.168.0.10:5357/"{addr_id}
 
     xml = TEMPLATE_SUBSCRIBE_SAE.format(
         to_device_uuid = sae_uuid,
