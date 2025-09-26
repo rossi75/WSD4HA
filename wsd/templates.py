@@ -127,7 +127,7 @@ TEMPLATE_SUBSCRIBE_RENEW = """<?xml version="1.0" encoding="utf-8"?>
   <soap:Header>
     <wsa:To>{xaddr}</wsa:To>
     <wsa:Action>http://schemas.xmlsoap.org/ws/2004/08/eventing/Renew</wsa:Action>
-    <wsa:MessageID>{msg_id}</wsa:MessageID>
+    <wsa:MessageID>urn:uuid:{msg_id}</wsa:MessageID>
     <wsa:ReplyTo>
       <wsa:Address>http://schemas.xmlsoap.org/ws/2004/08/addressing/role/anonymous</wsa:Address>
     </wsa:ReplyTo>
