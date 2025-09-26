@@ -254,7 +254,7 @@ async def state_monitor():
                     logger.warning(f"Anything went wrong while probing {scanner.friendly_name} @ {scanner.ip}, response is {str(e)}")
 
             # Timeout überschritten → offline markieren, damit werden alle Zwischenstati erschlagen, für den Fall dass was hängen geblieben ist und auch für ERROR
-            if (age > OFFLINE_TIMEOUT or (subscr_age > scanner.subscription_timeout) and scanner.state not in {STATE.ABSENT, STATE.TO_REMOVE}:
+            if (age > OFFLINE_TIMEOUT or (subscr_age > scanner.subscription_timeout) and scanner.state not in {STATE.ABSENT, STATE.TO_REMOVE}):
                 logger.warning(f"[WSD:Heartbeat] --> mark as offline")
                 scanner.mark_absent()
 
