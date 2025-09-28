@@ -60,6 +60,7 @@ class Scanner:
 #    def update_subscription(self, timeout = 3600):
     def update_subscription(self):
         self.subscription_last_seen = datetime.datetime.now().replace(microsecond=0)
+        self.last_seen = datetime.datetime.now().replace(microsecond=0)
         self.state = STATE.ONLINE
         self.offline_since = None
         self.remove_after = None
