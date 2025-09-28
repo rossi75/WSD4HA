@@ -41,24 +41,34 @@ async def status_page(request):
 #        formats = ", ".join(s.formats)
         #formats = ", ".join(s.types)
 #        scanner_list += f"<tr style='color:{color}'>
-        scanner_list += "<tr style='color:{color}'>"
-        scanner_list += "<td>" + str(s.friendly_name or '') + "</td>"
-        scanner_list += "<td>" + str(s.ip) + "</td>"
-        scanner_list += "<td>" + str(s.mac or '') + "</td>"
-        scanner_list += "<td>" + str(s.state.value) + "</td>"
-        scanner_list += "<td>" + str(s.uuid) + "</td>"
 #        scanner_list += "<td>" + str(s.last_seen.strftime('%Y-%m-%d %H:%M:%S')) + "</td>"
-        scanner_list += "<td>" + str(s.first_seen.strftime('%Y-%m-%d %H:%M:%S')) + "<br>"
-        scanner_list += "<td>" + str(s.last_seen.strftime('%Y-%m-%d %H:%M:%S')) + "<br>"
-        scanner_list += "<td>" + str(s.subscription_last_seen.strftime('%Y-%m-%d %H:%M:%S') or '') + "<br>"
-        scanner_list += "<td>" + str(s.remove_after.strftime('%Y-%m-%d %H:%M:%S') or '') + "</td>"
-        scanner_list += "<td>" + str(s.xaddr or '') + "</td>"
-        scanner_list += "<td>" + str(s.subscription_id or '') + "<br>"
-        scanner_list += "<td>" + str(s.subscription_expires or '') + "</td>"
-        scanner_list += "<td>" + str(s.manufacturer or '') + "<br>"
-        scanner_list += "<td>" + str(s.model or '') + "</td>"
-        scanner_list += "<td>" + str(s.firmware or '') + "<br>"
-        scanner_list += "<td>" + str(s.serial or '') + "</td>"
+        #scanner_list += "<td>" + str(s.subscription_last_seen.strftime('%Y-%m-%d %H:%M:%S') or '') + "<br>"
+#        scanner_list += "<td>" + str(s.remove_after.strftime('%Y-%m-%d %H:%M:%S') or '') + "</td>"
+#        scanner_list += "<td>" + str(s.xaddr or '') + "</td>"
+#        scanner_list += "<td>" + str(s.subscription_id or '') + "<br>"
+#        scanner_list += "<td>" + str(s.subscription_expires or '') + "</td>"
+#        scanner_list += "<td>" + str(s.manufacturer or '') + "<br>"
+#        scanner_list += "<td>" + str(s.model or '') + "</td>"
+#        scanner_list += "<td>" + str(s.firmware or '') + "<br>"
+#        scanner_list += "<td>" + str(s.serial or '') + "</td>"
+#        scanner_list += f"<td>{s.subscription_id if s.subscription_id else ''}<br>"
+        scanner_list += "<tr style='color:{color}'>"
+        scanner_list += f"<td>{s.friendly_name}</td>"
+        scanner_list += f"<td>{s.ip}<br>"
+        scanner_list += f"<td>{s.mac}</td>"
+        scanner_list += f"<td>{s.state.value}</td>"
+        scanner_list += f"<td>{s.first_seen.strftime('%Y-%m-%d %H:%M:%S')}<br>"
+        scanner_list += f"<td>{s.last_seen.strftime('%Y-%m-%d %H:%M:%S')}<br>"
+        scanner_list += f"<td>{s.subscription_last_seen.strftime('%Y-%m-%d %H:%M:%S') if s.subscription_last_seen else ''}<br>"
+        scanner_list += f"<td>{s.remove_after.strftime('%Y-%m-%d %H:%M:%S') if s.remove_after else ''}</td>"
+        scanner_list += f"<td>{s.uuid}<br>"
+        scanner_list += f"<td>{s.xaddr if s.xaddr else ''}</td>"
+        scanner_list += f"<td>{s.subscription_id if s.subscription_id else ''}<br>"
+        scanner_list += f"<td>{s.subscription_expires.strftime('%Y-%m-%d %H:%M:%S') if s.subscription_expires else ''}</td>"
+        scanner_list += f"<td>{s.manufacturer if s.manufacturer else ''}<br>"
+        scanner_list += f"<td>{s.model if s.model else ''}</td>"
+        scanner_list += f"<td>{s.firmware if s.firmware else ''}<br>"
+        scanner_list += f"<td>{s.serial if s.serial else ''}</td>"
         scanner_list += "</tr>"
 
     logger.debug(f"   ---> probably delivered http-response")
@@ -76,7 +86,7 @@ async def status_page(request):
             <h1>WSD4HA seems to be running</h1>
             <h2>Active Scanners:</h2>
             <table>
-                <tr><th>Name</th><th>IP</th><th>MAC</th><th>State</th><th>UUID</th><th>First seen<br>Last seen<br>Last Subscription<br>Remove after</th><th>XADDR</th><th>Subscr ID<br>Subscr Exp</th><th>Manufacturer<br>Model</th><th>Firmware<br>Serial</th></tr>
+                <tr><th>Name</th><th>IP<br>MAC</th><th>State</th><th>UUID</th><th>First seen<br>Last seen<br>Last Subscription<br>Remove after</th><th>XADDR</th><th>Subscr ID<br>Subscr Exp</th><th>Manufacturer<br>Model</th><th>Firmware<br>Serial</th></tr>
                 {scanner_list}
             </table>
             <h2>Last {MAX_FILES} Scans:</h2>
