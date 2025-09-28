@@ -34,6 +34,7 @@ class Scanner:
         self.related_uuids = set()
 
         # Status
+        self.first_seen = datetime.datetime.now().replace(microsecond=0)
         self.last_seen = datetime.datetime.now().replace(microsecond=0)
         self.state = STATE.DISCOVERED
         self.offline_since = None
