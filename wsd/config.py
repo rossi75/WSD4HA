@@ -10,14 +10,13 @@ import re
 import xml.etree.ElementTree as ET
 import subprocess
 import uuid
-from globals import SCANNERS, list_scanners, FROM_UUID, USER_AGENT
+from globals import SCANNERS, list_scanners, FROM_UUID, USER_AGENT, LOG_LEVEL
 
-
-NAMESPACES = {
-    "soap": "http://www.w3.org/2003/05/soap-envelope",
-    "wsd": "http://schemas.xmlsoap.org/ws/2005/04/discovery",
-    "wsa": "http://schemas.xmlsoap.org/ws/2004/08/addressing"
-}
+#NAMESPACES = {
+#    "soap": "http://www.w3.org/2003/05/soap-envelope",
+#    "wsd": "http://schemas.xmlsoap.org/ws/2005/04/discovery",
+#    "wsa": "http://schemas.xmlsoap.org/ws/2004/08/addressing"
+#}
 
 # ----------------- To Do -----------------
 # - Drucker oder Scanner name übernehmen
@@ -31,7 +30,7 @@ NAMESPACES = {
 
 # ---------------- Logging ----------------
 #LOG_LEVEL = os.environ.get("LOG_LEVEL", "INFO").upper()
-LOG_LEVEL = os.environ.get("LOG_LEVEL", "DEBUG").upper()
+#LOG_LEVEL = os.environ.get("LOG_LEVEL", "DEBUG").upper()
 # dynamisches loglevel
 #logging.basicConfig(
 #    level=getattr(logging, LOG_LEVEL, logging.INFO),
@@ -40,7 +39,8 @@ LOG_LEVEL = os.environ.get("LOG_LEVEL", "DEBUG").upper()
 #    format="%(asctime)s [%(levelname)s] %(message)s",
 # festes Loglevel
 #logging.basicConfig(level=logging.INFO, format='[%(levelname)s] %(message)s')
-logging.basicConfig(level=logging.DEBUG, format='[%(levelname)s] %(message)s')
+#logging.basicConfig(level=logging.DEBUG, format='[%(levelname)s] %(message)s')
+logging.basicConfig(level=logging.LOG_LEVEL, format='[%(levelname)s] %(message)s')
 
 logger = logging.getLogger("wsd-addon")
 
