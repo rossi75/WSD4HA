@@ -8,8 +8,8 @@ from enum import Enum
 import uuid
 
 # -----------------  Logging  -----------------
-LOG_LEVEL=WARNING
-LOG_LEVEL=INFO
+LOG_LEVEL="WARNING"
+LOG_LEVEL="INFO"
 #LOG_LEVEL=DEBUG
 #logging.basicConfig(level=logging.INFO, format='[%(levelname)s] %(message)s')
 logging.basicConfig(level=logging.LOG_LEVEL, format='[%(levelname)s] %(message)s')
