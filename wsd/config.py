@@ -40,8 +40,8 @@ from globals import SCANNERS, list_scanners, FROM_UUID, USER_AGENT, LOG_LEVEL
 # festes Loglevel
 #logging.basicConfig(level=logging.INFO, format='[%(levelname)s] %(message)s')
 #logging.basicConfig(level=logging.DEBUG, format='[%(levelname)s] %(message)s')
-logging.basicConfig(level=logging.LOG_LEVEL, format='[%(levelname)s] %(message)s')
-
+#logging.basicConfig(level=logging.LOG_LEVEL, format='[%(levelname)s] %(message)s')
+logging.basicConfig(level=LOG_LEVEL, format='[%(levelname)s] %(message)s')
 logger = logging.getLogger("wsd-addon")
 
 logger.info(f" ")
