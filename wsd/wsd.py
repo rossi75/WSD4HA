@@ -13,14 +13,15 @@ import uuid
 import xml.etree.ElementTree as ET
 from config import OFFLINE_TIMEOUT, LOCAL_IP, HTTP_PORT, FROM_UUID
 #from globals import SCANNERS, list_scanners, NAMESPACES, STATE, FROM_UUID
-from globals import SCANNERS, list_scanners, NAMESPACES, STATE
+from globals import SCANNERS, list_scanners, NAMESPACES, STATE, LOG_LEVEL
 from pathlib import Path
 from scanner import Scanner
 from templates import TEMPLATE_SOAP_PROBE, TEMPLATE_SOAP_TRANSFER_GET
 from send import send_probe, send_transfer_get, send_subscr_ScanAvailableEvent
 from parse import parse_wsd_packet, parse_probe, parse_transfer_get, parse_subscribe
 
-logging.basicConfig(level=logging.INFO, format='[%(levelname)s] %(message)s')
+#logging.basicConfig(level=logging.INFO, format='[%(levelname)s] %(message)s')
+logging.basicConfig(level=LOG_LEVEL, format='[%(levelname)s] %(message)s')
 logger = logging.getLogger("wsd-addon")
 
 # ---------------- XADDR filtern ----------------
