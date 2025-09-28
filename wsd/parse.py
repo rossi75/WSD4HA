@@ -131,6 +131,16 @@ def parse_transfer_get(xml_body, tf_g_uuid):
     if fn_elem is not None:
         SCANNERS[tf_g_uuid].friendly_name = fn_elem.text.strip()
 
+    # Maunfacturer
+    mf_elem = root.find(".//wsdp:Manufacturer", NAMESPACES)
+    if mf_elem is not None:
+        SCANNERS[tf_g_uuid].manufacturer = mf_elem.text.strip()
+
+    # Model
+    md_elem = root.find(".//wsdp:ModelName", NAMESPACES)
+    if md_elem is not None:
+        SCANNERS[tf_g_uuid].serial_number = md_elem.text.strip()
+
     # SerialNumber
     sn_elem = root.find(".//wsdp:SerialNumber", NAMESPACES)
     if sn_elem is not None:
