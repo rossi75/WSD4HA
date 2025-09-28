@@ -167,6 +167,8 @@ def parse_transfer_get(xml_body, tf_g_uuid):
     logger.info(f"   ---> FN: {SCANNERS[tf_g_uuid].friendly_name}")
     logger.info(f"   ---> SN: {SCANNERS[tf_g_uuid].serial_number}")
     logger.info(f"   ---> FW: {SCANNERS[tf_g_uuid].firmware}")
+    logger.info(f"   ---> MF: {SCANNERS[tf_g_uuid].manufacturer}")
+    logger.info(f"   ---> MD: {SCANNERS[tf_g_uuid].model}")
 
     SCANNERS[tf_g_uuid].state = STATE.TF_GET_PARSED
 
