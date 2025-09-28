@@ -205,7 +205,9 @@ def parse_subscribe(subscr_uuid, xml_body):
 #            SCANNERS[subscr_uuid].subscription_timeout = expires_elem.text.strip()
 #            SCANNERS[subscr_uuid].subscription_expires = datetime.datetime.now().replace(microsecond=0) + parse_w3c_duration(expires_elem.text.strip())
             SCANNERS[subscr_uuid].subscription_timeout = parse_w3c_duration(expires_elem.text.strip())
-            SCANNERS[subscr_uuid].subscription_expires = datetime.datetime.now().replace(microsecond=0) + timedelta(seconds = SCANNERS[subscr_uuid].subscription_timeout)
+#            SCANNERS[subscr_uuid].subscription_expires = datetime.datetime.now().replace(microsecond=0) + timedelta(seconds = SCANNERS[subscr_uuid].subscription_timeout)
+#            SCANNERS[subscr_uuid].update_subscription()_last_seen = datetime.datetime.now().replace(microsecond=0)
+            SCANNERS[subscr_uuid].update_subscription()
         except Exception as e:
             logger.warning(f"[PARSE:subscr] Could not parse Expires: {e}")
             SCANNERS[subscr_uuid].state = STATE.ERROR
@@ -243,6 +245,7 @@ def parse_subscribe(subscr_uuid, xml_body):
 
     logger.info(f"   --->        UUID: {subscr_uuid}")
     logger.info(f"   --->     timeout: {SCANNERS[subscr_uuid].subscription_timeout}")
+    logger.info(f"   --->     expires: {SCANNERS[subscr_uuid].subscription_expires}")
     logger.info(f"   --->     expires: {SCANNERS[subscr_uuid].subscription_expires}")
     logger.info(f"   --->   subscr_id: {SCANNERS[subscr_uuid].subscription_id}")
     logger.info(f"   --->      ref_id: {SCANNERS[subscr_uuid].subscription_ref}")
