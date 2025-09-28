@@ -2,11 +2,11 @@ import datetime
 import socket
 import logging
 import sys
-from globals import SCANNERS, list_scanners, NAMESPACES, STATE
+from globals import SCANNERS, list_scanners, NAMESPACES, STATE, LOG_LEVEL
 from config import OFFLINE_TIMEOUT
 
-
-logging.basicConfig(level=logging.INFO, format='[%(levelname)s] %(message)s')
+#logging.basicConfig(level=logging.INFO, format='[%(levelname)s] %(message)s')
+logging.basicConfig(level=logging.LOG_LEVEL, format='[%(levelname)s] %(message)s')
 logger = logging.getLogger("wsd-addon")
 
 # ---------------- Scanner-Datenstruktur ----------------
