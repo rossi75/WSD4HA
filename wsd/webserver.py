@@ -42,11 +42,11 @@ async def status_page(request):
         #formats = ", ".join(s.types)
 #        scanner_list += f"<tr style='color:{color}'>
         scanner_list += "<tr style='color:{color}'>"
-        scanner_list += "<td>" + str(s.ip) + "</td>"
-        scanner_list += "<td>" + str(s.uuid) + "</td>"
         scanner_list += "<td>" + str(s.friendly_name or '') + "</td>"
+        scanner_list += "<td>" + str(s.ip) + "</td>"
         scanner_list += "<td>" + str(s.mac or '') + "</td>"
         scanner_list += "<td>" + str(s.state.value) + "</td>"
+        scanner_list += "<td>" + str(s.uuid) + "</td>"
 #        scanner_list += "<td>" + str(s.last_seen.strftime('%Y-%m-%d %H:%M:%S')) + "</td>"
         scanner_list += "<td>" + str(s.first_seen.strftime('%Y-%m-%d %H:%M:%S')) + "<br>"
         scanner_list += "<td>" + str(s.last_seen.strftime('%Y-%m-%d %H:%M:%S')) + "<br>"
@@ -76,7 +76,7 @@ async def status_page(request):
             <h1>WSD4HA seems to be running</h1>
             <h2>Active Scanners:</h2>
             <table>
-                <tr><th>IP</th><th>UUID</th><th>Name</th><th>MAC</th><th>State</th><th>First seen<br>Last seen<br>Last Subscription<br>Remove after</th><th>XADDR</th><th>Subscr ID</th><th>Subscr Exp</th><th>Manufacturer</th><th>Model</th><th>Firmware</th><th>Serial</th></tr>
+                <tr><th>Name</th><th>IP</th><th>MAC</th><th>State</th><th>UUID</th><th>First seen<br>Last seen<br>Last Subscription<br>Remove after</th><th>XADDR</th><th>Subscr ID</th><th>Subscr Exp</th><th>Manufacturer</th><th>Model</th><th>Firmware</th><th>Serial</th></tr>
                 {scanner_list}
             </table>
             <h2>Last {MAX_FILES} Scans:</h2>
