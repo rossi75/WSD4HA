@@ -122,15 +122,37 @@ async def start_http_server():
     await site.start()
     logger.info(f"HTTP/SOAP Server is running on Port {HTTP_PORT}")
 
+
+
+
+
+
+
+
+
+
+
+
+# Fängt alles hinter / ab, z.B. /6ccf7716-4dc8-47bf-aca4-5a2ae5a959ca
+async def notify_handler(request):
+    if request.method == "OPTIONS":
+        return web.Response(status=200)   # Preflight akzeptieren
+    if request.method == "POST":
+        body = await request.text()
+        logger.info(f"[WEBSERVER:NOTIFY] SOAP:\n{body}")
+        return web.Response(text="OK")
+    return web.Response(status=405)
+
 # ---------------- NOTIFY handler ----------------
 #@routes.post('/WSDAPI')      # 👈 Decorator kommt direkt vor die Funktion
+#@routes.route('*', '/WSDAPI')
 routes = web.RouteTableDef()
-@routes.route('*', '/WSDAPI')
+@routes.route('*', r'/{uuid:[0-9a-fA-F\-]+}')
 async def notify_handler(request):
     logger.info(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} [WEBSERVER:NOTIFY] received {request.method} on {request.path}")
 
     text = await request.text()
-    logger.debug(f"payload: \n {text[:600]}")
+    logger.info(f"payload: \n {text[:600]}")
 
     try:
         root = ET.fromstring(text)
@@ -141,8 +163,17 @@ async def notify_handler(request):
     # try to extract identifier / event content
     ident = root.find(".//wse:Identifier", NAMESPACES)
     body = root.find(".//s:Body", NAMESPACES)
-    
-    # dump body child names for debugging
+
+    path_uuid = request.match_info['uuid']
+    logger.info(f"{path_uuid}")
+
+    if request.method == "OPTIONS":
+        logger.info(f"[WEBSERVER:NOTIFY] OPTIONS received")
+        return web.Response(status=200)   # Preflight akzeptieren
+    if request.method == "POST":
+        body = await request.text()
+        logger.info(f"[WEBSERVER:NOTIFY] POST received, SOAP:\n{body}")
+        return web.Response(text="OK")    # dump body child names for debugging
     events = []
     if body is not None:
         for child in body:
