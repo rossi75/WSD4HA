@@ -201,7 +201,6 @@ async def state_monitor():
                     logger.info(f"[WSD:Heartbeat] --> proceeding Halftime-Check")
                     try:
                         asyncio.create_task(send_probe(uuid))
-#                        scanner.update()                                                                                                # das muss eigentlich in den Parser !!
                     except Exception as e:
                         logger.warning(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} Could not reach scanner with {scanner.friendly_name} @ {scanner.ip}. Last seen at {scanner.last_seen}. Response is {str(e)}")
     
@@ -210,7 +209,6 @@ async def state_monitor():
                     logger.warning(f"[WSD:Heartbeat] --> proceeding 3/4-Check")
                     try:
                         asyncio.create_task(send_probe(uuid))
-#                        scanner.update()                                                # das muss eigentlich in den Parser !!
                     except Exception as e:
                         logger.warning(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} Could not reach scanner {scanner.friendly_name} @ {scanner.ip}. Last seen at {scanner.last_seen}. Response is {str(e)}")
 
@@ -267,7 +265,9 @@ async def state_monitor():
             await asyncio.sleep(2)
         else:
             logger.debug(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} [WSD:sleep] goodbye")
-            await asyncio.sleep(OFFLINE_TIMEOUT / 4)
+#            await asyncio.sleep(OFFLINE_TIMEOUT / 4)
+            await asyncio.sleep(OFFLINE_TIMEOUT / 5)
+
         logger.debug(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} [WSD:sleep] back in town")
 
 
