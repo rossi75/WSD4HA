@@ -98,13 +98,15 @@ def parse_probe(xml: str, probed_uuid: str):
         if probe_uuid not in SCANNERS:
             SCANNERS[probe_uuid] = Scanner(uuid=probe_uuid, ip=SCANNERS[probed_uuid].ip, xaddr=xaddr)
             SCANNERS[probe_uuid].state = STATE.PROBE_PARSED                       # das neue Gerät > hat die Probe bestanden, wird nun weiter konnektiert
-            SCANNERS[probed_uuid].state = STATE.ONLINE                                    # das alte Gerät > ist weiterhin online, wird nicht mehr bearbeitet
+#            SCANNERS[probed_uuid].state = STATE.ONLINE                                    # das alte Gerät > ist weiterhin online, wird nicht mehr bearbeitet
+            SCANNERS[probed_uuid].update()                                    # das alte Gerät > ist weiterhin online, wird nicht mehr bearbeitet
             marry_endpoints(probed_uuid, probe_uuid)
             logger.info(f"[WSD:probe_parser] Discovered new scanner endpoint with {probe_uuid} @ {SCANNERS[probed_uuid].ip} as child from {probed_uuid}")
         else:
             SCANNERS[probed_uuid].xaddr = xaddr
             if SCANNERS[probed_uuid].subscription_last_seen is not None:
-                SCANNERS[probed_uuid].state = STATE.ONLINE
+#                SCANNERS[probed_uuid].state = STATE.ONLINE
+                SCANNERS[probed_uuid].update()
                 logger.debug(f"   ===>  already found a subscription for {SCANNERS[probed_uuid].friendly_name} @ {SCANNERS[probed_uuid].ip}, no need to ask for more details")
             else:
                 SCANNERS[probed_uuid].state = STATE.PROBE_PARSED
@@ -164,11 +166,11 @@ def parse_transfer_get(xml_body, tf_g_uuid):
                 SCANNERS[tf_g_uuid].xaddr = addr
             logger.info(f"  ADDR: {SCANNERS[tf_g_uuid].xaddr}")
 
-    logger.info(f"   ---> FN: {SCANNERS[tf_g_uuid].friendly_name}")
-    logger.info(f"   ---> SN: {SCANNERS[tf_g_uuid].serial_number}")
-    logger.info(f"   ---> FW: {SCANNERS[tf_g_uuid].firmware}")
-    logger.info(f"   ---> MF: {SCANNERS[tf_g_uuid].manufacturer}")
-    logger.info(f"   ---> MD: {SCANNERS[tf_g_uuid].model}")
+    logger.debug(f"   ---> FN: {SCANNERS[tf_g_uuid].friendly_name}")
+    logger.debug(f"   ---> SN: {SCANNERS[tf_g_uuid].serial_number}")
+    logger.debug(f"   ---> FW: {SCANNERS[tf_g_uuid].firmware}")
+    logger.debug(f"   ---> MF: {SCANNERS[tf_g_uuid].manufacturer}")
+    logger.debug(f"   ---> MD: {SCANNERS[tf_g_uuid].model}")
 
     SCANNERS[tf_g_uuid].state = STATE.TF_GET_PARSED
 
@@ -195,7 +197,7 @@ def parse_subscribe(subscr_uuid, xml_body):
     try:
         root = ET.fromstring(xml_body)
     except ET.ParseError as e:
-        logger.warning(f"[PARSE:subscr] Error while parsing subscribe response: {e}")
+        logger.error(f"[PARSE:subscr] Error while parsing subscribe response: {e}")
         SCANNERS[subscr_uuid].state = STATE.ERROR
         return None
 
@@ -306,6 +308,7 @@ def parse_scan_available(notify_uuid, xml):
         xml (str): SOAP Notify payload (string)
     """
     logger.info(f"[PARSE:scan_available] parsing ScanAvailableEvent for {notify_uuid}")
+    logger.debug(f"   XML:\n{xml}")
 
     try:
         root = ET.fromstring(xml)
@@ -314,14 +317,14 @@ def parse_scan_available(notify_uuid, xml):
         return
 
     action = root.findtext(".//wsa:Action", default="", namespaces=NAMESPACES)
-    sub_identifier = root.findtext(".//wse:Identifier", default="", namespaces=NAMESPACES)
+    subscr_identifier = root.findtext(".//wse:Identifier", default="", namespaces=NAMESPACES)
     scan_identifier = root.findtext(".//wscn:ScanIdentifier", default="", namespaces=NAMESPACES)
     input_source = root.findtext(".//wscn:InputSource", default="", namespaces=NAMESPACES)
 
-    logger.info(f"[PARSE:scan_available] Action={action}")
-    logger.info(f"[PARSE:scan_available] Subscription ID={sub_identifier}")
-    logger.info(f"[PARSE:scan_available] Scan ID={scan_identifier}")
-    logger.info(f"[PARSE:scan_available] Input Source={input_source}")
+    logger.info(f"[PARSE:scan_available]          Action: {action}")
+    logger.info(f"[PARSE:scan_available] Subscription ID: {subscr_identifier}")
+    logger.info(f"[PARSE:scan_available]         Scan ID: {scan_identifier}")
+    logger.info(f"[PARSE:scan_available]    Input Source: {input_source}")
 
     # Optional: Im SCANNERS-Dict hinterlegen
     if notify_uuid in SCANNERS:
@@ -330,6 +333,11 @@ def parse_scan_available(notify_uuid, xml):
         s.last_scan_source = input_source
         s.last_scan_time = datetime.datetime.now().replace(microsecond=0)
         logger.info(f"[PARSE:scan_available] Scanner {s.friendly_name} updated with new scan event.")
+
+    # was machen wir jetzt mit der Info dass es ggf einen neuen Scan gibt?
+    # auf jeden Fall hat er sich gemeldet, also merken wir uns das
+    SCANNERS[notify_uuid].update()
+
 # ---------------- Pick Best XADDR from String ----------------
 def pick_best_xaddr(xaddrs: str) -> str:
     """
