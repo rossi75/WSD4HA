@@ -168,19 +168,17 @@ async def state_monitor():
             logger.info(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} [WSD:state_mon] Checking State and Timer for {scanner.friendly_name} @ {scanner.ip}...")
             status = scanner.state.value
             age = (now - scanner.last_seen).total_seconds()
-            logger.info(f"   -->            state: {status} ({scanner.state})")
-            logger.info(f"   -->        last_seen: {scanner.last_seen}")
-            logger.info(f"   -->              age: {age} seconds")
+            logger.info(f"   --->            state: {status} ({scanner.state})")
+            logger.info(f"   --->        last_seen: {scanner.last_seen}          age: {age} seconds")
             if scanner.subscription_last_seen is not None:
                 subscr_age = (now - scanner.subscription_last_seen).total_seconds()
-                logger.info(f"   --> subscr_last_seen: {scanner.subscription_last_seen}")
-                logger.info(f"   -->       subscr_age: {subscr_age} seconds")
+                logger.info(f"   ---> subscr_last_seen: {scanner.subscription_last_seen}          age: {subscr_age} seconds")
             
             if scanner.state.value in "online":          # auch die Sub-Stati für renew haben "online" als value
                 # Halbzeit-Check for subscription
                 if subscr_age > (SCANNERS[uuid].subscription_timeout / 2) and subscr_age <= (SCANNERS[uuid].subscription_timeout * 0.75):
                     scanner.state = STATE.SUBSCR_RNW_1_2_PENDING
-                    logger.info(f"[WSD:Heartbeat] --> proceeding Halftime-Check for Subscription")
+                    logger.info(f"[WSD:Heartbeat] ---> proceeding Halftime-Check for Subscription")
                     try:
                         asyncio.create_task(send_subscription_renew(uuid))                # update_subscription() später im parser
                     except Exception as e:
@@ -189,7 +187,7 @@ async def state_monitor():
                 # 3/4-Check for subscription
                 if subscr_age > (SCANNERS[uuid].subscription_timeout * 0.75):
                     scanner.state = STATE.SUBSCR_RNW_3_4_PENDING
-                    logger.warning(f"[WSD:Heartbeat] --> proceeding 3/4-Check for Subscription")
+                    logger.warning(f"[WSD:Heartbeat] ---> proceeding 3/4-Check for Subscription")
                     try:
                         asyncio.create_task(send_subscription_renew(uuid))                # update_subscription() später im parser
                     except Exception as e:
@@ -198,7 +196,7 @@ async def state_monitor():
 
                 # Halbzeit-Check Online
                 if age > (OFFLINE_TIMEOUT / 2) and age <= (OFFLINE_TIMEOUT * 0.75):
-                    logger.info(f"[WSD:Heartbeat] --> proceeding Halftime-Check")
+                    logger.info(f"[WSD:Heartbeat] ---> proceeding Halftime-Check")
                     try:
                         asyncio.create_task(send_probe(uuid))
                     except Exception as e:
@@ -206,7 +204,7 @@ async def state_monitor():
     
                 # 3/4-Check Online
                 if age > (OFFLINE_TIMEOUT * 0.75):
-                    logger.warning(f"[WSD:Heartbeat] --> proceeding 3/4-Check")
+                    logger.warning(f"[WSD:Heartbeat] ---> proceeding 3/4-Check")
                     try:
                         asyncio.create_task(send_probe(uuid))
                     except Exception as e:
