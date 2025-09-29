@@ -118,42 +118,12 @@ async def notify_handler(request):
 
     try:
         root = ET.fromstring(xml_payload)
+        asyncio.create_task(parse_scan_available(notify_uuid, xml_payload))
     except Exception as e:
         logger.warning(f"[SERVER:notify_handler] invalid xml: {e}")
         return web.Response(status=400, text="bad xml")
 
-    parse_scan_available(notify_uuid, xml_payload)
-    
     return web.Response(status=200, text="Alles juut")
-
-
-
-
-
-
-
-
-    
-    # try to extract identifier / event content
-#    ident = root.find(".//wse:Identifier", NAMESPACES)
-#    body = root.find(".//soap:Body", NAMESPACES)
-
-#    if request.method == "OPTIONS":
-#        logger.info(f"   --->   OPTIONS received")
-#        return web.Response(status=200)   # Preflight akzeptieren
-#    if request.method == "POST":
-#        body = await request.text()
-#        logger.info(f"   --->   POST received, SOAP:\n{body}")
-#        return web.Response(text="OK")    # dump body child names for debugging
-#    events = []
-#    if body is not None:
-#        for child in body:
-#            events.append(child.tag)
-#    logger.info(f"   --->   identifier={ident.text if ident is not None else None}, events={events}")
-
-    # Acknowledge (200 OK). Some implement a SOAP response; many accept simple 200.
-#    return web.Response(status=200, text="alles juut")
-
 
 # ---------------- NOTIFY Server ----------------
 async def start_notify_server():
