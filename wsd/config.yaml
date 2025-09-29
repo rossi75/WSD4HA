@@ -1,5 +1,5 @@
 name: WSD4HA
-version: "0.53_"
+version: "0.54"
 # _.xx._  reflects the implemented packet in the wireshark reference, max = x.46
 slug: wsd_scanner
 description: "Minimal WSD-Server for Samsung C480W [and probably other Scanners]"
