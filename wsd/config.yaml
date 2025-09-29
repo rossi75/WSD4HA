@@ -31,4 +31,4 @@ schema:
   displayname: str
   scan_folder: str
   max_files: int
-  log_level: list(INFO|DEBUG|WARNING)
+  log_level: list(ERROR|WARNING|INFO|DEBUG)
