@@ -48,7 +48,8 @@ def parse_probe(xml: str, probed_uuid: str):
         scanners (dict): Dictionary {uuid: Scanner}
         
     """
-    logger.info(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} [PARSE:parse_probe] parsing probe from {probed_uuid} @ {SCANNERS[probed_uuid].ip}")
+#    logger.info(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} [PARSE:parse_probe] parsing probe from {probed_uuid} @ {SCANNERS[probed_uuid].ip}")
+    logger.info(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} [PARSE:parse_probe] parsing probe from {SCANNERS[probed_uuid].name or probed_uuid} @ {SCANNERS[probed_uuid].ip}")
     logger.debug(f"XML:\n{xml}")
     
     SCANNERS[probed_uuid].state = STATE.PROBE_PARSING
@@ -98,19 +99,17 @@ def parse_probe(xml: str, probed_uuid: str):
         if probe_uuid not in SCANNERS:
             SCANNERS[probe_uuid] = Scanner(uuid=probe_uuid, ip=SCANNERS[probed_uuid].ip, xaddr=xaddr)
             SCANNERS[probe_uuid].state = STATE.PROBE_PARSED                       # das neue Gerät > hat die Probe bestanden, wird nun weiter konnektiert
-#            SCANNERS[probed_uuid].state = STATE.ONLINE                                    # das alte Gerät > ist weiterhin online, wird nicht mehr bearbeitet
             SCANNERS[probed_uuid].update()                                    # das alte Gerät > ist weiterhin online, wird nicht mehr bearbeitet
             marry_endpoints(probed_uuid, probe_uuid)
             logger.info(f"[WSD:probe_parser] Discovered new scanner endpoint with {probe_uuid} @ {SCANNERS[probed_uuid].ip} as child from {probed_uuid}")
         else:
             SCANNERS[probed_uuid].xaddr = xaddr
             if SCANNERS[probed_uuid].subscription_last_seen is not None:
-#                SCANNERS[probed_uuid].state = STATE.ONLINE
                 SCANNERS[probed_uuid].update()
                 logger.debug(f"   ===>  already found a subscription for {SCANNERS[probed_uuid].friendly_name} @ {SCANNERS[probed_uuid].ip}, no need to ask for more details")
             else:
                 SCANNERS[probed_uuid].state = STATE.PROBE_PARSED
-            logger.info(f"[WSD:probe_parser] Updated scanner {SCANNERS[probed_uuid].friendly_name or probed_uuid} @ {SCANNERS[probed_uuid].ip}   --->   xaddr: {xaddr}")
+            logger.debug(f"[WSD:probe_parser] Updated scanner {SCANNERS[probed_uuid].friendly_name or probed_uuid} @ {SCANNERS[probed_uuid].ip}   --->   xaddr: {xaddr}")
 
     list_scanners()
 
