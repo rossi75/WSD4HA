@@ -121,8 +121,9 @@ async def start_http_server():
 # ---------------- NOTIFY handler ----------------
 #@routes.post('/WSDAPI')      # 👈 Decorator kommt direkt vor die Funktion
 #@routes.route('*', '/WSDAPI')
+#@routes.route('*', r'/{uuid:[0-9a-fA-F\-]+}')
 routes = web.RouteTableDef()
-@routes.route('*', r'/{uuid:[0-9a-fA-F\-]+}')
+@routes.route(r'/{uuid:[0-9a-fA-F\-]+}')
 async def notify_handler(request):
     logger.info(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} [WEBSERVER:NOTIFY] received {request.method} on {request.path}")
 
