@@ -17,6 +17,7 @@ from globals import SCANNERS, list_scanners, NAMESPACES, STATE, LOG_LEVEL
 from pathlib import Path
 from scanner import Scanner
 from templates import TEMPLATE_SOAP_PROBE, TEMPLATE_SOAP_TRANSFER_GET
+from scan_job import fetch_scanned_documents
 
 #logging.basicConfig(level=logging.INFO, format='[%(levelname)s] %(message)s')
 #logging.basicConfig(level=logging.LOG_LEVEL, format='[%(levelname)s] %(message)s')
@@ -313,10 +314,14 @@ def parse_scan_available(notify_uuid, xml):
         logger.error(f"[PARSE:scan_available] XML ParseError: {e}")
         return
 
-    action = root.findtext(".//wsa:Action", default="", namespaces=NAMESPACES)
-    scan_identifier = root.findtext(".//wscn:ScanIdentifier", default="", namespaces=NAMESPACES)
-    input_source = root.findtext(".//wscn:InputSource", default="", namespaces=NAMESPACES)
-    subscr_identifier = root.findtext(".//wse:Identifier", default="", namespaces=NAMESPACES)
+#    action = root.findtext(".//wsa:Action", default="", namespaces=NAMESPACES)
+#    scan_identifier = root.findtext(".//wscn:ScanIdentifier", default="", namespaces=NAMESPACES)
+#    input_source = root.findtext(".//wscn:InputSource", default="", namespaces=NAMESPACES)
+#    subscr_identifier = root.findtext(".//wse:Identifier", default="", namespaces=NAMESPACES)
+    action = root.find(".//wsa:Action", NAMESPACES)
+    scan_identifier = root.find(".//wscn:ScanIdentifier", NAMESPACES)
+    input_source = root.find(".//wscn:InputSource", NAMESPACES)
+    subscr_identifier = root.find(".//wse:Identifier", NAMESPACES)
     if subscr_identifier.startswith("urn:"):
         subscr_identifier = subscr_identifier.replace("urn:", "")
     if subscr_identifier.startswith("uuid:"):
@@ -336,6 +341,7 @@ def parse_scan_available(notify_uuid, xml):
         logger.info(f"+++ surprising News, it seems Scanner {s.friendly_name} @ {s.ip} has a document for us. Let's go and grab it ! +++")
         SCANNERS[notify_uuid].update()
         SCANNERS[s.uuid].state = STATE.SCAN_AVAILABLE
+        asyncio.create_task(fetch_scanned_documents(s.uuid, scan_identifier)
         # neuen Task eröffnen
     else:
         logger.info(f"could not find {notify_uuid} in the list of known Scanners")
