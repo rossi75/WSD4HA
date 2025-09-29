@@ -179,7 +179,7 @@ def parse_subscribe(subscr_uuid, xml_body):
         expires_sec, subscription_id, subscription_ref, destination_token
     """
     logger.info(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} [PARSE:parse_subscribe] parsing SubscribeResponse for {SCANNERS[subscr_uuid].friendly_name} at {SCANNERS[subscr_uuid].ip}")
-    logger.info(f"XML:\n{xml_body}")
+    logger.debug(f"XML:\n{xml_body}")
 
     match SCANNERS[subscr_uuid].state:
         case STATE.SUBSCRIBING_SCAN_AVAIL_EVT:
@@ -189,7 +189,7 @@ def parse_subscribe(subscr_uuid, xml_body):
         case STATE.RNW_3_4_PENDING:
             SCANNERS[subscr_uuid].state = STATE.SUBSCR_RNW_3_4_CHK
         case _: # Sammelfall
-            logger.warning(f"called function with state {SCANNERS[subscr_uuid].state.value}, but cannot handle this state")
+            logger.warning(f"I was called with state {SCANNERS[subscr_uuid].state.value}, but cannot handle this")
             SCANNERS[subscr_uuid].state = STATE.ERROR
 
     try:
@@ -238,15 +238,15 @@ def parse_subscribe(subscr_uuid, xml_body):
     # DestinationToken
     dest_token_elem = root.find(".//wscn:DestinationToken", NAMESPACES)
     if dest_token_elem is not None and dest_token_elem.text:
-        logger.debug(f"   ---> dest_token_elem: {dest_token_elem.text.strip()}")
         SCANNERS[subscr_uuid].destination_token = dest_token_elem.text.strip()
+        logger.debug(f"   ---> dest_token_elem: {SCANNERS[subscr_uuid].destination_token}")
 
-    logger.info(f"   --->        UUID: {subscr_uuid}")
-    logger.info(f"   --->     timeout: {SCANNERS[subscr_uuid].subscription_timeout}")
-    logger.info(f"   --->   last_seen: {SCANNERS[subscr_uuid].subscription_last_seen}")
-    logger.info(f"   --->   subscr_id: {SCANNERS[subscr_uuid].subscription_id}")
-    logger.info(f"   --->      ref_id: {SCANNERS[subscr_uuid].subscription_ref}")
-    logger.info(f"   --->  dest_token: {SCANNERS[subscr_uuid].destination_token}")
+    logger.debug(f"   --->        UUID: {subscr_uuid}")
+    logger.debug(f"   --->     timeout: {SCANNERS[subscr_uuid].subscription_timeout}")
+    logger.debug(f"   --->   last_seen: {SCANNERS[subscr_uuid].subscription_last_seen}")
+    logger.debug(f"   --->   subscr_id: {SCANNERS[subscr_uuid].subscription_id}")
+    logger.debug(f"   --->      ref_id: {SCANNERS[subscr_uuid].subscription_ref}")
+    logger.debug(f"   --->  dest_token: {SCANNERS[subscr_uuid].destination_token}")
 
     # SCANNERS[subscr_uuid].state = STATE.SUBSCRIBED_SCAN_AVAIL_EVT
     match SCANNERS[subscr_uuid].state:
@@ -295,6 +295,41 @@ def parse_w3c_duration(duration: str) -> int:
 #    return timedelta(seconds = seconds)
     return seconds
 
+
+# ---------------- parse Scan available ----------------
+def parse_scan_available(notify_uuid, xml):
+    """
+    Parse ScanAvailableEvent and update scanner state.
+
+    Args:
+        notify_uuid (str): UUID from URL path (/uuid)
+        xml (str): SOAP Notify payload (string)
+    """
+    logger.info(f"[PARSE:scan_available] parsing ScanAvailableEvent for {notify_uuid}")
+
+    try:
+        root = ET.fromstring(xml)
+    except ET.ParseError as e:
+        logger.error(f"[PARSE:scan_available] XML ParseError: {e}")
+        return
+
+    action = root.findtext(".//wsa:Action", default="", namespaces=NAMESPACES)
+    sub_identifier = root.findtext(".//wse:Identifier", default="", namespaces=NAMESPACES)
+    scan_identifier = root.findtext(".//wscn:ScanIdentifier", default="", namespaces=NAMESPACES)
+    input_source = root.findtext(".//wscn:InputSource", default="", namespaces=NAMESPACES)
+
+    logger.info(f"[PARSE:scan_available] Action={action}")
+    logger.info(f"[PARSE:scan_available] Subscription ID={sub_identifier}")
+    logger.info(f"[PARSE:scan_available] Scan ID={scan_identifier}")
+    logger.info(f"[PARSE:scan_available] Input Source={input_source}")
+
+    # Optional: Im SCANNERS-Dict hinterlegen
+    if notify_uuid in SCANNERS:
+        s = SCANNERS[notify_uuid]
+        s.last_scan_id = scan_identifier
+        s.last_scan_source = input_source
+        s.last_scan_time = datetime.datetime.now().replace(microsecond=0)
+        logger.info(f"[PARSE:scan_available] Scanner {s.friendly_name} updated with new scan event.")
 # ---------------- Pick Best XADDR from String ----------------
 def pick_best_xaddr(xaddrs: str) -> str:
     """
