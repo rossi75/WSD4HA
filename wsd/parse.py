@@ -261,7 +261,7 @@ def parse_subscribe(subscr_uuid, xml_body):
         case STATE.ERROR:
             SCANNERS[subscr_uuid].state = STATE.ERROR
         case _: # Sammelfall
-            logger.warning(f"finished function with state {SCANNERS[subscr_uuid].state.value}, but don't know what to do with it (should never reach this point !)")
+            logger.error(f"finished function [PARSE:subscribe] with state {SCANNERS[subscr_uuid].state}, but don't know what to do with it (should never reach this point !)")
             SCANNERS[subscr_uuid].state = STATE.ERROR
 
 # ---------------- parse w3c timer ----------------
