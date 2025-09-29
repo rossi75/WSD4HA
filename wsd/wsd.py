@@ -205,7 +205,7 @@ async def state_monitor():
                     logger.info(f"[WSD:Hearbeat] --> proceeding Halftime-Check")
                     try:
                         asyncio.create_task(send_probe(uuid))
-                        scanner.update()                                                                                                # das muss eigentlich in den Parser !!
+#                        scanner.update()                                                                                                # das muss eigentlich in den Parser !!
                     except Exception as e:
                         logger.warning(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} Could not reach scanner with {scanner.friendly_name} @ {scanner.ip}. Last seen at {scanner.last_seen}. Response is {str(e)}")
     
@@ -214,10 +214,10 @@ async def state_monitor():
                     logger.warning(f"[WSD:Heartbeat] --> proceeding 3/4-Check")
                     try:
                         asyncio.create_task(send_probe(uuid))
-                        scanner.update()                                                # das muss eigentlich in den Parser !!
+#                        scanner.update()                                                # das muss eigentlich in den Parser !!
                     except Exception as e:
                         logger.warning(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} Could not reach scanner {scanner.friendly_name} @ {scanner.ip}. Last seen at {scanner.last_seen}. Response is {str(e)}")
-    
+
             if scanner.state in STATE.TF_GET_PARSED:
                 logger.info(f"[WSD:state_mon] Transfer/Get parsed, subscribing to EP...")
                 try:
