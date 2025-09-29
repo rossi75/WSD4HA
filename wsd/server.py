@@ -112,7 +112,9 @@ async def notify_handler(request):
     logger.info(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} [SERVER:notify_handler] received {request.method} Event on {request.path}")
 
     xml_payload = await request.text()
-    logger.info(f"received XML payload: \n {xml_payload}")
+    notify_uuid = request.match_info["uuid"]
+    logger.info(f"   ---> Notify UUID: {notify_uuid}")
+    logger.info(f"   ---> XML payload: \n {xml_payload}")
 
     try:
         root = ET.fromstring(xml_payload)
