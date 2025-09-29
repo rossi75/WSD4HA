@@ -12,17 +12,13 @@ import subprocess
 import uuid
 from globals import SCANNERS, list_scanners, FROM_UUID, USER_AGENT, LOG_LEVEL
 
-#NAMESPACES = {
-#    "soap": "http://www.w3.org/2003/05/soap-envelope",
-#    "wsd": "http://schemas.xmlsoap.org/ws/2005/04/discovery",
-#    "wsa": "http://schemas.xmlsoap.org/ws/2004/08/addressing"
-#}
-
 # ----------------- To Do -----------------
-# - Drucker oder Scanner name übernehmen
-# - passende antwort schreiben
+# + Drucker oder Scanner name übernehmen
+# + passende antwort schreiben
 # + Logs mit D/T
 # - scanauftrag entgegennehmen
+# - Daten in ne Datei schreiben
+# - Dateiliste auslesen
 # + webserver zum laufen bekommen
 # + nach einem neuzugang die liste anzeigen
 # + nach einem abgang diesen im log ausführlich ausgeben
