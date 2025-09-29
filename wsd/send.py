@@ -38,7 +38,7 @@ async def send_probe(probe_uuid: str):
     }
     url = f"http://{SCANNERS[probe_uuid].ip}:80/StableWSDiscoveryEndpoint/schemas-xmlsoap-org_ws_2005_04_discovery"
 
-    logger.info(f"   ---> URL: {url}")
+    logger.debug(f"   ---> URL: {url}")
     logger.debug(f"   ---> XML:\n{xml}")
 
     async with aiohttp.ClientSession() as session:
@@ -102,7 +102,6 @@ async def send_transfer_get(tf_g_uuid: str):
     parse_transfer_get(body, tf_g_uuid)
 
 # ---------------- Subscribe ScanAvailableEvent ----------------
-async def send_subscription_ScanAvailableEvent(sae_uuid: str):
     # to_device_uuid = scanners endpoint UUID
     # msg_id = Message ID
     # xaddr = serviceadress  ==>  <wsa:To>http://192.168.0.3:8018/wsd/scan</wsa:To>
@@ -110,6 +109,7 @@ async def send_subscription_ScanAvailableEvent(sae_uuid: str):
     # EndTo_addr = adress that needs to be reachable by the scanner  ==>  <wsa:Address>http://192.168.0.1:5357/6ccf7716-4dc8-47bf-aca4-5a2ae5a959ca</wsa:Address>
     # scan_to_name = Option selected by the user to start the scanning  ==>  "Scan to Home Assistant"
     # Ref_ID = one more senseless ID  ==>  <wse:Identifier>urn:uuid:680be7cf-bc5a-409d-ad1d-4d6d96b5cb4f</wse:Identifier>
+async def send_subscription_ScanAvailableEvent(sae_uuid: str):
     logger.info(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} [SEND:subscr_sae] subscribing ScanAvailableEvent to {sae_uuid} @ {SCANNERS[sae_uuid].ip}")
     
     SCANNERS[sae_uuid].state = STATE.SUBSCRIBING_SCAN_AVAIL_EVT
@@ -118,23 +118,18 @@ async def send_subscription_ScanAvailableEvent(sae_uuid: str):
     msg_id = uuid.uuid4()
     ref_id = uuid.uuid4()
     addr_id = uuid.uuid4()
+    url = SCANNERS[sae_uuid].xaddr  # z.B. http://192.168.0.3:8018/wsd
     if SCANNERS[sae_uuid].end_to_addr is None:
-#        EndTo_addr = f"http://192.168.0.10:5357/{addr_id}"
-#        SCANNERS[sae_uuid].end_to_addr = EndTo_addr
         SCANNERS[sae_uuid].end_to_addr = f"http://192.168.0.10:5357/{addr_id}"
         logger.info(f"created new end_to_addr")
     else:
-#        EndTo_addr = SCANNERS[sae_uuid].end_to_addr
         logger.info(f"using existing end_to_addr")
-#    EndToAddr = f"http://192.168.0.10:5357/{USER_AGENT}"
-    url = SCANNERS[sae_uuid].xaddr  # z.B. http://192.168.0.3:8018/wsd
+
     xml = TEMPLATE_SUBSCRIBE_SAE.format(
         to_device_uuid = sae_uuid,
         msg_id = msg_id,
         from_uuid = FROM_UUID,
         xaddr = SCANNERS[sae_uuid].xaddr,
-#        EndTo_addr = "http://192.168.0.10:5357/asdjkfhewjkhauiscndiausdnue",
-#        EndTo_addr = EndToAddr,
         EndTo_addr = SCANNERS[sae_uuid].end_to_addr,
         scan_to_name = DISPLAY,
         Ref_ID = ref_id
@@ -146,13 +141,13 @@ async def send_subscription_ScanAvailableEvent(sae_uuid: str):
 
 
 
-    logger.debug(f"   --->      TO: {sae_uuid}")
-    logger.debug(f"   --->  MSG_ID: {msg_id}")
-    logger.debug(f"   --->    FROM: {FROM_UUID}")
-    logger.info(f"   --->  End_To: {SCANNERS[sae_uuid].end_to_addr}")
-    logger.info(f"   --->  NAMEoD: {DISPLAY}")
-    logger.info(f"   --->  REF_ID: {ref_id}")
     logger.info(f"   --->     URL: {url}")
+    logger.info(f"   --->    FROM: {FROM_UUID}")
+    logger.info(f"   --->      TO: {sae_uuid}")
+    logger.info(f"   --->  MSG_ID: {msg_id}")
+    logger.info(f"   --->  REF_ID: {ref_id}")
+    logger.debug(f"   --->  NAMEoD: {DISPLAY}")
+    logger.info(f"   --->  End_To: {SCANNERS[sae_uuid].end_to_addr}")
     logger.info(f"   --->     XML:\n{xml}")
 
     async with aiohttp.ClientSession() as session:
@@ -187,9 +182,7 @@ async def send_subscription_renew(renew_uuid: str):
     body = ""
     msg_id = uuid.uuid4()
     ref_id = SCANNERS[renew_uuid].subscription_ref
-#    EndTo_addr = "http://192.168.0.10:5357/asdjkfhewjkhauiscndiausdnue",
-#    EndToAddr = f"http://192.168.0.10:5357/{USER_AGENT}"
-    EndToAddr = f"http://192.168.0.10:5357/{SCANNERS[renew_uuid].end_to_addr}"
+    EndToAddr = SCANNERS[renew_uuid].end_to_addr
     url = SCANNERS[renew_uuid].xaddr  # z.B. http://192.168.0.3:8018/wsd
     xml = TEMPLATE_SUBSCRIBE_RENEW.format(
         to_device_uuid = renew_uuid,
