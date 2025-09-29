@@ -17,7 +17,7 @@ from globals import SCANNERS, list_scanners, NAMESPACES, STATE, LOG_LEVEL
 from pathlib import Path
 from scanner import Scanner
 from templates import TEMPLATE_SOAP_PROBE, TEMPLATE_SOAP_TRANSFER_GET
-from scan_job import fetch_scanned_documents
+from scan_job import fetch_scanned_document
 
 #logging.basicConfig(level=logging.INFO, format='[%(levelname)s] %(message)s')
 #logging.basicConfig(level=logging.LOG_LEVEL, format='[%(levelname)s] %(message)s')
@@ -341,8 +341,7 @@ def parse_scan_available(notify_uuid, xml):
         logger.info(f"+++ surprising News, it seems Scanner {s.friendly_name} @ {s.ip} has a document for us. Let's go and grab it ! +++")
         SCANNERS[notify_uuid].update()
         SCANNERS[s.uuid].state = STATE.SCAN_AVAILABLE
-        asyncio.create_task(fetch_scanned_documents(s.uuid, scan_identifier))
-        # neuen Task eröffnen
+        asyncio.create_task(fetch_scanned_document(s.uuid, scan_identifier))
     else:
         logger.info(f"could not find {notify_uuid} in the list of known Scanners")
 
