@@ -99,8 +99,9 @@ def list_scanners():
         logger.info("   ------>   known Scanners   <------")
         for i, s in enumerate(SCANNERS.values(), start=1):
             logger.info(f"   [{i}] {s.friendly_name or s.uuid} @ {s.ip}")
-            logger.debug(f"       --->     XADDR: {s.xaddr}")
-            logger.info(f"       --->    Status: {s.state.value}")
-            logger.debug(f"       ---> last_seen: {s.last_seen}")
+            logger.debug(f"       --->      XADDR: {s.xaddr}")
+            logger.info(f"       --->     Status: {s.state.value}")
+            logger.debug(f"       ---> first_seen: {s.last_seen}")
+            logger.debug(f"       --->  last_seen: {s.first_seen}")
     else:
         logger.info("no known Scanners in list")  
