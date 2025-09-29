@@ -118,7 +118,7 @@ async def send_subscr_ScanAvailableEvent(sae_uuid: str):
     msg_id = uuid.uuid4()
     ref_id = uuid.uuid4()
     addr_id = uuid.uuid4()
-    if SCANNERS[sae_uuid].end_to_addr is None
+    if SCANNERS[sae_uuid].end_to_addr is None:
 #        EndTo_addr = f"http://192.168.0.10:5357/{addr_id}"
 #        SCANNERS[sae_uuid].end_to_addr = EndTo_addr
         SCANNERS[sae_uuid].end_to_addr = f"http://192.168.0.10:5357/{addr_id}"
