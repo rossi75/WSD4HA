@@ -117,9 +117,16 @@ async def send_subscr_ScanAvailableEvent(sae_uuid: str):
     body = ""
     msg_id = uuid.uuid4()
     ref_id = uuid.uuid4()
-#    addr_id = uuid.uuid4()
-#    EndTo_addr = f"http://192.168.0.10:5357/{addr_id}"
-    EndToAddr = f"http://192.168.0.10:5357/{USER_AGENT}"
+    addr_id = uuid.uuid4()
+    if SCANNERS[sae_uuid].end_to_addr is None
+#        EndTo_addr = f"http://192.168.0.10:5357/{addr_id}"
+#        SCANNERS[sae_uuid].end_to_addr = EndTo_addr
+        SCANNERS[sae_uuid].end_to_addr = f"http://192.168.0.10:5357/{addr_id}"
+        logger.info(f"created new end_to_addr")
+    else
+#        EndTo_addr = SCANNERS[sae_uuid].end_to_addr
+        logger.info(f"using existing end_to_addr")
+#    EndToAddr = f"http://192.168.0.10:5357/{USER_AGENT}"
     url = SCANNERS[sae_uuid].xaddr  # z.B. http://192.168.0.3:8018/wsd
     xml = TEMPLATE_SUBSCRIBE_SAE.format(
         to_device_uuid = sae_uuid,
@@ -127,9 +134,10 @@ async def send_subscr_ScanAvailableEvent(sae_uuid: str):
         from_uuid = FROM_UUID,
         xaddr = SCANNERS[sae_uuid].xaddr,
 #        EndTo_addr = "http://192.168.0.10:5357/asdjkfhewjkhauiscndiausdnue",
-        EndTo_addr = EndToAddr,
+#        EndTo_addr = EndToAddr,
+        EndTo_addr = SCANNERS[sae_uuid].end_to_addr,
         scan_to_name = DISPLAY,
-        Ref_ID = ref_id,
+        Ref_ID = ref_id
     )
     headers = {
         "Content-Type": "application/soap+xml",
@@ -137,10 +145,11 @@ async def send_subscr_ScanAvailableEvent(sae_uuid: str):
     }
 
 
+
     logger.debug(f"   --->      TO: {sae_uuid}")
     logger.debug(f"   --->  MSG_ID: {msg_id}")
     logger.debug(f"   --->    FROM: {FROM_UUID}")
-    logger.info(f"   --->  End_To: {EndToAddr}")
+    logger.info(f"   --->  End_To: {SCANNERS[uuid].end_to_addr}")
     logger.info(f"   --->  NAMEoD: {DISPLAY}")
     logger.info(f"   --->  REF_ID: {ref_id}")
     logger.info(f"   --->     URL: {url}")
@@ -160,7 +169,6 @@ async def send_subscr_ScanAvailableEvent(sae_uuid: str):
             SCANNERS[tf_g_uuid].state = STATE.ERROR
             return None
  
-#    logger.debug(f"received ScanAvailableEvents from {SCANNERS[sae_uuid].ip} as XML:\n{body}")
     parse_subscribe(sae_uuid, body)
 
 # ---------------- Subscribe ScanAvailableEvent ----------------
