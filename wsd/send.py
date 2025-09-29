@@ -188,7 +188,8 @@ async def send_subscription_renew(renew_uuid: str):
     msg_id = uuid.uuid4()
     ref_id = SCANNERS[renew_uuid].subscription_ref
 #    EndTo_addr = "http://192.168.0.10:5357/asdjkfhewjkhauiscndiausdnue",
-    EndToAddr = f"http://192.168.0.10:5357/{USER_AGENT}"
+#    EndToAddr = f"http://192.168.0.10:5357/{USER_AGENT}"
+    EndToAddr = f"http://192.168.0.10:5357/{SCANNERS[renew_uuid].end_to_addr}")
     url = SCANNERS[renew_uuid].xaddr  # z.B. http://192.168.0.3:8018/wsd
     xml = TEMPLATE_SUBSCRIBE_RENEW.format(
         to_device_uuid = renew_uuid,
@@ -197,6 +198,7 @@ async def send_subscription_renew(renew_uuid: str):
         xaddr = SCANNERS[renew_uuid].xaddr,
         EndTo_addr = EndToAddr,
         scan_to_name = DISPLAY,
+#        Ref_ID = ref_id
         Ref_ID = ref_id
     )
     headers = {
@@ -204,14 +206,15 @@ async def send_subscription_renew(renew_uuid: str):
         "User-Agent": USER_AGENT
     }
 
-    logger.debug(f"   --->      TO: {renew_uuid}")
-    logger.debug(f"   --->  MSG_ID: {msg_id}")
-    logger.debug(f"   --->    FROM: {FROM_UUID}")
-    logger.info(f"   --->  End_To: {EndToAddr}")
-    logger.debug(f"   --->    NAME: {DISPLAY}")
+    logger.debug(f"   --->        TO: {renew_uuid}")
+    logger.debug(f"   --->    MSG_ID: {msg_id}")
+    logger.debug(f"   --->      FROM: {FROM_UUID}")
+    logger.info(f"   --->    End_To: {EndToAddr}")
+    logger.info(f"   ---> subscr_ID: {ref_id}")
+    #logger.debug(f"   --->    NAME: {DISPLAY}")
     #logger.debug(f"   --->  REF_ID: {msg_id}")
-    logger.info(f"   --->     URL: {url}")
-    logger.info(f"   --->     XML:\n{xml}")
+    logger.info(f"   --->       URL: {url}")
+    logger.info(f"   --->       XML:\n{xml}")
 
     async with aiohttp.ClientSession() as session:
         try:
