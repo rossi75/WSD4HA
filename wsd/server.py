@@ -110,7 +110,7 @@ async def start_http_server():
 routes = web.RouteTableDef()
 @routes.post(r'/{uuid:[0-9a-fA-F\-]+}')
 async def notify_handler(request):
-    logger.info(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} [SERVER:notify_handler] received {request.method} on {request.path}")
+    logger.info(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} [SERVER:notify_handler] received {request.method} Event on {request.path}")
 
     xml_msg = await request.text()
     logger.info(f"received XML payload: \n {xml_msg}")
@@ -121,28 +121,37 @@ async def notify_handler(request):
         logger.warning(f"[SERVER:notify_handler] invalid xml: {e}")
         return web.Response(status=400, text="bad xml")
 
+    parse_scan_available(xml_payload, notify_uuid)
+    
+    return web.Response(status=200, text="Alles juut")
+
+
+
+
+
+
+
+
+    
     # try to extract identifier / event content
-    ident = root.find(".//wse:Identifier", NAMESPACES)
-    body = root.find(".//soap:Body", NAMESPACES)
+#    ident = root.find(".//wse:Identifier", NAMESPACES)
+#    body = root.find(".//soap:Body", NAMESPACES)
 
-    path_uuid = request.match_info['uuid']
-    logger.info(f"{path_uuid}")
-
-    if request.method == "OPTIONS":
-        logger.info(f"   --->   OPTIONS received")
-        return web.Response(status=200)   # Preflight akzeptieren
-    if request.method == "POST":
-        body = await request.text()
-        logger.info(f"   --->   POST received, SOAP:\n{body}")
-        return web.Response(text="OK")    # dump body child names for debugging
-    events = []
-    if body is not None:
-        for child in body:
-            events.append(child.tag)
-    logger.info(f"   --->   identifier={ident.text if ident is not None else None}, events={events}")
+#    if request.method == "OPTIONS":
+#        logger.info(f"   --->   OPTIONS received")
+#        return web.Response(status=200)   # Preflight akzeptieren
+#    if request.method == "POST":
+#        body = await request.text()
+#        logger.info(f"   --->   POST received, SOAP:\n{body}")
+#        return web.Response(text="OK")    # dump body child names for debugging
+#    events = []
+#    if body is not None:
+#        for child in body:
+#            events.append(child.tag)
+#    logger.info(f"   --->   identifier={ident.text if ident is not None else None}, events={events}")
 
     # Acknowledge (200 OK). Some implement a SOAP response; many accept simple 200.
-    return web.Response(status=200, text="alles juut")
+#    return web.Response(status=200, text="alles juut")
 
 
 # ---------------- NOTIFY Server ----------------
