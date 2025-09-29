@@ -52,6 +52,7 @@ async def status_page(request):
         scanner_list += f"<td style='text-align:center;'>{s.uuid}<br>"
         scanner_list += f"{s.xaddr if s.xaddr else ''}</td>"
         scanner_list += f"<td style='text-align:center;'>{s.subscription_id if s.subscription_id else ''}<br>"
+        scanner_list += f"{s.end_to_addr if s.end_to_addr else ''}<br>"
         scanner_list += f"{s.subscription_last_seen.strftime('%Y-%m-%d %H:%M:%S') if s.subscription_last_seen else ''}</td>"
         scanner_list += f"<td style='text-align:center;'>{s.manufacturer if s.manufacturer else ''}<br>"
         scanner_list += f"{s.model if s.model else ''}</td>"
@@ -74,7 +75,7 @@ async def status_page(request):
             <h1>WSD4HA seems to be running</h1>
             <h2>Active Scanners:</h2>
             <table>
-                <tr><th>Name</th><th>IP<br>MAC</th><th>State</th><th>First seen<br>Last seen<br>Remove after</th><th>UUID<br>XADDR</th><th>Subscr ID<br>Subscr Exp</th><th>Manufacturer<br>Model</th><th>Firmware<br>Serial</th></tr>
+                <tr><th>Name</th><th>IP<br>MAC</th><th>State</th><th>First seen<br>Last seen<br>Remove after</th><th>UUID<br>XADDR</th><th>Subscr ID<br>Subscr EndToAddr<br>Subscr Exp</th><th>Manufacturer<br>Model</th><th>Firmware<br>Serial</th></tr>
                 {scanner_list}
             </table>
             <h2>Last {MAX_FILES} Scans:</h2>
