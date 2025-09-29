@@ -27,7 +27,7 @@ class Scanner:
         self.end_to_addr = None
 
         # zusätzliche optionale Infos
-        self.friendly_name = "NoName"
+        self.friendly_name = None
         self.mac = None
         self.firmware = None
         self.serial = None
