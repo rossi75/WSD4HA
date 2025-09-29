@@ -18,7 +18,7 @@ async def fetch_scanned_document(scanner_uuid, doc_uuid):
         xaddr = SCANNERS[scanner_uuid].xaddr,
         msg_id = msg_id,
         scan_identifier = doc_uuid
-    }
+    )
 
     try:
         async with aiohttp.ClientSession() as session:
