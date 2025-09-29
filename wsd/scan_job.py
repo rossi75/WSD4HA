@@ -1,3 +1,27 @@
+# ---------------- take the document ----------------
+async def fetch_scanned_document(scanner_uuid, doc_uuid):
+    """
+    Holt das gescannte Dokument asynchron ab.
+    """
+    logger.info(f"[JOB:fetch] starting Download from {SCANNER[scanner_uuid].friendly_name}")
+
+    download_url = f"http://{scanner.ip}:80/ScanDocument"   # Beispiel-URL
+
+    try:
+        async with aiohttp.ClientSession() as session:
+            async with session.get(download_url, timeout=30) as resp:
+                if resp.status == 200:
+                    data = await resp.read()
+                    save_path = f"/tmp/{scanner_uuid}_scan.jpg"
+                    with open(save_path, "wb") as f:
+                        f.write(data)
+                    logger.info(f"[FETCH] Scan von {scanner.friendly_name} gespeichert: {save_path}")
+                else:
+                    logger.warning(f"[FETCH] Download fehlgeschlagen ({resp.status})")
+    except Exception as e:
+        logger.exception(f"[FETCH] Fehler beim Download: {e}")
+
+
 # ---------------- HTTP/SOAP Server ----------------
 async def handle_scan_job(request):
     logger.info(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} [SCAN] Scan-Job started")
