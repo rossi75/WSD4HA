@@ -256,7 +256,8 @@ async def state_monitor():
           
         if any (scanner.state not in {STATE.ABSENT,
                                       STATE.ONLINE,
-                                      STATE.RECV_SCAN,
+                                      STATE.SCAN_AVAILABLE,
+                                      STATE.SCAN_RECV,
                                       STATE.TO_REMOVE,
                                       STATE.ERROR}
                 for scanner in SCANNERS.values()):
