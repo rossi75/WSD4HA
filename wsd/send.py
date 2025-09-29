@@ -123,7 +123,7 @@ async def send_subscr_ScanAvailableEvent(sae_uuid: str):
 #        SCANNERS[sae_uuid].end_to_addr = EndTo_addr
         SCANNERS[sae_uuid].end_to_addr = f"http://192.168.0.10:5357/{addr_id}"
         logger.info(f"created new end_to_addr")
-    else
+    else:
 #        EndTo_addr = SCANNERS[sae_uuid].end_to_addr
         logger.info(f"using existing end_to_addr")
 #    EndToAddr = f"http://192.168.0.10:5357/{USER_AGENT}"
