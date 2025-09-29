@@ -178,7 +178,7 @@ async def state_monitor():
             
             if scanner.state.value in "online":          # auch die Sub-Stati für renew haben "online" als value
                 # Halbzeit-Check for subscription
-                if subscr_age > (SCANNERS[uuid].subscription_timeout / 2) and subscr_age < (SCANNERS[uuid].subscription_timeout * 0.75):
+                if subscr_age > (SCANNERS[uuid].subscription_timeout / 2) and subscr_age <= (SCANNERS[uuid].subscription_timeout * 0.75):
                     scanner.state = STATE.SUBSCR_RNW_1_2_PENDING
                     logger.info(f"[WSD:Heartbeat] --> proceeding Halftime-Check for Subscription")
                     try:
@@ -197,8 +197,8 @@ async def state_monitor():
                         logger.warning(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} Could not reach scanner {scanner.friendly_name} @ {scanner.ip}. Last seen at {scanner.subscription_last_seen}. Response is {str(e)}")
 
                 # Halbzeit-Check Online
-                if age > (OFFLINE_TIMEOUT / 2) and age < (OFFLINE_TIMEOUT * 0.75):
-                    logger.info(f"[WSD:Hearbeat] --> proceeding Halftime-Check")
+                if age > (OFFLINE_TIMEOUT / 2) and age <= (OFFLINE_TIMEOUT * 0.75):
+                    logger.info(f"[WSD:Heartbeat] --> proceeding Halftime-Check")
                     try:
                         asyncio.create_task(send_probe(uuid))
 #                        scanner.update()                                                                                                # das muss eigentlich in den Parser !!
