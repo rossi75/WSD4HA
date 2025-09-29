@@ -17,7 +17,7 @@ from globals import SCANNERS, list_scanners, NAMESPACES, STATE, LOG_LEVEL
 from pathlib import Path
 from scanner import Scanner
 from templates import TEMPLATE_SOAP_PROBE, TEMPLATE_SOAP_TRANSFER_GET
-from send import send_probe, send_transfer_get, send_subscr_ScanAvailableEvent
+from send import send_probe, send_transfer_get, send_subscr_ScanAvailableEvent, send_subscription_renew
 from parse import parse_wsd_packet, parse_probe, parse_transfer_get, parse_subscribe
 
 #logging.basicConfig(level=logging.INFO, format='[%(levelname)s] %(message)s')
