@@ -3,9 +3,22 @@ async def fetch_scanned_document(scanner_uuid, doc_uuid):
     """
     Holt das gescannte Dokument asynchron ab.
     """
-    logger.info(f"[JOB:fetch] starting Download from {SCANNER[scanner_uuid].friendly_name}")
+    logger.info(f"[JOB:fetch] retrieving document from {SCANNER[scanner_uuid].friendly_name}")
+    logger.info(f"   ---> doc ID: {doc_uuid}")
 
-    download_url = f"http://{scanner.ip}:80/ScanDocument"   # Beispiel-URL
+    url = SCANNERS[scanner_uuid].xaddr
+    msg_id = uuid.uuid4()
+
+    headers = {
+        "Content-Type": "application/soap+xml",
+        "User-Agent": USER_AGENT
+    }
+
+    body = TEMPLATE_RETRIEVE_DOCUMENT.format(
+        xaddr = SCANNERS[scanner_uuid].xaddr,
+        msg_id = msg_id,
+        scan_identifier = doc_uuid
+    }
 
     try:
         async with aiohttp.ClientSession() as session:
