@@ -93,10 +93,6 @@ async def start_http_server():
     app = web.Application()
     app.router.add_get("/", status_page)
     logger.debug(f"   ---> added endpoint /")
-#    app.router.add_post("/wsd/notify", notify_handler)
-#    logger.debug(f"   ---> added endpoint /wsd/notify")
-#    app.router.add_post("/wsd/scan", handle_scan_job)
-#    logger.debug(f"   ---> added endpoint /wsd/scan")
     
     runner = web.AppRunner(app)
     await runner.setup()
@@ -108,53 +104,42 @@ async def start_http_server():
     logger.info(f"HTTP/SOAP Server is running on Port {HTTP_PORT}")
 
 
-# Fängt alles hinter / ab, z.B. /6ccf7716-4dc8-47bf-aca4-5a2ae5a959ca
-#async def notify_handler(request):
-#    if request.method == "OPTIONS":
-#        return web.Response(status=200)   # Preflight akzeptieren
-#    if request.method == "POST":
-#        body = await request.text()
-#        logger.info(f"[WEBSERVER:NOTIFY] SOAP:\n{body}")
-#        return web.Response(text="OK")
-#    return web.Response(status=405)
 
 # ---------------- NOTIFY handler ----------------
-#@routes.post('/WSDAPI')      # 👈 Decorator kommt direkt vor die Funktion
-#@routes.route('*', '/WSDAPI')
-#@routes.route('*', r'/{uuid:[0-9a-fA-F\-]+}')
+# Fängt alles hinter / ab, z.B. /6ccf7716-4dc8-47bf-aca4-5a2ae5a959ca
 routes = web.RouteTableDef()
 @routes.post(r'/{uuid:[0-9a-fA-F\-]+}')
 async def notify_handler(request):
-    logger.info(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} [WEBSERVER:NOTIFY] received {request.method} on {request.path}")
+    logger.info(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} [SERVER:notify_handler] received {request.method} on {request.path}")
 
-    text = await request.text()
-    logger.info(f"payload: \n {text[:600]}")
+    xml_msg = await request.text()
+    logger.info(f"received XML payload: \n {xml_msg}")
 
     try:
-        root = ET.fromstring(text)
+        root = ET.fromstring(xml_msg)
     except Exception as e:
-        logger.warning("[WEBSERVER:NOTIFY] invalid xml: %s", e)
+        logger.warning(f"[SERVER:notify_handler] invalid xml: {e}")
         return web.Response(status=400, text="bad xml")
 
     # try to extract identifier / event content
     ident = root.find(".//wse:Identifier", NAMESPACES)
-    body = root.find(".//s:Body", NAMESPACES)
+    body = root.find(".//soap:Body", NAMESPACES)
 
     path_uuid = request.match_info['uuid']
     logger.info(f"{path_uuid}")
 
     if request.method == "OPTIONS":
-        logger.info(f"[WEBSERVER:NOTIFY] OPTIONS received")
+        logger.info(f"   --->   OPTIONS received")
         return web.Response(status=200)   # Preflight akzeptieren
     if request.method == "POST":
         body = await request.text()
-        logger.info(f"[WEBSERVER:NOTIFY] POST received, SOAP:\n{body}")
+        logger.info(f"   --->   POST received, SOAP:\n{body}")
         return web.Response(text="OK")    # dump body child names for debugging
     events = []
     if body is not None:
         for child in body:
             events.append(child.tag)
-    logger.info(f"WEBSERVER:[NOTIFY] identifier={ident.text if ident is not None else None}, events={events}")
+    logger.info(f"   --->   identifier={ident.text if ident is not None else None}, events={events}")
 
     # Acknowledge (200 OK). Some implement a SOAP response; many accept simple 200.
     return web.Response(status=200, text="alles juut")
