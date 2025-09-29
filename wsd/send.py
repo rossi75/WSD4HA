@@ -189,7 +189,7 @@ async def send_subscription_renew(renew_uuid: str):
     ref_id = SCANNERS[renew_uuid].subscription_ref
 #    EndTo_addr = "http://192.168.0.10:5357/asdjkfhewjkhauiscndiausdnue",
 #    EndToAddr = f"http://192.168.0.10:5357/{USER_AGENT}"
-    EndToAddr = f"http://192.168.0.10:5357/{SCANNERS[renew_uuid].end_to_addr}")
+    EndToAddr = f"http://192.168.0.10:5357/{SCANNERS[renew_uuid].end_to_addr}"
     url = SCANNERS[renew_uuid].xaddr  # z.B. http://192.168.0.3:8018/wsd
     xml = TEMPLATE_SUBSCRIBE_RENEW.format(
         to_device_uuid = renew_uuid,
