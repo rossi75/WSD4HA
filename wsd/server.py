@@ -12,9 +12,8 @@ import subprocess
 from config import OFFLINE_TIMEOUT, SCAN_FOLDER, HTTP_PORT, MAX_FILES, NOTIFY_PORT
 from globals import SCANNERS, NAMESPACES, STATE, USER_AGENT, LOG_LEVEL
 from scanner import Scanner
+from parse import parse_scan_available
 
-#logging.basicConfig(level=logging.INFO, format='[%(levelname)s] %(message)s')
-#logging.basicConfig(level=logging.LOG_LEVEL, format='[%(levelname)s] %(message)s')
 logging.basicConfig(level=LOG_LEVEL, format='[%(levelname)s] %(message)s')
 logger = logging.getLogger("wsd-addon")
 
