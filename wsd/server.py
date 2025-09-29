@@ -111,16 +111,16 @@ routes = web.RouteTableDef()
 async def notify_handler(request):
     logger.info(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} [SERVER:notify_handler] received {request.method} Event on {request.path}")
 
-    xml_msg = await request.text()
-    logger.info(f"received XML payload: \n {xml_msg}")
+    xml_payload = await request.text()
+    logger.info(f"received XML payload: \n {xml_payload}")
 
     try:
-        root = ET.fromstring(xml_msg)
+        root = ET.fromstring(xml_payload)
     except Exception as e:
         logger.warning(f"[SERVER:notify_handler] invalid xml: {e}")
         return web.Response(status=400, text="bad xml")
 
-    parse_scan_available(xml_payload, notify_uuid)
+    parse_scan_available(notify_uuid, xml_payload)
     
     return web.Response(status=200, text="Alles juut")
 
