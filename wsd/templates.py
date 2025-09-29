@@ -157,3 +157,4 @@ TEMPLATE_RETRIEVE_DOCUMENT = """<?xml version="1.0" encoding="utf-8"?>
     </wscn:RetrieveImageRequest>
   </soap:Body>
 </soap:Envelope>
+"""
