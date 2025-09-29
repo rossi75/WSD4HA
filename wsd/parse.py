@@ -307,7 +307,7 @@ def parse_scan_available(notify_uuid, xml):
         xml (str): SOAP Notify payload (string)
     """
     logger.info(f"[PARSE:scan_available] parsing ScanAvailableEvent for {notify_uuid}")
-    logger.debug(f"   XML:\n{xml}")
+    logger.info(f"   XML:\n{xml}")
 
     try:
         root = ET.fromstring(xml)
@@ -331,11 +331,13 @@ def parse_scan_available(notify_uuid, xml):
         s.last_scan_id = scan_identifier
         s.last_scan_source = input_source
         s.last_scan_time = datetime.datetime.now().replace(microsecond=0)
-        logger.info(f"[PARSE:scan_available] Scanner {s.friendly_name} updated with new scan event.")
+        logger.info(f"+++ surprising News, it seems Scanner {s.friendly_name} has a document for us. Let's take it ! +++")
+        SCANNERS[notify_uuid].update()
+    else:
+        logger.info(f"could not find {notify_uuid} in the list of known Scanners")
 
     # was machen wir jetzt mit der Info dass es ggf einen neuen Scan gibt?
-    # auf jeden Fall hat er sich gemeldet, also merken wir uns das
-    SCANNERS[notify_uuid].update()
+    # auf jeden Fall hat er sich gemeldet, also merken wir uns das iwie
 
 # ---------------- Pick Best XADDR from String ----------------
 def pick_best_xaddr(xaddrs: str) -> str:
