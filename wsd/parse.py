@@ -49,7 +49,7 @@ def parse_probe(xml: str, probed_uuid: str):
         
     """
 #    logger.info(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} [PARSE:parse_probe] parsing probe from {probed_uuid} @ {SCANNERS[probed_uuid].ip}")
-    logger.info(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} [PARSE:parse_probe] parsing probe from {SCANNERS[probed_uuid].name or probed_uuid} @ {SCANNERS[probed_uuid].ip}")
+    logger.info(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} [PARSE:parse_probe] parsing probe from {SCANNERS[probed_uuid].friendly_name or probed_uuid} @ {SCANNERS[probed_uuid].ip}")
     logger.debug(f"XML:\n{xml}")
     
     SCANNERS[probed_uuid].state = STATE.PROBE_PARSING
