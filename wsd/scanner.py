@@ -24,6 +24,7 @@ class Scanner:
         self.subscription_id = None
         self.subscription_ref = None
         self.destination_token = None
+        self.end_to_addr = None
 
         # zusätzliche optionale Infos
         self.friendly_name = "NoName"
