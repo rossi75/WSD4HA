@@ -11,7 +11,7 @@ import time
 import threading
 import uuid
 import xml.etree.ElementTree as ET
-from config import OFFLINE_TIMEOUT, LOCAL_IP, HTTP_PORT, FROM_UUID, DISPLAY
+from config import OFFLINE_TIMEOUT, LOCAL_IP, HTTP_PORT, FROM_UUID, DISPLAY, NOTIFY_PORT, get_local_ip
 from globals import SCANNERS, list_scanners, NAMESPACES, STATE, USER_AGENT, LOG_LEVEL
 from pathlib import Path
 from scanner import Scanner
@@ -120,11 +120,16 @@ async def send_subscription_ScanAvailableEvent(sae_uuid: str):
     addr_id = uuid.uuid4()
     url = SCANNERS[sae_uuid].xaddr  # z.B. http://192.168.0.3:8018/wsd
     if SCANNERS[sae_uuid].end_to_addr is None:
-        SCANNERS[sae_uuid].end_to_addr = f"http://192.168.0.10:5357/{addr_id}"
+#        SCANNERS[sae_uuid].end_to_addr = f"http://192.168.0.10:5357/{addr_id}"
+        SCANNERS[sae_uuid].end_to_addr = f"http://{get_local_ip()}:{NOTIFY_PORT}/{addr_id}"
         logger.info(f"created new end_to_addr")
     else:
         logger.info(f"using existing end_to_addr")
 
+    headers = {
+        "Content-Type": "application/soap+xml",
+        "User-Agent": USER_AGENT
+    }
     xml = TEMPLATE_SUBSCRIBE_SAE.format(
         to_device_uuid = sae_uuid,
         msg_id = msg_id,
@@ -134,12 +139,6 @@ async def send_subscription_ScanAvailableEvent(sae_uuid: str):
         scan_to_name = DISPLAY,
         Ref_ID = ref_id
     )
-    headers = {
-        "Content-Type": "application/soap+xml",
-        "User-Agent": USER_AGENT
-    }
-
-
 
     logger.info(f"   --->     URL: {url}")
     logger.info(f"   --->    FROM: {FROM_UUID}")
