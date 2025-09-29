@@ -102,7 +102,7 @@ async def send_transfer_get(tf_g_uuid: str):
     parse_transfer_get(body, tf_g_uuid)
 
 # ---------------- Subscribe ScanAvailableEvent ----------------
-async def send_subscr_ScanAvailableEvent(sae_uuid: str):
+async def send_subscription_ScanAvailableEvent(sae_uuid: str):
     # to_device_uuid = scanners endpoint UUID
     # msg_id = Message ID
     # xaddr = serviceadress  ==>  <wsa:To>http://192.168.0.3:8018/wsd/scan</wsa:To>
@@ -172,8 +172,7 @@ async def send_subscr_ScanAvailableEvent(sae_uuid: str):
     parse_subscribe(sae_uuid, body)
 
 # ---------------- Subscribe ScanAvailableEvent ----------------
-async def send_subscr_renew(renew_uuid: str):
-
+async def send_subscription_renew(renew_uuid: str):
     # to_device_uuid = scanners endpoint UUID
     # msg_id = Message ID
     # xaddr = serviceadress  ==>  <wsa:To>http://192.168.0.3:8018/wsd/scan</wsa:To>
