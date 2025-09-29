@@ -293,9 +293,7 @@ def parse_w3c_duration(duration: str) -> int:
     logger.debug(f"[PARSE:w3c_dur]   ---> d: {d}")
     logger.debug(f"[PARSE:w3c_dur]   ---> seconds: {seconds}")
 
-#    return timedelta(seconds = seconds)
     return seconds
-
 
 # ---------------- parse Scan available ----------------
 def parse_scan_available(notify_uuid, xml):
@@ -306,7 +304,7 @@ def parse_scan_available(notify_uuid, xml):
         notify_uuid (str): UUID from URL path (/uuid)
         xml (str): SOAP Notify payload (string)
     """
-    logger.info(f"[PARSE:scan_available] parsing ScanAvailableEvent for {notify_uuid}")
+    logger.info(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} [PARSE:scan_available] parsing ScanAvailableEvent for {notify_uuid}")
     logger.info(f"   XML:\n{xml}")
 
     try:
@@ -316,9 +314,13 @@ def parse_scan_available(notify_uuid, xml):
         return
 
     action = root.findtext(".//wsa:Action", default="", namespaces=NAMESPACES)
-    subscr_identifier = root.findtext(".//wse:Identifier", default="", namespaces=NAMESPACES)
     scan_identifier = root.findtext(".//wscn:ScanIdentifier", default="", namespaces=NAMESPACES)
     input_source = root.findtext(".//wscn:InputSource", default="", namespaces=NAMESPACES)
+    subscr_identifier = root.findtext(".//wse:Identifier", default="", namespaces=NAMESPACES)
+    if subscr_identifier.startswith("urn:"):
+        subscr_identifier = subscr_identifier.replace("urn:", "")
+    if subscr_identifier.startswith("uuid:"):
+        subscr_identifier = subscr_identifier.replace("uuid:", "")
 
     logger.info(f"[PARSE:scan_available]          Action: {action}")
     logger.info(f"[PARSE:scan_available] Subscription ID: {subscr_identifier}")
@@ -326,13 +328,15 @@ def parse_scan_available(notify_uuid, xml):
     logger.info(f"[PARSE:scan_available]    Input Source: {input_source}")
 
     # Optional: Im SCANNERS-Dict hinterlegen
-    if notify_uuid in SCANNERS:
-        s = SCANNERS[notify_uuid]
-        s.last_scan_id = scan_identifier
-        s.last_scan_source = input_source
-        s.last_scan_time = datetime.datetime.now().replace(microsecond=0)
-        logger.info(f"+++ surprising News, it seems Scanner {s.friendly_name} has a document for us. Let's take it ! +++")
+    if subscr_identifier in SCANNERS:
+        s = SCANNERS[subscr_identifier]
+#        s.last_scan_id = scan_identifier
+#        s.last_scan_source = input_source
+#        s.last_scan_time = datetime.datetime.now().replace(microsecond=0)
+        logger.info(f"+++ surprising News, it seems Scanner {s.friendly_name} @ {s.ip} has a document for us. Let's go and grab it ! +++")
         SCANNERS[notify_uuid].update()
+        SCANNERS[s.uuid].state = STATE.SCAN_AVAILABLE
+        # neuen Task eröffnen
     else:
         logger.info(f"could not find {notify_uuid} in the list of known Scanners")
 
