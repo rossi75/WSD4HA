@@ -12,7 +12,6 @@ import threading
 import uuid
 import xml.etree.ElementTree as ET
 from config import OFFLINE_TIMEOUT, LOCAL_IP, HTTP_PORT, FROM_UUID
-#from globals import SCANNERS, list_scanners, NAMESPACES, STATE, FROM_UUID
 from globals import SCANNERS, list_scanners, NAMESPACES, STATE, LOG_LEVEL
 from pathlib import Path
 from scanner import Scanner
