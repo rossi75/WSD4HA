@@ -65,7 +65,7 @@ async def discovery_processor(data, addr):
     try:
         root = ET.fromstring(data.decode("utf-8", errors="ignore"))
     except Exception:
-        logger.error("[WSD:hm] Exception while reading from ET")
+        logger.error("[WSD:dp] Exception while reading from ET")
         return
 
     # UUID (without urn:uuid:)
@@ -97,10 +97,10 @@ async def discovery_processor(data, addr):
     if xaddrs_elem is not None and xaddrs_elem.text:
         xaddr = pick_best_xaddr(xaddrs_elem.text.strip())
 
-    logger.debug(f"    -->   UUID: {uuid}")
-    logger.info(f"    --> Action: {action_text}")
-    logger.debug(f"    -->  Types: {types_text}")
-    logger.debug(f"    -->  XADDR: {xaddr}")
+    logger.debug(f"    --->   UUID: {uuid}")
+    logger.info(f"    ---> Action: {action_text}")
+    logger.debug(f"    --->  Types: {types_text}")
+    logger.debug(f"    --->  XADDR: {xaddr}")
 
     if action_text == "Hello":
         # Nur Scanner berücksichtigen
