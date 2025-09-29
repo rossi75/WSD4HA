@@ -26,9 +26,10 @@ COPY main.py .
 COPY parse.py .
 COPY scanner.py .
 COPY send.py .
+COPY server.py .
 COPY templates.py .
 COPY translations/en.yaml ./translations
-COPY webserver.py .
+#COPY webserver.py .
 COPY wsd.py .
 
 EXPOSE 8110
