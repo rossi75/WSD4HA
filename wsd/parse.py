@@ -341,7 +341,7 @@ def parse_scan_available(notify_uuid, xml):
         logger.info(f"+++ surprising News, it seems Scanner {s.friendly_name} @ {s.ip} has a document for us. Let's go and grab it ! +++")
         SCANNERS[notify_uuid].update()
         SCANNERS[s.uuid].state = STATE.SCAN_AVAILABLE
-        asyncio.create_task(fetch_scanned_documents(s.uuid, scan_identifier)
+        asyncio.create_task(fetch_scanned_documents(s.uuid, scan_identifier))
         # neuen Task eröffnen
     else:
         logger.info(f"could not find {notify_uuid} in the list of known Scanners")
