@@ -170,8 +170,9 @@ async def start_notify_server():
 #    loop.create_task(web._run_app(create_notify_app(), port=5357))
 
     app = web.Application()
-    app.router.add_get(f"/{USER_AGENT}", notify_handler)
-    logger.debug(f"   ---> added endpoint /{USER_AGENT}")
+#    app.router.add_get(f"/{USER_AGENT}", notify_handler)
+#    logger.debug(f"   ---> added endpoint /{USER_AGENT}")
+    app.add_routes(routes)
 
     runner = web.AppRunner(app)
     await runner.setup()
