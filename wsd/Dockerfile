@@ -24,6 +24,7 @@ COPY config.py .
 COPY globals.py .
 COPY main.py .
 COPY parse.py .
+COPY scan_job.py .
 COPY scanner.py .
 COPY send.py .
 COPY server.py .
