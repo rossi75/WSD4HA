@@ -213,10 +213,10 @@ async def send_subscription_renew(renew_uuid: str):
                     body = await resp.text()
                 else:
                     SCANNERS[renew_uuid].state = STATE.ERROR
-                    logger.error(f"[SEND:sae] Subscribe to ScanAvailableEvents failed with Statuscode {resp.status}")
+                    logger.error(f"[SEND:rnw] Renew to ScanAvailableEvents failed with Statuscode {resp.status}")
                     return None
         except Exception as e:
-            logger.error(f"[SEND:sae] failed for {SCANNERS[renew_uuid].uuid}: {e}")
+            logger.error(f"[SEND:rnw] failed for {SCANNERS[renew_uuid].uuid}: {e}")
             SCANNERS[renew_uuid].state = STATE.ERROR
             return None
  
