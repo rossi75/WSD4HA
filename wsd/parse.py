@@ -204,11 +204,7 @@ def parse_subscribe(subscr_uuid, xml_body):
     if expires_elem is not None and expires_elem.text:
         logger.debug(f"   ---> expires_elem: {expires_elem.text.strip()}")
         try:
-#            SCANNERS[subscr_uuid].subscription_timeout = expires_elem.text.strip()
-#            SCANNERS[subscr_uuid].subscription_expires = datetime.datetime.now().replace(microsecond=0) + parse_w3c_duration(expires_elem.text.strip())
             SCANNERS[subscr_uuid].subscription_timeout = parse_w3c_duration(expires_elem.text.strip())
-#            SCANNERS[subscr_uuid].subscription_expires = datetime.datetime.now().replace(microsecond=0) + timedelta(seconds = SCANNERS[subscr_uuid].subscription_timeout)
-#            SCANNERS[subscr_uuid].update_subscription()_last_seen = datetime.datetime.now().replace(microsecond=0)
             SCANNERS[subscr_uuid].update_subscription()
         except Exception as e:
             logger.warning(f"[PARSE:subscr] Could not parse Expires: {e}")
@@ -247,13 +243,12 @@ def parse_subscribe(subscr_uuid, xml_body):
 
     logger.info(f"   --->        UUID: {subscr_uuid}")
     logger.info(f"   --->     timeout: {SCANNERS[subscr_uuid].subscription_timeout}")
-    logger.info(f"   --->     expires: {SCANNERS[subscr_uuid].subscription_expires}")
-    logger.info(f"   --->     expires: {SCANNERS[subscr_uuid].subscription_expires}")
+    logger.info(f"   --->   last_seen: {SCANNERS[subscr_uuid].subscription_last_seen}")
     logger.info(f"   --->   subscr_id: {SCANNERS[subscr_uuid].subscription_id}")
     logger.info(f"   --->      ref_id: {SCANNERS[subscr_uuid].subscription_ref}")
     logger.info(f"   --->  dest_token: {SCANNERS[subscr_uuid].destination_token}")
 
-#    SCANNERS[subscr_uuid].state = STATE.SUBSCRIBED_SCAN_AVAIL_EVT
+    # SCANNERS[subscr_uuid].state = STATE.SUBSCRIBED_SCAN_AVAIL_EVT
     match SCANNERS[subscr_uuid].state:
         case STATE.CHK_SCAN_AVAIL_EVT:
             SCANNERS[subscr_uuid].update()
