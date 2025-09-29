@@ -92,11 +92,9 @@ async def discovery_processor(data, addr):
         types_text = " ".join(t.split(":")[-1] for t in types_elem.text.split())
 
     # exctract XAddrs
-#    xaddrs_elem = root.find(".//{http://schemas.xmlsoap.org/ws/2005/04/discovery}XAddrs")
     xaddrs_elem = root.find(".//wsd:XAddrs", NAMESPACES)
     xaddr = ""
     if xaddrs_elem is not None and xaddrs_elem.text:
-#        xaddr = pick_best_xaddr(xaddrs_elem.text.strip()) + "/scan"
         xaddr = pick_best_xaddr(xaddrs_elem.text.strip())
 
     logger.debug(f"    -->   UUID: {uuid}")
@@ -146,7 +144,6 @@ async def UDP_listener_3702():
     sock.setsockopt(socket.IPPROTO_IP, socket.IP_ADD_MEMBERSHIP, mreq)
     sock.setblocking(False)   # WICHTIG für asyncio!
     logger.info("WSD-Listener running on Port 3702/UDP")
-#    logger.info(f"-----------------------  Events  -------------------------")
 
     # Daten abholen
     loop = asyncio.get_running_loop()
@@ -157,7 +154,6 @@ async def UDP_listener_3702():
             await discovery_processor(data, addr)   # ausgelagerte Verarbeitung
             await asyncio.sleep(1)
 
-    # asyncio.create_task(recv_loop())
     await recv_loop()
 
 # ---------------- Scanner Probe ----------------
@@ -248,9 +244,7 @@ async def state_monitor():
                 scanner.mark_absent()
 
             # Nach Ablauf von Timeout+Offline → entfernen
-#            #if status in ("absent") and now >= scanner.remove_after:
             if status == "absent" and scanner.remove_after is not None and now >= scanner.remove_after:
-#                logger.info(f"[WSD:Heartbeat] --> Marking {SCANNERS[uuid].friendly_name} @ {scanner.ip} to remove")
                 logger.info(f"[WSD:Heartbeat] --> Marking {scanner.friendly_name} @ {scanner.ip} to remove")
                 to_remove.append(scanner)
 
