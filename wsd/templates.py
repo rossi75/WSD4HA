@@ -105,12 +105,8 @@ TEMPLATE_SUBSCRIBE_SAE = """<?xml version="1.0" encoding="utf-8"?>
       </wse:Filter>
       <sca:ScanDestinations>
         <sca:ScanDestination>
-          <sca:ClientDisplayName>
-            {scan_to_name}
-          </sca:ClientDisplayName>
-          <sca:ClientContext>
-            Scan
-          </sca:ClientContext>
+          <sca:ClientDisplayName>{scan_to_name}</sca:ClientDisplayName>
+          <sca:ClientContext>Scan</sca:ClientContext>
         </sca:ScanDestination>
       </sca:ScanDestinations>
     </wse:Subscribe>
