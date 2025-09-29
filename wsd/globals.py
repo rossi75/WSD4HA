@@ -1,13 +1,11 @@
 # to be imported by all files
-#import datetime
-#import socket
 import logging
 import sys
 from enum import Enum
-#import os
 import uuid
 
 # -----------------  Logging  -----------------
+LOG_LEVEL="ERROR"
 LOG_LEVEL="WARNING"
 LOG_LEVEL="INFO"
 #LOG_LEVEL=DEBUG
@@ -26,8 +24,8 @@ logger = logging.getLogger("wsd-addon")
 SCANNERS = {}
 
 # -----------------  define User-Agent  -----------------
-#USER_AGENT = "WSD4HA"
-USER_AGENT = "WSDAPI"       # originaler Wert von Microsoft
+USER_AGENT = "WSD4HA"
+#USER_AGENT = "WSDAPI"       # originaler Wert von Microsoft
 
 # -----------------  define FROM_UUID  -----------------
 FROM_UUID = None
@@ -100,7 +98,6 @@ def list_scanners():
     logger.info("[SCANNERS] known Scanners:")
 
     for i, s in enumerate(SCANNERS.values(), start=1):
-#        logger.info(f"  [{i}] {s.friendly_name} @ {s.ip}   UUID={s.uuid}")
         logger.info(f"  [{i}] {s.friendly_name} @ {s.ip}")
         logger.debug(f"      --->     XADDR: {s.xaddr}")
         logger.info(f"      --->    Status: {s.state.value}")
