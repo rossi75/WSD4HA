@@ -42,32 +42,16 @@ async def status_page(request):
 #        color = "green" if s.online else ("orange" if delta < 2*OFFLINE_TIMEOUT else "red")
 #        formats = ", ".join(s.formats)
         #formats = ", ".join(s.types)
-#        scanner_list += f"<tr style='color:{color}'>
-#        scanner_list += "<td>" + str(s.last_seen.strftime('%Y-%m-%d %H:%M:%S')) + "</td>"
-        #scanner_list += "<td>" + str(s.subscription_last_seen.strftime('%Y-%m-%d %H:%M:%S') or '') + "<br>"
-#        scanner_list += "<td>" + str(s.remove_after.strftime('%Y-%m-%d %H:%M:%S') or '') + "</td>"
-#        scanner_list += "<td>" + str(s.xaddr or '') + "</td>"
-#        scanner_list += "<td>" + str(s.subscription_id or '') + "<br>"
-#        scanner_list += "<td>" + str(s.subscription_expires or '') + "</td>"
-#        scanner_list += "<td>" + str(s.manufacturer or '') + "<br>"
-#        scanner_list += "<td>" + str(s.model or '') + "</td>"
-#        scanner_list += "<td>" + str(s.firmware or '') + "<br>"
-#        scanner_list += "<td>" + str(s.serial or '') + "</td>"
-#        scanner_list += f"<td>{s.subscription_id if s.subscription_id else ''}<br>"
         scanner_list += "<tr style='color:{color}'>"
-        scanner_list += f"<td>{s.friendly_name}</td>"
-#        scanner_list += f"<td>{s.ip}<br>"
-#        scanner_list += f"<td>{s.mac}</td>"
-        scanner_list += f"<td>{s.ip}<br>{s.mac}</td>"
-        scanner_list += f"<td>{s.state.value}</td>"
+        scanner_list += f"<td style='text-align:center;'>{s.friendly_name}</td>"
+        scanner_list += f"<td style='text-align:center;'>{s.ip}<br>{s.mac}</td>"
+        scanner_list += f"<td style='text-align:center;'>{s.state.value}</td>"
         scanner_list += f"<td style='text-align:center;'>{s.first_seen.strftime('%Y-%m-%d %H:%M:%S')}<br>"
         scanner_list += f"{s.last_seen.strftime('%Y-%m-%d %H:%M:%S')}<br>"
-        scanner_list += f"{s.subscription_last_seen.strftime('%Y-%m-%d %H:%M:%S') if s.subscription_last_seen else ''}<br>"
         scanner_list += f"{s.remove_after.strftime('%Y-%m-%d %H:%M:%S') if s.remove_after else ''}</td>"
         scanner_list += f"<td style='text-align:center;'>{s.uuid}<br>"
         scanner_list += f"{s.xaddr if s.xaddr else ''}</td>"
         scanner_list += f"<td style='text-align:center;'>{s.subscription_id if s.subscription_id else ''}<br>"
-#        scanner_list += f"{s.subscription_expires.strftime('%Y-%m-%d %H:%M:%S') if s.subscription_expires else ''}</td>"
         scanner_list += f"{s.subscription_last_seen.strftime('%Y-%m-%d %H:%M:%S') if s.subscription_last_seen else ''}</td>"
         scanner_list += f"<td style='text-align:center;'>{s.manufacturer if s.manufacturer else ''}<br>"
         scanner_list += f"{s.model if s.model else ''}</td>"
@@ -90,7 +74,7 @@ async def status_page(request):
             <h1>WSD4HA seems to be running</h1>
             <h2>Active Scanners:</h2>
             <table>
-                <tr><th>Name</th><th>IP<br>MAC</th><th>State</th><th>First seen<br>Last seen<br>Last Subscription<br>Remove after</th><th>UUID<br>XADDR</th><th>Subscr ID<br>Subscr Exp</th><th>Manufacturer<br>Model</th><th>Firmware<br>Serial</th></tr>
+                <tr><th>Name</th><th>IP<br>MAC</th><th>State</th><th>First seen<br>Last seen<br>Remove after</th><th>UUID<br>XADDR</th><th>Subscr ID<br>Subscr Exp</th><th>Manufacturer<br>Model</th><th>Firmware<br>Serial</th></tr>
                 {scanner_list}
             </table>
             <h2>Last {MAX_FILES} Scans:</h2>
@@ -101,7 +85,6 @@ async def status_page(request):
         </body>
         </html>
     """, content_type="text/html")
-#                <tr><th>Name</th><th>IP</th><th>MAC</th><th>State</th><th>UUID</th><th>First seen<br>Last seen<br>Last Subscription<br>Remove after</th><th>XADDR</th><th>Subscr ID</th><th>Subscr Exp</th><th>Manufacturer<br><th>Model</th><th>Firmware<br><th>Serial</th></tr>
 
 # ---------------- HTTP Server ----------------
 async def start_http_server():
@@ -124,25 +107,15 @@ async def start_http_server():
     logger.info(f"HTTP/SOAP Server is running on Port {HTTP_PORT}")
 
 
-
-
-
-
-
-
-
-
-
-
 # Fängt alles hinter / ab, z.B. /6ccf7716-4dc8-47bf-aca4-5a2ae5a959ca
-async def notify_handler(request):
-    if request.method == "OPTIONS":
-        return web.Response(status=200)   # Preflight akzeptieren
-    if request.method == "POST":
-        body = await request.text()
-        logger.info(f"[WEBSERVER:NOTIFY] SOAP:\n{body}")
-        return web.Response(text="OK")
-    return web.Response(status=405)
+#async def notify_handler(request):
+#    if request.method == "OPTIONS":
+#        return web.Response(status=200)   # Preflight akzeptieren
+#    if request.method == "POST":
+#        body = await request.text()
+#        logger.info(f"[WEBSERVER:NOTIFY] SOAP:\n{body}")
+#        return web.Response(text="OK")
+#    return web.Response(status=405)
 
 # ---------------- NOTIFY handler ----------------
 #@routes.post('/WSDAPI')      # 👈 Decorator kommt direkt vor die Funktion
