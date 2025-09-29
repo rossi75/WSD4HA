@@ -16,7 +16,7 @@ from globals import SCANNERS, list_scanners, NAMESPACES, STATE, LOG_LEVEL
 from pathlib import Path
 from scanner import Scanner
 from templates import TEMPLATE_SOAP_PROBE, TEMPLATE_SOAP_TRANSFER_GET
-from send import send_probe, send_transfer_get, send_subscr_ScanAvailableEvent, send_subscription_renew
+from send import send_probe, send_transfer_get, send_subscription_ScanAvailableEvent, send_subscription_renew
 from parse import parse_wsd_packet, parse_probe, parse_transfer_get, parse_subscribe
 
 #logging.basicConfig(level=logging.INFO, format='[%(levelname)s] %(message)s')
@@ -221,7 +221,7 @@ async def state_monitor():
             if scanner.state in STATE.TF_GET_PARSED:
                 logger.info(f"[WSD:state_mon] Transfer/Get parsed, subscribing to EP...")
                 try:
-                    asyncio.create_task(send_subscr_ScanAvailableEvent(uuid))
+                    asyncio.create_task(send_subscription_ScanAvailableEvent(uuid))
                 except Exception as e:
                     scanner.state = STATE.ERROR
                     logger.warning(f"Anything went wrong while parsing the subscribe attempt from {scanner.friendly_name} @ {scanner.ip}, response is {str(e)}")
