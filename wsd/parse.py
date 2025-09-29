@@ -108,7 +108,7 @@ def parse_probe(xml: str, probed_uuid: str):
                 logger.debug(f"   ===>  already found a subscription for {SCANNERS[probed_uuid].friendly_name} @ {SCANNERS[probed_uuid].ip}, no need to ask for more details")
             else:
                 SCANNERS[probed_uuid].state = STATE.PROBE_PARSED
-            logger.info(f"[WSD:probe_parser] Updated scanner {probed_uuid} -> {xaddr}")
+            logger.info(f"[WSD:probe_parser] Updated scanner {SCANNERS[probed_uuid].friendly_name or probed_uuid} @ {SCANNERS[probed_uuid].ip}   --->   xaddr: {xaddr}")
 
     list_scanners()
 
