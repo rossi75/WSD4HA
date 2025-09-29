@@ -100,12 +100,12 @@ def parse_probe(xml: str, probed_uuid: str):
             SCANNERS[probe_uuid].state = STATE.PROBE_PARSED                       # das neue Gerät > hat die Probe bestanden, wird nun weiter konnektiert
             SCANNERS[probed_uuid].state = STATE.ONLINE                                    # das alte Gerät > ist weiterhin online, wird nicht mehr bearbeitet
             marry_endpoints(probed_uuid, probe_uuid)
-            logger.info(f"[WSD:probe_parser] Discovered new scanner endpoint with {probe_uuid} @ {SCANNER[probed_uuid].ip} as child from {probed_uuid}")
+            logger.info(f"[WSD:probe_parser] Discovered new scanner endpoint with {probe_uuid} @ {SCANNERS[probed_uuid].ip} as child from {probed_uuid}")
         else:
             SCANNERS[probed_uuid].xaddr = xaddr
             if SCANNERS[probed_uuid].subscription_last_seen is not None:
                 SCANNERS[probed_uuid].state = STATE.ONLINE
-                logger.debug(f"   ===>  already found a subscription for {SCANNER[probed_uuid].friendly_name} @ {SCANNER[probed_uuid].ip}, no need to ask for more details")
+                logger.debug(f"   ===>  already found a subscription for {SCANNERS[probed_uuid].friendly_name} @ {SCANNERS[probed_uuid].ip}, no need to ask for more details")
             else:
                 SCANNERS[probed_uuid].state = STATE.PROBE_PARSED
             logger.info(f"[WSD:probe_parser] Updated scanner {probed_uuid} -> {xaddr}")
@@ -264,7 +264,7 @@ def parse_subscribe(subscr_uuid, xml_body):
         case STATE.ERROR:
             SCANNERS[subscr_uuid].state = STATE.ERROR
         case _: # Sammelfall
-            logger.warning(f"called function with state {SCANNERS[subscr_uuid].state.value}, but cannot handle this state")
+            logger.warning(f"finished function with state {SCANNERS[subscr_uuid].state.value}, but don't know what to do with it (should never reach this point !)")
             SCANNERS[subscr_uuid].state = STATE.ERROR
 
 # ---------------- parse w3c timer ----------------
