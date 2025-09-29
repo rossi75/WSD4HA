@@ -141,3 +141,19 @@ TEMPLATE_SUBSCRIBE_RENEW = """<?xml version="1.0" encoding="utf-8"?>
   </soap:Body>
 </soap:Envelope>
 """
+
+TEMPLATE_RETRIEVE_DOCUMENT = """<?xml version="1.0" encoding="utf-8"?>
+<soap:Envelope xmlns:soap="http://www.w3.org/2003/05/soap-envelope"
+               xmlns:wsa="http://schemas.xmlsoap.org/ws/2004/08/addressing"
+               xmlns:wscn="http://schemas.microsoft.com/windows/2006/08/wdp/scan">
+  <soap:Header>
+    <wsa:To>http://{xaddr}</wsa:To>
+    <wsa:Action>http://schemas.microsoft.com/windows/2006/08/wdp/scan/RetrieveImage</wsa:Action>
+    <wsa:MessageID>urn:uuid:{msg_id}</wsa:MessageID>
+  </soap:Header>
+  <soap:Body>
+    <wscn:RetrieveImageRequest>
+      <wscn:ScanIdentifier>{scan_identifier}</wscn:ScanIdentifier>
+    </wscn:RetrieveImageRequest>
+  </soap:Body>
+</soap:Envelope>
