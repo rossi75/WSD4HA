@@ -149,7 +149,7 @@ async def send_subscription_ScanAvailableEvent(sae_uuid: str):
     logger.debug(f"   --->      TO: {sae_uuid}")
     logger.debug(f"   --->  MSG_ID: {msg_id}")
     logger.debug(f"   --->    FROM: {FROM_UUID}")
-    logger.info(f"   --->  End_To: {SCANNERS[uuid].end_to_addr}")
+    logger.info(f"   --->  End_To: {SCANNERS[sae_uuid].end_to_addr}")
     logger.info(f"   --->  NAMEoD: {DISPLAY}")
     logger.info(f"   --->  REF_ID: {ref_id}")
     logger.info(f"   --->     URL: {url}")
