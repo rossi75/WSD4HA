@@ -74,7 +74,7 @@ async def status_page(request):
             <h1>WSD4HA seems to be running</h1>
             <h2>Active Scanners:</h2>
             <table>
-                <tr><th>Name</th><th>IP<br>MAC</th><th>State</th><th>First seen<br>Last seen<br>Remove after</th><th>UUID<br>XADDR</th><th>Subscr ID<br>Subscr EndToAddr<br>Subscr Exp</th><th>Manufacturer<br>Model</th><th>Firmware<br>Serial</th></tr>
+                <tr><th>Name</th><th>IP<br>MAC</th><th>State</th><th>First seen<br>Last seen<br>Remove after</th><th>UUID<br>XADDR</th><th>Subscr ID<br>Subscr EndToAddr<br>Last Subscr</th><th>Manufacturer<br>Model</th><th>Firmware<br>Serial</th></tr>
                 {scanner_list}
             </table>
             <h2>Last {MAX_FILES} Scans:</h2>
