@@ -1,7 +1,13 @@
 # Changelog
 
+## 0.54 - 2025-09-29
+- added routine for receiving scanner ticket
+- display entry works now, needed to put the name and xml within one line
+- Heartbeat for online state and subscribing state
+
 ## 0.18.51 - 2025-09-26
-- added complete renew routine with several new states
+- added complete subscribing renew routine with several new states
+! sending subscribing renew works, but returns a 500 server internal error from the scanner
 
 ## 0.18.x - 2025-09-24
 - port 5357 should be available for notifications
