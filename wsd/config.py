@@ -79,7 +79,7 @@ FROM_UUID = f"{uuid.uuid4()}"
 logger.info(f"FROM_UUID: {FROM_UUID}")
 
 # ---------------- Display Entry ----------------
-raw = os.environ.get("DISPLAYNAME", "Scan to HA FB")
+raw = os.environ.get("DISPLAYNAME", "Home Assistant")
 logger.debug(f"Display Entry from Environment: {raw}")
 try:
     DISPLAY = raw  # Sekunden
