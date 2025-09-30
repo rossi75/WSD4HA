@@ -130,7 +130,7 @@ TEMPLATE_SUBSCRIBE_RENEW = """<?xml version="1.0" encoding="utf-8"?>
     <wsa:From>
       <wsa:Address>urn:uuid:{from_uuid}</wsa:Address>
     </wsa:From>
-    <wse:Identifier>urn:uuid:{Ref_ID}</wse:Identifier>
+    <wse:Identifier>{Ref_ID}</wse:Identifier>
   </soap:Header>
   <soap:Body>
     <wse:Renew>
@@ -141,6 +141,7 @@ TEMPLATE_SUBSCRIBE_RENEW = """<?xml version="1.0" encoding="utf-8"?>
   </soap:Body>
 </soap:Envelope>
 """
+#    <wse:Identifier>urn:uuid:{Ref_ID}</wse:Identifier>
 
 TEMPLATE_RETRIEVE_DOCUMENT = """<?xml version="1.0" encoding="utf-8"?>
 <soap:Envelope xmlns:soap="http://www.w3.org/2003/05/soap-envelope"
