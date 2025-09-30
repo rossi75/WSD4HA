@@ -49,7 +49,6 @@ def parse_probe(xml: str, probed_uuid: str):
         scanners (dict): Dictionary {uuid: Scanner}
         
     """
-#    logger.info(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} [PARSE:parse_probe] parsing probe from {probed_uuid} @ {SCANNERS[probed_uuid].ip}")
     logger.info(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} [PARSE:parse_probe] parsing probe from {SCANNERS[probed_uuid].friendly_name or probed_uuid} @ {SCANNERS[probed_uuid].ip}")
     logger.debug(f"XML:\n{xml}")
     
@@ -104,7 +103,6 @@ def parse_probe(xml: str, probed_uuid: str):
             marry_endpoints(probed_uuid, probe_uuid)
             logger.info(f"[WSD:probe_parser] Discovered new scanner endpoint with {probe_uuid} @ {SCANNERS[probed_uuid].ip} as child from {probed_uuid}")
         else:
-#            SCANNERS[probed_uuid].xaddr = xaddr
             if SCANNERS[probed_uuid].subscription_last_seen is not None:
                 SCANNERS[probed_uuid].update()
                 logger.debug(f"   ===>  already found a subscription for {SCANNERS[probed_uuid].friendly_name} @ {SCANNERS[probed_uuid].ip}, no need to ask for more details")
@@ -225,7 +223,7 @@ def parse_subscribe(subscr_uuid, xml_body):
         if subscr_id.startswith("uuid:"):
             subscr_id = subscr_id.replace("uuid:", "")
         SCANNERS[subscr_uuid].subscription_id = subscr_id
-                
+
     # ReferenceParameters -> Identifier
     ref_id = ""
     ref_id_elem = root.find(".//wsa:ReferenceParameters/wse:Identifier", NAMESPACES)
