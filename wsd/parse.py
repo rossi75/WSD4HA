@@ -96,7 +96,7 @@ def parse_probe(xml: str, probed_uuid: str):
             continue
 
 
-        # neuer oder vorhandener Scanner?
+        # neuer oder vorhandener Endpoint?
         if probe_uuid not in SCANNERS:
             SCANNERS[probe_uuid] = Scanner(uuid=probe_uuid, ip=SCANNERS[probed_uuid].ip, xaddr=xaddr)
             SCANNERS[probe_uuid].state = STATE.PROBE_PARSED                       # das neue Gerät > hat die Probe bestanden, wird nun weiter konnektiert
@@ -104,11 +104,12 @@ def parse_probe(xml: str, probed_uuid: str):
             marry_endpoints(probed_uuid, probe_uuid)
             logger.info(f"[WSD:probe_parser] Discovered new scanner endpoint with {probe_uuid} @ {SCANNERS[probed_uuid].ip} as child from {probed_uuid}")
         else:
-            SCANNERS[probed_uuid].xaddr = xaddr
+#            SCANNERS[probed_uuid].xaddr = xaddr
             if SCANNERS[probed_uuid].subscription_last_seen is not None:
                 SCANNERS[probed_uuid].update()
                 logger.debug(f"   ===>  already found a subscription for {SCANNERS[probed_uuid].friendly_name} @ {SCANNERS[probed_uuid].ip}, no need to ask for more details")
             else:
+                SCANNERS[probed_uuid].xaddr = xaddr
                 SCANNERS[probed_uuid].state = STATE.PROBE_PARSED
             logger.debug(f"[WSD:probe_parser] Updated scanner {SCANNERS[probed_uuid].friendly_name or probed_uuid} @ {SCANNERS[probed_uuid].ip}   --->   xaddr: {xaddr}")
 
