@@ -230,10 +230,6 @@ def parse_subscribe(subscr_uuid, xml_body):
     if ref_id_elem is not None and ref_id_elem.text:
         ref_id = ref_id_elem.text.strip()
         logger.debug(f"   ---> ref_ui_elem: {ref_id}")
-#        if ref_id.startswith("urn:"):
-#            ref_id = ref_id.replace("urn:", "")
-#        if ref_id.startswith("uuid:"):
-#            ref_id = ref_id.replace("uuid:", "")
         SCANNERS[subscr_uuid].subscription_ref = ref_id
 
     # DestinationToken
@@ -319,12 +315,14 @@ def parse_scan_available(notify_uuid, xml):
 #    subscr_identifier = root.findtext(".//wse:Identifier", default="", namespaces=NAMESPACES)
     action = root.find(".//wsa:Action", NAMESPACES)
     scan_identifier = root.find(".//wscn:ScanIdentifier", NAMESPACES)
-    input_source = root.find(".//wscn:InputSource", NAMESPACES)
-    subscr_identifier = root.find(".//wse:Identifier", NAMESPACES)
-    if subscr_identifier.startswith("urn:"):
-        subscr_identifier = subscr_identifier.replace("urn:", "")
-    if subscr_identifier.startswith("uuid:"):
-        subscr_identifier = subscr_identifier.replace("uuid:", "")
+#    input_source = root.find(".//wscn:InputSource", NAMESPACES)
+    subscr_identifier_elem = root.find(".//wse:Identifier", NAMESPACES)
+    if subscr_identifier_elem is not None and subscr_identifier_elem.text:
+        subscr_identifier = subscr_identifier_elem.text.strip()
+        if subscr_identifier.startswith("urn:"):
+            subscr_identifier = subscr_identifier.replace("urn:", "")
+        if subscr_identifier.startswith("uuid:"):
+            subscr_identifier = subscr_identifier.replace("uuid:", "")
 
     logger.info(f"[PARSE:scan_available]          Action: {action}")
     logger.info(f"[PARSE:scan_available] Subscription ID: {subscr_identifier}")
