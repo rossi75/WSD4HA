@@ -53,7 +53,6 @@ async def send_probe(probe_uuid: str):
             logger.error(f"   ---> Probe failed at {url}: {e}")
             SCANNERS[probe_uuid].state = STATE.ABSENT
 
-    logger.debug(f"   ---> Response Code: {resp.status}")
     logger.debug(f"ProbeMatch from {SCANNERS[probe_uuid].ip}:\n{body}")
 
     parse_probe(body, probe_uuid)
