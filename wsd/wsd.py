@@ -265,7 +265,8 @@ async def state_monitor():
             await asyncio.sleep(2)
         else:
             logger.debug(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} [WSD:sleep] goodbye")
-            await asyncio.sleep(OFFLINE_TIMEOUT / 5)
+#            await asyncio.sleep(OFFLINE_TIMEOUT / 5)
+            await asyncio.sleep(OFFLINE_TIMEOUT / 7) # damit wir iwie auf nen krummen Wert kommen
 
         logger.debug(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} [WSD:sleep] back in town")
 
