@@ -48,10 +48,10 @@ async def send_probe(probe_uuid: str):
                     body = await resp.text()
                 else:
                     logger.error(f"Probe failed with status {resp.status}")
-                    SCANNER[uuid].state = STATE.ABSENT
+                    SCANNERS[uuid].state = STATE.ABSENT
         except Exception as e:
             logger.error(f"   ---> Probe fehlgeschlagen bei {url}: {e}")
-            SCANNER[probe_uuid].state = STATE.ABSENT
+            SCANNERS[probe_uuid].state = STATE.ABSENT
 
     logger.debug(f"   ---> Statuscode: {resp.status}")
     logger.debug(f"ProbeMatch von {SCANNERS[probe_uuid].ip}:\n{body}")
