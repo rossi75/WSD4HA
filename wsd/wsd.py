@@ -177,7 +177,7 @@ async def state_monitor():
             
             if scanner.state.value in "online":          # auch die Sub-Stati für renew haben "online" als value
                 # 3/4-Check for subscription
-                if subscr_age > (SCANNERS[uuid].subscription_timeout * 0.75):
+                if subscr_age >= (SCANNERS[uuid].subscription_timeout * 0.75):
                     scanner.state = STATE.SUBSCR_RNW_3_4_PENDING
                     logger.warning(f"[WSD:Heartbeat] ---> proceeding 3/4-Check for Subscription")
                     try:
@@ -187,7 +187,7 @@ async def state_monitor():
                         logger.warning(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} Could not reach scanner {scanner.friendly_name} @ {scanner.ip}. Last seen at {scanner.subscription_last_seen}. Response is {str(e)}")
 
                 # Halbzeit-Check for subscription
-                elif subscr_age > (SCANNERS[uuid].subscription_timeout / 2):
+                elif subscr_age >= (SCANNERS[uuid].subscription_timeout / 2):
                     scanner.state = STATE.SUBSCR_RNW_1_2_PENDING
                     logger.info(f"[WSD:Heartbeat] ---> proceeding Halftime-Check for Subscription")
                     try:
@@ -196,7 +196,7 @@ async def state_monitor():
                         logger.warning(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} Could not reach scanner {scanner.friendly_name} @ {scanner.ip}. Last seen at {scanner.subscription_last_seen}. Response is {str(e)}")
 
                 # 3/4-Check Online
-                elif age > (OFFLINE_TIMEOUT * 0.75):
+                elif age >= (OFFLINE_TIMEOUT * 0.75):
                     logger.warning(f"[WSD:Heartbeat] ---> proceeding 3/4-Check")
                     try:
                         asyncio.create_task(send_probe(uuid))
@@ -204,7 +204,7 @@ async def state_monitor():
                         logger.warning(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} Could not reach scanner {scanner.friendly_name} @ {scanner.ip}. Last seen at {scanner.last_seen}. Response is {str(e)}")
 
                 # Halbzeit-Check Online
-                elif age > (OFFLINE_TIMEOUT / 2):
+                elif age >= (OFFLINE_TIMEOUT / 2):
                     logger.info(f"[WSD:Heartbeat] ---> proceeding Halftime-Check")
                     try:
                         asyncio.create_task(send_probe(uuid))
@@ -265,7 +265,6 @@ async def state_monitor():
             await asyncio.sleep(2)
         else:
             logger.debug(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} [WSD:sleep] goodbye")
-#            await asyncio.sleep(OFFLINE_TIMEOUT / 4)
             await asyncio.sleep(OFFLINE_TIMEOUT / 5)
 
         logger.debug(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} [WSD:sleep] back in town")
