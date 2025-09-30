@@ -31,3 +31,8 @@
 ## 0.0.1 – 2025-09-01
 - Erste Version mit WSD-Discovery (Hello/Bye)
 - Logging für Scanner-Events implementiert
+
+---
+# ToDo:
+- Scan receive
+- Parameter from HA-/Docker-Config to PY
