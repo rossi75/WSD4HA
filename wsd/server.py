@@ -43,7 +43,7 @@ async def status_page(request):
         #formats = ", ".join(s.types)
         scanner_list += "<tr style='color:{color}'>"
         scanner_list += f"<td style='text-align:center;'>{s.friendly_name}</td>"
-        scanner_list += f"<td style='text-align:center;'>{s.ip}<br>{s.mac}</td>"
+        scanner_list += f"<td style='text-align:center;'>{s.ip}<br>{s.mac if s.mac else ''}</td>"
         scanner_list += f"<td style='text-align:center;'>{s.state.value}</td>"
         scanner_list += f"<td style='text-align:center;'>{s.first_seen.strftime('%Y-%m-%d %H:%M:%S')}<br>"
         scanner_list += f"{s.last_seen.strftime('%Y-%m-%d %H:%M:%S')}<br>"
@@ -74,7 +74,7 @@ async def status_page(request):
             <h1>WSD4HA seems to be running</h1>
             <h2>Active Scanners:</h2>
             <table>
-                <tr><th>Name</th><th>IP<br>MAC</th><th>State</th><th>First seen<br>Last seen<br>Remove after</th><th>UUID<br>XADDR</th><th>Subscr ID<br>Subscr EndToAddr<br>Last Subscr</th><th>Manufacturer<br>Model</th><th>Firmware<br>Serial</th></tr>
+                <tr><th>Name</th><th>IP<br>[MAC]</th><th>State</th><th>First seen<br>Last seen<br>[Remove after]</th><th>UUID<br>XADDR</th><th>Subscr ID<br>Subscr EndToAddr<br>Last Subscr</th><th>Manufacturer<br>Model</th><th>Firmware<br>Serial</th></tr>
                 {scanner_list}
             </table>
             <h2>Last {MAX_FILES} Scans:</h2>
