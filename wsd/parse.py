@@ -216,8 +216,8 @@ def parse_subscribe(subscr_uuid, xml_body):
     subscr_id = ""
     subscr_id_elem = root.find(".//soap:Header/wse:Identifier", NAMESPACES)
     if subscr_id_elem is not None and subscr_id_elem.text:
-        logger.debug(f"   ---> subscr_id_elem: {subscr_id_elem.text.strip()}")
         subscr_id = subscr_id_elem.text.strip()
+        logger.debug(f"   ---> subscr_id_elem: {subscr_id}")
         if subscr_id.startswith("urn:"):
             subscr_id = subscr_id.replace("urn:", "")
         if subscr_id.startswith("uuid:"):
@@ -228,12 +228,12 @@ def parse_subscribe(subscr_uuid, xml_body):
     ref_id = ""
     ref_id_elem = root.find(".//wsa:ReferenceParameters/wse:Identifier", NAMESPACES)
     if ref_id_elem is not None and ref_id_elem.text:
-        logger.debug(f"   ---> ref_ui_elem: {ref_id_elem.text.strip()}")
         ref_id = ref_id_elem.text.strip()
-        if ref_id.startswith("urn:"):
-            ref_id = ref_id.replace("urn:", "")
-        if ref_id.startswith("uuid:"):
-            ref_id = ref_id.replace("uuid:", "")
+        logger.debug(f"   ---> ref_ui_elem: {ref_id}")
+#        if ref_id.startswith("urn:"):
+#            ref_id = ref_id.replace("urn:", "")
+#        if ref_id.startswith("uuid:"):
+#            ref_id = ref_id.replace("uuid:", "")
         SCANNERS[subscr_uuid].subscription_ref = ref_id
 
     # DestinationToken
