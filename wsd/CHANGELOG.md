@@ -1,5 +1,8 @@
 # Changelog
 
+## 0.56 - 2025-09-29
+- solved subscription renew issue
+
 ## 0.54 - 2025-09-29
 - added routine for receiving scanner ticket
 - display entry works now, needed to put the name and xml within one line
