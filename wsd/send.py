@@ -50,11 +50,11 @@ async def send_probe(probe_uuid: str):
                     logger.error(f"Probe failed with status {resp.status}")
                     SCANNERS[uuid].state = STATE.ABSENT
         except Exception as e:
-            logger.error(f"   ---> Probe fehlgeschlagen bei {url}: {e}")
+            logger.error(f"   ---> Probe failed at {url}: {e}")
             SCANNERS[probe_uuid].state = STATE.ABSENT
 
-    logger.debug(f"   ---> Statuscode: {resp.status}")
-    logger.debug(f"ProbeMatch von {SCANNERS[probe_uuid].ip}:\n{body}")
+    logger.debug(f"   ---> Response Code: {resp.status}")
+    logger.debug(f"ProbeMatch from {SCANNERS[probe_uuid].ip}:\n{body}")
 
     parse_probe(body, probe_uuid)
 
