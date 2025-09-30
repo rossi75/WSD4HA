@@ -110,7 +110,7 @@ async def send_transfer_get(tf_g_uuid: str):
     # scan_to_name = Option selected by the user to start the scanning  ==>  "Scan to Home Assistant"
     # Ref_ID = one more senseless ID  ==>  <wse:Identifier>urn:uuid:680be7cf-bc5a-409d-ad1d-4d6d96b5cb4f</wse:Identifier>
 async def send_subscription_ScanAvailableEvent(sae_uuid: str):
-    logger.info(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} [SEND:subscr_sae] subscribing ScanAvailableEvent to {sae_uuid} @ {SCANNERS[sae_uuid].ip}")
+    logger.info(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} [SEND:subscr_sae] subscribing ScanAvailableEvent to {SCANNERS[sae_uuid].friendly_name or sae_uuid} @ {SCANNERS[sae_uuid].ip}")
     
     SCANNERS[sae_uuid].state = STATE.SUBSCRIBING_SCAN_AVAIL_EVT
 
@@ -140,14 +140,14 @@ async def send_subscription_ScanAvailableEvent(sae_uuid: str):
         Ref_ID = ref_id
     )
 
-    logger.info(f"   --->     URL: {url}")
-    logger.info(f"   --->    FROM: {FROM_UUID}")
-    logger.info(f"   --->      TO: {sae_uuid}")
-    logger.info(f"   --->  MSG_ID: {msg_id}")
-    logger.info(f"   --->  REF_ID: {ref_id}")
+    logger.debug(f"   --->     URL: {url}")
+    logger.debug(f"   --->    FROM: {FROM_UUID}")
+    logger.debug(f"   --->      TO: {sae_uuid}")
+    logger.debug(f"   --->  MSG_ID: {msg_id}")
+    logger.debug(f"   --->  REF_ID: {ref_id}")
     logger.debug(f"   --->  NAMEoD: {DISPLAY}")
-    logger.info(f"   --->  End_To: {SCANNERS[sae_uuid].end_to_addr}")
-    logger.info(f"   --->     XML:\n{xml}")
+    logger.debug(f"   --->  End_To: {SCANNERS[sae_uuid].end_to_addr}")
+    logger.debug(f"   --->     XML:\n{xml}")
 
     async with aiohttp.ClientSession() as session:
         try:
@@ -190,7 +190,6 @@ async def send_subscription_renew(renew_uuid: str):
         xaddr = SCANNERS[renew_uuid].xaddr,
         EndTo_addr = EndToAddr,
         scan_to_name = DISPLAY,
-#        Ref_ID = ref_id
         Ref_ID = ref_id
     )
     headers = {
@@ -198,13 +197,13 @@ async def send_subscription_renew(renew_uuid: str):
         "User-Agent": USER_AGENT
     }
 
-    logger.info(f"   --->      FROM: {FROM_UUID}")
-    logger.info(f"   --->        TO: {renew_uuid}")
-    logger.info(f"   --->    MSG_ID: {msg_id}")
-    logger.info(f"   ---> subscr_ID: {ref_id}")
-    logger.info(f"   --->    End_To: {EndToAddr}")
-    logger.info(f"   --->       URL: {url}")
-    logger.info(f"   --->       XML:\n{xml}")
+    logger.debug(f"   --->      FROM: {FROM_UUID}")
+    logger.debug(f"   --->        TO: {renew_uuid}")
+    logger.debug(f"   --->    MSG_ID: {msg_id}")
+    logger.debug(f"   ---> subscr_ID: {ref_id}")
+    logger.debug(f"   --->    End_To: {EndToAddr}")
+    logger.debug(f"   --->       URL: {url}")
+    logger.debug(f"   --->       XML:\n{xml}")
 
     async with aiohttp.ClientSession() as session:
         try:
@@ -220,6 +219,5 @@ async def send_subscription_renew(renew_uuid: str):
             SCANNERS[renew_uuid].state = STATE.ERROR
             return None
  
-#    logger.debug(f"received ScanAvailableEvents from {SCANNERS[sae_uuid].ip} as XML:\n{body}")
     parse_subscribe(renew_uuid, body)
 
