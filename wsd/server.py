@@ -17,6 +17,7 @@ from parse import parse_scan_available
 logging.basicConfig(level=LOG_LEVEL, format='[%(levelname)s] %(message)s')
 logger = logging.getLogger("wsd-addon")
 
+
 # ---------------- WebUI ----------------
 async def status_page(request):
     logger.info(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} [WEBSERVER:status_page] received request for status page")
@@ -86,6 +87,7 @@ async def status_page(request):
         </html>
     """, content_type="text/html")
 
+
 # ---------------- HTTP Server ----------------
 async def start_http_server():
     logger.info(f"[WEBSERVER:start_http] configuring HTTP/SOAP Server on Port {HTTP_PORT}")
@@ -101,7 +103,6 @@ async def start_http_server():
     site = web.TCPSite(runner, "0.0.0.0", HTTP_PORT)
     await site.start()
     logger.info(f"HTTP/SOAP Server is running on Port {HTTP_PORT}")
-
 
 
 # ---------------- NOTIFY handler ----------------
@@ -123,7 +124,9 @@ async def notify_handler(request):
         logger.warning(f"[SERVER:notify_handler] invalid xml: {e}")
         return web.Response(status=400, text="bad xml")
 
-    return web.Response(status=200, text="Alles juut")
+#    return web.Response(status=200, text="Alles juut")
+    return web.Response(status=202, text="Alles juut")
+
 
 # ---------------- NOTIFY Server ----------------
 async def start_notify_server():
