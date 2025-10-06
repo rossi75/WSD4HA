@@ -88,3 +88,26 @@ def marry_endpoints(uuid_a: str, uuid_b: str):
     SCANNERS[uuid_a].related_uuids += uuid_b
     SCANNERS[uuid_b].related_uuids += uuid_a
     logger.info(f"[SCANNER:marry_EP] married UUID {uuid_a} with {uuid_b}")
+
+
+# ---------------- Scanner-Datenstruktur ----------------
+class Scanner_Jobs:
+    def __init__(self, scan_job_id, subscription_id, scanner_uuid, xaddr):
+        logger.debug(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} [SCANNER_JOBS:__init__] New instance of a Scanner Job")
+
+        self.scanjobidentifier = scan_job_id
+        self.subscriptionidentifier = subscription_id
+        self.scanner_uuid = scanner_uuid
+        self.xaddr = xaddr
+        
+        self.status = STATE.PENDING
+        self.retries = 0
+        self.created = datetime.datetime.now().replace(microsecond=0)
+        self.last_try = None
+        self.remove_after = None  # Zeitpunkt zum Löschen
+
+        logger.info(f"[SCANNER_JOBS:__init__]   SCAN_JOB_ID: {self.scanjobidentifier}")
+        logger.info(f"[SCANNER_JOBS:__init__]     SUBSCR_ID: {self.subscriptionidentifier}")
+        logger.info(f"[SCANNER_JOBS:__init__]  SCANNER UUID: {self.scanner_uuid}")
+        logger.info(f"[SCANNER_JOBS:__init__]         XADDR: {self.xaddr}")
+
