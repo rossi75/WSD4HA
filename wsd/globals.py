@@ -23,6 +23,9 @@ logger = logging.getLogger("wsd-addon")
 # -----------------  define SCANNERS dict  -----------------
 SCANNERS = {}
 
+# -----------------  define SCAN_JOBS dict  -----------------
+SCAN_JOBS = {}
+
 # -----------------  define User-Agent  -----------------
 USER_AGENT = "WSD4HA"
 #USER_AGENT = "WSDAPI"       # originaler Wert von Microsoft
@@ -30,7 +33,6 @@ USER_AGENT = "WSD4HA"
 # -----------------  define FROM_UUID  -----------------
 FROM_UUID = None
 
-            
 # -----------------  define NAMESPACE  -----------------
 NAMESPACES = {
     "df": "http://schemas.microsoft.com/windows/2008/09/devicefoundation",
