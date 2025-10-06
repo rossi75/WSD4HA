@@ -91,7 +91,7 @@ def marry_endpoints(uuid_a: str, uuid_b: str):
 
 
 # ---------------- Scanner-Datenstruktur ----------------
-class Scanner_Jobs:
+class Scan_Jobs:
     def __init__(self, scan_job_id, subscription_id, scanner_uuid, xaddr):
         logger.debug(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} [SCANNER_JOBS:__init__] New instance of a Scanner Job")
 
