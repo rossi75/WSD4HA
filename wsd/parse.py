@@ -309,13 +309,9 @@ def parse_scan_available(notify_uuid, xml):
         logger.error(f"[PARSE:scan_available] XML ParseError: {e}")
         return
 
-#    action = root.findtext(".//wsa:Action", default="", namespaces=NAMESPACES)
-#    scan_identifier = root.findtext(".//wscn:ScanIdentifier", default="", namespaces=NAMESPACES)
-#    input_source = root.findtext(".//wscn:InputSource", default="", namespaces=NAMESPACES)
-#    subscr_identifier = root.findtext(".//wse:Identifier", default="", namespaces=NAMESPACES)
     action = root.find(".//wsa:Action", NAMESPACES)
     scan_identifier = root.find(".//wscn:ScanIdentifier", NAMESPACES)
-#    input_source = root.find(".//wscn:InputSource", NAMESPACES)
+    input_source = root.find(".//wscn:InputSource", NAMESPACES)
     subscr_identifier_elem = root.find(".//wse:Identifier", NAMESPACES)
     if subscr_identifier_elem is not None and subscr_identifier_elem.text:
         subscr_identifier = subscr_identifier_elem.text.strip()
@@ -324,14 +320,19 @@ def parse_scan_available(notify_uuid, xml):
         if subscr_identifier.startswith("uuid:"):
             subscr_identifier = subscr_identifier.replace("uuid:", "")
 
-    logger.info(f"[PARSE:scan_available]          Action: {action}")
-    logger.info(f"[PARSE:scan_available] Subscription ID: {subscr_identifier}")
-    logger.info(f"[PARSE:scan_available]         Scan ID: {scan_identifier}")
-    logger.info(f"[PARSE:scan_available]    Input Source: {input_source}")
+    # umrechnen von notify_uuid zu SCANNERS[uuid]
+    
 
-    # Optional: Im SCANNERS-Dict hinterlegen
+    logger.info(f"   --->          Action: {action}")
+    logger.info(f"   --->     Notify UUID: {notify_uuid}")
+    logger.info(f"   ---> Subscription ID: {subscr_identifier}")
+    logger.info(f"   --->         Scan ID: {scan_identifier}")
+    logger.info(f"   --->    Input Source: {input_source}")
+
+
+    # Neuen Auftrag zum Abholen in SCANNER_JOBS[] hinterlegen
     if subscr_identifier in SCANNERS:
-        s = SCANNERS[subscr_identifier]
+        s = SCANNER_JOBS[subscr_identifier]
 #        s.last_scan_id = scan_identifier
 #        s.last_scan_source = input_source
 #        s.last_scan_time = datetime.datetime.now().replace(microsecond=0)
