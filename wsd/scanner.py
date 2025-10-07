@@ -2,8 +2,10 @@ import datetime
 import socket
 import logging
 import sys
-from globals import SCANNERS, list_scanners, NAMESPACES, STATE, LOG_LEVEL
+#from globals import SCANNERS, list_scanners, NAMESPACES, STATE, LOG_LEVEL
+from globals import SCANNERS, NAMESPACES, STATE, LOG_LEVEL
 from config import OFFLINE_TIMEOUT
+from tools import list_scanners, marry_endpoints
 
 #logging.basicConfig(level=logging.INFO, format='[%(levelname)s] %(message)s')
 #logging.basicConfig(level=logging.LOG_LEVEL, format='[%(levelname)s] %(message)s')
@@ -81,7 +83,7 @@ class Scanner:
         logger.debug(f"   -->  remove_after: {self.remove_after}")
 
 # ---------------- marry two endpoints ----------------
-def marry_endpoints(uuid_a: str, uuid_b: str):
+def _marry_endpoints(uuid_a: str, uuid_b: str):
     """
     Stellt sicher, dass zwei Scanner-Objekte sich gegenseitig kennen.
     """
