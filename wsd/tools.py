@@ -1,8 +1,22 @@
-# ---------------- Helper/Tools ----------------
+# ------------------------------- Helper/Tools -------------------------------
+# def check_port(port)
+#     checks if port is available or occupied
+#     return true if port is available
+#     returns false if port is occupied
+# 
+# def get_local_ip()
+#     returns the local IP. not hardened against a network change !!
+#
+# def pick_best_xaddr(xaddrs: str) -> str:
 #
 #
 #
-# ----------------------------------------------
+# def list_scanners():
+#
+#
+# def marry_endpoints(uuid_a: str, uuid_b: str):
+#
+# ----------------------------------------------------------------------------
 
 # ---------------- lokale IP abfragen ----------------
 def get_local_ip():
@@ -25,4 +39,58 @@ def check_port(port):
             return True
         except OSError:
             return False
+
+# ---------------- Pick Best XADDR from String ----------------
+def pick_best_xaddr(xaddrs: str) -> str:
+    """
+    Wählt aus einer Liste von XAddrs den besten Kandidaten:
+    - bevorzugt IPv4
+    - ignoriert IPv6, wenn IPv4 vorhanden ist
+    - nimmt den Hostnamen, falls keine IP vorhanden ist
+    """
+    logger.debug(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S}[TOOLS:xaddr] received {xaddrs}")
+    if not xaddrs:
+        return None
+
+    candidates = xaddrs.split()
+
+    ipv4 = None
+    hostname = None
+
+    for addr in candidates:
+        if addr.startswith("http://["):  
+            # IPv6 -> ignorieren
+            continue
+        elif addr.startswith("http://") and any(c.isdigit() for c in addr.split("/")[2].split(":")[0]):
+            # IPv4 gefunden
+            ipv4 = addr
+        else:
+            # vermutlich Hostname
+            hostname = addr
+
+    logger.debug(f"[TOOLS:xaddr] extracted {ipv4 or hostname or None}")
+    return ipv4 or hostname or None
+
+# -----------------  Nach jedem Update: Liste loggen  -----------------
+def list_scanners():
+    if SCANNERS:
+        logger.info("   ------>   known Scanners   <------")
+        for i, s in enumerate(SCANNERS.values(), start=1):
+            logger.info(f"   [{i}] {s.friendly_name or s.uuid} @ {s.ip}")
+            logger.debug(f"       --->      XADDR: {s.xaddr}")
+            logger.info(f"       --->     Status: {s.state.value}")
+            logger.debug(f"       ---> first_seen: {s.last_seen}")
+            logger.debug(f"       --->  last_seen: {s.first_seen}")
+    else:
+        logger.info("no known Scanners in list")  
+
+# ---------------- marry two endpoints ----------------
+def marry_endpoints(uuid_a: str, uuid_b: str):
+    """
+    Stellt sicher, dass zwei Scanner-Objekte sich gegenseitig kennen.
+    """
+    SCANNERS[uuid_a].related_uuids += uuid_b
+    SCANNERS[uuid_b].related_uuids += uuid_a
+    logger.info(f"[SCANNER:marry_EP] married UUID {uuid_a} with {uuid_b}")
+
 
