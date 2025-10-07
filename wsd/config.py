@@ -117,7 +117,7 @@ except ValueError:
 logger.info(f"max scanned files to show: {MAX_FILES}")
 
 # ---------------- lokale IP abfragen ----------------
-def get_local_ip():
+def _get_local_ip():
     try:
         # UDP-Socket zu einer externen Adresse öffnen (wird nicht gesendet)
         s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
@@ -132,7 +132,7 @@ def get_local_ip():
 LOCAL_IP = get_local_ip()
 
 # ---------------- Portprüfung ----------------
-def check_port(port):
+def _check_port(port):
     with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
         try:
             s.bind(('', port))
