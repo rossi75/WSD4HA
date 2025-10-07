@@ -99,7 +99,7 @@ class STATE(str, Enum):
     ERROR = "error"
 
 # -----------------  Nach jedem Update: Liste loggen  -----------------
-def list_scanners():
+def _list_scanners():
     if SCANNERS:
         logger.info("   ------>   known Scanners   <------")
         for i, s in enumerate(SCANNERS.values(), start=1):
