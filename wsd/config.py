@@ -11,6 +11,7 @@ import xml.etree.ElementTree as ET
 import subprocess
 import uuid
 from globals import SCANNERS, list_scanners, FROM_UUID, USER_AGENT, LOG_LEVEL
+from tools import list_scanners, check_port, get_local_ip
 
 # ----------------- To Do -----------------
 # + Drucker oder Scanner name übernehmen
