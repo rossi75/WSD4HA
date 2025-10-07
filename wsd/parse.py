@@ -18,6 +18,7 @@ from pathlib import Path
 from scanner import Scanner
 from templates import TEMPLATE_SOAP_PROBE, TEMPLATE_SOAP_TRANSFER_GET
 from scan_job import fetch_scanned_document
+from tools import list_scanners, pick_best_xaddr
 
 #logging.basicConfig(level=logging.INFO, format='[%(levelname)s] %(message)s')
 #logging.basicConfig(level=logging.LOG_LEVEL, format='[%(levelname)s] %(message)s')
@@ -347,7 +348,7 @@ def parse_scan_available(notify_uuid, xml):
     # auf jeden Fall hat er sich gemeldet, also merken wir uns das iwie
 
 # ---------------- Pick Best XADDR from String ----------------
-def pick_best_xaddr(xaddrs: str) -> str:
+def _pick_best_xaddr(xaddrs: str) -> str:
     """
     Wählt aus einer Liste von XAddrs den besten Kandidaten:
     - bevorzugt IPv4
