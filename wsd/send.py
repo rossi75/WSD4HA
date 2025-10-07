@@ -11,12 +11,15 @@ import time
 import threading
 import uuid
 import xml.etree.ElementTree as ET
-from config import OFFLINE_TIMEOUT, LOCAL_IP, HTTP_PORT, FROM_UUID, DISPLAY, NOTIFY_PORT, get_local_ip
-from globals import SCANNERS, list_scanners, NAMESPACES, STATE, USER_AGENT, LOG_LEVEL
+#from config import OFFLINE_TIMEOUT, LOCAL_IP, HTTP_PORT, FROM_UUID, DISPLAY, NOTIFY_PORT, get_local_ip
+#from globals import SCANNERS, list_scanners, NAMESPACES, STATE, USER_AGENT, LOG_LEVEL
+from config import OFFLINE_TIMEOUT, LOCAL_IP, HTTP_PORT, FROM_UUID, DISPLAY, NOTIFY_PORT
+from globals import SCANNERS, NAMESPACES, STATE, USER_AGENT, LOG_LEVEL
+from parse import parse_wsd_packet, parse_probe, parse_transfer_get, parse_subscribe
 from pathlib import Path
 from scanner import Scanner
+from tools import list_scanners, get_local_ip
 from templates import TEMPLATE_SOAP_PROBE, TEMPLATE_SOAP_TRANSFER_GET, TEMPLATE_SUBSCRIBE_SAE, TEMPLATE_SUBSCRIBE_RENEW
-from parse import parse_wsd_packet, parse_probe, parse_transfer_get, parse_subscribe
 
 #logging.basicConfig(level=logging.INFO, format='[%(levelname)s] %(message)s')
 #logging.basicConfig(level=logging.{LOG_LEVEL}, format='[%(levelname)s] %(message)s')
