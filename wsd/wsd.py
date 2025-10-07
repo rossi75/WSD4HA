@@ -12,19 +12,21 @@ import threading
 import uuid
 import xml.etree.ElementTree as ET
 from config import OFFLINE_TIMEOUT, LOCAL_IP, HTTP_PORT, FROM_UUID
-from globals import SCANNERS, list_scanners, NAMESPACES, STATE, LOG_LEVEL
+#from globals import SCANNERS, list_scanners, NAMESPACES, STATE, LOG_LEVEL
+from globals import SCANNERS, NAMESPACES, STATE, LOG_LEVEL
 from pathlib import Path
 from scanner import Scanner
 from templates import TEMPLATE_SOAP_PROBE, TEMPLATE_SOAP_TRANSFER_GET
 from send import send_probe, send_transfer_get, send_subscription_ScanAvailableEvent, send_subscription_renew
 from parse import parse_wsd_packet, parse_probe, parse_transfer_get, parse_subscribe
+from tools import list_scanners, pick_best_xaddr
 
 #logging.basicConfig(level=logging.INFO, format='[%(levelname)s] %(message)s')
 logging.basicConfig(level=LOG_LEVEL, format='[%(levelname)s] %(message)s')
 logger = logging.getLogger("wsd-addon")
 
 # ---------------- XADDR filtern ----------------
-def pick_best_xaddr(xaddrs: str) -> str:
+def _pick_best_xaddr(xaddrs: str) -> str:
     """
     Wählt aus einer Liste von XAddrs den besten Kandidaten:
     - bevorzugt IPv4
@@ -265,7 +267,6 @@ async def state_monitor():
             await asyncio.sleep(2)
         else:
             logger.debug(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} [WSD:sleep] goodbye")
-#            await asyncio.sleep(OFFLINE_TIMEOUT / 5)
             await asyncio.sleep(OFFLINE_TIMEOUT / 7) # damit wir iwie auf nen krummen Wert kommen
 
         logger.debug(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} [WSD:sleep] back in town")
