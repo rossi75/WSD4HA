@@ -1,5 +1,8 @@
 # Changelog
 
+## 0.57 - 2025-10-07
+- outsourced many helper functions into new tools.py
+
 ## 0.56 - 2025-09-29
 - solved subscription renew issue
 
