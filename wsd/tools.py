@@ -185,3 +185,8 @@ def _find_scanner_from_notify(xml_body: str):
 
     logger.warning(f"[TOOLS:find_scanner] Could not find any Scanner with notify point =  or Identifier = {identifier} or Token = {token}")
     return None
+
+#
+#
+# --------------------------------------------------
+# ---------------- END OF SERVER.PY ----------------
