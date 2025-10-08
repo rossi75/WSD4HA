@@ -114,8 +114,8 @@ async def notify_handler(request):
 
     xml_payload = await request.text()
     notify_uuid = request.match_info["uuid"]
-    logger.debug(f"   ---> Notify UUID: {notify_uuid}")
-    logger.debug(f"   ---> XML payload: \n {xml_payload}")
+    logger.info(f"   ---> Notify UUID: {notify_uuid}")
+    logger.info(f"   ---> XML payload: \n {xml_payload}")
 
     try:
         root = ET.fromstring(xml_payload)
