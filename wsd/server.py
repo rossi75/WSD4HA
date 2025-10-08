@@ -135,9 +135,16 @@ routes = web.RouteTableDef()
 async def notify_handler(request):
     logger.info(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} [SERVER:notify_handler] received {request.method} event on {request.path}")
 
+    scanner_uuid = ""
     EndTo_id = request.path
     scanner_uuid = find_scanner_by_endto_addr(EndTo_id)
     xml_payload = await request.text()
+
+    if scanner_uuid is not None:
+        logger.info(f"received scanner {SCANNERS[scanner_uuid].freidnly_name or scanner_uuid} @ {SCANNERS[scanner_uuid].ip")
+    else:
+        logger.info(f"no search result for {EndTo_id}")
+        return web.Response(status=400, text="bad notify endpoint")
     logger.debug(f"   ---> XML payload: \n {xml_payload}")
 
     try:
