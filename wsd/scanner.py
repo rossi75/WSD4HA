@@ -1,8 +1,8 @@
-import datetime
+#import datetime
+from datetime import datetime, timedelta
 import socket
 import logging
 import sys
-#from globals import SCANNERS, list_scanners, NAMESPACES, STATE, LOG_LEVEL
 from globals import SCANNERS, NAMESPACES, STATE, LOG_LEVEL
 from config import OFFLINE_TIMEOUT
 from tools import list_scanners, marry_endpoints
