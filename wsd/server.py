@@ -50,7 +50,7 @@ async def status_page(request):
 
     # Scanner
     scanner_list = ''
-    now = datetime.datetime.now()
+#    now = datetime.datetime.now()
     for s in SCANNERS.values():
         delta = (now - s.last_seen).total_seconds()
 #        if delta > OFFLINE_TIMEOUT:
@@ -70,6 +70,7 @@ async def status_page(request):
         scanner_list += f"{s.xaddr if s.xaddr else ''}</td>"
         scanner_list += f"<td style='text-align:center;'>{s.subscription_id if s.subscription_id else ''}<br>"
         scanner_list += f"{s.end_to_addr if s.end_to_addr else ''}<br>"
+        scanner_list += f"{s.destination_token if s.destination_token else ''}<br>"
         scanner_list += f"{s.subscription_last_seen.strftime('%Y-%m-%d %H:%M:%S') if s.subscription_last_seen else ''}</td>"
         scanner_list += f"<td style='text-align:center;'>{s.manufacturer if s.manufacturer else ''}<br>"
         scanner_list += f"{s.model if s.model else ''}</td>"
@@ -77,6 +78,23 @@ async def status_page(request):
         scanner_list += f"{s.serial if s.serial else ''}</td>"
         scanner_list += "</tr>"
 
+
+    # Jobs
+    job_list = ''
+#    now = datetime.datetime.now()
+    for j in SCAN_JOBS.values():
+        job_list += "<tr style='color:{color}'>"
+        job_list += f"<td style='text-align:center;'>{j.scanjob_identifier}</td>"
+        job_list += f"<td style='text-align:center;'>{j.input_source}</td>"
+        job_list += f"<td style='text-align:center;'>{j.scanner_uuid}<br>"
+        job_list += f"{j.xaddr}</td>"
+        job_list += f"<td style='text-align:center;'>{j.subscription_identifier}<br>"
+        job_list += f"{j.dest_token}</td>"
+        job_list += f"<td style='text-align:center;'>{j.status}</td>"
+        job_list += f"<td style='text-align:center;'>{j.job_created}</td>"
+        job_list += f"<td style='text-align:center;'>{j.remove_after}</td>"
+        job_list += "</tr>"
+        
     logger.debug(f"   ---> probably delivered http-response")
     return web.Response(text=f"""
         <html>
@@ -92,8 +110,13 @@ async def status_page(request):
             <h1>WSD4HA seems to be running</h1>
             <h2>Active Scanners:</h2>
             <table>
-                <tr><th>Name</th><th>IP<br>[MAC]</th><th>State</th><th>First seen<br>Last seen<br>[Remove after]</th><th>UUID<br>XADDR</th><th>Subscr ID<br>Subscr EndToAddr<br>Last Subscr</th><th>Manufacturer<br>Model</th><th>Firmware<br>Serial</th></tr>
+                <tr><th>Name</th><th>IP<br>[MAC]</th><th>State</th><th>First seen<br>Last seen<br>[Remove after]</th><th>UUID<br>XADDR</th><th>Subscr ID<br>Subscr EndToAddr<br>Destination Token<br>Last Subscr</th><th>Manufacturer<br>Model</th><th>Firmware<br>Serial</th></tr>
                 {scanner_list}
+            </table>
+            <h2>List of Scans:</h2>
+            <table>
+                <tr><th>ScanJob ID</th><th>HW Source</th><th>Scanner UUID<br>XADDR<br>Subscr UUID<br>Destination Token<br>Status</th><th>Job created<br>Remove after</tr>
+                {job_list}
             </table>
             <h2>Last {MAX_FILES} Scans:</h2>
             <table>
@@ -104,18 +127,12 @@ async def status_page(request):
         </html>
     """, content_type="text/html")
 
+# parallel zum UI starten
 # ---------------- NOTIFY Server ----------------
 async def start_notify_server():
     logger.info(f"[SERVER:start_notify] configuring Notify Server on Port {NOTIFY_PORT}")
-    # parallel zum UI starten
-#from notify_server import create_notify_app
-
-#    loop = asyncio.get_event_loop()
-#    loop.create_task(web._run_app(create_notify_app(), port=5357))
 
     app = web.Application()
-#    app.router.add_get(f"/{USER_AGENT}", notify_handler)
-#    logger.debug(f"   ---> added endpoint /{USER_AGENT}")
     app.add_routes(routes)
 
     runner = web.AppRunner(app)
