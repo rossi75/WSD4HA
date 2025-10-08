@@ -18,6 +18,9 @@
 #
 # ----------------------------------------------------------------------------
 
+from globals import SCANNERS
+import xml.etree.ElementTree as ET
+
 # ---------------- lokale IP abfragen ----------------
 def get_local_ip():
     try:
@@ -91,6 +94,34 @@ def marry_endpoints(uuid_a: str, uuid_b: str):
     """
     SCANNERS[uuid_a].related_uuids += uuid_b
     SCANNERS[uuid_b].related_uuids += uuid_a
-    logger.info(f"[SCANNER:marry_EP] married UUID {uuid_a} with {uuid_b}")
+    logger.info(f"[TOOLS:marry_EP] married UUID {uuid_a} with {uuid_b}")
 
 
+def find_scanner_from_notify(xml_body: str):
+    """Analysiert eine eingehende Notify-Message und findet die zugehörige Scanner-UUID"""
+
+    try:
+        root = ET.fromstring(xml_body)
+    except ET.ParseError:
+        logger.warning("[TOOLS:find_scanner] XML parse error")
+        return None
+
+    # Versuch 1: Identifier
+    ident_elem = root.find(".//wse:Identifier", NAMESPACES)
+    identifier = ident_elem.text.strip() if ident_elem is not None else None
+
+    # Versuch 2: DestinationToken
+    token_elem = root.find(".//wscn:DestinationToken", NAMESPACES)
+    token = token_elem.text.strip() if token_elem is not None else None
+
+    # Versuch 3: IP-Adresse (Fallback)
+    # (wird besser im Handler gemacht, z.B. request.remote)
+    
+    for uuid, scanner in SCANNERS.items():
+        if (identifier and getattr(scanner, "subscription_identifier", None) == identifier) \
+           or (token and getattr(scanner, "destination_token", None) == token):
+            logger.info(f"[TOOLS:find_scanner] Zuordnung: Scanner {uuid} ({scanner.friendly_name}) erkannt")
+            return uuid
+
+    logger.warning(f"[TOOLS:find_scanner] Kein Scanner mit Identifier={identifier} oder Token={token} gefunden")
+    return None
