@@ -44,6 +44,25 @@ class Scanner:
         self.offline_since = None
         self.remove_after = None  # Zeitpunkt zum Löschen
 
+        # Document related parameters
+        self.DocPar_FileFormat = 'jfif'
+        self.DocPar_ImagesToTransfer = 1
+        self.DocPar_InputSource = None
+        self.DocPar_InputWidth = None
+        self.DocPar_InputHeight = None
+        self.DocPar_RegionWidth = None
+        self.DocPar_RegionHeight = None
+        self.DocPar_ResolutionWidth = None
+        self.DocPar_ResolutionHeight = None
+        self.DocPar_ExposureContrast = 0
+        self.DocPar_ExposureBrightness = 0
+        self.DocPar_ScalingWidth = 100
+        self.DocPar_ScalingHeight = 100
+        self.DocPar_Rotation = 0
+        self.DocPar_RegionXOffset = 0
+        self.DocPar_RegionYOffset = 0
+        self.DocPar_ColorProcessing = RGB24
+
         logger.debug(f"   --->  UUID: {self.uuid}")
         logger.debug(f"   --->    IP: {self.ip}")
         logger.debug(f"   ---> XADDR: {self.xaddr}")
