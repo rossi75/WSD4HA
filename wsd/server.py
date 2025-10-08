@@ -13,7 +13,7 @@ from config import OFFLINE_TIMEOUT, SCAN_FOLDER, HTTP_PORT, MAX_FILES, NOTIFY_PO
 from globals import SCANNERS, NAMESPACES, STATE, USER_AGENT, LOG_LEVEL
 from scanner import Scanner
 from parse import parse_scan_available
-from tools import find_scanner_from_endto_addr
+from tools import find_scanner_by_endto_addr
 
 logging.basicConfig(level=LOG_LEVEL, format='[%(levelname)s] %(message)s')
 logger = logging.getLogger("wsd-addon")
@@ -136,7 +136,7 @@ async def notify_handler(request):
     logger.info(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} [SERVER:notify_handler] received {request.method} event on {request.path}")
 
     EndTo_id = request.path
-    scanner_uuid = find_scanner_from_endto_addr(EndTo_id)
+    scanner_uuid = find_scanner_by_endto_addr(EndTo_id)
     xml_payload = await request.text()
     logger.debug(f"   ---> XML payload: \n {xml_payload}")
 
