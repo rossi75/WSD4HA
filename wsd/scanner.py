@@ -95,6 +95,7 @@ class Scan_Jobs:
         self.scanner_uuid = scanner_uuid
         self.subscription_identifier = SCANNERS[scanner_uuid].subscription_id
         self.xaddr = SCANNERS[scanner_uuid].xaddr
+        self.dest_token = SCANNERS[scanner_uuid].destination_token
 
         self.status = STATE.SCAN_PENDING
         self.job_created = datetime.datetime.now().replace(microsecond=0)
@@ -107,6 +108,7 @@ class Scan_Jobs:
         logger.info(f"   --->  SCANNER UUID: {self.scanner_uuid}")
         logger.info(f"   --->     SUBSCR_ID: {self.subscriptionidentifier}")
         logger.info(f"   --->         XADDR: {self.xaddr}")
+        logger.info(f"   --->    DEST_TOKEN: {self.dest_token}")
         logger.info(f"   --->        STATUS: {self.status}")
         logger.info(f"   --->       CREATED: {self.job_created}")
         logger.info(f"   --->  REMOVE_AFTER: {self.remove_after}")
