@@ -13,10 +13,27 @@ from config import OFFLINE_TIMEOUT, SCAN_FOLDER, HTTP_PORT, MAX_FILES, NOTIFY_PO
 from globals import SCANNERS, NAMESPACES, STATE, USER_AGENT, LOG_LEVEL
 from scanner import Scanner
 from parse import parse_scan_available
+from tools import find_scanner_from_endto
 
 logging.basicConfig(level=LOG_LEVEL, format='[%(levelname)s] %(message)s')
 logger = logging.getLogger("wsd-addon")
 
+
+# ---------------- HTTP Server ----------------
+async def start_http_server():
+    logger.info(f"[SERVER:start_http] configuring HTTP/SOAP Server on Port {HTTP_PORT}")
+    app = web.Application()
+    app.router.add_get("/", status_page)
+    logger.debug(f"   ---> added endpoint /")
+    
+    runner = web.AppRunner(app)
+    await runner.setup()
+    logger.debug(f"   ---> runner.setup().web.AppRunner(app)")
+    
+    # An alle Interfaces binden (0.0.0.0) -> wichtig für Docker / HA
+    site = web.TCPSite(runner, "0.0.0.0", HTTP_PORT)
+    await site.start()
+    logger.info(f"HTTP/SOAP Server is running on Port {HTTP_PORT}")
 
 # ---------------- WebUI ----------------
 async def status_page(request):
@@ -87,47 +104,6 @@ async def status_page(request):
         </html>
     """, content_type="text/html")
 
-
-# ---------------- HTTP Server ----------------
-async def start_http_server():
-    logger.info(f"[SERVER:start_http] configuring HTTP/SOAP Server on Port {HTTP_PORT}")
-    app = web.Application()
-    app.router.add_get("/", status_page)
-    logger.debug(f"   ---> added endpoint /")
-    
-    runner = web.AppRunner(app)
-    await runner.setup()
-    logger.debug(f"   ---> runner.setup().web.AppRunner(app)")
-    
-    # An alle Interfaces binden (0.0.0.0) -> wichtig für Docker / HA
-    site = web.TCPSite(runner, "0.0.0.0", HTTP_PORT)
-    await site.start()
-    logger.info(f"HTTP/SOAP Server is running on Port {HTTP_PORT}")
-
-
-# ---------------- NOTIFY handler ----------------
-# Fängt alles hinter / ab, z.B. /6ccf7716-4dc8-47bf-aca4-5a2ae5a959ca
-routes = web.RouteTableDef()
-@routes.post(r'/{uuid:[0-9a-fA-F\-]+}')
-async def notify_handler(request):
-    logger.info(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} [SERVER:notify_handler] received {request.method} Event on {request.path}")
-
-    xml_payload = await request.text()
-    notify_uuid = request.match_info["uuid"]
-    logger.debug(f"   ---> Notify UUID: {notify_uuid}")
-    logger.debug(f"   ---> XML payload: \n {xml_payload}")
-
-    try:
-        root = ET.fromstring(xml_payload)
-        asyncio.create_task(parse_scan_available(notify_uuid, xml_payload))
-    except Exception as e:
-        logger.warning(f"[SERVER:notify_handler] invalid xml: {e}")
-        return web.Response(status=400, text="bad xml")
-
-#    return web.Response(status=200, text="Alles juut")
-    return web.Response(status=202, text="Alles juut")
-
-
 # ---------------- NOTIFY Server ----------------
 async def start_notify_server():
     logger.info(f"[SERVER:start_notify] configuring Notify Server on Port {NOTIFY_PORT}")
@@ -152,3 +128,28 @@ async def start_notify_server():
     logger.info(f"Notify Server is running on Port {NOTIFY_PORT}")
     logger.info(f"-----------------------  Events  -------------------------")
 
+# ---------------- NOTIFY handler ----------------
+# Fängt alles hinter / ab, z.B. /6ccf7716-4dc8-47bf-aca4-5a2ae5a959ca
+routes = web.RouteTableDef()
+@routes.post(r'/{uuid:[0-9a-fA-F\-]+}')
+async def notify_handler(request):
+    logger.info(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} [SERVER:notify_handler] received {request.method} event on {request.path}")
+
+    EndTo_id = request.path
+    scanner_uuid = find_scanner_from_endto(EndTo_id)
+    xml_payload = await request.text()
+    logger.debug(f"   ---> XML payload: \n {xml_payload}")
+
+    try:
+        root = ET.fromstring(xml_payload)
+        asyncio.create_task(parse_scan_available(notify_uuid, xml_payload))
+    except Exception as e:
+        logger.warning(f"[SERVER:notify_handler] invalid xml: {e}")
+        return web.Response(status=400, text="bad xml")
+
+#    return web.Response(status=200, text="Alles juut")
+    return web.Response(status=202, text="Alles juut")
+
+
+# --------------------------------------------------
+# ---------------- END OF SERVER.PY ----------------
