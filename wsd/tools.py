@@ -23,6 +23,8 @@
 
 from globals import SCANNERS
 import xml.etree.ElementTree as ET
+import sockets
+import logging
 
 # ---------------- lokale IP abfragen ----------------
 def get_local_ip():
