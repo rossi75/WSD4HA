@@ -136,13 +136,13 @@ async def notify_handler(request):
     logger.info(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} [SERVER:notify_handler] received {request.method} event on {request.path}")
 
     EndTo_id = request.path
-    scanner_uuid = find_scanner_from_endto(EndTo_id)
+    scanner_uuid = find_scanner_from_endto_addr(EndTo_id)
     xml_payload = await request.text()
     logger.debug(f"   ---> XML payload: \n {xml_payload}")
 
     try:
         root = ET.fromstring(xml_payload)
-        asyncio.create_task(parse_scan_available(notify_uuid, xml_payload))
+        asyncio.create_task(parse_scan_available(scanner_uuid, xml_payload))
     except Exception as e:
         logger.warning(f"[SERVER:notify_handler] invalid xml: {e}")
         return web.Response(status=400, text="bad xml")
