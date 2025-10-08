@@ -311,9 +311,6 @@ def parse_scan_available(notify_uuid, xml):
         logger.error(f"[PARSE:scan_available] XML ParseError: {e}")
         return
 
-    action = root.find(".//wsa:Action", NAMESPACES)
-    scan_identifier = root.find(".//wscn:ScanIdentifier", NAMESPACES)
-    input_source = root.find(".//wscn:InputSource", NAMESPACES)
     subscr_identifier_elem = root.find(".//wse:Identifier", NAMESPACES)
     if subscr_identifier_elem is not None and subscr_identifier_elem.text:
         subscr_identifier = subscr_identifier_elem.text.strip()
@@ -322,12 +319,24 @@ def parse_scan_available(notify_uuid, xml):
         if subscr_identifier.startswith("uuid:"):
             subscr_identifier = subscr_identifier.replace("uuid:", "")
 
+    action_elem = root.find(".//wsa:Action", NAMESPACES)
+    if action_elem is not None and action_elem.text:
+        action = action_elem.text.strip()
+
+    scan_identifier_elem = root.find(".//wscn:ScanIdentifier", NAMESPACES)
+    if scan_identifier_elem is not None and scan_identifier_elem.text:
+        scan_identifier = scan_identifier_elem.text.strip()
+    
+    input_source_elem = root.find(".//wscn:InputSource", NAMESPACES)
+    if input_source_elem is not None and input_source_elem.text:
+        input_source = input_source_elem.text.strip()
+
     # umrechnen von notify_uuid zu SCANNERS[uuid]
     
 
-    logger.info(f"   --->          Action: {action}")
     logger.info(f"   --->     Notify UUID: {notify_uuid}")
     logger.info(f"   ---> Subscription ID: {subscr_identifier}")
+    logger.info(f"   --->          Action: {action}")
     logger.info(f"   --->         Scan ID: {scan_identifier}")
     logger.info(f"   --->    Input Source: {input_source}")
 
@@ -348,34 +357,5 @@ def parse_scan_available(notify_uuid, xml):
     # was machen wir jetzt mit der Info dass es ggf einen neuen Scan gibt?
     # auf jeden Fall hat er sich gemeldet, also merken wir uns das iwie
 
-# ---------------- Pick Best XADDR from String ----------------
-def _pick_best_xaddr(xaddrs: str) -> str:
-    """
-    Wählt aus einer Liste von XAddrs den besten Kandidaten:
-    - bevorzugt IPv4
-    - ignoriert IPv6, wenn IPv4 vorhanden ist
-    - nimmt den Hostnamen, falls keine IP vorhanden ist
-    """
-    logger.debug(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S}[WSD:XADDR] received {xaddrs}")
-    if not xaddrs:
-        return None
 
-    candidates = xaddrs.split()
-
-    ipv4 = None
-    hostname = None
-
-    for addr in candidates:
-        if addr.startswith("http://["):  
-            # IPv6 -> ignorieren
-            continue
-        elif addr.startswith("http://") and any(c.isdigit() for c in addr.split("/")[2].split(":")[0]):
-            # IPv4 gefunden
-            ipv4 = addr
-        else:
-            # vermutlich Hostname
-            hostname = addr
-
-    logger.debug(f"[WSD:XADDR] extracted {ipv4 or hostname or None}")
-    return ipv4 or hostname or None
-
+# **************** END OF PARSE.PY  ****************
