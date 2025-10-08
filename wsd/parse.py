@@ -294,7 +294,7 @@ def parse_w3c_duration(duration: str) -> int:
     return seconds
 
 # ---------------- parse Scan available ----------------
-def parse_scan_available(notify_url, xml):
+def parse_scan_available(scan_available_uuid, xml):
     """
     Parse ScanAvailableEvent and update scanner state.
 
@@ -302,7 +302,7 @@ def parse_scan_available(notify_url, xml):
         notify_uuid (str): UUID from URL path (/uuid)
         xml (str): SOAP Notify payload (string)
     """
-    logger.info(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} [PARSE:scan_available] parsing an event for /{notify_url}")
+    logger.info(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} [PARSE:scan_available] parsing an event for {SCANNERS[scan_available_uuid].friendly_name or scan_available_uuid} @ {SCANNERS[scan_available_uuid].ip}")
     logger.info(f"   XML:\n{xml}")
 
     try:
@@ -332,7 +332,7 @@ def parse_scan_available(notify_url, xml):
         input_source = input_source_elem.text.strip()
 
     # umrechnen von notify_uuid zu SCANNERS[uuid]
-    find_scanner_from_notify(notify_url)
+#    find_scanner_from_notify(notify_url)
 
     logger.info(f"   --->     Notify UUID: {notify_url}")
     logger.info(f"   ---> Subscription ID: {subscr_identifier}")
