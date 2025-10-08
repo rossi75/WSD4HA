@@ -52,7 +52,7 @@ async def status_page(request):
     scanner_list = ''
 #    now = datetime.datetime.now()
     for s in SCANNERS.values():
-        delta = (now - s.last_seen).total_seconds()
+#        delta = (now - s.last_seen).total_seconds()
 #        if delta > OFFLINE_TIMEOUT:
 #            s.online = False
 #            s.state = False
