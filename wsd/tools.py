@@ -23,7 +23,7 @@
 
 from globals import SCANNERS
 import xml.etree.ElementTree as ET
-import sockets
+import socket
 import logging
 
 # ---------------- lokale IP abfragen ----------------
