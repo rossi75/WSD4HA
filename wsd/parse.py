@@ -13,7 +13,6 @@ import uuid
 import xml.etree.ElementTree as ET
 from datetime import timedelta
 from config import OFFLINE_TIMEOUT, LOCAL_IP, HTTP_PORT, FROM_UUID
-#from globals import SCANNERS, list_scanners, NAMESPACES, STATE, LOG_LEVEL
 from globals import SCANNERS, NAMESPACES, STATE, LOG_LEVEL
 from pathlib import Path
 from scanner import Scanner
@@ -294,21 +293,21 @@ def parse_w3c_duration(duration: str) -> int:
     return seconds
 
 # ---------------- parse Scan available ----------------
-def parse_scan_available(scan_available_uuid, xml):
+def parse_notify_msg(notifier_uuid, xml):
     """
     Parse ScanAvailableEvent and update scanner state.
 
     Args:
-        notify_uuid (str): UUID from URL path (/uuid)
+        notifier_uuid (str): URL path (/uuid) belongs to a scanners uuid, this is the notifier_uuid
         xml (str): SOAP Notify payload (string)
     """
-    logger.info(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} [PARSE:scan_available] parsing an event for {SCANNERS[scan_available_uuid].friendly_name or scan_available_uuid} @ {SCANNERS[scan_available_uuid].ip}")
+    logger.info(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} [PARSE:notify] parsing an event for {SCANNERS[notifier_uuid].friendly_name or notifier_uuid} @ {SCANNERS[notifier_uuid].ip}")
     logger.info(f"   XML:\n{xml}")
 
     try:
         root = ET.fromstring(xml)
     except ET.ParseError as e:
-        logger.error(f"[PARSE:scan_available] XML ParseError: {e}")
+        logger.error(f"[PARSE:notify] XML ParseError: {e}")
         return
 
     subscr_identifier_elem = root.find(".//wse:Identifier", NAMESPACES)
@@ -334,7 +333,7 @@ def parse_scan_available(scan_available_uuid, xml):
     # umrechnen von notify_uuid zu SCANNERS[uuid]
 #    find_scanner_from_notify(notify_url)
 
-    logger.info(f"   --->     Notify UUID: {notify_url}")
+    logger.info(f"   --->     Notify UUID: {notifier_uuid}")
     logger.info(f"   ---> Subscription ID: {subscr_identifier}")
     logger.info(f"   --->          Action: {action}")
     logger.info(f"   --->         Scan ID: {scan_identifier}")
@@ -344,15 +343,16 @@ def parse_scan_available(scan_available_uuid, xml):
     # Neuen Auftrag zum Abholen in SCANNER_JOBS[] hinterlegen
     if subscr_identifier in SCANNERS:
         s = SCANNER_JOBS[subscr_identifier]
-#        s.last_scan_id = scan_identifier
-#        s.last_scan_source = input_source
+        s.scan_id = scan_identifier
+        s.scan_source = input_source
 #        s.last_scan_time = datetime.datetime.now().replace(microsecond=0)
-        logger.info(f"+++ surprising News, it seems Scanner {s.friendly_name} @ {s.ip} has a document for us. Let's go and grab it ! +++")
-        SCANNERS[notify_uuid].update()
-        SCANNERS[s.uuid].state = STATE.SCAN_AVAILABLE
-        asyncio.create_task(fetch_scanned_document(s.uuid, scan_identifier))
+#        logger.info(f"+++ surprising News, it seems Scanner {s.friendly_name} @ {s.ip} has a document for us. Let's go and grab it ! +++")
+        logger.info(f"+++ surprising News, it seems Scanner {SCANNER[notifier_uuid].friendly_name or notifier_uuid} @ {s.ip} has a document for us. Let's go and grab it ! +++")
+        SCANNERS[notifier_uuid].update()
+#        SCANNERS[s.uuid].state = STATE.SCAN_AVAILABLE
+#        asyncio.create_task(fetch_scanned_document(s.uuid, scan_identifier))
     else:
-        logger.info(f"could not find {notify_uuid} in the list of known Scanners")
+        logger.info(f"could not find {notifier_uuid} in the list of known Scanners")
 
     # was machen wir jetzt mit der Info dass es ggf einen neuen Scan gibt?
     # auf jeden Fall hat er sich gemeldet, also merken wir uns das iwie
