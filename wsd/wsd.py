@@ -224,11 +224,16 @@ async def state_monitor():
             del SCANNERS[scanner.uuid]
             list_scanners()
 
-        # welche Jobs sollen entfernt werden?
-#        logger.debug(f"[WSD:Heartbeat] checking for Jobs to remove from known list")
-#        for j in jobs_to_remove:
-#            logger.warning(f"[Heartbeat]     --> Removing job with {scanner.friendly_name} @ {scanner.ip} from list")
-#            del SCAN_JOBS[scanner.uuid]
+        # Entferne die abgelaufenen Jobs
+        if SCAN_JOBS:   # Nur wenn überhaupt Jobs existieren
+            expired_jobs = []
+            for job_id, job in list(SCAN_JOBS.items()):
+                remove_after = getattr(job, "remove_after", None)
+                if now >= remove_after:
+                    logger.info(f"[WSD:HEARTBEAT] Removing expired job {job_id} (expired at {remove_after})")
+                    expired_jobs.append(job_id)
+            for job_id in expired_jobs:
+                del SCAN_JOBS[job_id]
 
         # bei allen Zuständen außer [...] die kurze Pause
         if any (scanner.state not in {STATE.ABSENT,
