@@ -82,16 +82,6 @@ class Scanner:
         logger.debug(f"   --> offline_since: {self.offline_since}")
         logger.debug(f"   -->  remove_after: {self.remove_after}")
 
-# ---------------- marry two endpoints ----------------
-def _marry_endpoints(uuid_a: str, uuid_b: str):
-    """
-    Stellt sicher, dass zwei Scanner-Objekte sich gegenseitig kennen.
-    """
-    SCANNERS[uuid_a].related_uuids += uuid_b
-    SCANNERS[uuid_b].related_uuids += uuid_a
-    logger.info(f"[SCANNER:marry_EP] married UUID {uuid_a} with {uuid_b}")
-
-
 # ---------------- Scanner-Datenstruktur ----------------
 class Scan_Jobs:
 #    def __init__(self, scan_job_id, subscription_id, scanner_uuid, xaddr):
