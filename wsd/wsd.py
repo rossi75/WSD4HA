@@ -224,6 +224,12 @@ async def state_monitor():
             del SCANNERS[scanner.uuid]
             list_scanners()
 
+        # welche Jobs sollen entfernt werden?
+#        logger.debug(f"[WSD:Heartbeat] checking for Jobs to remove from known list")
+#        for j in jobs_to_remove:
+#            logger.warning(f"[Heartbeat]     --> Removing job with {scanner.friendly_name} @ {scanner.ip} from list")
+#            del SCAN_JOBS[scanner.uuid]
+
         # bei allen Zuständen außer [...] die kurze Pause
         if any (scanner.state not in {STATE.ABSENT,
                                       STATE.ONLINE,
