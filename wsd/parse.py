@@ -17,7 +17,7 @@ from globals import SCANNERS, NAMESPACES, STATE, LOG_LEVEL
 from pathlib import Path
 from scanner import Scanner
 from templates import TEMPLATE_SOAP_PROBE, TEMPLATE_SOAP_TRANSFER_GET
-from scan_job import fetch_scanned_document
+#from scan_job import fetch_scanned_document
 from tools import list_scanners, pick_best_xaddr
 
 #logging.basicConfig(level=logging.INFO, format='[%(levelname)s] %(message)s')
@@ -321,7 +321,8 @@ def parse_notify_msg(notifier_uuid, xml):
 
     action_elem = root.find(".//wsa:Action", NAMESPACES)
     if action_elem is not None and action_elem.text:
-        action = action_elem.text.strip()
+#        action = action_elem.text.strip()
+        action = action_elem.text.split("/")[-1]  # → "Hello|Bye|Probe"
 
     client_context_elem = root.find(".//wscn:ClientContext", NAMESPACES)
     if client_context_elem is not None and client_context_elem.text:
