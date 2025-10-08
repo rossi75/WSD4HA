@@ -141,7 +141,7 @@ async def notify_handler(request):
     xml_payload = await request.text()
 
     if scanner_uuid is not None:
-        logger.info(f"received scanner {SCANNERS[scanner_uuid].freidnly_name or scanner_uuid} @ {SCANNERS[scanner_uuid].ip")
+        logger.info(f"found scanner {SCANNERS[scanner_uuid].friendly_name or scanner_uuid} @ {SCANNERS[scanner_uuid].ip} for {EndTo_id}")
     else:
         logger.info(f"no search result for {EndTo_id}")
         return web.Response(status=400, text="bad notify endpoint")
@@ -149,14 +149,14 @@ async def notify_handler(request):
 
     try:
         root = ET.fromstring(xml_payload)
-        asyncio.create_task(parse_scan_available(scanner_uuid, xml_payload))
+        asyncio.create_task(parse_scan_available(scanner_uuid, xml_payload))      # hier wird dann der Abholauftrag an sich generiert
     except Exception as e:
         logger.warning(f"[SERVER:notify_handler] invalid xml: {e}")
         return web.Response(status=400, text="bad xml")
 
-#    return web.Response(status=200, text="Alles juut")
     return web.Response(status=202, text="Alles juut")
 
-
+#
+#
 # --------------------------------------------------
 # ---------------- END OF SERVER.PY ----------------
