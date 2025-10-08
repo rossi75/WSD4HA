@@ -96,9 +96,7 @@ TEMPLATE_SUBSCRIBE_SAE = """<?xml version="1.0" encoding="utf-8"?>
           </wsa:ReferenceParameters>
         </wse:NotifyTo>
       </wse:Delivery>
-      <wse:Expires>
-        PT1H
-      </wse:Expires>
+      <wse:Expires>PT1H</wse:Expires>
       <wse:Filter
         Dialect="http://schemas.xmlsoap.org/ws/2006/02/devprof/Action">
         http://schemas.microsoft.com/windows/2006/08/wdp/scan/ScanAvailableEvent
@@ -143,9 +141,7 @@ TEMPLATE_SUBSCRIBE_RENEW = """<?xml version="1.0" encoding="utf-8"?>
   </soap:Header>
   <soap:Body>
     <wse:Renew>
-      <wse:Expires>
-        PT1H
-      </wse:Expires>
+      <wse:Expires>PT1H</wse:Expires>
     </wse:Renew>
   </soap:Body>
 </soap:Envelope>
@@ -160,9 +156,9 @@ TEMPLATE_SUBSCRIBE_RENEW = """<?xml version="1.0" encoding="utf-8"?>
 # scan_identifier = Scan Identifier from xml notification dialog
 # destination_token = token given by scanner while registration
 # ---------------------------------------------------------------------------------
-# Document Parameters, what and how to scan. those with an OR are optional
-# DocPar_FileFormat or jfif
-# DocPar_ImagesToTransfer or 1
+# Document Parameters, what and how to scan
+# DocPar_FileFormat
+# DocPar_ImagesToTransfer
 # DocPar_InputSource
 # DocPar_InputWidth
 # DocPar_InputHeight
@@ -170,15 +166,15 @@ TEMPLATE_SUBSCRIBE_RENEW = """<?xml version="1.0" encoding="utf-8"?>
 # DocPar_RegionHeight
 # DocPar_ResolutionWidth
 # DocPar_ResolutionHeight
-# DocPar_ExposureContrast or 0
-# DocPar_ExposureBrightness or 0
-# DocPar_ScalingWidth or 100
-# DocPar_ScalingHeight or 100
-# DocPar_Rotation or 0
-# DocPar_RegionXOffset or 0
-# DocPar_RegionYOffset or 0
-# DocPar_ColorProcessing or RGB24
-TEMPLATE_CREATE_SCANJOB = f"""<?xml version="1.0" encoding="utf-8"?>
+# DocPar_ExposureContrast
+# DocPar_ExposureBrightness
+# DocPar_ScalingWidth
+# DocPar_ScalingHeight
+# DocPar_Rotation
+# DocPar_RegionXOffset
+# DocPar_RegionYOffset
+# DocPar_ColorProcessing
+TEMPLATE_CREATE_SCANJOB = """<?xml version="1.0" encoding="utf-8"?>
 <soap:Envelope xmlns:soap="http://www.w3.org/2003/05/soap-envelope"
                xmlns:wsa="http://schemas.xmlsoap.org/ws/2004/08/addressing"
                xmlns:sca="http://schemas.microsoft.com/windows/2006/08/wdp/scan">
@@ -206,11 +202,11 @@ TEMPLATE_CREATE_SCANJOB = f"""<?xml version="1.0" encoding="utf-8"?>
             <sca:DocumentParameters>
                 <sca:Format
                     sca:MustHonor="true">
-                    {DocPar_FileFormat or jfif}
+                    {DocPar_FileFormat}
                     </sca:Format>
                 <sca:ImagesToTransfer
                     sca:MustHonor="true">
-                    {DocPar_ImagesToTransfer or 1}
+                    {DocPar_ImagesToTransfer}
                     </sca:ImagesToTransfer>
                 <sca:InputSource
                     sca:MustHonor="true">
@@ -226,36 +222,36 @@ TEMPLATE_CREATE_SCANJOB = f"""<?xml version="1.0" encoding="utf-8"?>
                 <sca:Exposure
                     sca:MustHonor="true">
                         <sca:ExposureSettings>
-                        <sca:Contrast>{DocPar_ExposureConrast or 0}</sca:Contrast>
-                        <sca:Brightness>{DocPar_ExposureBrightness or 0}</sca:Brightness>
+                        <sca:Contrast>{DocPar_ExposureConrast}</sca:Contrast>
+                        <sca:Brightness>{DocPar_ExposureBrightness}</sca:Brightness>
                         </sca:ExposureSettings>
                     </sca:Exposure>
                 <sca:Scaling
                     sca:MustHonor="true">
-                    <sca:ScalingWidth>{DocPar_ScalingWidth or 100}</sca:ScalingWidth>
-                    <sca:ScalingHeight>{DocPar_ScalingHeight or 100}</sca:ScalingHeight>
+                    <sca:ScalingWidth>{DocPar_ScalingWidth}</sca:ScalingWidth>
+                    <sca:ScalingHeight>{DocPar_ScalingHeight}</sca:ScalingHeight>
                     </sca:Scaling>
                 <sca:Rotation
                     sca:MustHonor="true">
-                    {DocPar_Rotation or 0}
+                    {DocPar_Rotation}
                     </sca:Rotation>
                 <sca:MediaSides>
                     <sca:MediaFront>
                         <sca:ScanRegion>
                             <sca:ScanRegionXOffset
                                 sca:MustHonor="true">
-                                {DocPar_RegionXOffset or 0}
+                                {DocPar_RegionXOffset}
                                 </sca:ScanRegionXOffset>
                             <sca:ScanRegionYOffset
                                 sca:MustHonor="true">
-                                {DocPar_RegionYOffset or 0}
+                                {DocPar_RegionYOffset}
                                 </sca:ScanRegionYOffset>
                             <sca:ScanRegionWidth>{DocPar_RegionWidth}</sca:ScanRegionWidth>
                             <sca:ScanRegionHeight>{DocPar_RegionHeight}</sca:ScanRegionHeight>
                             </sca:ScanRegion>
                         <sca:ColorProcessing
                             sca:MustHonor="true">
-                            {DocPar_ColorProcessing or RGB24}
+                            {DocPar_ColorProcessing}
                             </sca:ColorProcessing>
                         <sca:Resolution
                             sca:MustHonor="true">
