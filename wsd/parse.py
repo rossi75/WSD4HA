@@ -15,7 +15,7 @@ from datetime import timedelta
 from config import OFFLINE_TIMEOUT, LOCAL_IP, HTTP_PORT, FROM_UUID
 from globals import SCANNERS, SCAN_JOBS, NAMESPACES, STATE, LOG_LEVEL
 from pathlib import Path
-from scanner import Scanner
+from scanner import Scanner, Scan_Jobs
 from templates import TEMPLATE_SOAP_PROBE, TEMPLATE_SOAP_TRANSFER_GET
 from tools import list_scanners, pick_best_xaddr
 
