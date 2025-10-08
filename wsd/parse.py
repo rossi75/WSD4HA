@@ -13,11 +13,10 @@ import uuid
 import xml.etree.ElementTree as ET
 from datetime import timedelta
 from config import OFFLINE_TIMEOUT, LOCAL_IP, HTTP_PORT, FROM_UUID
-from globals import SCANNERS, NAMESPACES, STATE, LOG_LEVEL
+from globals import SCANNERS, SCAN_JOBS, NAMESPACES, STATE, LOG_LEVEL
 from pathlib import Path
 from scanner import Scanner
 from templates import TEMPLATE_SOAP_PROBE, TEMPLATE_SOAP_TRANSFER_GET
-#from scan_job import fetch_scanned_document
 from tools import list_scanners, pick_best_xaddr
 
 #logging.basicConfig(level=logging.INFO, format='[%(levelname)s] %(message)s')
