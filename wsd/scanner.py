@@ -61,7 +61,7 @@ class Scanner:
         self.DocPar_Rotation = 0
         self.DocPar_RegionXOffset = 0
         self.DocPar_RegionYOffset = 0
-        self.DocPar_ColorProcessing = RGB24
+        self.DocPar_ColorProcessing = 'RGB24'
 
         logger.debug(f"   --->  UUID: {self.uuid}")
         logger.debug(f"   --->    IP: {self.ip}")
