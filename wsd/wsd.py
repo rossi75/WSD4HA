@@ -12,13 +12,12 @@ import threading
 import uuid
 import xml.etree.ElementTree as ET
 from config import OFFLINE_TIMEOUT, LOCAL_IP, HTTP_PORT, FROM_UUID
-#from globals import SCANNERS, list_scanners, NAMESPACES, STATE, LOG_LEVEL
-from globals import SCANNERS, NAMESPACES, STATE, LOG_LEVEL
+from globals import SCANNERS, SCAN_JOBS, NAMESPACES, STATE, LOG_LEVEL
+from parse import parse_wsd_packet, parse_probe, parse_transfer_get, parse_subscribe
 from pathlib import Path
 from scanner import Scanner
-from templates import TEMPLATE_SOAP_PROBE, TEMPLATE_SOAP_TRANSFER_GET
 from send import send_probe, send_transfer_get, send_subscription_ScanAvailableEvent, send_subscription_renew
-from parse import parse_wsd_packet, parse_probe, parse_transfer_get, parse_subscribe
+from templates import TEMPLATE_SOAP_PROBE, TEMPLATE_SOAP_TRANSFER_GET
 from tools import list_scanners, pick_best_xaddr
 
 #logging.basicConfig(level=logging.INFO, format='[%(levelname)s] %(message)s')
