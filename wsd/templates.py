@@ -141,7 +141,100 @@ TEMPLATE_SUBSCRIBE_RENEW = """<?xml version="1.0" encoding="utf-8"?>
   </soap:Body>
 </soap:Envelope>
 """
-#    <wse:Identifier>urn:uuid:{Ref_ID}</wse:Identifier>
+
+
+TEMPLATE_SUBSCRIBE_RENEW = """<?xml version="1.0" encoding="utf-8"?>
+<soap:Envelope xmlns:soap="http://www.w3.org/2003/05/soap-envelope"
+               xmlns:wsa="http://schemas.xmlsoap.org/ws/2004/08/addressing"
+               xmlns:sca="http://schemas.microsoft.com/windows/2006/08/wdp/scan">
+  <soap:Header>
+    <wsa:To>http://192.168.0.3:8018/wsd/scan</wsa:To>
+    <wsa:Action>http://schemas.microsoft.com/windows/2006/08/wdp/scan/CreateScanJob</wsa:Action>
+    <wsa:MessageID>urn:uuid:{msg_id}</wsa:MessageID>
+    <wsa:ReplyTo>
+        <wsa:Address>http://schemas.xmlsoap.org/ws/2004/08/addressing/role/anonymous</wsa:Address>
+        </wsa:ReplyTo>
+    <wsa:From>
+        <wsa:Address>urn:uuid:{from_uuid}</wsa:Address>
+        </wsa:From>
+    </soap:Header>
+<soap:Body>
+    <sca:CreateScanJobRequest>
+        <sca:ScanIdentifier>{scan_identifier}</sca:ScanIdentifier>
+        <sca:DestinationToken>{destination_token}</sca:DestinationToken>
+        <sca:ScanTicket>
+            <sca:JobDescription>
+                <sca:JobName>Validating scan ticket</sca:JobName>
+                <sca:JobOriginatingUserName>Session for HomeAssistant</sca:JobOriginatingUserName>
+                <sca:JobInformation>Scanning from platen..</sca:JobInformation>
+                </sca:JobDescription>
+            <sca:DocumentParameters>
+                <sca:Format
+                    sca:MustHonor="true">
+                    {DocPar_FileFormat or jfif}
+                    </sca:Format>
+                <sca:ImagesToTransfer
+                    sca:MustHonor="true">
+                    {DocPar_ImagesToTransfer or 1}
+                    </sca:ImagesToTransfer>
+                <sca:InputSource
+                    sca:MustHonor="true">
+                    {DocPar_InputSource}
+                    </sca:InputSource>
+                <sca:InputSize
+                    sca:MustHonor="true">
+                    <sca:InputMediaSize>
+                        <sca:Width>{DocPar_InputWidth}</sca:Width>
+                        <sca:Height>{DocPar_InputHeight}</sca:Height>
+                        </sca:InputMediaSize>
+                    </sca:InputSize>
+                <sca:Exposure
+                    sca:MustHonor="true">
+                        <sca:ExposureSettings>
+                        <sca:Contrast>{DocPar_ExposureConrast or 0}</sca:Contrast>
+                        <sca:Brightness>{DocPar_ExposureBrightness or 0}</sca:Brightness>
+                        </sca:ExposureSettings>
+                    </sca:Exposure>
+                <sca:Scaling
+                    sca:MustHonor="true">
+                    <sca:ScalingWidth>{DocPar_ScalingWidth or 100}</sca:ScalingWidth>
+                    <sca:ScalingHeight>{DocPar_ScalingHeight or 100}</sca:ScalingHeight>
+                    </sca:Scaling>
+                <sca:Rotation
+                    sca:MustHonor="true">
+                    {DocPar_Rotation or 0}
+                    </sca:Rotation>
+                <sca:MediaSides>
+                    <sca:MediaFront>
+                        <sca:ScanRegion>
+                            <sca:ScanRegionXOffset
+                                sca:MustHonor="true">
+                                {DocPar_RegionXOffset or 0}
+                                </sca:ScanRegionXOffset>
+                            <sca:ScanRegionYOffset
+                                sca:MustHonor="true">
+                                {DocPar_RegionYOffset or 0}
+                                </sca:ScanRegionYOffset>
+                            <sca:ScanRegionWidth>{DocPar_RegionWidth}</sca:ScanRegionWidth>
+                            <sca:ScanRegionHeight>{DocPar_RegionHeight}</sca:ScanRegionHeight>
+                            </sca:ScanRegion>
+                        <sca:ColorProcessing
+                            sca:MustHonor="true">
+                            {DocPar_ColorProcessing or RGB24}
+                            </sca:ColorProcessing>
+                        <sca:Resolution
+                            sca:MustHonor="true">
+                            <sca:Width>{DocPar_ResolutionWidth}</sca:Width>
+                            <sca:Height>{DocPar_ResolutionHeight}</sca:Height>
+                            </sca:Resolution>
+                        </sca:MediaFront>
+                    </sca:MediaSides>
+                </sca:DocumentParameters>
+            </sca:ScanTicket>
+        </sca:CreateScanJobRequest>
+    </soap:Body>
+</soap:Envelope>
+"""
 
 TEMPLATE_RETRIEVE_DOCUMENT = """<?xml version="1.0" encoding="utf-8"?>
 <soap:Envelope xmlns:soap="http://www.w3.org/2003/05/soap-envelope"
