@@ -114,22 +114,20 @@ def find_scanner_by_endto_addr(endto_addr: str):
     Findet den Scanner anhand des EndTo-Identifier-Teils (z.B. '4de2dca3-c3cf-4fff-8b66-bbfac4c3bd50').
     """
 
-    logger.info(f"[TOOLS:find_scanner] searching for {endto_addr} in all known scanners")
+    logger.debug(f"[TOOLS:find_scanner] searching for {endto_addr} in all known scanners")
 
     endto_addr = endto_addr.strip().lstrip('/')  # führenden Slash entfernen
-    logger.info(f"   ---> endto_addr: {endto_addr}")
+    logger.debug(f"   ---> endto_addr: {endto_addr}")
 
     for uuid, scanner in SCANNERS.items():
-#        endto_compare = getattr(scanner, "subscription_endToAddr", "")
         endto_compare = getattr(scanner, "end_to_addr", "")
-        logger.info(f"   ---> 1endto_comp: {endto_compare}")
         endto_compare = endto_compare.split('/')[-1]
-        logger.info(f"   ---> 2endto_comp: {endto_compare}")
+        logger.debug(f"   ---> endto_comp: {endto_compare}")
         if endto_compare and endto_addr in endto_compare:    # Teilstring-Suche
-            logger.info(f"[TOOLS:find_scanner] match found for {SCANNERS[uuid].friendly_name or uuid} @ {SCANNERS[uuid].ip}")
+            logger.debug(f"[TOOLS:find_scanner] match found for {SCANNERS[uuid].friendly_name or uuid} @ {SCANNERS[uuid].ip}")
             return uuid
 
-    logger.info(f"[TOOLS:find_scanner] could not find {endto_addr} in any known scanners")
+    logger.warning(f"[TOOLS:find_scanner] could not find {endto_addr} in any known scanners")
     return None
 
 #
