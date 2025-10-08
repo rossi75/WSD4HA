@@ -115,7 +115,16 @@ TEMPLATE_SUBSCRIBE_SAE = """<?xml version="1.0" encoding="utf-8"?>
 """
 
 
-TEMPLATE_SUBSCRIBE_RENEW = """<?xml version="1.0" encoding="utf-8"?>
+###################################################################################
+# TEMPLATE_SUBSCRIBE_RENEW
+# ---------------------------------------------------------------------------------
+# xaddr = destination adress
+# msg_id = random message ID
+# from_uuid = sender UUID
+# Ref_ID = Reference UUID from subscribing
+# ---------------------------------------------------------------------------------
+# Document Parameters, what and how to scan. those with an OR are optional
+TEMPLATE_SUBSCRIBE_RENEW = f"""<?xml version="1.0" encoding="utf-8"?>
 <soap:Envelope xmlns:soap="http://www.w3.org/2003/05/soap-envelope"
                xmlns:wsa="http://schemas.xmlsoap.org/ws/2004/08/addressing"
                xmlns:wse="http://schemas.xmlsoap.org/ws/2004/08/eventing"
@@ -142,13 +151,39 @@ TEMPLATE_SUBSCRIBE_RENEW = """<?xml version="1.0" encoding="utf-8"?>
 </soap:Envelope>
 """
 
-
-TEMPLATE_SUBSCRIBE_RENEW = """<?xml version="1.0" encoding="utf-8"?>
+###################################################################################
+# TEMPLATE_CREATE_SCANJOB
+# ---------------------------------------------------------------------------------
+# xaddr = destination adress
+# msg_id = random message ID
+# from_uuid = sender UUID
+# scan_identifier = Scan Identifier from xml notification dialog
+# destination_token = token given by scanner while registration
+# ---------------------------------------------------------------------------------
+# Document Parameters, what and how to scan. those with an OR are optional
+# DocPar_FileFormat or jfif
+# DocPar_ImagesToTransfer or 1
+# DocPar_InputSource
+# DocPar_InputWidth
+# DocPar_InputHeight
+# DocPar_RegionWidth
+# DocPar_RegionHeight
+# DocPar_ResolutionWidth
+# DocPar_ResolutionHeight
+# DocPar_ExposureContrast or 0
+# DocPar_ExposureBrightness or 0
+# DocPar_ScalingWidth or 100
+# DocPar_ScalingHeight or 100
+# DocPar_Rotation or 0
+# DocPar_RegionXOffset or 0
+# DocPar_RegionYOffset or 0
+# DocPar_ColorProcessing or RGB24
+TEMPLATE_CREATE_SCANJOB = f"""<?xml version="1.0" encoding="utf-8"?>
 <soap:Envelope xmlns:soap="http://www.w3.org/2003/05/soap-envelope"
                xmlns:wsa="http://schemas.xmlsoap.org/ws/2004/08/addressing"
                xmlns:sca="http://schemas.microsoft.com/windows/2006/08/wdp/scan">
   <soap:Header>
-    <wsa:To>http://192.168.0.3:8018/wsd/scan</wsa:To>
+    <wsa:To>{xaddr}</wsa:To>
     <wsa:Action>http://schemas.microsoft.com/windows/2006/08/wdp/scan/CreateScanJob</wsa:Action>
     <wsa:MessageID>urn:uuid:{msg_id}</wsa:MessageID>
     <wsa:ReplyTo>
