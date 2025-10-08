@@ -16,7 +16,7 @@
 # def marry_endpoints(uuid_a: str, uuid_b: str):
 #
 #
-# def find_scanner_from_notify(xml_body: str):
+# def find_scanner_by_endto_addr(endto_addr: str):
 #
 #
 # ----------------------------------------------------------------------------
