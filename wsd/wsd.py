@@ -223,7 +223,8 @@ async def state_monitor():
             logger.warning(f"[Heartbeat]     --> Removing {scanner.friendly_name} @ {scanner.ip} from list")
             del SCANNERS[scanner.uuid]
             list_scanners()
-          
+
+        # bei allen Zuständen außer [...] die kurze Pause
         if any (scanner.state not in {STATE.ABSENT,
                                       STATE.ONLINE,
                                       STATE.SCAN_PENDING,
@@ -233,6 +234,7 @@ async def state_monitor():
                 for scanner in SCANNERS.values()):
             logger.debug(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} [WSD:sleep] short nap")
             await asyncio.sleep(2)
+        # sonst die lange Pause
         else:
             logger.debug(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} [WSD:sleep] goodbye")
             await asyncio.sleep(OFFLINE_TIMEOUT / 7) # damit wir iwie auf nen krummen Wert kommen
