@@ -10,11 +10,14 @@
 # def pick_best_xaddr(xaddrs: str) -> str:
 #
 #
-#
 # def list_scanners():
 #
 #
 # def marry_endpoints(uuid_a: str, uuid_b: str):
+#
+#
+# def find_scanner_from_notify(xml_body: str):
+#
 #
 # ----------------------------------------------------------------------------
 
@@ -118,10 +121,11 @@ def find_scanner_from_notify(xml_body: str):
     # (wird besser im Handler gemacht, z.B. request.remote)
     
     for uuid, scanner in SCANNERS.items():
+        logger.info(f"testing {uuid} and/or {scanner}")
         if (identifier and getattr(scanner, "subscription_identifier", None) == identifier) \
            or (token and getattr(scanner, "destination_token", None) == token):
-            logger.info(f"[TOOLS:find_scanner] Zuordnung: Scanner {uuid} ({scanner.friendly_name}) erkannt")
+            logger.info(f"[TOOLS:find_scanner] Found relation for notify point : {SCANNERS[uuid].friendly_name} @ {scanner.friendly_name}) erkannt")
             return uuid
 
-    logger.warning(f"[TOOLS:find_scanner] Kein Scanner mit Identifier={identifier} oder Token={token} gefunden")
+    logger.warning(f"[TOOLS:find_scanner] Could not find any Scanner with notify point =  or Identifier = {identifier} or Token = {token}")
     return None
