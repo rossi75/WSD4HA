@@ -301,7 +301,8 @@ def parse_notify_msg(notifier_uuid, xml):
         notifier_uuid (str): URL path (/uuid) belongs to a scanners uuid, this is the notifier_uuid
         xml (str): SOAP Notify payload (string)
     """
-    logger.info(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} [PARSE:notify] parsing an event for {SCANNERS[notifier_uuid].friendly_name or notifier_uuid} @ {SCANNERS[notifier_uuid].ip}")
+#    logger.info(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} [PARSE:notify] parsing an event for {SCANNERS[notifier_uuid].friendly_name or notifier_uuid} @ {SCANNERS[notifier_uuid].ip}")
+    logger.info(f"[PARSE:notify] parsing an event for {SCANNERS[notifier_uuid].friendly_name or notifier_uuid} @ {SCANNERS[notifier_uuid].ip}")
     logger.info(f"   XML:\n{xml}")
 
     try:
@@ -322,6 +323,10 @@ def parse_notify_msg(notifier_uuid, xml):
     if action_elem is not None and action_elem.text:
         action = action_elem.text.strip()
 
+    client_context_elem = root.find(".//wscn:ClientContext", NAMESPACES)
+    if client_context_elem is not None and client_context_elem.text:
+        client_context = client_context_elem.text.strip()
+
     scan_identifier_elem = root.find(".//wscn:ScanIdentifier", NAMESPACES)
     if scan_identifier_elem is not None and scan_identifier_elem.text:
         scan_identifier = scan_identifier_elem.text.strip()
@@ -336,26 +341,24 @@ def parse_notify_msg(notifier_uuid, xml):
     logger.info(f"   --->     Notify UUID: {notifier_uuid}")
     logger.info(f"   ---> Subscription ID: {subscr_identifier}")
     logger.info(f"   --->          Action: {action}")
+    logger.info(f"   --->  Client Context: {client_context}")
     logger.info(f"   --->         Scan ID: {scan_identifier}")
     logger.info(f"   --->    Input Source: {input_source}")
 
-
     # Neuen Auftrag zum Abholen in SCANNER_JOBS[] hinterlegen
-    if subscr_identifier in SCANNERS:
-        s = SCANNER_JOBS[subscr_identifier]
-        s.scan_id = scan_identifier
-        s.scan_source = input_source
-#        s.last_scan_time = datetime.datetime.now().replace(microsecond=0)
-#        logger.info(f"+++ surprising News, it seems Scanner {s.friendly_name} @ {s.ip} has a document for us. Let's go and grab it ! +++")
-        logger.info(f"+++ surprising News, it seems Scanner {SCANNER[notifier_uuid].friendly_name or notifier_uuid} @ {s.ip} has a document for us. Let's go and grab it ! +++")
-        SCANNERS[notifier_uuid].update()
-#        SCANNERS[s.uuid].state = STATE.SCAN_AVAILABLE
-#        asyncio.create_task(fetch_scanned_document(s.uuid, scan_identifier))
+    if action == "ScanAvailableEvent":
+        if scan_identifier not in SCANNER_JOBS:
+            logger.info(f"+++ surprising News, it seems Scanner {SCANNERS[notifier_uuid].friendly_name or notifier_uuid} @ {SCANNERS[notifier_uuid].ip} has a document for us to scan. Let's go and grab it ! +++")
+            SCAN_JOBS[scan_identifier] = Scan_Jobs(scan_identifier, notifier_uuid, input_source)
+            SCANNERS[notifier_uuid].update()
+        else:
+            logger.info(f"the job that should be added is still in the list [{scan_identifier}]")
     else:
-        logger.info(f"could not find {notifier_uuid} in the list of known Scanners")
-
-    # was machen wir jetzt mit der Info dass es ggf einen neuen Scan gibt?
-    # auf jeden Fall hat er sich gemeldet, also merken wir uns das iwie
+        logger.warning(f"Scanner {SCANNERS[notifier_uuid].friendly_name or notifier_uuid} @ {SCANNERS[notifier_uuid].ip} notified the unrecognized action {action}")
+        return
 
 
+#
+#
+# **************************************************
 # **************** END OF PARSE.PY  ****************
