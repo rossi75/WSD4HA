@@ -303,7 +303,7 @@ def parse_notify_msg(notifier_uuid, xml):
     """
 #    logger.info(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} [PARSE:notify] parsing an event for {SCANNERS[notifier_uuid].friendly_name or notifier_uuid} @ {SCANNERS[notifier_uuid].ip}")
     logger.info(f"[PARSE:notify] parsing an event for {SCANNERS[notifier_uuid].friendly_name or notifier_uuid} @ {SCANNERS[notifier_uuid].ip}")
-    logger.info(f"   XML:\n{xml}")
+    logger.debug(f"   XML:\n{xml}")
 
     try:
         root = ET.fromstring(xml)
@@ -348,12 +348,12 @@ def parse_notify_msg(notifier_uuid, xml):
 
     # Neuen Auftrag zum Abholen in SCANNER_JOBS[] hinterlegen
     if action == "ScanAvailableEvent":
-        if scan_identifier not in SCANNER_JOBS:
+        if scan_identifier not in SCAN_JOBS:
             logger.info(f"+++ surprising News, it seems Scanner {SCANNERS[notifier_uuid].friendly_name or notifier_uuid} @ {SCANNERS[notifier_uuid].ip} has a document for us to scan. Let's go and grab it ! +++")
             SCAN_JOBS[scan_identifier] = Scan_Jobs(scan_identifier, notifier_uuid, input_source)
             SCANNERS[notifier_uuid].update()
         else:
-            logger.info(f"the job that should be added is still in the list [{scan_identifier}]")
+            logger.info(f"the job that should be added [{scan_identifier}] is still in the list")
     else:
         logger.warning(f"Scanner {SCANNERS[notifier_uuid].friendly_name or notifier_uuid} @ {SCANNERS[notifier_uuid].ip} notified the unrecognized action {action}")
         return
