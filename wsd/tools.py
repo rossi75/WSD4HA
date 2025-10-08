@@ -120,7 +120,8 @@ def find_scanner_by_endto_addr(endto_addr: str):
     logger.info(f"   ---> endto_addr: {endto_addr}")
 
     for uuid, scanner in SCANNERS.items():
-        endto_compare = getattr(scanner, "subscription_endToAddr", "")
+#        endto_compare = getattr(scanner, "subscription_endToAddr", "")
+        endto_compare = getattr(scanner, "end_to_addr", "")
         logger.info(f"   ---> 1endto_comp: {endto_compare}")
         endto_compare = endto_compare.split('/')[-1]
         logger.info(f"   ---> 2endto_comp: {endto_compare}")
