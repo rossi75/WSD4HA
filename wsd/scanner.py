@@ -86,10 +86,11 @@ class Scanner:
 class Scan_Jobs:
 #    def __init__(self, scan_job_id, subscription_id, scanner_uuid, xaddr):
 #    def __init__(self, scan_job_id, subscription_id, scanner_uuid):
-    def __init__(self, scan_job_id, scanner_uuid):
+    def __init__(self, scan_job_id, scanner_uuid, input_source):
         logger.debug(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} [SCANNER_JOBS:__init__] New instance of a Scanner Job")
 
         self.scanjob_identifier = scan_job_id
+        self.input_source = input_source
         self.scanner_uuid = scanner_uuid
         self.subscription_identifier = SCANNERS[scanner_uuid].subscription_id
         self.xaddr = SCANNERS[scanner_uuid].xaddr
@@ -100,13 +101,14 @@ class Scan_Jobs:
         self.created = datetime.datetime.now().replace(microsecond=0)
         self.remove_after = datetime.datetime.now().replace(microsecond=0)  # Zeitpunkt zum Löschen des Auftrages = jetzt + 30 Minuten
 
-        logger.info(f"[SCANNER_JOBS:__init__]   SCAN_JOB_ID: {self.scanjobidentifier}")
-        logger.info(f"[SCANNER_JOBS:__init__]  SCANNER UUID: {self.scanner_uuid}")
-        logger.info(f"[SCANNER_JOBS:__init__]     SUBSCR_ID: {self.subscriptionidentifier}")
-        logger.info(f"[SCANNER_JOBS:__init__]         XADDR: {self.xaddr}")
-        logger.info(f"[SCANNER_JOBS:__init__]        STATUS: {self.status}")
-        logger.info(f"[SCANNER_JOBS:__init__]       CREATED: {self.created}")
-        logger.info(f"[SCANNER_JOBS:__init__]     RMV_AFTER: {self.remove_after}")
+        logger.info(f"   --->   SCAN_JOB_ID: {self.scanjobidentifier}")
+        logger.info(f"   --->  INPUT_SOURCE: {self.input_source}")
+        logger.info(f"   --->  SCANNER UUID: {self.scanner_uuid}")
+        logger.info(f"   --->     SUBSCR_ID: {self.subscriptionidentifier}")
+        logger.info(f"   --->         XADDR: {self.xaddr}")
+        logger.info(f"   --->        STATUS: {self.status}")
+        logger.info(f"   --->        CREATED: {self.created}")
+        logger.info(f"   --->   REMOVE_AFTER: {self.remove_after}")
 
 
 #
