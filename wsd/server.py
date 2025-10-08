@@ -12,7 +12,7 @@ import subprocess
 from config import OFFLINE_TIMEOUT, SCAN_FOLDER, HTTP_PORT, MAX_FILES, NOTIFY_PORT
 from globals import SCANNERS, NAMESPACES, STATE, USER_AGENT, LOG_LEVEL
 from scanner import Scanner
-from parse import parse_scan_available
+from parse import parse_notify_msg
 from tools import find_scanner_by_endto_addr
 
 logging.basicConfig(level=LOG_LEVEL, format='[%(levelname)s] %(message)s')
@@ -149,7 +149,7 @@ async def notify_handler(request):
 
     try:
         root = ET.fromstring(xml_payload)
-        asyncio.create_task(parse_scan_available(scanner_uuid, xml_payload))      # hier wird dann der Abholauftrag an sich generiert
+        asyncio.create_task(parse_notify_msg(scanner_uuid, xml_payload))      # hier wird dann der Abholauftrag an sich generiert
     except Exception as e:
         logger.warning(f"[SERVER:notify_handler] invalid xml: {e}")
         return web.Response(status=400, text="bad xml")
