@@ -44,9 +44,9 @@ class Scanner:
         self.offline_since = None
         self.remove_after = None  # Zeitpunkt zum Löschen
 
-        logger.debug(f"[SCANNER:__init__]  UUID: {self.uuid}")
-        logger.debug(f"[SCANNER:__init__]    IP: {self.ip}")
-        logger.debug(f"[SCANNER:__init__] XADDR: {self.xaddr}")
+        logger.debug(f"   --->  UUID: {self.uuid}")
+        logger.debug(f"   --->    IP: {self.ip}")
+        logger.debug(f"   ---> XADDR: {self.xaddr}")
 
     # Scanner ist noch online
     # Aufruf mit SCANNER[uuid].update()
@@ -55,6 +55,7 @@ class Scanner:
         self.state = STATE.ONLINE
         self.offline_since = None
         self.remove_after = None
+
         logger.info(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} [SCANNER:upd] Updated timestamps for {self.friendly_name} @ {self.ip} with UUID {self.uuid}")
         logger.debug(f"   ---> new last_seen: {self.last_seen}")
 
@@ -67,7 +68,7 @@ class Scanner:
         self.state = STATE.ONLINE
         self.offline_since = None
         self.remove_after = None
-        logger.info(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} [SCANNER:updsvc] Updated timestamps for scanner subscription {self.friendly_name} @ {self.ip} with UUID {self.uuid}")
+        logger.info(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} [SCANNER:upd_subscr] Updated timestamps for scanner subscription {self.friendly_name} @ {self.ip} with UUID {self.uuid}")
         logger.info(f"   ---> new subscribtion last_seen: {self.subscription_last_seen}")
 
     # wird aufgerufen wenn ein Scanner offline gesetzt wird
@@ -87,7 +88,7 @@ class Scan_Jobs:
 #    def __init__(self, scan_job_id, subscription_id, scanner_uuid, xaddr):
 #    def __init__(self, scan_job_id, subscription_id, scanner_uuid):
     def __init__(self, scan_job_id, scanner_uuid, input_source):
-        logger.debug(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} [SCANNER_JOBS:__init__] New instance of a Scanner Job")
+        logger.debug(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} [SCAN_JOBS:__init__] New instance of a Scanner Job")
 
         self.scanjob_identifier = scan_job_id
         self.input_source = input_source
@@ -95,11 +96,11 @@ class Scan_Jobs:
         self.subscription_identifier = SCANNERS[scanner_uuid].subscription_id
         self.xaddr = SCANNERS[scanner_uuid].xaddr
 
-        self.status = STATE.SCAN_AVAILABLE
-#        self.retries = 0
-#        self.last_try = None
-        self.created = datetime.datetime.now().replace(microsecond=0)
-        self.remove_after = datetime.datetime.now().replace(microsecond=0)  # Zeitpunkt zum Löschen des Auftrages = jetzt + 30 Minuten
+        self.status = STATE.SCAN_PENDING
+        self.job_created = datetime.datetime.now().replace(microsecond=0)
+        self.remove_after = datetime.datetime.now().replace(microsecond=0) + timedelta(minutes=30) # Zeitpunkt zum Löschen des Auftrages = jetzt + 30 Minuten
+        #SCANNERS[scanner_uuid].last_seen = datetime.datetime.now().replace(microsecond=0)
+        SCANNER[scanner_uuid].update()
 
         logger.info(f"   --->   SCAN_JOB_ID: {self.scanjobidentifier}")
         logger.info(f"   --->  INPUT_SOURCE: {self.input_source}")
@@ -107,11 +108,11 @@ class Scan_Jobs:
         logger.info(f"   --->     SUBSCR_ID: {self.subscriptionidentifier}")
         logger.info(f"   --->         XADDR: {self.xaddr}")
         logger.info(f"   --->        STATUS: {self.status}")
-        logger.info(f"   --->       CREATED: {self.created}")
+        logger.info(f"   --->       CREATED: {self.job_created}")
         logger.info(f"   --->  REMOVE_AFTER: {self.remove_after}")
 
 
 #
 #
-# --------------------------------------------------
-# ---------------- END OF SCANNER.PY ----------------
+# **************************************************
+# *************** END OF SCANNER.PY ****************
