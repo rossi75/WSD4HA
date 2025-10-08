@@ -145,6 +145,7 @@ async def notify_handler(request):
     else:
         logger.info(f"no search result for {EndTo_id}")
         return web.Response(status=400, text="bad notify endpoint")
+
     logger.debug(f"   ---> XML payload: \n {xml_payload}")
 
     try:
