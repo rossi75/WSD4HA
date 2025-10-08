@@ -121,8 +121,9 @@ def find_scanner_by_endto_addr(endto_addr: str):
 
     for uuid, scanner in SCANNERS.items():
         endto_compare = getattr(scanner, "subscription_endToAddr", "")
+        logger.info(f"   ---> 1endto_comp: {endto_compare}")
         endto_compare = endto_compare.split('/')[-1]
-        logger.info(f"   ---> endto_comp: {endto_compare}")
+        logger.info(f"   ---> 2endto_comp: {endto_compare}")
         if endto_compare and endto_addr in endto_compare:    # Teilstring-Suche
             logger.info(f"[TOOLS:find_scanner] match found for {SCANNERS[uuid].friendly_name or uuid} @ {SCANNERS[uuid].ip}")
             return uuid
