@@ -13,7 +13,7 @@ from config import OFFLINE_TIMEOUT, SCAN_FOLDER, HTTP_PORT, MAX_FILES, NOTIFY_PO
 from globals import SCANNERS, NAMESPACES, STATE, USER_AGENT, LOG_LEVEL
 from scanner import Scanner
 from parse import parse_scan_available
-from tools import find_scanner_from_endto
+from tools import find_scanner_from_endto_addr
 
 logging.basicConfig(level=LOG_LEVEL, format='[%(levelname)s] %(message)s')
 logger = logging.getLogger("wsd-addon")
