@@ -148,3 +148,7 @@ if not check_port(HTTP_PORT):
 else:
     logger.info(f"Statusserver reachable at {LOCAL_IP}:{HTTP_PORT}")
 
+#
+#
+# --------------------------------------------------
+# ---------------- END OF CONFIG.PY ----------------
