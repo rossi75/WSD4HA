@@ -114,76 +114,15 @@ def find_scanner_by_endto_addr(endto_addr: str):
     Findet den Scanner anhand des EndTo-Identifier-Teils (z.B. '4de2dca3-c3cf-4fff-8b66-bbfac4c3bd50').
     """
 
-    logger.info(f"[TOOLS:find_scanner] searching for /{endto_addr} in all known scanners")
+    logger.info(f"[TOOLS:find_scanner] searching for {endto_addr} in all known scanners")
     
     for uuid, scanner in SCANNERS.items():
         endto = getattr(scanner, "subscription_endToAddr", "")
-        if endto and endto_id in endto:    # Teilstring-Suche
+        if endto and endto_addr in endto:    # Teilstring-Suche
             logger.info(f"[TOOLS:find_scanner] match found for {SCANNERS[uuid].friendly_name or uuid} @ {SCANNERS[uuid].ip}")
             return uuid
 
     logger.info(f"[TOOLS:find_scanner] could not find {endto_addr} in any known scanners")
-    return None
-
-# ---------------- which scanner notified to end_to? ----------------
-def _find_scanner_from_endto(end_to_addr: str):
-    """Analysiert eine eingehende EndTo-Addr und findet die zugehörige Scanner-UUID"""
-
-    try:
-        root = ET.fromstring(xml_body)
-    except ET.ParseError:
-        logger.warning("[TOOLS:find_scanner] XML parse error")
-        return None
-
-    # Versuch 1: Identifier
-    ident_elem = root.find(".//wse:Identifier", NAMESPACES)
-    identifier = ident_elem.text.strip() if ident_elem is not None else None
-
-    # Versuch 2: DestinationToken
-    token_elem = root.find(".//wscn:DestinationToken", NAMESPACES)
-    token = token_elem.text.strip() if token_elem is not None else None
-
-    # Versuch 3: IP-Adresse (Fallback)
-    # (wird besser im Handler gemacht, z.B. request.remote)
-    
-    for uuid, scanner in SCANNERS.items():
-        logger.info(f"testing {uuid} and/or {scanner}")
-        if (identifier and getattr(scanner, "subscription_identifier", None) == identifier) \
-           or (token and getattr(scanner, "destination_token", None) == token):
-            logger.info(f"[TOOLS:find_scanner] Found relation for notify point : {SCANNERS[uuid].friendly_name} @ {scanner.friendly_name}) erkannt")
-            return uuid
-
-    logger.warning(f"[TOOLS:find_scanner] Could not find any Scanner with notify point =  or Identifier = {identifier} or Token = {token}")
-    return None
-
-def _find_scanner_from_notify(xml_body: str):
-    """Analysiert eine eingehende Notify-Message und findet die zugehörige Scanner-UUID"""
-
-    try:
-        root = ET.fromstring(xml_body)
-    except ET.ParseError:
-        logger.warning("[TOOLS:find_scanner] XML parse error")
-        return None
-
-    # Versuch 1: Identifier
-    ident_elem = root.find(".//wse:Identifier", NAMESPACES)
-    identifier = ident_elem.text.strip() if ident_elem is not None else None
-
-    # Versuch 2: DestinationToken
-    token_elem = root.find(".//wscn:DestinationToken", NAMESPACES)
-    token = token_elem.text.strip() if token_elem is not None else None
-
-    # Versuch 3: IP-Adresse (Fallback)
-    # (wird besser im Handler gemacht, z.B. request.remote)
-    
-    for uuid, scanner in SCANNERS.items():
-        logger.info(f"testing {uuid} and/or {scanner}")
-        if (identifier and getattr(scanner, "subscription_identifier", None) == identifier) \
-           or (token and getattr(scanner, "destination_token", None) == token):
-            logger.info(f"[TOOLS:find_scanner] Found relation for notify point : {SCANNERS[uuid].friendly_name} @ {scanner.friendly_name}) erkannt")
-            return uuid
-
-    logger.warning(f"[TOOLS:find_scanner] Could not find any Scanner with notify point =  or Identifier = {identifier} or Token = {token}")
     return None
 
 #
