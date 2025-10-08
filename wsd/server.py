@@ -20,7 +20,7 @@ logger = logging.getLogger("wsd-addon")
 
 # ---------------- WebUI ----------------
 async def status_page(request):
-    logger.info(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} [WEBSERVER:status_page] received request for status page")
+    logger.info(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} [SERVER:status_page] received request for status page")
 
     # Dateien
     files = sorted(SCAN_FOLDER.iterdir(), reverse=True)[:MAX_FILES]
@@ -90,7 +90,7 @@ async def status_page(request):
 
 # ---------------- HTTP Server ----------------
 async def start_http_server():
-    logger.info(f"[WEBSERVER:start_http] configuring HTTP/SOAP Server on Port {HTTP_PORT}")
+    logger.info(f"[SERVER:start_http] configuring HTTP/SOAP Server on Port {HTTP_PORT}")
     app = web.Application()
     app.router.add_get("/", status_page)
     logger.debug(f"   ---> added endpoint /")
@@ -114,8 +114,8 @@ async def notify_handler(request):
 
     xml_payload = await request.text()
     notify_uuid = request.match_info["uuid"]
-    logger.info(f"   ---> Notify UUID: {notify_uuid}")
-    logger.info(f"   ---> XML payload: \n {xml_payload}")
+    logger.debug(f"   ---> Notify UUID: {notify_uuid}")
+    logger.debug(f"   ---> XML payload: \n {xml_payload}")
 
     try:
         root = ET.fromstring(xml_payload)
@@ -130,7 +130,7 @@ async def notify_handler(request):
 
 # ---------------- NOTIFY Server ----------------
 async def start_notify_server():
-    logger.info(f"[WEBSERVER:start_notify] configuring Notify Server on Port {NOTIFY_PORT}")
+    logger.info(f"[SERVER:start_notify] configuring Notify Server on Port {NOTIFY_PORT}")
     # parallel zum UI starten
 #from notify_server import create_notify_app
 
