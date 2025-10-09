@@ -292,7 +292,7 @@ def _parse_w3c_duration(duration: str) -> int:
     return seconds
 
 # ---------------- parse Scan available ----------------
-def parse_notify_msg(notifier_uuid, xml):
+async def parse_notify_msg(notifier_uuid, xml):
     """
     Parse ScanAvailableEvent and update scanner state.
 
@@ -351,8 +351,10 @@ def parse_notify_msg(notifier_uuid, xml):
             logger.info(f"+++ surprising News, it seems Scanner {SCANNERS[notifier_uuid].friendly_name or notifier_uuid} @ {SCANNERS[notifier_uuid].ip} has a document for us to scan. Let's go and grab it ! +++")
             SCAN_JOBS[scan_identifier] = Scan_Jobs(scan_identifier, notifier_uuid, input_source)
             SCANNERS[notifier_uuid].update()
+            return
         else:
             logger.info(f"the job that should be added [{scan_identifier}] is still in the list")
+            return
     else:
         logger.warning(f"Scanner {SCANNERS[notifier_uuid].friendly_name or notifier_uuid} @ {SCANNERS[notifier_uuid].ip} notified the unrecognized action {action}")
         return
