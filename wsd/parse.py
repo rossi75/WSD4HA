@@ -3,7 +3,7 @@ import aiohttp
 import datetime
 import logging
 import os
-import re
+#import re
 import socket
 import subprocess
 import sys
