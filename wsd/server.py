@@ -86,7 +86,7 @@ async def status_page(request):
         job_list += "<tr style='color:{color}'>"
         job_list += f"<td style='text-align:center;'>{j.scanjob_identifier}</td>"
         job_list += f"<td style='text-align:center;'>{j.input_source}</td>"
-        job_list += f"<td style='text-align:center;'>{j.scanner_uuid}<br>"
+        job_list += f"<td style='text-align:center;'>{j.scan_from_uuid}<br>"
         job_list += f"{j.xaddr}</td>"
         job_list += f"<td style='text-align:center;'>{j.subscription_identifier}<br>"
         job_list += f"{j.dest_token}</td>"
