@@ -120,7 +120,7 @@ class Scan_Jobs:
         self.job_created = datetime.datetime.now().replace(microsecond=0)
         self.remove_after = datetime.datetime.now().replace(microsecond=0) + timedelta(minutes=30) # Zeitpunkt zum Löschen des Auftrages = jetzt + 30 Minuten
         #SCANNERS[scanner_uuid].last_seen = datetime.datetime.now().replace(microsecond=0)
-        SCANNERS[scanner_uuid].update()
+        SCANNERS[scan_from_uuid].update()
 
         logger.info(f"   --->    SCAN_JOB_ID: {self.scanjobidentifier}")
         logger.info(f"   --->   INPUT_SOURCE: {self.input_source}")
