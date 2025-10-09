@@ -122,10 +122,10 @@ class Scan_Jobs:
         #SCANNERS[scanner_uuid].last_seen = datetime.datetime.now().replace(microsecond=0)
         SCANNERS[scan_from_uuid].update()
 
-        logger.info(f"   --->    SCAN_JOB_ID: {self.scanjobidentifier}")
+        logger.info(f"   --->    SCAN_JOB_ID: {self.scanjob_identifier}")
         logger.info(f"   --->   INPUT_SOURCE: {self.input_source}")
         logger.info(f"   ---> SCAN FROM UUID: {self.scan_from_uuid}")
-        logger.info(f"   --->      SUBSCR_ID: {self.subscriptionidentifier}")
+        logger.info(f"   --->      SUBSCR_ID: {self.subscription_identifier}")
         logger.info(f"   --->          XADDR: {self.xaddr}")
         logger.info(f"   --->     DEST_TOKEN: {self.dest_token}")
         logger.info(f"   --->         STATUS: {self.status}")
