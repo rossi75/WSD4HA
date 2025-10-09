@@ -62,7 +62,8 @@ async def status_page(request):
         scanner_list += "<tr style='color:{color}'>"
         scanner_list += f"<td style='text-align:center;'>{s.friendly_name}</td>"
         scanner_list += f"<td style='text-align:center;'>{s.ip}<br>{s.mac if s.mac else ''}</td>"
-        scanner_list += f"<td style='text-align:center;'>{s.state.value}</td>"
+        scanner_list += f"<td style='text-align:center;'>{s.state.value}<br>"
+        scanner_list += f"{s.subscription_last_seen.strftime('%Y-%m-%d %H:%M:%S') if s.subscription_last_seen else ''}</td>"
         scanner_list += f"<td style='text-align:center;'>{s.first_seen.strftime('%Y-%m-%d %H:%M:%S')}<br>"
         scanner_list += f"{s.last_seen.strftime('%Y-%m-%d %H:%M:%S')}<br>"
         scanner_list += f"{s.remove_after.strftime('%Y-%m-%d %H:%M:%S') if s.remove_after else ''}</td>"
@@ -70,8 +71,7 @@ async def status_page(request):
         scanner_list += f"{s.xaddr if s.xaddr else ''}</td>"
         scanner_list += f"<td style='text-align:center;'>{s.subscription_id if s.subscription_id else ''}<br>"
         scanner_list += f"{s.end_to_addr if s.end_to_addr else ''}<br>"
-        scanner_list += f"{s.destination_token if s.destination_token else ''}<br>"
-        scanner_list += f"{s.subscription_last_seen.strftime('%Y-%m-%d %H:%M:%S') if s.subscription_last_seen else ''}</td>"
+        scanner_list += f"{s.destination_token if s.destination_token else ''}</td>"
         scanner_list += f"<td style='text-align:center;'>{s.manufacturer if s.manufacturer else ''}<br>"
         scanner_list += f"{s.model if s.model else ''}</td>"
         scanner_list += f"<td style='text-align:center;'>{s.firmware if s.firmware else ''}<br>"
@@ -90,9 +90,9 @@ async def status_page(request):
         job_list += f"{j.xaddr}</td>"
         job_list += f"<td style='text-align:center;'>{j.subscription_identifier}<br>"
         job_list += f"{j.dest_token}</td>"
-        job_list += f"<td style='text-align:center;'>{j.status}</td>"
-        job_list += f"<td style='text-align:center;'>{j.job_created}</td>"
-        job_list += f"<td style='text-align:center;'>{j.remove_after}</td>"
+        job_list += f"<td style='text-align:center;'>{j.status.value}</td>"
+        job_list += f"<td style='text-align:center;'>{j.job_created.strftime('%Y-%m-%d %H:%M:%S')}</td>"
+        job_list += f"<td style='text-align:center;'>{j.remove_after.strftime('%Y-%m-%d %H:%M:%S')}</td>"
         job_list += "</tr>"
         
     logger.debug(f"   ---> probably delivered http-response")
@@ -110,7 +110,7 @@ async def status_page(request):
             <h1>WSD4HA seems to be running</h1>
             <h2>Active Scanners:</h2>
             <table>
-                <tr><th>Name</th><th>IP<br>[MAC]</th><th>State</th><th>First seen<br>Last seen<br>[Remove after]</th><th>UUID<br>XADDR</th><th>Subscr ID<br>Subscr EndToAddr<br>Destination Token<br>Last Subscr</th><th>Manufacturer<br>Model</th><th>Firmware<br>Serial</th></tr>
+                <tr><th>Name</th><th>IP<br>[MAC]</th><th>State<br>Last Subscr</th><th>First seen<br>Last seen<br>[Remove after]</th><th>UUID<br>XADDR</th><th>Subscr ID<br>Subscr EndToAddr<br>Destination Token</th><th>Manufacturer<br>Model</th><th>Firmware<br>Serial</th></tr>
                 {scanner_list}
             </table>
             <h2>List of Scans:</h2>
