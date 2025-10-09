@@ -107,11 +107,11 @@ class Scan_Jobs:
 #    def __init__(self, scan_job_id, subscription_id, scanner_uuid, xaddr):
 #    def __init__(self, scan_job_id, subscription_id, scanner_uuid):
     def __init__(self, scan_job_id, scanner_uuid, input_source):
-        logger.debug(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} [SCAN_JOBS:__init__] New instance of a Scanner Job")
+        logger.debug(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} [SCAN_JOBS:__init__] New instance of a Scan Job")
 
         self.scanjob_identifier = scan_job_id
         self.input_source = input_source
-        self.scanner_uuid = scanner_uuid
+        self.scan_from_uuid = scanner_uuid
         self.subscription_identifier = SCANNERS[scanner_uuid].subscription_id
         self.xaddr = SCANNERS[scanner_uuid].xaddr
         self.dest_token = SCANNERS[scanner_uuid].destination_token
@@ -120,17 +120,17 @@ class Scan_Jobs:
         self.job_created = datetime.datetime.now().replace(microsecond=0)
         self.remove_after = datetime.datetime.now().replace(microsecond=0) + timedelta(minutes=30) # Zeitpunkt zum Löschen des Auftrages = jetzt + 30 Minuten
         #SCANNERS[scanner_uuid].last_seen = datetime.datetime.now().replace(microsecond=0)
-        SCANNER[scanner_uuid].update()
+        SCANNERS[scanner_uuid].update()
 
-        logger.info(f"   --->   SCAN_JOB_ID: {self.scanjobidentifier}")
-        logger.info(f"   --->  INPUT_SOURCE: {self.input_source}")
-        logger.info(f"   --->  SCANNER UUID: {self.scanner_uuid}")
-        logger.info(f"   --->     SUBSCR_ID: {self.subscriptionidentifier}")
-        logger.info(f"   --->         XADDR: {self.xaddr}")
-        logger.info(f"   --->    DEST_TOKEN: {self.dest_token}")
-        logger.info(f"   --->        STATUS: {self.status}")
-        logger.info(f"   --->       CREATED: {self.job_created}")
-        logger.info(f"   --->  REMOVE_AFTER: {self.remove_after}")
+        logger.info(f"   --->    SCAN_JOB_ID: {self.scanjobidentifier}")
+        logger.info(f"   --->   INPUT_SOURCE: {self.input_source}")
+        logger.info(f"   ---> SCAN FROM UUID: {self.scan_from_uuid}")
+        logger.info(f"   --->      SUBSCR_ID: {self.subscriptionidentifier}")
+        logger.info(f"   --->          XADDR: {self.xaddr}")
+        logger.info(f"   --->     DEST_TOKEN: {self.dest_token}")
+        logger.info(f"   --->         STATUS: {self.status}")
+        logger.info(f"   --->        CREATED: {self.job_created}")
+        logger.info(f"   --->   REMOVE_AFTER: {self.remove_after}")
 
 
 #
