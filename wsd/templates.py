@@ -48,7 +48,7 @@ TEMPLATE_SOAP_TRANSFER_GET = """<?xml version="1.0" encoding="utf-8"?>
 </soap:Envelope>
 """
 
-
+################################################################################
 # TEMPLATE_SUBSCRIBE_SAE
 # SAE = ScanAvailableEvents
 # provides a template to subscribe to a service
@@ -61,8 +61,6 @@ TEMPLATE_SOAP_TRANSFER_GET = """<?xml version="1.0" encoding="utf-8"?>
 # EndTo_addr = adress that needs to be reachable by the scanner  ==>  <wsa:Address>http://192.168.0.1:5357/6ccf7716-4dc8-47bf-aca4-5a2ae5a959ca</wsa:Address>
 # scan_to_name = Option selected by the user to start the scanning  ==>  "Scan to Home Assistant"
 # Ref_ID = one more senseless ID  ==>  <wse:Identifier>urn:uuid:680be7cf-bc5a-409d-ad1d-4d6d96b5cb4f</wse:Identifier>
-
-#TEMPLATE_SUBSCRIBE_ScanAvailableEvents = """<?xml version="1.0" encoding="utf-8"?>
 TEMPLATE_SUBSCRIBE_SAE = """<?xml version="1.0" encoding="utf-8"?>
 <soap:Envelope xmlns:soap="http://www.w3.org/2003/05/soap-envelope"
                xmlns:wsa="http://schemas.xmlsoap.org/ws/2004/08/addressing"
@@ -121,7 +119,7 @@ TEMPLATE_SUBSCRIBE_SAE = """<?xml version="1.0" encoding="utf-8"?>
 # from_uuid = sender UUID
 # Ref_ID = Reference UUID from subscribing
 # ---------------------------------------------------------------------------------
-# Document Parameters, what and how to scan. those with an OR are optional
+# Document Parameters, what and how to scan
 TEMPLATE_SUBSCRIBE_RENEW = """<?xml version="1.0" encoding="utf-8"?>
 <soap:Envelope xmlns:soap="http://www.w3.org/2003/05/soap-envelope"
                xmlns:wsa="http://schemas.xmlsoap.org/ws/2004/08/addressing"
@@ -148,6 +146,26 @@ TEMPLATE_SUBSCRIBE_RENEW = """<?xml version="1.0" encoding="utf-8"?>
 """
 
 
+################################################################################
+# TEMPLATE_SOAP_VALIDATE_SCAN_TICKET
+# ---------------------------------------------------------------------------------
+# xaddr = destination adress
+# msg_id = random message ID
+# from_uuid = sender UUID
+# Ref_ID = Reference UUID from subscribing
+# ---------------------------------------------------------------------------------
+# Document Parameters, what and how to scan
+# DocPar_format
+# input_source
+# DocPar_width
+# DocPar_height
+# DocPar_contrast
+# DocPar_brightness
+# DocPar_scan_width
+# DocPar_scan_height
+# DocPar_dpi_width
+# DocPar_dpi_height
+# ---------------------------------------------------------------------------------
 TEMPLATE_SOAP_VALIDATE_SCAN_TICKET = """<?xml version="1.0" encoding="utf-8"?>
 <soap:Envelope
  xmlns:soap="http://www.w3.org/2003/05/soap-envelope"
@@ -174,19 +192,19 @@ TEMPLATE_SOAP_VALIDATE_SCAN_TICKET = """<?xml version="1.0" encoding="utf-8"?>
           <sca:JobInformation>Pommes</sca:JobInformation>
         </sca:JobDescription>
         <sca:DocumentParameters>
-          <sca:Format sca:MustHonor="true">{format}</sca:Format>
+          <sca:Format sca:MustHonor="true">{DocPar_format}</sca:Format>
           <sca:ImagesToTransfer sca:MustHonor="true">1</sca:ImagesToTransfer>
           <sca:InputSource sca:MustHonor="true">{input_source}</sca:InputSource>
           <sca:InputSize sca:MustHonor="true">
             <sca:InputMediaSize>
-              <sca:Width>{width}</sca:Width>
-              <sca:Height>{height}</sca:Height>
+              <sca:Width>{DocPar_width}</sca:Width>
+              <sca:Height>{DocPar_height}</sca:Height>
             </sca:InputMediaSize>
           </sca:InputSize>
           <sca:Exposure sca:MustHonor="true">
             <sca:ExposureSettings>
-              <sca:Contrast>{contrast}</sca:Contrast>
-              <sca:Brightness>{brightness}</sca:Brightness>
+              <sca:Contrast>{DocPar_contrast}</sca:Contrast>
+              <sca:Brightness>{DocPar_brightness}</sca:Brightness>
             </sca:ExposureSettings>
           </sca:Exposure>
           <sca:Scaling sca:MustHonor="true">
@@ -199,13 +217,13 @@ TEMPLATE_SOAP_VALIDATE_SCAN_TICKET = """<?xml version="1.0" encoding="utf-8"?>
               <sca:ScanRegion>
                 <sca:ScanRegionXOffset>0</sca:ScanRegionXOffset>
                 <sca:ScanRegionYOffset>0</sca:ScanRegionYOffset>
-                <sca:ScanRegionWidth>{scan_width}</sca:ScanRegionWidth>
-                <sca:ScanRegionHeight>{scan_height}</sca:ScanRegionHeight>
+                <sca:ScanRegionWidth>{DocPar_scan_width}</sca:ScanRegionWidth>
+                <sca:ScanRegionHeight>{DocPar_scan_height}</sca:ScanRegionHeight>
               </sca:ScanRegion>
               <sca:ColorProcessing sca:MustHonor="true">RGB24</sca:ColorProcessing>
               <sca:Resolution sca:MustHonor="true">
-                <sca:Width>{dpi}</sca:Width>
-                <sca:Height>{dpi}</sca:Height>
+                <sca:Width>{DocPar_dpi_width}</sca:Width>
+                <sca:Height>{DocPar_dpi_height}</sca:Height>
               </sca:Resolution>
             </sca:MediaFront>
           </sca:MediaSides>
