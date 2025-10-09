@@ -21,11 +21,12 @@
 #
 # ----------------------------------------------------------------------------
 
-from globals import SCANNERS, LOG_LEVEL, NAMESPACES
-import xml.etree.ElementTree as ET
-import socket
-import logging
 import datetime
+import logging
+import re
+import socket
+import xml.etree.ElementTree as ET
+from globals import SCANNERS, LOG_LEVEL, NAMESPACES
 
 logging.basicConfig(level=LOG_LEVEL, format='[%(levelname)s] %(message)s')
 logger = logging.getLogger("wsd-addon")
@@ -45,6 +46,7 @@ def get_local_ip():
         logger.warning(f"[CONFIG] Could not obtain Host IP: {e}")
         return "undefined"
 
+
 # ---------------- Portprüfung ----------------
 def check_port(port):
     with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
@@ -53,6 +55,7 @@ def check_port(port):
             return True
         except OSError:
             return False
+
 
 # ---------------- Pick Best XADDR from String ----------------
 def pick_best_xaddr(xaddrs: str) -> str:
@@ -98,6 +101,39 @@ def list_scanners():
     else:
         logger.info("no known Scanners in list")  
 
+# ---------------- parse w3c timer ----------------
+# parse_w3c_duration("PT1H")   # -> 3600
+def calc_w3c_duration(duration: str) -> int:
+    """
+    Wandelt W3C/ISO8601 Duration (z.B. 'PT1H30M') in Sekunden um.
+    Unterstützt Tage, Stunden, Minuten, Sekunden.
+    """
+    
+    logger.debug(f"[PARSE:w3c_dur] duration to calculate: {duration}")
+    
+    pattern = (
+        r'P'                                  # Beginn 'P'
+        r'(?:(?P<days>\d+)D)?'                # Tage
+        r'(?:T'                               # Beginn Zeitabschnitt
+        r'(?:(?P<hours>\d+)H)?'
+        r'(?:(?P<minutes>\d+)M)?'
+        r'(?:(?P<seconds>\d+)S)?'
+        r')?'
+    )
+    
+    m = re.match(pattern, duration)
+    if not m:
+        return 0
+    d = m.groupdict(default='0')
+    
+    seconds = int(d['days']) * 86400 + int(d['hours']) * 3600 + int(d['minutes']) * 60 + int(d['seconds'])
+    
+    logger.debug(f"   ---> d: {d}")
+    logger.debug(f"   ---> seconds: {seconds}")
+
+    return seconds
+
+
 # ---------------- marry two endpoints ----------------
 def marry_endpoints(uuid_a: str, uuid_b: str):
     """
@@ -133,4 +169,4 @@ def find_scanner_by_endto_addr(endto_addr: str):
 #
 #
 # --------------------------------------------------
-# ---------------- END OF SERVER.PY ----------------
+# ---------------- END OF TOOLS.PY ----------------
