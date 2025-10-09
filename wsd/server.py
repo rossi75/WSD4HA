@@ -59,7 +59,7 @@ async def status_page(request):
 #        color = "green" if s.online else ("orange" if delta < 2*OFFLINE_TIMEOUT else "red")
 #        formats = ", ".join(s.formats)
         #formats = ", ".join(s.types)
-        scanner_list += "<tr style='color:{color}'>"
+        scanner_list = "<tr style='color:{color}'>"
         scanner_list += f"<td style='text-align:center;'>{s.friendly_name}</td>"
         scanner_list += f"<td style='text-align:center;'>{s.ip}<br>{s.mac if s.mac else ''}</td>"
         scanner_list += f"<td style='text-align:center;'>{s.state.value}<br>"
@@ -83,7 +83,7 @@ async def status_page(request):
     job_list = ''
 #    now = datetime.datetime.now()
     for j in SCAN_JOBS.values():
-        job_list += "<tr style='color:{color}'>"
+        job_list = "<tr style='color:{color}'>"
         job_list += f"<td style='text-align:center;'>{j.scanjob_identifier}</td>"
         job_list += f"<td style='text-align:center;'>{j.input_source}</td>"
         job_list += f"<td style='text-align:center;'>{j.scan_from_uuid}<br>"
@@ -91,7 +91,7 @@ async def status_page(request):
         job_list += f"{j.subscription_identifier}<br>"
         job_list += f"{j.dest_token}</td>"
         job_list += f"<td style='text-align:center;'>{j.status.value}</td>"
-        job_list += f"<td style='text-align:center;'>{j.job_created.strftime('%Y-%m-%d %H:%M:%S')}</td>"
+        job_list += f"<td style='text-align:center;'>{j.job_created.strftime('%Y-%m-%d %H:%M:%S')}<br>"
         job_list += f"<td style='text-align:center;'>{j.remove_after.strftime('%Y-%m-%d %H:%M:%S')}</td>"
         job_list += "</tr>"
         
