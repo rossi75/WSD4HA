@@ -45,6 +45,7 @@ class Scanner:
         self.remove_after = None  # Zeitpunkt zum Löschen
 
         # Document related parameters
+        self.ScanTicket_Dialect = None              # SIMPLE or DETAIL
         self.DocPar_FileFormat = 'jfif'
         self.DocPar_ImagesToTransfer = 1
         self.DocPar_InputSource = None
