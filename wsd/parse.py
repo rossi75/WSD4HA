@@ -17,7 +17,7 @@ from globals import SCANNERS, SCAN_JOBS, NAMESPACES, STATE, LOG_LEVEL
 from pathlib import Path
 from scanner import Scanner, Scan_Jobs
 from templates import TEMPLATE_SOAP_PROBE, TEMPLATE_SOAP_TRANSFER_GET
-from tools import list_scanners, pick_best_xaddr
+from tools import list_scanners, pick_best_xaddr, calc_w3c_duration
 
 #logging.basicConfig(level=logging.INFO, format='[%(levelname)s] %(message)s')
 #logging.basicConfig(level=logging.LOG_LEVEL, format='[%(levelname)s] %(message)s')
@@ -205,7 +205,7 @@ def parse_subscribe(subscr_uuid, xml_body):
     if expires_elem is not None and expires_elem.text:
         logger.debug(f"   ---> expires_elem: {expires_elem.text.strip()}")
         try:
-            SCANNERS[subscr_uuid].subscription_timeout = parse_w3c_duration(expires_elem.text.strip())
+            SCANNERS[subscr_uuid].subscription_timeout = calc_w3c_duration(expires_elem.text.strip())
             SCANNERS[subscr_uuid].update_subscription()
         except Exception as e:
             logger.warning(f"[PARSE:subscr] Could not parse Expires: {e}")
@@ -261,7 +261,7 @@ def parse_subscribe(subscr_uuid, xml_body):
 
 # ---------------- parse w3c timer ----------------
 # parse_w3c_duration("PT1H")   # -> 3600
-def parse_w3c_duration(duration: str) -> int:
+def _parse_w3c_duration(duration: str) -> int:
     """
     Wandelt W3C/ISO8601 Duration (z.B. 'PT1H30M') in Sekunden um.
     Unterstützt Tage, Stunden, Minuten, Sekunden.
@@ -338,12 +338,12 @@ def parse_notify_msg(notifier_uuid, xml):
     # umrechnen von notify_uuid zu SCANNERS[uuid]
 #    find_scanner_from_notify(notify_url)
 
-    logger.info(f"   --->     Notify UUID: {notifier_uuid}")
-    logger.info(f"   ---> Subscription ID: {subscr_identifier}")
-    logger.info(f"   --->          Action: {action}")
-    logger.info(f"   --->  Client Context: {client_context}")
-    logger.info(f"   --->         Scan ID: {scan_identifier}")
-    logger.info(f"   --->    Input Source: {input_source}")
+    logger.debug(f"   --->     Notify UUID: {notifier_uuid}")
+    logger.debug(f"   ---> Subscription ID: {subscr_identifier}")
+    logger.debug(f"   --->          Action: {action}")
+    logger.debug(f"   --->  Client Context: {client_context}")
+    logger.debug(f"   --->         Scan ID: {scan_identifier}")
+    logger.debug(f"   --->    Input Source: {input_source}")
 
     # Neuen Auftrag zum Abholen in SCANNER_JOBS[] hinterlegen
     if action == "ScanAvailableEvent":
