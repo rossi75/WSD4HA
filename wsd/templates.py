@@ -147,6 +147,76 @@ TEMPLATE_SUBSCRIBE_RENEW = """<?xml version="1.0" encoding="utf-8"?>
 </soap:Envelope>
 """
 
+
+TEMPLATE_SOAP_VALIDATE_SCAN_TICKET = """<?xml version="1.0" encoding="utf-8"?>
+<soap:Envelope
+ xmlns:soap="http://www.w3.org/2003/05/soap-envelope"
+ xmlns:wsa="http://schemas.xmlsoap.org/ws/2004/08/addressing"
+ xmlns:sca="http://schemas.microsoft.com/windows/2006/08/wdp/scan">
+
+  <soap:Header>
+    <wsa:To>{to_addr}</wsa:To>
+    <wsa:Action>http://schemas.microsoft.com/windows/2006/08/wdp/scan/ValidateScanTicket</wsa:Action>
+    <wsa:MessageID>urn:uuid:{msg_id}</wsa:MessageID>
+    <wsa:ReplyTo>
+      <wsa:Address>http://schemas.xmlsoap.org/ws/2004/08/addressing/role/anonymous</wsa:Address>
+    </wsa:ReplyTo>
+    <wsa:From>
+      <wsa:Address>urn:uuid:{from_uuid}</wsa:Address>
+    </wsa:From>
+  </soap:Header>
+  <soap:Body>
+    <sca:ValidateScanTicketRequest>
+      <sca:ScanTicket>
+        <sca:JobDescription>
+          <sca:JobName>Altbier</sca:JobName>
+          <sca:JobOriginatingUserName>Schnitzel</sca:JobOriginatingUserName>
+          <sca:JobInformation>Pommes</sca:JobInformation>
+        </sca:JobDescription>
+        <sca:DocumentParameters>
+          <sca:Format sca:MustHonor="true">{format}</sca:Format>
+          <sca:ImagesToTransfer sca:MustHonor="true">1</sca:ImagesToTransfer>
+          <sca:InputSource sca:MustHonor="true">{input_source}</sca:InputSource>
+          <sca:InputSize sca:MustHonor="true">
+            <sca:InputMediaSize>
+              <sca:Width>{width}</sca:Width>
+              <sca:Height>{height}</sca:Height>
+            </sca:InputMediaSize>
+          </sca:InputSize>
+          <sca:Exposure sca:MustHonor="true">
+            <sca:ExposureSettings>
+              <sca:Contrast>{contrast}</sca:Contrast>
+              <sca:Brightness>{brightness}</sca:Brightness>
+            </sca:ExposureSettings>
+          </sca:Exposure>
+          <sca:Scaling sca:MustHonor="true">
+            <sca:ScalingWidth>100</sca:ScalingWidth>
+            <sca:ScalingHeight>100</sca:ScalingHeight>
+          </sca:Scaling>
+          <sca:Rotation sca:MustHonor="true">0</sca:Rotation>
+          <sca:MediaSides>
+            <sca:MediaFront>
+              <sca:ScanRegion>
+                <sca:ScanRegionXOffset>0</sca:ScanRegionXOffset>
+                <sca:ScanRegionYOffset>0</sca:ScanRegionYOffset>
+                <sca:ScanRegionWidth>{scan_width}</sca:ScanRegionWidth>
+                <sca:ScanRegionHeight>{scan_height}</sca:ScanRegionHeight>
+              </sca:ScanRegion>
+              <sca:ColorProcessing sca:MustHonor="true">RGB24</sca:ColorProcessing>
+              <sca:Resolution sca:MustHonor="true">
+                <sca:Width>{dpi}</sca:Width>
+                <sca:Height>{dpi}</sca:Height>
+              </sca:Resolution>
+            </sca:MediaFront>
+          </sca:MediaSides>
+        </sca:DocumentParameters>
+      </sca:ScanTicket>
+    </sca:ValidateScanTicketRequest>
+  </soap:Body>
+</soap:Envelope>
+"""
+
+
 ###################################################################################
 # TEMPLATE_CREATE_SCANJOB
 # ---------------------------------------------------------------------------------
@@ -174,7 +244,7 @@ TEMPLATE_SUBSCRIBE_RENEW = """<?xml version="1.0" encoding="utf-8"?>
 # DocPar_RegionXOffset
 # DocPar_RegionYOffset
 # DocPar_ColorProcessing
-TEMPLATE_CREATE_SCANJOB = """<?xml version="1.0" encoding="utf-8"?>
+TEMPLATE_SOAP_CREATE_SCANJOB = """<?xml version="1.0" encoding="utf-8"?>
 <soap:Envelope xmlns:soap="http://www.w3.org/2003/05/soap-envelope"
                xmlns:wsa="http://schemas.xmlsoap.org/ws/2004/08/addressing"
                xmlns:sca="http://schemas.microsoft.com/windows/2006/08/wdp/scan">
