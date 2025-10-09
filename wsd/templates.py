@@ -166,7 +166,7 @@ TEMPLATE_SUBSCRIBE_RENEW = """<?xml version="1.0" encoding="utf-8"?>
 # DocPar_dpi_width
 # DocPar_dpi_height
 # ---------------------------------------------------------------------------------
-TEMPLATE_SOAP_VALIDATE_SCAN_TICKET = """<?xml version="1.0" encoding="utf-8"?>
+TEMPLATE_SOAP_VALIDATE_SCAN_TICKET_DETAIL = """<?xml version="1.0" encoding="utf-8"?>
 <soap:Envelope
  xmlns:soap="http://www.w3.org/2003/05/soap-envelope"
  xmlns:wsa="http://schemas.xmlsoap.org/ws/2004/08/addressing"
