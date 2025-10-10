@@ -41,11 +41,11 @@ async def request_scan_job_ticket(job_id: str):
 
     if job_id not in SCAN_JOBS:
         logger.warning(f"could not find any existing job with ID {job_id}. Skipping request")
-        SCAN_JOB[job_id].status = STATE.SCAN_FAILED
+        SCAN_JOBS[job_id].status = STATE.SCAN_FAILED
         return
     else:
-        if SCAN_JOB[job_id].status == STATE.SCAN_PENDING:
-            SCAN_JOB[job_id].status == STATE.SCAN_REQ_TICKET
+        if SCAN_JOBS[job_id].status == STATE.SCAN_PENDING:
+            SCAN_JOBS[job_id].status == STATE.SCAN_REQ_TICKET
 
     scanner_uuid = SCAN_JOBS[job_id].scan_from_uuid
 
@@ -109,7 +109,7 @@ async def request_scan_job_ticket(job_id: str):
                     logger.error(f"[SCAN_JOB:ticket] Request for ticket failed with Statuscode {resp.status}")
                     return
         except Exception as e:
-            logger.error(f"[SCAN_JOB:ticket] anything went wrong with {SCAN_JOB[job_id]}: {e}")
+            logger.error(f"[SCAN_JOB:ticket] anything went wrong with {SCAN_JOBS[job_id]}: {e}")
             SCAN_JOBS[job_id].state = STATE.SCAN_FAILED
             return
 
