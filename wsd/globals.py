@@ -93,10 +93,10 @@ class STATE(str, Enum):
     SUBSCR_RNW_1_2_CHK = "online"                                                          # Hälfte der Zeit is rum
     SUBSCR_RNW_3_4_PENDING = "online"                                                      # 3/4 der Zeit is rum
     SUBSCR_RNW_3_4_CHK = "online"                                                          # 3/4 der Zeit is rum
+    ONLINE_BUSY = "online"                                                                 # beim Scannen
     SCAN_PENDING = "Document available"
     SCAN_REQ_TICKET = "Requesting Job Ticket"
     SCAN_RETRIEVING = "receiving/downloading a Document"
-#    SCAN_DOWNLOADING = "receiving/downloading a Document"
     SCAN_DONE = "Document scan done successfully"
     SCAN_FAILED = "Document scan failed"
     ABSENT = "absent"
