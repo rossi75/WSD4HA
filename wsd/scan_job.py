@@ -46,46 +46,17 @@ async def request_scan_job_ticket(job_id: str):
         SCAN_JOB[job_id].status = STATE.SCAN_FAILED
         return
     else:
-        if SCAN_JOB[job_id].status == STATE.SCAN_PENDING
+        if SCAN_JOB[job_id].status == STATE.SCAN_PENDING:
             SCAN_JOB[job_id].status == STATE.SCAN_REQ_TICKET
 
     scanner_uuid = SCAN_JOBS[job_id].scan_from_uuid
 
-###################################################################################
-# TEMPLATE_CREATE_SCANJOB
-# ---------------------------------------------------------------------------------
-# xaddr = destination adress
-# msg_id = random message ID
-# from_uuid = sender UUID
-# scan_identifier = Scan Identifier from xml notification dialog
-# destination_token = token given by scanner while registration
-# ---------------------------------------------------------------------------------
-# Document Parameters, what and how to scan
-# DocPar_FileFormat
-# DocPar_ImagesToTransfer
-# DocPar_InputSource
-# DocPar_InputWidth
-# DocPar_InputHeight
-# DocPar_RegionWidth
-# DocPar_RegionHeight
-# DocPar_ResolutionWidth
-# DocPar_ResolutionHeight
-# DocPar_ExposureContrast
-# DocPar_ExposureBrightness
-# DocPar_ScalingWidth
-# DocPar_ScalingHeight
-# DocPar_Rotation
-# DocPar_RegionXOffset
-# DocPar_RegionYOffset
-# DocPar_ColorProcessing
-# ---------------------------------------------------------------------------------
-
-        self.scanjob_identifier = scan_job_id
-        self.input_source = input_source
-        self.scan_from_uuid = scan_from_uuid
-        self.subscription_identifier = SCANNERS[scan_from_uuid].subscription_id
-        self.xaddr = SCANNERS[scan_from_uuid].xaddr
-        self.dest_token = SCANNERS[scan_from_uuid].destination_token
+#        self.scanjob_identifier = scan_job_id
+#        self.input_source = input_source
+#        self.scan_from_uuid = scan_from_uuid
+#        self.subscription_identifier = SCANNERS[scan_from_uuid].subscription_id
+#        self.xaddr = SCANNERS[scan_from_uuid].xaddr
+#        self.dest_token = SCANNERS[scan_from_uuid].destination_token
 # xaddr = destination adress
 # msg_id = random message ID
 # from_uuid = sender UUID
@@ -101,8 +72,8 @@ async def request_scan_job_ticket(job_id: str):
         msg_id = msg_id
         from_uuid = FROM_UUID
         scan_identifier = SCAN_JOBS[job_id].scanjob_identifier
-        destination_token = SCAN_JOBS[job_id].subscription_identifier
-
+        subscription_identifier = SCAN_JOBS[job_id].subscription_identifier
+        destination_token = SCAN_JOBS[job_id].destination_token
         DocPar_FileFormat = SCANNERS[scanner_uuid].DocPar_FileFormat
         DocPar_FileFormat = SCANNERS[scanner_uuid].DocPar_FileFormat
         DocPar_InputSource = SCANNERS[scanner_uuid].DocPar_InputSource
@@ -127,9 +98,7 @@ async def request_scan_job_ticket(job_id: str):
     }
 
     logger.debug(f"   --->      FROM: {FROM_UUID}")
-    logger.debug(f"   --->        TO: {renew_uuid}")
     logger.debug(f"   --->    MSG_ID: {msg_id}")
-    logger.debug(f"   ---> subscr_ID: {ref_id}")
     logger.info(f"   --->       URL: {url}")
     logger.info(f"   --->       XML:\n{xml}")
 
