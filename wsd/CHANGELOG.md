@@ -1,5 +1,20 @@
 # Changelog
 
+### todo
+- implement detailled variant of ValdiateScanTicket
+- implement simple variant of ValdiateScanTicket
+- choose between simple and detailled variant of ValdiateScanTicket
+- implement GetScannerElements[State] before requesting a ticket, do nothing while not in IDLE
+- implement GetScannerElements[ScannerDescription]
+- implement GetScannerElements[DefaultScanTicket]
+- implement GetScannerElements[ScannerConfiguration]
+- write bin to harddisk
+- ...
+
+## 0.60 - 2025-10-10
+- creating/requesting ticket for a scan job after notification
+- SCAN_JOBS[] now stores the outstanding jobs
+
 ## 0.57 - 2025-10-07
 - outsourced many helper functions into new tools.py
 
