@@ -4,9 +4,9 @@ import uuid
 import aiohttp
 from pathlib import Path
 #from globals import SCANNERS, SCAN_JOBS, STATE, WSD_SCAN_FOLDER, MAX_SEMAPHORE, logger
-from globals import SCANNERS, SCAN_JOBS, STATE, SCAN_FOLDER, logger
+#from globals import SCANNERS, SCAN_JOBS, STATE, SCAN_FOLDER, logger, USER_AGENT
+from globals import SCANNERS, SCAN_JOBS, STATE, logger, USER_AGENT
 
-#import datetime
 #import logging
 #import os
 #import re
@@ -15,15 +15,13 @@ from globals import SCANNERS, SCAN_JOBS, STATE, SCAN_FOLDER, logger
 #import sys
 #import time
 #import threading
-import uuid
 #import xml.etree.ElementTree as ET
 
 #from config import OFFLINE_TIMEOUT, LOCAL_IP, HTTP_PORT, FROM_UUID, DISPLAY, NOTIFY_PORT, get_local_ip
 #from globals import SCANNERS, list_scanners, NAMESPACES, STATE, USER_AGENT, LOG_LEVEL
 from config import OFFLINE_TIMEOUT, LOCAL_IP, HTTP_PORT, FROM_UUID, DISPLAY, NOTIFY_PORT
-from globals import SCANNERS, SCAN_JOBS, NAMESPACES, WSD_SCAN_FOLDER, STATE, USER_AGENT, LOG_LEVEL
+#from globals import SCANNERS, SCAN_JOBS, NAMESPACES, SCAN_FOLDER, STATE, USER_AGENT, LOG_LEVEL
 #from parse import parse_wsd_packet, parse_probe, parse_transfer_get, parse_subscribe
-from pathlib import Path
 from scanner import Scanner, Scan_Jobs
 from tools import list_scanners, get_local_ip
 from templates import TEMPLATE_CREATE_SCANJOB
