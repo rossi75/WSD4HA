@@ -9,7 +9,7 @@ from globals import SCANNERS, SCAN_JOBS, STATE, logger
 from config import OFFLINE_TIMEOUT, LOCAL_IP, HTTP_PORT, USER_AGENT, FROM_UUID, DISPLAY, NOTIFY_PORT
 from scanner import Scanner, Scan_Jobs
 from tools import list_scanners, get_local_ip
-from templates import TEMPLATE_CREATE_SCANJOB
+from templates import TEMPLATE_SOAP_CREATE_SCANJOB
 
 #import logging
 #import os
@@ -65,7 +65,7 @@ async def request_scan_job_ticket(job_id: str):
     msg_id = uuid.uuid4()
     url = SCAN_JOBS[job_id].xaddr  # z.B. http://192.168.0.3:8018/wsd
 
-    xml = TEMPLATE_CREATE_SCANJOB.format(
+    xml = TEMPLATE_SOAP_CREATE_SCANJOB.format(
         xaddr = url,
         msg_id = msg_id,
         from_uuid = FROM_UUID,
