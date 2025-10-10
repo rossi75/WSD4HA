@@ -5,7 +5,11 @@ import aiohttp
 from pathlib import Path
 #from globals import SCANNERS, SCAN_JOBS, STATE, WSD_SCAN_FOLDER, MAX_SEMAPHORE, logger
 #from globals import SCANNERS, SCAN_JOBS, STATE, SCAN_FOLDER, logger, USER_AGENT
-from globals import SCANNERS, SCAN_JOBS, STATE, logger, USER_AGENT
+from globals import SCANNERS, SCAN_JOBS, STATE, logger
+from config import OFFLINE_TIMEOUT, LOCAL_IP, HTTP_PORT, USER_AGENT, FROM_UUID, DISPLAY, NOTIFY_PORT
+from scanner import Scanner, Scan_Jobs
+from tools import list_scanners, get_local_ip
+from templates import TEMPLATE_CREATE_SCANJOB
 
 #import logging
 #import os
@@ -19,12 +23,8 @@ from globals import SCANNERS, SCAN_JOBS, STATE, logger, USER_AGENT
 
 #from config import OFFLINE_TIMEOUT, LOCAL_IP, HTTP_PORT, FROM_UUID, DISPLAY, NOTIFY_PORT, get_local_ip
 #from globals import SCANNERS, list_scanners, NAMESPACES, STATE, USER_AGENT, LOG_LEVEL
-from config import OFFLINE_TIMEOUT, LOCAL_IP, HTTP_PORT, FROM_UUID, DISPLAY, NOTIFY_PORT
 #from globals import SCANNERS, SCAN_JOBS, NAMESPACES, SCAN_FOLDER, STATE, USER_AGENT, LOG_LEVEL
 #from parse import parse_wsd_packet, parse_probe, parse_transfer_get, parse_subscribe
-from scanner import Scanner, Scan_Jobs
-from tools import list_scanners, get_local_ip
-from templates import TEMPLATE_CREATE_SCANJOB
 
 
 #WSD_SCAN_FOLDER.mkdir(parents=True, exist_ok=True)
