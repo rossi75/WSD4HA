@@ -10,6 +10,7 @@ from config import OFFLINE_TIMEOUT, LOCAL_IP, HTTP_PORT, USER_AGENT, FROM_UUID, 
 from scanner import Scanner, Scan_Jobs
 from tools import list_scanners, get_local_ip
 from templates import TEMPLATE_SOAP_CREATE_SCANJOB
+from parser import parse_request_scan_job_ticket
 
 #import logging
 #import os
