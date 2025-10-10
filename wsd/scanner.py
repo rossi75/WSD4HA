@@ -48,7 +48,7 @@ class Scanner:
         self.ScanTicket_Dialect = None              # SIMPLE or DETAIL
         self.DocPar_FileFormat = 'jfif'
         self.DocPar_ImagesToTransfer = 1
-        self.DocPar_InputSource = None
+#        self.DocPar_InputSource = None
         self.DocPar_InputWidth = None
         self.DocPar_InputHeight = None
         self.DocPar_RegionWidth = None
