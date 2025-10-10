@@ -13,16 +13,19 @@ import uuid
 import xml.etree.ElementTree as ET
 from datetime import timedelta
 from config import OFFLINE_TIMEOUT, LOCAL_IP, HTTP_PORT, FROM_UUID
-from globals import SCANNERS, SCAN_JOBS, NAMESPACES, STATE, LOG_LEVEL
+#from globals import SCANNERS, SCAN_JOBS, NAMESPACES, STATE, LOG_LEVEL
+from globals import SCANNERS, SCAN_JOBS, NAMESPACES, STATE, logger
 from pathlib import Path
 from scanner import Scanner, Scan_Jobs
 from templates import TEMPLATE_SOAP_PROBE, TEMPLATE_SOAP_TRANSFER_GET
 from tools import list_scanners, pick_best_xaddr, calc_w3c_duration
+from scan_job import request_scan_job_ticket
 
 #logging.basicConfig(level=logging.INFO, format='[%(levelname)s] %(message)s')
 #logging.basicConfig(level=logging.LOG_LEVEL, format='[%(levelname)s] %(message)s')
-logging.basicConfig(level=LOG_LEVEL, format='[%(levelname)s] %(message)s')
-logger = logging.getLogger("wsd-addon")
+
+#logging.basicConfig(level=LOG_LEVEL, format='[%(levelname)s] %(message)s')
+#logger = logging.getLogger("wsd-addon")
 
 # ---------------- WSD SOAP Parser ----------------
 def parse_wsd_packet(data: bytes):
@@ -300,7 +303,6 @@ async def parse_notify_msg(notifier_uuid, xml):
         notifier_uuid (str): URL path (/uuid) belongs to a scanners uuid, this is the notifier_uuid
         xml (str): SOAP Notify payload (string)
     """
-#    logger.info(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} [PARSE:notify] parsing an event for {SCANNERS[notifier_uuid].friendly_name or notifier_uuid} @ {SCANNERS[notifier_uuid].ip}")
     logger.info(f"[PARSE:notify] parsing an event for {SCANNERS[notifier_uuid].friendly_name or notifier_uuid} @ {SCANNERS[notifier_uuid].ip}")
     logger.debug(f"   XML:\n{xml}")
 
@@ -320,7 +322,6 @@ async def parse_notify_msg(notifier_uuid, xml):
 
     action_elem = root.find(".//wsa:Action", NAMESPACES)
     if action_elem is not None and action_elem.text:
-#        action = action_elem.text.strip()
         action = action_elem.text.split("/")[-1]  # → "Hello|Bye|Probe"
 
     client_context_elem = root.find(".//wscn:ClientContext", NAMESPACES)
@@ -335,9 +336,6 @@ async def parse_notify_msg(notifier_uuid, xml):
     if input_source_elem is not None and input_source_elem.text:
         input_source = input_source_elem.text.strip()
 
-    # umrechnen von notify_uuid zu SCANNERS[uuid]
-#    find_scanner_from_notify(notify_url)
-
     logger.debug(f"   --->     Notify UUID: {notifier_uuid}")
     logger.debug(f"   ---> Subscription ID: {subscr_identifier}")
     logger.debug(f"   --->          Action: {action}")
@@ -351,7 +349,7 @@ async def parse_notify_msg(notifier_uuid, xml):
             logger.info(f"+++ surprising News, it seems Scanner {SCANNERS[notifier_uuid].friendly_name or notifier_uuid} @ {SCANNERS[notifier_uuid].ip} has a document for us to scan. Let's go and grab it ! +++")
             SCAN_JOBS[scan_identifier] = Scan_Jobs(scan_identifier, notifier_uuid, input_source)
             SCANNERS[notifier_uuid].update()
-            return
+#            return
         else:
             logger.info(f"the job that should be added [{scan_identifier}] is still in the list")
             return
@@ -359,6 +357,8 @@ async def parse_notify_msg(notifier_uuid, xml):
         logger.warning(f"Scanner {SCANNERS[notifier_uuid].friendly_name or notifier_uuid} @ {SCANNERS[notifier_uuid].ip} notified the unrecognized action {action}")
         return
 
+    # erst mal n Ticket holen
+    asyncio.create_task(request_scan_job_ticket(scan_identifier))      
 
 #
 #
