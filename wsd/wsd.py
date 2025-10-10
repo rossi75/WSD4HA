@@ -237,10 +237,13 @@ async def state_monitor():
                 del SCAN_JOBS[job_id]
 
         # bei allen Zuständen außer [...] die kurze Pause
-        if any (scanner.state not in {STATE.ABSENT,
-                                      STATE.ONLINE,
-                                      STATE.SCAN_PENDING,
-                                      STATE.SCAN_DOWNLOADING,
+        if any (scanner.state not in {STATE.ONLINE,
+                                      STATE.ABSENT,
+#                                      STATE.SCAN_PENDING,
+#                                      STATE.SCAN_REQ_TICKET,
+#                                      STATE.SCAN_RETRIEVING,
+#                                      STATE.SCAN_DONE,
+#                                      STATE.SCAN_FAILED,
                                       STATE.TO_REMOVE,
                                       STATE.ERROR}
                 for scanner in SCANNERS.values()):
