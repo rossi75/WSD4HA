@@ -8,11 +8,11 @@ from globals import SCANNERS, SCAN_JOBS, STATE, WSD_SCAN_FOLDER, logger
 
 #import datetime
 #import logging
-#import os
-#import re
-#import socket
+import os
+import re
+import socket
 #import subprocess
-#import sys
+import sys
 #import time
 #import threading
 import uuid
