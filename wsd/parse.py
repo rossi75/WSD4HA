@@ -360,6 +360,15 @@ async def parse_notify_msg(notifier_uuid, xml):
     # erst mal n Ticket holen
     asyncio.create_task(request_scan_job_ticket(scan_identifier))      
 
+
+# ---------------- parse Scan available ----------------
+async def parse_request_scan_job_ticket(job_id, xml):
+    logger.info(f"[PARSE:sj_ticket] parsing ticket request for {SCAN_JOBS[job_id]}")
+    logger.info(f"   XML:\n{xml}")
+
+    
+
+
 #
 #
 # **************************************************
