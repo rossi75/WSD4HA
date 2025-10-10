@@ -315,7 +315,7 @@ TEMPLATE_SOAP_CREATE_SCANJOB = """<?xml version="1.0" encoding="utf-8"?>
                 <sca:Exposure
                     sca:MustHonor="true">
                         <sca:ExposureSettings>
-                        <sca:Contrast>{DocPar_ExposureConrast}</sca:Contrast>
+                        <sca:Contrast>{DocPar_ExposureContrast}</sca:Contrast>
                         <sca:Brightness>{DocPar_ExposureBrightness}</sca:Brightness>
                         </sca:ExposureSettings>
                     </sca:Exposure>
