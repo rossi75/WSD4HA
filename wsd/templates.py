@@ -1,11 +1,12 @@
 # contains the templates used for the requests
 
+################################################################################
 # TEMPLATE_SOAP_PROBE
 # provides a SOAP probe to a probably scanner
-#
+# ---------------------------------------------------------------------------------
 # Parameters:
 # msg_id = Message ID
-
+# ---------------------------------------------------------------------------------
 TEMPLATE_SOAP_PROBE = """<?xml version="1.0" encoding="utf-8"?>
 <soap:Envelope
   xmlns:soap="http://www.w3.org/2003/05/soap-envelope"
@@ -22,14 +23,15 @@ TEMPLATE_SOAP_PROBE = """<?xml version="1.0" encoding="utf-8"?>
 </soap:Envelope>
 """
 
+################################################################################
 # TEMPLATE_SOAP_TRANSFER_GET
 # provides a SOAP TRANSFER/GET request to the scanner
-#
+# ---------------------------------------------------------------------------------
 # Parameters:
 # to_device_uuid = scanners endpoint UUID
 # msg_id = Message ID
 # from_uuid = WSD4HAs UUID
-
+# ---------------------------------------------------------------------------------
 TEMPLATE_SOAP_TRANSFER_GET = """<?xml version="1.0" encoding="utf-8"?>
 <soap:Envelope xmlns:soap="http://www.w3.org/2003/05/soap-envelope"
                xmlns:wsa="http://schemas.xmlsoap.org/ws/2004/08/addressing">
@@ -52,15 +54,18 @@ TEMPLATE_SOAP_TRANSFER_GET = """<?xml version="1.0" encoding="utf-8"?>
 # TEMPLATE_SUBSCRIBE_SAE
 # SAE = ScanAvailableEvents
 # provides a template to subscribe to a service
-#
+# ---------------------------------------------------------------------------------
 # Parameters:
-# to_device_uuid = scanners endpoint UUID
-# msg_id = Message ID
 # xaddr = serviceadress  ==>  <wsa:To>http://192.168.0.3:8018/wsd/scan</wsa:To>
+# msg_id = Message ID
 # from_uuid = WSD4HAs UUID
+# ---------------------------------------------------------------------------------
 # EndTo_addr = adress that needs to be reachable by the scanner  ==>  <wsa:Address>http://192.168.0.1:5357/6ccf7716-4dc8-47bf-aca4-5a2ae5a959ca</wsa:Address>
-# scan_to_name = Option selected by the user to start the scanning  ==>  "Scan to Home Assistant"
 # Ref_ID = one more senseless ID  ==>  <wse:Identifier>urn:uuid:680be7cf-bc5a-409d-ad1d-4d6d96b5cb4f</wse:Identifier>
+# scan_to_name = Option selected by the user to start the scanning  ==>  "Scan to Home Assistant"
+
+# to_device_uuid = scanners endpoint UUID --> wo is n der abgeblieben?
+# ---------------------------------------------------------------------------------
 TEMPLATE_SUBSCRIBE_SAE = """<?xml version="1.0" encoding="utf-8"?>
 <soap:Envelope xmlns:soap="http://www.w3.org/2003/05/soap-envelope"
                xmlns:wsa="http://schemas.xmlsoap.org/ws/2004/08/addressing"
@@ -119,7 +124,6 @@ TEMPLATE_SUBSCRIBE_SAE = """<?xml version="1.0" encoding="utf-8"?>
 # from_uuid = sender UUID
 # Ref_ID = Reference UUID from subscribing
 # ---------------------------------------------------------------------------------
-# Document Parameters, what and how to scan
 TEMPLATE_SUBSCRIBE_RENEW = """<?xml version="1.0" encoding="utf-8"?>
 <soap:Envelope xmlns:soap="http://www.w3.org/2003/05/soap-envelope"
                xmlns:wsa="http://schemas.xmlsoap.org/ws/2004/08/addressing"
@@ -262,6 +266,7 @@ TEMPLATE_SOAP_VALIDATE_SCAN_TICKET_DETAIL = """<?xml version="1.0" encoding="utf
 # DocPar_RegionXOffset
 # DocPar_RegionYOffset
 # DocPar_ColorProcessing
+# ---------------------------------------------------------------------------------
 TEMPLATE_SOAP_CREATE_SCANJOB = """<?xml version="1.0" encoding="utf-8"?>
 <soap:Envelope xmlns:soap="http://www.w3.org/2003/05/soap-envelope"
                xmlns:wsa="http://schemas.xmlsoap.org/ws/2004/08/addressing"
@@ -355,6 +360,15 @@ TEMPLATE_SOAP_CREATE_SCANJOB = """<?xml version="1.0" encoding="utf-8"?>
 </soap:Envelope>
 """
 
+###################################################################################
+# TEMPLATE_RETRIEVE_DOCUMENT
+# fetches the document itself
+# ---------------------------------------------------------------------------------
+# xaddr = destination adress
+# msg_id = random message ID
+# ---------------------------------------------------------------------------------
+# scan_identifier = Scan Identifier from xml notification dialog
+# ---------------------------------------------------------------------------------
 TEMPLATE_RETRIEVE_DOCUMENT = """<?xml version="1.0" encoding="utf-8"?>
 <soap:Envelope xmlns:soap="http://www.w3.org/2003/05/soap-envelope"
                xmlns:wsa="http://schemas.xmlsoap.org/ws/2004/08/addressing"
