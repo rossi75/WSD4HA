@@ -6,9 +6,15 @@ from globals import SCANNERS, SCAN_JOBS, STATE, WSD_SCAN_FOLDER, logger
 WSD_SCAN_FOLDER.mkdir(parents=True, exist_ok=True)
 SEMAPHORE = asyncio.Semaphore(MAX_SEMAPHORE)   # max parallel downloads
 
+###################################################################################
+# Create/Request Scan Job Ticket
+# ---------------------------------------------------------------------------------
+# Parameters:
+# renew_uuid = scanners endpoint UUID
+# ---------------------------------------------------------------------------------
 # ----------------- Request Scan Job Ticket -----------------
 async def request_scan_job_ticket(job_id: str):
-    logger.info(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} [SCAN_JOB:ticket] requesting ticket for scan job {job_id}")
+    logger.info(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} [SCAN_JOB:ticket] creating/requesting ticket for scan job {job_id}")
 
     if job_id not in SCAN_JOBS:
         logger.warning(f"could not find any existing job with ID {job_id}. Skipping request")
@@ -21,7 +27,56 @@ async def request_scan_job_ticket(job_id: str):
     scanner_uuid = SCAN_JOBS[job_id].scanner_uuid
 
 
+
+async def create_scan_job_ticket(renew_uuid: str):
+    logger.info(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} [SEND:subscr_rnw] renewing subscription for {SCANNERS[renew_uuid].friendly_name or renew_uuid} @ {SCANNERS[renew_uuid].ip}")
     
+    SCANNERS[renew_uuid].state = STATE.SUBSCRIBING_SCAN_AVAIL_EVT
+
+    body = ""
+    msg_id = uuid.uuid4()
+    ref_id = SCANNERS[renew_uuid].subscription_ref
+    EndToAddr = SCANNERS[renew_uuid].end_to_addr
+    url = SCANNERS[renew_uuid].xaddr  # z.B. http://192.168.0.3:8018/wsd
+    xml = TEMPLATE_SUBSCRIBE_RENEW.format(
+        to_device_uuid = renew_uuid,
+        msg_id = msg_id,
+        from_uuid = FROM_UUID,
+        xaddr = SCANNERS[renew_uuid].xaddr,
+        EndTo_addr = EndToAddr,
+        scan_to_name = DISPLAY,
+        Ref_ID = ref_id
+    )
+    headers = {
+        "Content-Type": "application/soap+xml",
+        "User-Agent": USER_AGENT
+    }
+
+    logger.debug(f"   --->      FROM: {FROM_UUID}")
+    logger.debug(f"   --->        TO: {renew_uuid}")
+    logger.debug(f"   --->    MSG_ID: {msg_id}")
+    logger.debug(f"   ---> subscr_ID: {ref_id}")
+    logger.debug(f"   --->    End_To: {EndToAddr}")
+    logger.debug(f"   --->       URL: {url}")
+    logger.debug(f"   --->       XML:\n{xml}")
+
+    async with aiohttp.ClientSession() as session:
+        try:
+            async with session.post(url, data=xml, headers=headers, timeout=5) as resp:
+                if resp.status == 200:
+                    body = await resp.text()
+                else:
+                    SCANNERS[renew_uuid].state = STATE.ERROR
+                    logger.error(f"[SEND:rnw] Renew to ScanAvailableEvents failed with Statuscode {resp.status}")
+                    return None
+        except Exception as e:
+            logger.error(f"[SEND:rnw] failed for {SCANNERS[renew_uuid].uuid}: {e}")
+            SCANNERS[renew_uuid].state = STATE.ERROR
+            return None
+ 
+    parse_subscribe(renew_uuid, body)
+
+
     
     
     
