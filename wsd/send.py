@@ -103,14 +103,13 @@ async def send_transfer_get(tf_g_uuid: str):
     logger.debug(f"TransferGet von {SCANNERS[tf_g_uuid].ip}:\n{body}")
     parse_transfer_get(body, tf_g_uuid)
 
-# ---------------- Subscribe ScanAvailableEvent ----------------
-    # to_device_uuid = scanners endpoint UUID
-    # msg_id = Message ID
-    # xaddr = serviceadress  ==>  <wsa:To>http://192.168.0.3:8018/wsd/scan</wsa:To>
-    # from_uuid = WSD4HAs UUID
-    # EndTo_addr = adress that needs to be reachable by the scanner  ==>  <wsa:Address>http://192.168.0.1:5357/6ccf7716-4dc8-47bf-aca4-5a2ae5a959ca</wsa:Address>
-    # scan_to_name = Option selected by the user to start the scanning  ==>  "Scan to Home Assistant"
-    # Ref_ID = one more senseless ID  ==>  <wse:Identifier>urn:uuid:680be7cf-bc5a-409d-ad1d-4d6d96b5cb4f</wse:Identifier>
+
+###################################################################################
+# Subscribe ScanAvailableEvent
+# ---------------------------------------------------------------------------------
+# Parameters:
+# sae_uuis = scanners endpoint UUID
+# ---------------------------------------------------------------------------------
 async def send_subscription_ScanAvailableEvent(sae_uuid: str):
     logger.info(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} [SEND:subscr_sae] subscribing ScanAvailableEvent to {SCANNERS[sae_uuid].friendly_name or sae_uuid} @ {SCANNERS[sae_uuid].ip}")
     
@@ -167,14 +166,12 @@ async def send_subscription_ScanAvailableEvent(sae_uuid: str):
  
     parse_subscribe(sae_uuid, body)
 
-# ---------------- Subscribe ScanAvailableEvent ----------------
-    # to_device_uuid = scanners endpoint UUID
-    # msg_id = Message ID
-    # xaddr = serviceadress  ==>  <wsa:To>http://192.168.0.3:8018/wsd/scan</wsa:To>
-    # from_uuid = WSD4HAs UUID
-    # EndTo_addr = adress that needs to be reachable by the scanner  ==>  <wsa:Address>http://192.168.0.1:5357/6ccf7716-4dc8-47bf-aca4-5a2ae5a959ca</wsa:Address>
-    # scan_to_name = Option selected by the user to start the scanning  ==>  "Scan to Home Assistant"
-    # Ref_ID = one more senseless ID  ==>  <wse:Identifier>urn:uuid:680be7cf-bc5a-409d-ad1d-4d6d96b5cb4f</wse:Identifier>
+###################################################################################
+# Subscription Renew
+# ---------------------------------------------------------------------------------
+# Parameters:
+# renew_uuid = scanners endpoint UUID
+# ---------------------------------------------------------------------------------
 async def send_subscription_renew(renew_uuid: str):
     logger.info(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} [SEND:subscr_rnw] renewing subscription for {SCANNERS[renew_uuid].friendly_name or renew_uuid} @ {SCANNERS[renew_uuid].ip}")
     
