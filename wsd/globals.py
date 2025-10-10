@@ -33,6 +33,9 @@ USER_AGENT = "WSD4HA"
 # -----------------  define FROM_UUID  -----------------
 FROM_UUID = None
 
+# -----------------  define SCAN_FOLDER  -----------------
+SCAN_FOLDER = None
+
 # -----------------  define NAMESPACE  -----------------
 NAMESPACES = {
     "df": "http://schemas.microsoft.com/windows/2008/09/devicefoundation",
