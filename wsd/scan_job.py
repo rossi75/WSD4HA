@@ -1,18 +1,43 @@
-import asyncio, datetime, uuid, aiohttp
+import asyncio
+import datetime
+import uuid
+import aiohttp
 from pathlib import Path
 #from globals import SCANNERS, SCAN_JOBS, STATE, WSD_SCAN_FOLDER, MAX_SEMAPHORE, logger
 from globals import SCANNERS, SCAN_JOBS, STATE, WSD_SCAN_FOLDER, logger
 
-WSD_SCAN_FOLDER.mkdir(parents=True, exist_ok=True)
-SEMAPHORE = asyncio.Semaphore(MAX_SEMAPHORE)   # max parallel downloads
+#import datetime
+#import logging
+#import os
+#import re
+#import socket
+#import subprocess
+#import sys
+#import time
+#import threading
+import uuid
+#import xml.etree.ElementTree as ET
+
+#from config import OFFLINE_TIMEOUT, LOCAL_IP, HTTP_PORT, FROM_UUID, DISPLAY, NOTIFY_PORT, get_local_ip
+#from globals import SCANNERS, list_scanners, NAMESPACES, STATE, USER_AGENT, LOG_LEVEL
+from config import OFFLINE_TIMEOUT, LOCAL_IP, HTTP_PORT, FROM_UUID, DISPLAY, NOTIFY_PORT
+from globals import SCANNERS, SCAN_JOBS, NAMESPACES, WSD_SCAN_FOLDER, STATE, USER_AGENT, LOG_LEVEL
+#from parse import parse_wsd_packet, parse_probe, parse_transfer_get, parse_subscribe
+from pathlib import Path
+from scanner import Scanner, Scan_Jobs
+from tools import list_scanners, get_local_ip
+from templates import TEMPLATE_CREATE_SCANJOB
+
+
+#WSD_SCAN_FOLDER.mkdir(parents=True, exist_ok=True)
+#SEMAPHORE = asyncio.Semaphore(MAX_SEMAPHORE)   # max parallel downloads
 
 ###################################################################################
 # Create/Request Scan Job Ticket
 # ---------------------------------------------------------------------------------
 # Parameters:
-# renew_uuid = scanners endpoint UUID
+# job_id = scan job identifier
 # ---------------------------------------------------------------------------------
-# ----------------- Request Scan Job Ticket -----------------
 async def request_scan_job_ticket(job_id: str):
     logger.info(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} [SCAN_JOB:ticket] creating/requesting ticket for scan job {job_id}")
 
@@ -24,11 +49,110 @@ async def request_scan_job_ticket(job_id: str):
         if SCAN_JOB[job_id].status == STATE.SCAN_PENDING
             SCAN_JOB[job_id].status == STATE.SCAN_REQ_TICKET
 
-    scanner_uuid = SCAN_JOBS[job_id].scanner_uuid
+    scanner_uuid = SCAN_JOBS[job_id].scan_from_uuid
+
+###################################################################################
+# TEMPLATE_CREATE_SCANJOB
+# ---------------------------------------------------------------------------------
+# xaddr = destination adress
+# msg_id = random message ID
+# from_uuid = sender UUID
+# scan_identifier = Scan Identifier from xml notification dialog
+# destination_token = token given by scanner while registration
+# ---------------------------------------------------------------------------------
+# Document Parameters, what and how to scan
+# DocPar_FileFormat
+# DocPar_ImagesToTransfer
+# DocPar_InputSource
+# DocPar_InputWidth
+# DocPar_InputHeight
+# DocPar_RegionWidth
+# DocPar_RegionHeight
+# DocPar_ResolutionWidth
+# DocPar_ResolutionHeight
+# DocPar_ExposureContrast
+# DocPar_ExposureBrightness
+# DocPar_ScalingWidth
+# DocPar_ScalingHeight
+# DocPar_Rotation
+# DocPar_RegionXOffset
+# DocPar_RegionYOffset
+# DocPar_ColorProcessing
+# ---------------------------------------------------------------------------------
+
+        self.scanjob_identifier = scan_job_id
+        self.input_source = input_source
+        self.scan_from_uuid = scan_from_uuid
+        self.subscription_identifier = SCANNERS[scan_from_uuid].subscription_id
+        self.xaddr = SCANNERS[scan_from_uuid].xaddr
+        self.dest_token = SCANNERS[scan_from_uuid].destination_token
+# xaddr = destination adress
+# msg_id = random message ID
+# from_uuid = sender UUID
+# scan_identifier = Scan Identifier from xml notification dialog
+# destination_token = token given by scanner while registration
+
+    body = ""
+    msg_id = uuid.uuid4()
+    url = SCAN_JOBS[job_id].xaddr  # z.B. http://192.168.0.3:8018/wsd
+
+    xml = TEMPLATE_CREATE_SCANJOB.format(
+        xaddr = url
+        msg_id = msg_id
+        from_uuid = FROM_UUID
+        scan_identifier = SCAN_JOBS[job_id].scanjob_identifier
+        destination_token = SCAN_JOBS[job_id].subscription_identifier
+
+        DocPar_FileFormat = SCANNERS[scanner_uuid].DocPar_FileFormat
+        DocPar_FileFormat = SCANNERS[scanner_uuid].DocPar_FileFormat
+        DocPar_InputSource = SCANNERS[scanner_uuid].DocPar_InputSource
+        DocPar_InputWidth = SCANNERS[scanner_uuid].DocPar_InputWidth
+        DocPar_InputHeight = SCANNERS[scanner_uuid].DocPar_InputHeight
+        DocPar_RegionWidth = SCANNERS[scanner_uuid].DocPar_RegionWidth
+        DocPar_RegionHeight = SCANNERS[scanner_uuid].DocPar_RegionHeight
+        DocPar_ResolutionWidth = SCANNERS[scanner_uuid].DocPar_ResolutionWidth
+        DocPar_ResolutionHeight = SCANNERS[scanner_uuid].DocPar_ResolutionHeight
+        DocPar_ExposureContrast = SCANNERS[scanner_uuid].DocPar_ExposureContrast
+        DocPar_ExposureBrightness = SCANNERS[scanner_uuid].DocPar_ExposureBrightness
+        DocPar_ScalingWidth = SCANNERS[scanner_uuid].DocPar_ScalingWidth
+        DocPar_ScalingHeight = SCANNERS[scanner_uuid].DocPar_ScalingHeight
+        DocPar_Rotation = SCANNERS[scanner_uuid].DocPar_Rotation
+        DocPar_RegionXOffset = SCANNERS[scanner_uuid].DocPar_RegionXOffset
+        DocPar_RegionYOffset = SCANNERS[scanner_uuid].DocPar_RegionYOffset
+        DocPar_ColorProcessing = SCANNERS[scanner_uuid].DocPar_ColorProcessing
+    )
+    headers = {
+        "Content-Type": "application/soap+xml",
+        "User-Agent": USER_AGENT
+    }
+
+    logger.debug(f"   --->      FROM: {FROM_UUID}")
+    logger.debug(f"   --->        TO: {renew_uuid}")
+    logger.debug(f"   --->    MSG_ID: {msg_id}")
+    logger.debug(f"   ---> subscr_ID: {ref_id}")
+    logger.info(f"   --->       URL: {url}")
+    logger.info(f"   --->       XML:\n{xml}")
+
+    async with aiohttp.ClientSession() as session:
+        try:
+            async with session.post(url, data=xml, headers=headers, timeout=5) as resp:
+                if resp.status == 200:
+                    body = await resp.text()
+                else:
+                    SCAN_JOBS[job_id].state = STATE.SCAN_FAILED
+                    logger.error(f"[SCAN_JOB:ticket] Request for ticket failed with Statuscode {resp.status}")
+                    return
+        except Exception as e:
+            logger.error(f"[SCAN_JOB:ticket] anything went wrong with {SCAN_JOB[job_id]}: {e}")
+            SCAN_JOBS[job_id].state = STATE.SCAN_FAILED
+            return
+
+    logger.info(f"trying to parse the ticket answer")
+    
+    asyncio.create_task(parse_request_scan_job_ticket(job_id, body))
 
 
-
-async def create_scan_job_ticket(renew_uuid: str):
+async def _create_scan_job_ticket(renew_uuid: str):
     logger.info(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} [SEND:subscr_rnw] renewing subscription for {SCANNERS[renew_uuid].friendly_name or renew_uuid} @ {SCANNERS[renew_uuid].ip}")
     
     SCANNERS[renew_uuid].state = STATE.SUBSCRIBING_SCAN_AVAIL_EVT
