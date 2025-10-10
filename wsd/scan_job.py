@@ -74,7 +74,7 @@ async def request_scan_job_ticket(job_id: str):
         destination_token = SCAN_JOBS[job_id].destination_token,
         DocPar_FileFormat = SCANNERS[scanner_uuid].DocPar_FileFormat,
         DocPar_InputSource = SCANNERS[scanner_uuid].DocPar_InputSource,
-        DocPar_ImagesToTransfer = SCANNERS[scanner_uuid].DocPar_ImagesToTransfer
+        DocPar_ImagesToTransfer = SCANNERS[scanner_uuid].DocPar_ImagesToTransfer,
         DocPar_InputWidth = SCANNERS[scanner_uuid].DocPar_InputWidth,
         DocPar_InputHeight = SCANNERS[scanner_uuid].DocPar_InputHeight,
         DocPar_RegionWidth = SCANNERS[scanner_uuid].DocPar_RegionWidth,
