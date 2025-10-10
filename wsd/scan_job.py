@@ -1,14 +1,14 @@
-# polling.py (Beispiel)
 import asyncio, datetime, uuid, aiohttp
 from pathlib import Path
-from globals import SCANNERS, SCAN_JOBS, STATE, WSD_SCAN_FOLDER, MAX_SEMAPHORE, logger
+#from globals import SCANNERS, SCAN_JOBS, STATE, WSD_SCAN_FOLDER, MAX_SEMAPHORE, logger
+from globals import SCANNERS, SCAN_JOBS, STATE, WSD_SCAN_FOLDER, logger
 
 WSD_SCAN_FOLDER.mkdir(parents=True, exist_ok=True)
 SEMAPHORE = asyncio.Semaphore(MAX_SEMAPHORE)   # max parallel downloads
 
-# ----------------- Request Scan Job -----------------
-async def request_scan_job(job_id: str):
-    logger.info(f"[SCAN_JOB] received request for job {job_id}")
+# ----------------- Request Scan Job Ticket -----------------
+async def request_scan_job_ticket(job_id: str):
+    logger.info(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} [SCAN_JOB:ticket] requesting ticket for scan job {job_id}")
 
     if job_id not in SCAN_JOBS:
         logger.warning(f"could not find any existing job with ID {job_id}. Skipping request")
@@ -16,19 +16,17 @@ async def request_scan_job(job_id: str):
         return
     else:
         if SCAN_JOB[job_id].status == STATE.SCAN_PENDING
-            SCAN_JOB[job_id].status == STATE.SCAN_REQUESTING
+            SCAN_JOB[job_id].status == STATE.SCAN_REQ_TICKET
+
+    scanner_uuid = SCAN_JOBS[job_id].scanner_uuid
 
 
-
-        
-    logger.info(f"[JOB] started polling task for {job_id}")
-
-    scanner_uuid = job["scanner_uuid"]
-    scanner = SCANNERS.get(scanner_uuid)
-    if not scanner:
-        logger.error(f"[JOB] unknown scanner {scanner_uuid}")
-        job["status"] = "failed"
-        return
+    
+    
+    
+    
+# ----------------- Request Scan Job -----------------
+async def _request_scan_ticket(job_id: str):
 
     # Polling schedule: fast then slower
     intervals = [0.5]*10 + [2.0]*30 + [10.0]*18  # insgesamt ~10min
@@ -96,7 +94,7 @@ async def request_scan_job(job_id: str):
     logger.warning(f"[JOB] give up on {job_id} after {job['retries']} tries")
 
 # ---------------- take the document ----------------
-async def fetch_scanned_document(scanner_uuid, doc_uuid):
+async def _fetch_scanned_document(scanner_uuid, doc_uuid):
     """
     Holt das gescannte Dokument asynchron ab.
     """
@@ -133,7 +131,7 @@ async def fetch_scanned_document(scanner_uuid, doc_uuid):
 
 
 # ---------------- HTTP/SOAP Server ----------------
-async def handle_scan_job(request):
+async def _handle_scan_job(request):
     logger.info(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} [SCAN] Scan-Job started")
     data = await request.read()
     logger.info(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} [SCAN] Received first Bytes: {len(data)}")
@@ -152,3 +150,8 @@ async def handle_scan_job(request):
             </soap:Body>
         </soap:Envelope>
     """, content_type='application/soap+xml')
+
+#
+#
+# *****************************************************
+# **************** END OF SCAN_JOB.PY  ****************
