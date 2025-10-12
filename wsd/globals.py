@@ -96,7 +96,7 @@ class STATE(str, Enum):
     ONLINE_BUSY = "busy scanning"                                                                 # beim Scannen
     SCAN_PENDING = "Document available"
     SCAN_REQ_TICKET = "Requesting Job Ticket"
-    SCAN_RETRIEVING = "receiving/downloading a Document"
+    SCAN_RETRIEVE_IMG = "receiving/downloading a Document"
     SCAN_DONE = "Document scan done successfully"
     SCAN_FAILED = "Document scan failed"
     ABSENT = "absent"
