@@ -369,7 +369,7 @@ TEMPLATE_SOAP_CREATE_SCANJOB = """<?xml version="1.0" encoding="utf-8"?>
 # ---------------------------------------------------------------------------------
 # scan_identifier = Scan Identifier from xml notification dialog
 # ---------------------------------------------------------------------------------
-TEMPLATE_RETRIEVE_DOCUMENT = """<?xml version="1.0" encoding="utf-8"?>
+_TEMPLATE_RETRIEVE_DOCUMENT = """<?xml version="1.0" encoding="utf-8"?>
 <soap:Envelope xmlns:soap="http://www.w3.org/2003/05/soap-envelope"
                xmlns:wsa="http://schemas.xmlsoap.org/ws/2004/08/addressing"
                xmlns:wscn="http://schemas.microsoft.com/windows/2006/08/wdp/scan">
@@ -387,6 +387,15 @@ TEMPLATE_RETRIEVE_DOCUMENT = """<?xml version="1.0" encoding="utf-8"?>
 """
 
 
+###################################################################################
+# TEMPLATE_RETRIEVE_DOCUMENT
+# fetches the document itself
+# ---------------------------------------------------------------------------------
+# xaddr = destination adress
+# msg_id = random message ID
+# ---------------------------------------------------------------------------------
+# scan_identifier = Scan Identifier from xml notification dialog
+# ---------------------------------------------------------------------------------
 TEMPLATE_RETRIEVE_DOCUMENT = """<?xml version="1.0" encoding="utf-8"?>
     <soap:Envelope
         xmlns:soap="http://www.w3.org/2003/05/soap-envelope"
@@ -395,11 +404,11 @@ TEMPLATE_RETRIEVE_DOCUMENT = """<?xml version="1.0" encoding="utf-8"?>
         <soap:Header>
             <wsa:To>{xaddr}</wsa:To>
             <wsa:Action>http://schemas.microsoft.com/windows/2006/08/wdp/scan/RetrieveImage</wsa:Action>
-            <wsa:MessageID>urn:uuid:5fc40b1d-7f68-45e5-be9b-a899d43600c0</wsa:MessageID>
+            <wsa:MessageID>urn:uuid:{msg_id}</wsa:MessageID>
             <wsa:ReplyTo>
                 <wsa:Address>http://schemas.xmlsoap.org/ws/2004/08/addressing/role/anonymous</wsa:Address>
                 </wsa:ReplyTo>
-            <wsa:From><wsa:Address>urn:uuid:4e19ef1c-1701-40e2-987f-3a3f19ae14a7</wsa:Address></wsa:From>
+            <wsa:From><wsa:Address>urn:uuid:{from_uuid}</wsa:Address></wsa:From>
             </soap:Header>
         <soap:Body>
             <sca:RetrieveImageRequest>
