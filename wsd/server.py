@@ -151,11 +151,12 @@ routes = web.RouteTableDef()
 @routes.post(r'/{uuid:[0-9a-fA-F\-]+}')
 async def notify_handler(request):
     logger.info(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} [SERVER:notify_handler] received {request.method} event on {request.path}")
+    xml_payload = await request.text()
+    logger.debug(f"   ---> XML payload: \n {xml_payload}")
 
     scanner_uuid = ""
     EndTo_id = request.path
     scanner_uuid = find_scanner_by_endto_addr(EndTo_id)
-    xml_payload = await request.text()
 
     if scanner_uuid is not None:
         logger.info(f"found scanner {SCANNERS[scanner_uuid].friendly_name or scanner_uuid} @ {SCANNERS[scanner_uuid].ip} for {EndTo_id}")
@@ -163,16 +164,40 @@ async def notify_handler(request):
         logger.info(f"no search result for {EndTo_id}")
         return web.Response(status=400, text="bad notify endpoint")
 
-    logger.debug(f"   ---> XML payload: \n {xml_payload}")
-
     try:
         root = ET.fromstring(xml_payload)
-        asyncio.create_task(parse_notify_msg(scanner_uuid, xml_payload))      # hier wird dann der Abholauftrag an sich generiert
+        task_fill = asyncio.create_task(parse_notify_msg(scanner_uuid, xml_payload))      # hier wird dann der Abholauftrag an sich gefüllt
     except Exception as e:
         logger.warning(f"[SERVER:notify_handler] invalid xml: {e}")
         return web.Response(status=400, text="bad xml")
 
+    if not task_fill:
+        return web.Response(status=400, text="task not filled")
+    
+    logger.info(f"scheduling scan job {job_id} for scanner {SCANNERS[scanner_uuid].friendly_name or scanner_uuid}")
+
+    loop = asyncio.get_event_loop()
+    loop.call_soon(asyncio.create_task, run_scan_job(job_id))
+
+    logger.info(f"... done !")
+
+     # --- Danach asynchron Scan starten ---
+    # call_soon sorgt dafür, dass der Task erst nach Rückgabe gestartet wird
+#    if job_id:
+#        loop = asyncio.get_event_loop()
+#        loop.call_soon(asyncio.create_task, run_scan_job(job_id))
+#        logger.info(f"[SERVER:notify_handler] scheduled scan job {job_id} for scanner {scanner_uuid}")
+#    else:
+#        logger.debug(f"[SERVER:notify_handler] no job created from notify message")
+
+    logger.info(f"  LOGPOINT A, hier sollten wir noch landen")
+
+
+
     return web.Response(status=202, text="Alles juut")
+
+    logger.info(f"  LOGPOINT B, hier sollten wir nicht mehr ankommen")
+
 
 #
 #
