@@ -3,7 +3,7 @@ import aiohttp
 import datetime
 import logging
 import os
-#import re
+import re
 import socket
 import subprocess
 import sys
@@ -20,6 +20,8 @@ from scanner import Scanner, Scan_Jobs
 from templates import TEMPLATE_SOAP_PROBE, TEMPLATE_SOAP_TRANSFER_GET
 from tools import list_scanners, pick_best_xaddr, calc_w3c_duration
 #from scan_job import request_scan_job_ticket
+
+
 
 #logging.basicConfig(level=logging.INFO, format='[%(levelname)s] %(message)s')
 #logging.basicConfig(level=logging.LOG_LEVEL, format='[%(levelname)s] %(message)s')
@@ -420,6 +422,63 @@ async def parse_create_scan_job_response(scan_identifier, xml: str) -> bool:
 
     logger.info(f" received JobId={job_id} and JobToken={job_token} with format {format}")
     return True
+
+
+# -------------------------------  ----------------------------------------------------
+def parse_retrieve_image_response(body: bytes, content_type: str):
+    """
+    Parse multipart/related RetrieveImageResponse from scanner.
+    Returns: (soap_xml: str, image_bytes: bytes or None)
+    """
+    logger.info(f"[PARSE:rtrv_img] parsing image bytes")
+
+    # Boundary extrahieren
+    m = re.search(r'boundary="?([^";]+)"?', content_type, re.IGNORECASE)
+    if not m:
+        logger.warning("[PARSER] No MIME boundary found in Content-Type")
+        return None, None
+    boundary = m.group(1).encode()
+
+    parts = body.split(b"--" + boundary)
+    soap_xml = None
+    image_bytes = None
+    image_content_id = None
+
+    for p in parts:
+        if not p.strip() or p.startswith(b"--"):
+            continue
+
+        headers, _, data = p.partition(b"\r\n\r\n")
+        headers_decoded = headers.decode(errors="ignore")
+
+        if "application/xop+xml" in headers_decoded or "application/soap+xml" in headers_decoded:
+            soap_xml = re.sub(rb"^[0-9a-fA-F]+\r\n", b"", data.strip())
+            soap_xml = soap_xml.strip(b"\r\n0\r\n")
+        elif "application/binary" in headers_decoded:
+            image_bytes = data.strip()
+            m_id = re.search(r"Content-ID:\s*<([^>]+)>", headers_decoded)
+            if m_id:
+                image_content_id = m_id.group(1)
+
+    # SOAP optional parsen (nur Logging)
+    if soap_xml:
+        try:
+            root = ET.fromstring(soap_xml)
+#            ns = {
+#                "soap": "http://www.w3.org/2003/05/soap-envelope",
+#                "wscn": "http://schemas.microsoft.com/windows/2006/08/wdp/scan",
+#                "xop": "http://www.w3.org/2004/08/xop/include"
+#            }
+            href = root.find(".//xop:Include", NAMESPACES)
+            if href is not None:
+                cid = href.attrib.get("href", "").replace("cid:", "")
+                if image_content_id and cid != image_content_id:
+                    logger.warning(f"[PARSER] Mismatch CID: {cid} != {image_content_id}")
+        except Exception as e:
+            logger.warning(f"[PARSER] Could not parse SOAP XML: {e}")
+
+    return soap_xml.decode("utf-8", errors="ignore") if soap_xml else None, image_bytes
+
 
 
 #
