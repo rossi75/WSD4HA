@@ -227,7 +227,7 @@ async def send_subscription_renew(renew_uuid: str):
 # job_id = scan job identifier
 # ---------------------------------------------------------------------------------
 async def request_scan_job_ticket(job_id: str):
-    logger.info(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} [SCAN_JOB:ticket] creating/requesting ticket for scan job {job_id}")
+    logger.info(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} [SEND:sj_ticket] creating/requesting ticket for scan job {job_id}")
 
     if job_id not in SCAN_JOBS:
         logger.warning(f"could not find any existing job with ID {job_id}. Skipping request")
@@ -300,13 +300,13 @@ async def request_scan_job_ticket(job_id: str):
 
 
 ###################################################################################
-# Create/Request Scan Job Ticket
+# retrieve image from scanner
 # ---------------------------------------------------------------------------------
 # Parameters:
 # scanjob_identifier = scan job identifier
 # ---------------------------------------------------------------------------------
 async def request_retrieve_image(scanjob_identifier: str):
-    logger.info(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} [SCAN_JOB:retrieve_img] retrieving image for scan job {job_id}")
+    logger.info(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} [SEND:rtrv_img] retrieving image for scan job {job_id}")
 
     if scanjob_identifier not in SCAN_JOBS:
         logger.warning(f"could not find any existing job with ID {scanjob_identifier}. Skipping retrieve image")
@@ -344,7 +344,19 @@ async def request_retrieve_image(scanjob_identifier: str):
         try:
             async with session.post(url, data=xml, headers=headers, timeout=5) as resp:
                 if resp.status == 200:
-                    body = await resp.text()
+                #    body = await resp.text()
+                    body = await resp.read()
+                    soap_xml, image_bytes = parse_retrieve_image_response(body, resp.headers.get("Content-Type", ""))
+                    if image_bytes:
+                        filename = f"/scans/{scanner.friendly_name or scanner_uuid}_{scan_identifier}.jfif"
+                        os.makedirs(os.path.dirname(filename), exist_ok=True)
+                        with open(filename, "wb") as f:
+                            f.write(image_bytes)
+                        logger.info(f"[RETRIEVE] Image saved to {filename}")
+                        job.state = STATE.SCAN_DONE
+                    else:
+                        logger.warning(f"[RETRIEVE] No image found in response")
+                        job.state = STATE.SCAN_FAIL
                 else:
                     SCAN_JOBS[scanjob_identifier].state = STATE.SCAN_FAILED
                     logger.error(f"[SCAN_JOB:rtrv_img] Retrieving image failed with Statuscode {resp.status}")
@@ -354,7 +366,9 @@ async def request_retrieve_image(scanjob_identifier: str):
             SCAN_JOBS[scanjob_identifier].state = STATE.SCAN_FAILED
             return
 
-    logger.info(f"trying to parse the image")
-    logger.info(f"   --->  Answer XML:\n{xml}")
-    
-    asyncio.create_task(parse_request_scan_job_ticket(job_id, body))
+    logger.info(f"finished reading image from scanner")
+
+#
+#
+# **************************************************
+# *************** END OF SEND.PY ****************
