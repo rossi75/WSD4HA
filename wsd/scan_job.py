@@ -37,7 +37,7 @@ from parse import parse_request_scan_job_ticket
 # Parameters:
 # job_id = scan job identifier
 # ---------------------------------------------------------------------------------
-async def request_scan_job_ticket(job_id: str):
+async def _request_scan_job_ticket(job_id: str):
     logger.info(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} [SCAN_JOB:ticket] creating/requesting ticket for scan job {job_id}")
 
     if job_id not in SCAN_JOBS:
