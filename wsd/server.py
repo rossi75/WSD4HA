@@ -90,6 +90,8 @@ async def status_page(request):
         job_list += f"{j.xaddr}<br>"
         job_list += f"{j.subscription_identifier}<br>"
         job_list += f"{j.destination_token}</td>"
+        job_list += f"<td style='text-align:center;'>{j.job_id}<br>"
+        job_list += f"{j.job_token}</td>"
         job_list += f"<td style='text-align:center;'>{j.status.value}</td>"
         job_list += f"<td style='text-align:center;'>{j.job_created.strftime('%Y-%m-%d %H:%M:%S')}<br>"
         job_list += f"{j.remove_after.strftime('%Y-%m-%d %H:%M:%S')}</td>"
