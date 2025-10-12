@@ -87,9 +87,9 @@ async def run_scan_job(scan_identifier: str):
     result = asyncio.create_task(request_retrieve_image(scan_identifier))
 
     if result:
-        logger.info(f" received ScanJob Ticket #{SCAN_JOBS[scan_identifier].status} for scan job {scan_identifier}")
+        logger.info(f" received data from scanner (more detailed later)")
     else:
-        logger.info(f" something went wrong with job {scan_identifier}")
+        logger.info(f" something went wrong with receiving data from scanner")
         SCAN_JOBS[scan_identifier].status = STATE.SCAN_FAILED
         return
 
