@@ -19,6 +19,9 @@
 # def find_scanner_by_endto_addr(endto_addr: str):
 #
 #
+# def save_scanned_image(scanner_name: str, image_bytes: bytes):
+#
+#
 # ----------------------------------------------------------------------------
 
 import datetime
@@ -165,6 +168,52 @@ def find_scanner_by_endto_addr(endto_addr: str):
 
     logger.warning(f"[TOOLS:find_scanner] could not find {endto_addr} in any known scanners")
     return None
+
+
+# ---------------- which scanner notified to end_to? ----------------
+def save_scanned_image(scanner_name: str, image_bytes: bytes):
+    """
+    Speichert das empfangene Scan-Image auf der Festplatte mit
+    - automatisch erkannter Dateiendung
+    - bereinigtem Dateinamen
+    - Zeitstempel
+    """
+    if not image_bytes:
+        logger.warning("[SAVE] No image data to save")
+        return None
+
+    # Dateityp erkennen
+    header = image_bytes[:8]
+    if header.startswith(b"\xFF\xD8\xFF"):
+        ext = ".jpg"
+    elif header.startswith(b"\x89PNG"):
+        ext = ".png"
+    elif header.startswith(b"II*\x00") or header.startswith(b"MM\x00*"):
+        ext = ".tiff"
+    elif header.startswith(b"%PDF"):
+        ext = ".pdf"
+    else:
+        ext = ".bin"  # Fallback
+
+    # Friendly-Name säubern
+    safe_name = re.sub(r"[^A-Za-z0-9_\-]", "_", scanner_name.strip())
+
+    # Zeitstempel
+    timestamp = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
+
+    # Zielpfad
+    filename = f"/scans/{safe_name}_{timestamp}{ext}"
+    os.makedirs(os.path.dirname(filename), exist_ok=True)
+
+    # Datei speichern
+    try:
+        with open(filename, "wb") as f:
+            f.write(image_bytes)
+        logger.info(f"[SAVE] Image saved: {filename}")
+        return filename
+    except Exception as e:
+        logger.error(f"[SAVE] Could not save image: {e}")
+        return None
 
 #
 #
