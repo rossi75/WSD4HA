@@ -96,7 +96,14 @@ async def run_scan_job(scan_identifier: str):
 
     # Bild auf HDD abspeichern
     SCAN_JOBS[scan_identifier].status == STATE.SCAN_SAVING
+    result=save_scanned_image({SCANNERS[SCAN_JOBS[scan_identifier].scan_from_uuid].friendly_name or SCAN_JOBS[scan_identifier].scan_from_uuid}, result):
 
+    if result:
+        logger.info(f" saved  image (more detailed later)")
+    else:
+        logger.info(f" something went wrong with saving image")
+        SCAN_JOBS[scan_identifier].status = STATE.SCAN_FAILED
+        return
 
 
     # alles soweit erledigt
@@ -104,11 +111,6 @@ async def run_scan_job(scan_identifier: str):
 
 
     
-
-    logger.info(f"trying to parse the ticket answer")
-    
-    asyncio.create_task(parse_request_scan_job_ticket(job_id, body))
-
 
 async def _create_scan_job_ticket(renew_uuid: str):
     logger.info(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} [SEND:subscr_rnw] renewing subscription for {SCANNERS[renew_uuid].friendly_name or renew_uuid} @ {SCANNERS[renew_uuid].ip}")
