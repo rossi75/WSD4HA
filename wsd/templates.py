@@ -385,3 +385,30 @@ TEMPLATE_RETRIEVE_DOCUMENT = """<?xml version="1.0" encoding="utf-8"?>
   </soap:Body>
 </soap:Envelope>
 """
+
+
+TEMPLATE_RETRIEVE_DOCUMENT = """<?xml version="1.0" encoding="utf-8"?>
+    <soap:Envelope
+        xmlns:soap="http://www.w3.org/2003/05/soap-envelope"
+        xmlns:wsa="http://schemas.xmlsoap.org/ws/2004/08/addressing"
+        xmlns:sca="http://schemas.microsoft.com/windows/2006/08/wdp/scan">
+        <soap:Header>
+            <wsa:To>{xaddr}</wsa:To>
+            <wsa:Action>http://schemas.microsoft.com/windows/2006/08/wdp/scan/RetrieveImage</wsa:Action>
+            <wsa:MessageID>urn:uuid:5fc40b1d-7f68-45e5-be9b-a899d43600c0</wsa:MessageID>
+            <wsa:ReplyTo>
+                <wsa:Address>http://schemas.xmlsoap.org/ws/2004/08/addressing/role/anonymous</wsa:Address>
+                </wsa:ReplyTo>
+            <wsa:From><wsa:Address>urn:uuid:4e19ef1c-1701-40e2-987f-3a3f19ae14a7</wsa:Address></wsa:From>
+            </soap:Header>
+        <soap:Body>
+            <sca:RetrieveImageRequest>
+                <sca:JobId>{JobID}</sca:JobId>
+                <sca:JobToken>{JobToken}</sca:JobToken>
+                <sca:DocumentDescription>
+                    <sca:DocumentName>Scanned image</sca:DocumentName>
+                    </sca:DocumentDescription>
+                </sca:RetrieveImageRequest>
+            </soap:Body>
+        </soap:Envelope>
+"""
