@@ -396,6 +396,7 @@ _TEMPLATE_RETRIEVE_DOCUMENT = """<?xml version="1.0" encoding="utf-8"?>
 # from_uuid = sender UUID
 # ---------------------------------------------------------------------------------
 # JobID = JobID from scanner through Scan Identifier
+# JobToken = JobToken from scanner through Scan Identifier
 # ---------------------------------------------------------------------------------
 TEMPLATE_RETRIEVE_DOCUMENT = """<?xml version="1.0" encoding="utf-8"?>
     <soap:Envelope
