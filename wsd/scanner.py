@@ -107,10 +107,12 @@ class Scanner:
 class Scan_Jobs:
 #    def __init__(self, scan_job_id, subscription_id, scanner_uuid, xaddr):
 #    def __init__(self, scan_job_id, subscription_id, scanner_uuid):
-    def __init__(self, scan_job_id, scan_from_uuid, input_source):
+    def __init__(self, scan_job_idendtifier, scan_from_uuid, input_source):
         logger.debug(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} [SCAN_JOBS:__init__] New instance of a Scan Job")
 
-        self.scanjob_identifier = scan_job_id
+        self.scanjob_identifier = scan_job_idendtifier
+        self.job_id = None
+        self.job_token = None
         self.input_source = input_source
         self.scan_from_uuid = scan_from_uuid
         self.subscription_identifier = SCANNERS[scan_from_uuid].subscription_id
