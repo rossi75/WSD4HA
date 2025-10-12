@@ -297,3 +297,64 @@ async def request_scan_job_ticket(job_id: str):
     
     asyncio.create_task(parse_request_scan_job_ticket(job_id, body))
 
+
+
+###################################################################################
+# Create/Request Scan Job Ticket
+# ---------------------------------------------------------------------------------
+# Parameters:
+# scanjob_identifier = scan job identifier
+# ---------------------------------------------------------------------------------
+async def request_retrieve_image(scanjob_identifier: str):
+    logger.info(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} [SCAN_JOB:retrieve_img] retrieving image for scan job {job_id}")
+
+    if scanjob_identifier not in SCAN_JOBS:
+        logger.warning(f"could not find any existing job with ID {scanjob_identifier}. Skipping retrieve image")
+        SCAN_JOBS[scanjob_identifier].status = STATE.SCAN_FAILED
+        return
+
+    SCAN_JOBS[scanjob_identifier].status == STATE.SCAN_RETRIEVE_IMG
+
+    scanner_uuid = SCAN_JOBS[scanjob_identifier].scan_from_uuid
+
+    body = ""
+    msg_id = uuid.uuid4()
+    url = SCAN_JOBS[scanjob_identifier].xaddr  # z.B. http://192.168.0.3:8018/wsd
+
+    xml = TEMPLATE_SOAP_CREATE_SCANJOB.format(
+        xaddr = url,
+        msg_id = msg_id,
+        from_uuid = FROM_UUID,
+        JobID = SCAN_JOBS[scanjob_identifier].job_id,
+        JobToken = SCAN_JOBS[scanjob_identifier].job_token,
+    )
+    headers = {
+        "Content-Type": "application/soap+xml",
+        "User-Agent": USER_AGENT
+    }
+
+    logger.debug(f"   --->        FROM: {FROM_UUID}")
+    logger.debug(f"   --->      MSG_ID: {msg_id}")
+    logger.info(f"   --->         URL: {url}")
+    logger.info(f"   ---> Request XML:\n{xml}")
+
+    logger.info(f"requesting the image")
+
+    async with aiohttp.ClientSession() as session:
+        try:
+            async with session.post(url, data=xml, headers=headers, timeout=5) as resp:
+                if resp.status == 200:
+                    body = await resp.text()
+                else:
+                    SCAN_JOBS[scanjob_identifier].state = STATE.SCAN_FAILED
+                    logger.error(f"[SCAN_JOB:rtrv_img] Retrieving image failed with Statuscode {resp.status}")
+                    return
+        except Exception as e:
+            logger.error(f"[SCAN_JOB:rtrv_img] anything went wrong with {SCAN_JOBS[scanjob_identifier]}: {e}")
+            SCAN_JOBS[scanjob_identifier].state = STATE.SCAN_FAILED
+            return
+
+    logger.info(f"trying to parse the image")
+    logger.info(f"   --->  Answer XML:\n{xml}")
+    
+    asyncio.create_task(parse_request_scan_job_ticket(job_id, body))
