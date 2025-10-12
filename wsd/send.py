@@ -15,7 +15,7 @@ import xml.etree.ElementTree as ET
 #from globals import SCANNERS, list_scanners, NAMESPACES, STATE, USER_AGENT, LOG_LEVEL
 from config import OFFLINE_TIMEOUT, LOCAL_IP, HTTP_PORT, FROM_UUID, DISPLAY, NOTIFY_PORT
 from globals import SCANNERS, NAMESPACES, STATE, USER_AGENT, LOG_LEVEL
-from parse import parse_wsd_packet, parse_probe, parse_transfer_get, parse_subscribe
+from parse import parse_wsd_packet, parse_probe, parse_transfer_get, parse_subscribe, parse_request_scan_job_ticket
 from pathlib import Path
 from scanner import Scanner
 from tools import list_scanners, get_local_ip
