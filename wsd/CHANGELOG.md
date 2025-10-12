@@ -9,6 +9,7 @@
 - implement GetScannerElements[DefaultScanTicket]
 - implement GetScannerElements[ScannerConfiguration]
 - write bin to harddisk
+- merge globals.py + config.py to globalconfig.py
 - ...
 
 ## 0.60 - 2025-10-10
