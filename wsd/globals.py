@@ -8,7 +8,7 @@ import uuid
 LOG_LEVEL="ERROR"
 LOG_LEVEL="WARNING"
 LOG_LEVEL="INFO"
-#LOG_LEVEL=DEBUG
+#LOG_LEVEL="DEBUG"
 #logging.basicConfig(level=logging.INFO, format='[%(levelname)s] %(message)s')
 #logging.basicConfig(level=logging.LOG_LEVEL, format='[%(levelname)s] %(message)s')
 logging.basicConfig(level=LOG_LEVEL, format='[%(levelname)s] %(message)s')
@@ -93,7 +93,7 @@ class STATE(str, Enum):
     SUBSCR_RNW_1_2_CHK = "online"                                                          # Hälfte der Zeit is rum
     SUBSCR_RNW_3_4_PENDING = "online"                                                      # 3/4 der Zeit is rum
     SUBSCR_RNW_3_4_CHK = "online"                                                          # 3/4 der Zeit is rum
-    ONLINE_BUSY = "online"                                                                 # beim Scannen
+    ONLINE_BUSY = "busy scanning"                                                                 # beim Scannen
     SCAN_PENDING = "Document available"
     SCAN_REQ_TICKET = "Requesting Job Ticket"
     SCAN_RETRIEVING = "receiving/downloading a Document"
