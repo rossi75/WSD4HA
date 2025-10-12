@@ -319,7 +319,7 @@ async def parse_notify_msg(notifier_uuid, xml) -> bool:
             subscr_identifier = subscr_identifier.replace("urn:", "")
         if subscr_identifier.startswith("uuid:"):
             subscr_identifier = subscr_identifier.replace("uuid:", "")
-
+    
     action_elem = root.find(".//wsa:Action", NAMESPACES)
     if action_elem is not None and action_elem.text:
         action = action_elem.text.split("/")[-1]  # → "Hello|Bye|Probe"
@@ -347,7 +347,7 @@ async def parse_notify_msg(notifier_uuid, xml) -> bool:
     if action == "ScanAvailableEvent":
         if scan_identifier not in SCAN_JOBS:
             logger.info(f"+++ surprising News, it seems Scanner {SCANNERS[notifier_uuid].friendly_name or notifier_uuid} @ {SCANNERS[notifier_uuid].ip} has a document for us to scan. Let's go and grab it ! +++")
-            SCAN_JOBS[scan_identifier] = Scan_Jobs(scan_identifier, notifier_uuid, input_source)
+            SCAN_JOBS[scan_identifier] = Scan_Jobs(scan_identifier, notifier_uuid, input_source)         # ==> hier wird der Task erstellt für um das Ticket und das Bild abzuholen
             SCANNERS[notifier_uuid].update()
         else:
             logger.info(f"the job that should be added [{scan_identifier}] is still in the list")
@@ -363,11 +363,63 @@ async def parse_notify_msg(notifier_uuid, xml) -> bool:
 
 
 # ---------------- parse Scan available ----------------
-async def parse_request_scan_job_ticket(job_id, xml):
-    logger.info(f"[PARSE:sj_ticket] parsing ticket request for {SCAN_JOBS[job_id]}")
+async def _parse_request_scan_job_ticket(job_id, xml):
+    logger.info(f"[PARSE:sj_ticket__] parsing ticket request for {SCAN_JOBS[job_id]}")
     logger.info(f"   XML:\n{xml}")
 
-    
+
+async def parse_create_scan_job_response(scan_identifier, xml: str) -> bool:
+    """Parst die Antwort vom Scanner und speichert Werte in SCAN_JOBS."""
+    logger.info(f"[PARSE:sj_ticket] parsing ticket request for {SCAN_JOBS[scan_identifier]} from {SCANNERS[SCAN_JOBS[scan_identifier].notifier_uuid].friendly_name or notifier_uuid} @ {SCANNERS[notifier_uuid].ip}")
+    logger.info(f"   XML:\n{xml}")
+
+    try:
+        root = ET.fromstring(xml)
+    except ET.ParseError as e:
+        logger.error(f"[PARSE:sj_ticket] failed to parse CreateScanJobResponse: {e}")
+        scan_job.state = STATE.SCAN_FAIL
+        return False
+
+#        job_id = root.findtext(".//wscn:JobId", NAMESPACES)
+    # JobID
+    job_id = ""
+    job_id_elem = root.find(".//wscn:JobId", NAMESPACES)
+    if job_id_elem is not None and job_id_elem.text:
+        job_id = job_id_elem.text.strip()
+        SCAN_JOBS[scan_identifier].job_id = job_id
+    else:
+        return false
+
+#        job_token = root.findtext(".//wscn:JobToken", namespaces=ns)
+    # JobToken
+    job_token = ""
+    job_token_elem = root.find(".//wscn:JobToken", NAMESPACES)
+    if job_token_elem is not None and job_token_elem.text:
+        job_token = job_token_elem.text.strip()
+        SCAN_JOBS[scan_identifier].job_token = job_token
+    else:
+        return false
+
+#        job_token = root.findtext(".//wscn:JobToken", namespaces=ns)
+    # FileFormat
+    format = ""
+    format_elem = root.find(".//wscn:JobToken", NAMESPACES)
+    if format_elem is not None and format_elem.text:
+        format = format_elem.text.strip()
+        SCANNERS[{SCAN_JOBS[scan_identifier].notifier_uuid}].DocPar_FileFormat = format
+    else:
+        return false
+        
+#        pixels_per_line = root.findtext(".//wscn:PixelsPerLine", namespaces=ns)
+#        num_lines = root.findtext(".//wscn:NumberOfLines", namespaces=ns)
+
+ #       scan_job.job_id = job_id
+ #       scan_job.job_token = job_token
+ #       scan_job.pixels_per_line = int(pixels_per_line or 0)
+ #       scan_job.number_of_lines = int(num_lines or 0)
+
+    logger.info(f" received JobId={job_id} and JobToken={job_token} with format {format}")
+    return True
 
 
 #
