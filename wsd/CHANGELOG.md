@@ -8,6 +8,7 @@
 - implement GetScannerElements[ScannerDescription]
 - implement GetScannerElements[DefaultScanTicket]
 - implement GetScannerElements[ScannerConfiguration]
+- implement CreateScanJob[CreateScanJobReuqest]
 - write bin to harddisk
 - merge globals.py + config.py to globalconfig.py
 - ...
