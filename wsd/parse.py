@@ -295,7 +295,7 @@ def _parse_w3c_duration(duration: str) -> int:
     return seconds
 
 # ---------------- parse Scan available ----------------
-async def parse_notify_msg(notifier_uuid, xml):
+async def parse_notify_msg(notifier_uuid, xml) -> bool:
     """
     Parse ScanAvailableEvent and update scanner state.
 
@@ -349,16 +349,17 @@ async def parse_notify_msg(notifier_uuid, xml):
             logger.info(f"+++ surprising News, it seems Scanner {SCANNERS[notifier_uuid].friendly_name or notifier_uuid} @ {SCANNERS[notifier_uuid].ip} has a document for us to scan. Let's go and grab it ! +++")
             SCAN_JOBS[scan_identifier] = Scan_Jobs(scan_identifier, notifier_uuid, input_source)
             SCANNERS[notifier_uuid].update()
-#            return
         else:
             logger.info(f"the job that should be added [{scan_identifier}] is still in the list")
-            return
+            return false
     else:
         logger.warning(f"Scanner {SCANNERS[notifier_uuid].friendly_name or notifier_uuid} @ {SCANNERS[notifier_uuid].ip} notified the unrecognized action {action}")
-        return
+        return false
 
+    return true
     # erst mal n Ticket holen
-    asyncio.create_task(request_scan_job_ticket(scan_identifier))      
+#    asyncio.create_task(request_scan_job_ticket(scan_identifier))      
+    # --> machen wir später in nem eigenen Task, aus SCAN_JOB.py heraus
 
 
 # ---------------- parse Scan available ----------------
