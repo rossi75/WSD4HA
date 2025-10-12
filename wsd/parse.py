@@ -19,7 +19,7 @@ from pathlib import Path
 from scanner import Scanner, Scan_Jobs
 from templates import TEMPLATE_SOAP_PROBE, TEMPLATE_SOAP_TRANSFER_GET
 from tools import list_scanners, pick_best_xaddr, calc_w3c_duration
-from scan_job import request_scan_job_ticket
+#from scan_job import request_scan_job_ticket
 
 #logging.basicConfig(level=logging.INFO, format='[%(levelname)s] %(message)s')
 #logging.basicConfig(level=logging.LOG_LEVEL, format='[%(levelname)s] %(message)s')
