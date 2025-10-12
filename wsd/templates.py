@@ -393,8 +393,9 @@ _TEMPLATE_RETRIEVE_DOCUMENT = """<?xml version="1.0" encoding="utf-8"?>
 # ---------------------------------------------------------------------------------
 # xaddr = destination adress
 # msg_id = random message ID
+# from_uuid = sender UUID
 # ---------------------------------------------------------------------------------
-# scan_identifier = Scan Identifier from xml notification dialog
+# JobID = JobID from scanner through Scan Identifier
 # ---------------------------------------------------------------------------------
 TEMPLATE_RETRIEVE_DOCUMENT = """<?xml version="1.0" encoding="utf-8"?>
     <soap:Envelope
