@@ -220,3 +220,80 @@ async def send_subscription_renew(renew_uuid: str):
  
     parse_subscribe(renew_uuid, body)
 
+###################################################################################
+# Create/Request Scan Job Ticket
+# ---------------------------------------------------------------------------------
+# Parameters:
+# job_id = scan job identifier
+# ---------------------------------------------------------------------------------
+async def request_scan_job_ticket(job_id: str):
+    logger.info(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} [SCAN_JOB:ticket] creating/requesting ticket for scan job {job_id}")
+
+    if job_id not in SCAN_JOBS:
+        logger.warning(f"could not find any existing job with ID {job_id}. Skipping request")
+        SCAN_JOBS[job_id].status = STATE.SCAN_FAILED
+        return
+    else:
+        if SCAN_JOBS[job_id].status == STATE.SCAN_PENDING:
+            SCAN_JOBS[job_id].status == STATE.SCAN_REQ_TICKET
+
+    scanner_uuid = SCAN_JOBS[job_id].scan_from_uuid
+
+    body = ""
+    msg_id = uuid.uuid4()
+    url = SCAN_JOBS[job_id].xaddr  # z.B. http://192.168.0.3:8018/wsd
+
+    xml = TEMPLATE_SOAP_CREATE_SCANJOB.format(
+        xaddr = url,
+        msg_id = msg_id,
+        from_uuid = FROM_UUID,
+        scan_identifier = SCAN_JOBS[job_id].scanjob_identifier,
+        subscription_identifier = SCAN_JOBS[job_id].subscription_identifier,
+        destination_token = SCAN_JOBS[job_id].destination_token,
+        DocPar_InputSource = SCAN_JOBS[job_id].input_source,
+        DocPar_FileFormat = SCANNERS[scanner_uuid].DocPar_FileFormat,
+        DocPar_ImagesToTransfer = SCANNERS[scanner_uuid].DocPar_ImagesToTransfer,
+        DocPar_InputWidth = SCANNERS[scanner_uuid].DocPar_InputWidth,
+        DocPar_InputHeight = SCANNERS[scanner_uuid].DocPar_InputHeight,
+        DocPar_RegionWidth = SCANNERS[scanner_uuid].DocPar_RegionWidth,
+        DocPar_RegionHeight = SCANNERS[scanner_uuid].DocPar_RegionHeight,
+        DocPar_ResolutionWidth = SCANNERS[scanner_uuid].DocPar_ResolutionWidth,
+        DocPar_ResolutionHeight = SCANNERS[scanner_uuid].DocPar_ResolutionHeight,
+        DocPar_ExposureContrast = SCANNERS[scanner_uuid].DocPar_ExposureContrast,
+        DocPar_ExposureBrightness = SCANNERS[scanner_uuid].DocPar_ExposureBrightness,
+        DocPar_ScalingWidth = SCANNERS[scanner_uuid].DocPar_ScalingWidth,
+        DocPar_ScalingHeight = SCANNERS[scanner_uuid].DocPar_ScalingHeight,
+        DocPar_Rotation = SCANNERS[scanner_uuid].DocPar_Rotation,
+        DocPar_RegionXOffset = SCANNERS[scanner_uuid].DocPar_RegionXOffset,
+        DocPar_RegionYOffset = SCANNERS[scanner_uuid].DocPar_RegionYOffset,
+        DocPar_ColorProcessing = SCANNERS[scanner_uuid].DocPar_ColorProcessing
+    )
+    headers = {
+        "Content-Type": "application/soap+xml",
+        "User-Agent": USER_AGENT
+    }
+
+    logger.debug(f"   --->        FROM: {FROM_UUID}")
+    logger.debug(f"   --->      MSG_ID: {msg_id}")
+    logger.info(f"   --->         URL: {url}")
+    logger.info(f"   ---> Request XML:\n{xml}")
+
+    async with aiohttp.ClientSession() as session:
+        try:
+            async with session.post(url, data=xml, headers=headers, timeout=5) as resp:
+                if resp.status == 200:
+                    body = await resp.text()
+                else:
+                    SCAN_JOBS[job_id].state = STATE.SCAN_FAILED
+                    logger.error(f"[SCAN_JOB:ticket] Request for ticket failed with Statuscode {resp.status}")
+                    return
+        except Exception as e:
+            logger.error(f"[SCAN_JOB:ticket] anything went wrong with {SCAN_JOBS[job_id]}: {e}")
+            SCAN_JOBS[job_id].state = STATE.SCAN_FAILED
+            return
+
+    logger.info(f"trying to parse the ticket answer")
+    logger.info(f"   --->  Answer XML:\n{xml}")
+    
+    asyncio.create_task(parse_request_scan_job_ticket(job_id, body))
+
