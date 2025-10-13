@@ -119,7 +119,7 @@ async def status_page(request):
             </table>
             <h2>List of Scans:</h2>
             <table>
-                <tr><th>ScanJob ID</th><th>HW Source</th><th>Scanner UUID<br>XADDR<br>Subscr UUID<br>Destination Token</th><th>Job ID<br>Job Token</tr><th>Status</th><th>Job created<br>Remove after</tr>
+                <tr><th>ScanJob ID</th><th>HW Source</th><th>Scanner UUID<br>XADDR<br>Subscr UUID<br>Destination Token</th><th>Job ID<br>Job Token</th><th>Status</th><th>Job created<br>Remove after</tr>
                 {job_list}
             </table>
             <h2>Last {MAX_FILES} Scans:</h2>
