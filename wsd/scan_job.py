@@ -78,7 +78,7 @@ async def run_scan_job(scanjob_identifier: str):
 
     # Ticket abholen, Ergebnis wird direkt in SCAN_JOBS[] geschrieben und gibt true für Erfolg, false für Misserfolg zurück
     SCAN_JOBS[scanjob_identifier].status == STATE.SCAN_REQ_TICKET
-    result = asyncio.create_task(request_scan_job_ticket(scanjob_identifier))
+    result = await asyncio.create_task(request_scan_job_ticket(scanjob_identifier))
 
     if result:
         logger.info(f" received scan job id #{SCAN_JOBS[scanjob_identifier].job_id} and token {SCAN_JOBS[scanjob_identifier].job_token}")
