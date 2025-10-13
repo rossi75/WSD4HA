@@ -297,7 +297,7 @@ def _parse_w3c_duration(duration: str) -> int:
     return seconds
 
 # ---------------- parse Scan available ----------------
-async def parse_notify_msg(notifier_uuid, xml) -> bool:
+async def parse_notify_msg(notifier_uuid, xml) -> string:
     """
     Parse ScanAvailableEvent and update scanner state.
 
@@ -312,7 +312,7 @@ async def parse_notify_msg(notifier_uuid, xml) -> bool:
         root = ET.fromstring(xml)
     except ET.ParseError as e:
         logger.error(f"[PARSE:notify] XML ParseError: {e}")
-        return
+        return None
 
     subscr_identifier_elem = root.find(".//wse:Identifier", NAMESPACES)
     if subscr_identifier_elem is not None and subscr_identifier_elem.text:
@@ -330,46 +330,38 @@ async def parse_notify_msg(notifier_uuid, xml) -> bool:
     if client_context_elem is not None and client_context_elem.text:
         client_context = client_context_elem.text.strip()
 
-    scan_identifier_elem = root.find(".//wscn:ScanIdentifier", NAMESPACES)
-    if scan_identifier_elem is not None and scan_identifier_elem.text:
-        scan_identifier = scan_identifier_elem.text.strip()
+    scanjob_identifier_elem = root.find(".//wscn:ScanIdentifier", NAMESPACES)
+    if scanjob_identifier_elem is not None and scanjob_identifier_elem.text:
+        scanjob_identifier = scanjob_identifier_elem.text.strip()
     
     input_source_elem = root.find(".//wscn:InputSource", NAMESPACES)
     if input_source_elem is not None and input_source_elem.text:
         input_source = input_source_elem.text.strip()
 
-    logger.debug(f"   --->     Notify UUID: {notifier_uuid}")
-    logger.debug(f"   ---> Subscription ID: {subscr_identifier}")
-    logger.debug(f"   --->          Action: {action}")
-    logger.debug(f"   --->  Client Context: {client_context}")
-    logger.debug(f"   --->         Scan ID: {scan_identifier}")
-    logger.debug(f"   --->    Input Source: {input_source}")
+    logger.debug(f"   --->        Notify UUID: {notifier_uuid}")
+    logger.debug(f"   --->    Subscription ID: {subscr_identifier}")
+    logger.debug(f"   --->             Action: {action}")
+    logger.debug(f"   --->     Client Context: {client_context}")
+    logger.debug(f"   ---> Scanjob Identifier: {scanjob_identifier}")
+    logger.debug(f"   --->       Input Source: {input_source}")
 
-    # Neuen Auftrag zum Abholen in SCANNER_JOBS[] hinterlegen
+    # Neuen Auftrag zum Abholen in SCAN_JOBS[] hinterlegen
     if action == "ScanAvailableEvent":
-        if scan_identifier not in SCAN_JOBS:
-            logger.info(f"+++ surprising News, it seems Scanner {SCANNERS[notifier_uuid].friendly_name or notifier_uuid} @ {SCANNERS[notifier_uuid].ip} has a document for us to scan. Let's go and grab it ! +++")
-            SCAN_JOBS[scan_identifier] = Scan_Jobs(scan_identifier, notifier_uuid, input_source)         # ==> hier wird der Task erstellt für um das Ticket und das Bild abzuholen
+        if scanjob_identifier not in SCAN_JOBS:
+            logger.info(f"+++   surprising News, it seems Scanner {SCANNERS[notifier_uuid].friendly_name or notifier_uuid} @ {SCANNERS[notifier_uuid].ip} has a document for us to scan. Let's go and grab it !   +++")
+            SCAN_JOBS[scanjob_identifier] = Scan_Jobs(scanjob_identifier, notifier_uuid, input_source)         # ==> hier wird der Task erstellt für um das Ticket und das Bild abzuholen
             SCANNERS[notifier_uuid].update()
         else:
-            logger.info(f"the job that should be added [{scan_identifier}] is still in the list")
-            return false
+            logger.info(f"the job that should be added [{scanjob_identifier}] is still in the list")
+            return scanjob_identifer    # or return NONE?
     else:
         logger.warning(f"Scanner {SCANNERS[notifier_uuid].friendly_name or notifier_uuid} @ {SCANNERS[notifier_uuid].ip} notified the unrecognized action {action}")
-        return false
+        return None
 
-    return true
-    # erst mal n Ticket holen
-#    asyncio.create_task(request_scan_job_ticket(scan_identifier))      
-    # --> machen wir später in nem eigenen Task, aus SCAN_JOB.py heraus
+    return scanjob_identifier
 
 
 # ---------------- parse Scan available ----------------
-async def _parse_request_scan_job_ticket(job_id, xml):
-    logger.info(f"[PARSE:sj_ticket__] parsing ticket request for {SCAN_JOBS[job_id]}")
-    logger.info(f"   XML:\n{xml}")
-
-
 async def parse_create_scan_job_response(scan_identifier, xml: str) -> bool:
     """Parst die Antwort vom Scanner und speichert Werte in SCAN_JOBS."""
     logger.info(f"[PARSE:sj_ticket] parsing ticket request for {SCAN_JOBS[scan_identifier]} from {SCANNERS[SCAN_JOBS[scan_identifier].notifier_uuid].friendly_name or notifier_uuid} @ {SCANNERS[notifier_uuid].ip}")
