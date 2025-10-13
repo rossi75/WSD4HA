@@ -333,7 +333,7 @@ def parse_notify_msg(notifier_uuid, xml):
 
 # ---------------- parse create Scan Job Response ----------------
 #async def parse_create_scan_job_response(scan_identifier, xml: str) -> bool:
-def parse_create_scan_job_response(scan_identifier, xml: str):
+def parse_create_scan_job(scan_identifier, xml: str):
     """Parst die Antwort vom Scanner und speichert Werte in SCAN_JOBS."""
     logger.info(f"[PARSE:sj_ticket] parsing ticket request for {SCAN_JOBS[scan_identifier]} from {SCANNERS[SCAN_JOBS[scan_identifier].notifier_uuid].friendly_name or notifier_uuid} @ {SCANNERS[notifier_uuid].ip}")
     logger.info(f"   XML:\n{xml}")
@@ -397,7 +397,7 @@ def parse_create_scan_job_response(scan_identifier, xml: str):
 
 
 # -------------------------------  ----------------------------------------------------
-def parse_retrieve_image_response(body: bytes, content_type: str):
+def parse_retrieve_image(body: bytes, content_type: str):
     """
     Parse multipart/related RetrieveImageResponse from scanner.
     Returns: (soap_xml: str, image_bytes: bytes or None)
