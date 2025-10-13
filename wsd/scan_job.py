@@ -25,13 +25,9 @@ async def run_scan_job(scanjob_identifier: str):
 
     # GetScannerElements[State] before requesting a ticket, do nothing while not in IDLE
 
-    # ValdiateScanTicket Detail
-
     # GetScannerElements[DefaultScanTicket]
 
-    # GetScannerElements[ScannerConfiguration]
-
-    # Ticket abholen, Ergebnis wird direkt in SCAN_JOBS[] geschrieben und gibt true für Erfolg, false für Misserfolg zurück
+    # ValidateScanTicket Detail
 
     # Ticket abholen, Ergebnis wird direkt in SCAN_JOBS[] geschrieben und gibt true für Erfolg, false für Misserfolg zurück
     SCAN_JOBS[scanjob_identifier].status == STATE.SCAN_REQ_TICKET
