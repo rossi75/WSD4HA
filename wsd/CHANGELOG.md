@@ -1,6 +1,7 @@
 # Changelog
 
 ### todo
+- make manual configuration functional
 - implement detailled variant of ValdiateScanTicket
 - implement simple variant of ValdiateScanTicket
 - decide automatically between simple and detailled variant of ValdiateScanTicket
@@ -11,11 +12,9 @@
 - write bin to harddisk
 - merge globals.py + config.py to globalconfig.py
 - webinterface improvements:
- - left column for tree with config/scanners/jobs/scans
+  - left column for tree with config/scanners/jobs/scans
   - display several details only in debug mode
-- make manual configuration functional
 - ...
-
 
 ## 0.61 - 2025-10-12
 - filled scan_job.py with live
