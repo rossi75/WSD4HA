@@ -7,7 +7,7 @@
 # Parameters:
 # msg_id = Message ID
 # ---------------------------------------------------------------------------------
-TEMPLATE_SOAP_PROBE = """<?xml version="1.0" encoding="utf-8"?>
+TEMPLATE_PROBE = """<?xml version="1.0" encoding="utf-8"?>
 <soap:Envelope
   xmlns:soap="http://www.w3.org/2003/05/soap-envelope"
   xmlns:wsa="http://schemas.xmlsoap.org/ws/2004/08/addressing"
@@ -32,7 +32,7 @@ TEMPLATE_SOAP_PROBE = """<?xml version="1.0" encoding="utf-8"?>
 # msg_id = Message ID
 # from_uuid = WSD4HAs UUID
 # ---------------------------------------------------------------------------------
-TEMPLATE_SOAP_TRANSFER_GET = """<?xml version="1.0" encoding="utf-8"?>
+TEMPLATE_TRANSFER_GET = """<?xml version="1.0" encoding="utf-8"?>
 <soap:Envelope xmlns:soap="http://www.w3.org/2003/05/soap-envelope"
                xmlns:wsa="http://schemas.xmlsoap.org/ws/2004/08/addressing">
   <soap:Header>
@@ -170,7 +170,7 @@ TEMPLATE_SUBSCRIBE_RENEW = """<?xml version="1.0" encoding="utf-8"?>
 # DocPar_dpi_width
 # DocPar_dpi_height
 # ---------------------------------------------------------------------------------
-TEMPLATE_SOAP_VALIDATE_SCAN_TICKET_DETAIL = """<?xml version="1.0" encoding="utf-8"?>
+TEMPLATE_VALIDATE_SCAN_TICKET_DETAIL = """<?xml version="1.0" encoding="utf-8"?>
 <soap:Envelope
  xmlns:soap="http://www.w3.org/2003/05/soap-envelope"
  xmlns:wsa="http://schemas.xmlsoap.org/ws/2004/08/addressing"
@@ -267,7 +267,7 @@ TEMPLATE_SOAP_VALIDATE_SCAN_TICKET_DETAIL = """<?xml version="1.0" encoding="utf
 # DocPar_RegionYOffset
 # DocPar_ColorProcessing
 # ---------------------------------------------------------------------------------
-TEMPLATE_SOAP_CREATE_SCANJOB = """<?xml version="1.0" encoding="utf-8"?>
+TEMPLATE_CREATE_SCANJOB = """<?xml version="1.0" encoding="utf-8"?>
 <soap:Envelope xmlns:soap="http://www.w3.org/2003/05/soap-envelope"
                xmlns:wsa="http://schemas.xmlsoap.org/ws/2004/08/addressing"
                xmlns:sca="http://schemas.microsoft.com/windows/2006/08/wdp/scan">
