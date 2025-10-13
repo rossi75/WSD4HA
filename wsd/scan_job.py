@@ -45,15 +45,15 @@ from send import request_scan_job_ticket, request_retrieve_image
 # job_id = scan job identifier
 # ---------------------------------------------------------------------------------
 #async def run_scan_job(job_id: str):
-async def run_scan_job(scan_identifier: str):
-    logger.info(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} [SCAN_JOB:run_job] running scan job {scan_identifier}")
+async def run_scan_job(scanjob_identifier: str):
+    logger.info(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} [SCAN_JOB:run_job] running scan job {scanjob_identifier}")
 
     await asyncio.sleep(2)                   # Zwangspause für um die Notification erst einmal abzuarbeiten und dann hier nen freien Kopf zu haben.
     logger.info(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} [SCAN_JOB:run_job] weiter geht's !")
     
     if scan_identifier not in SCAN_JOBS:
-        logger.warning(f"could not find any existing job with ID {scan_identifier}. Skipping request")
-        SCAN_JOBS[scan_identifier].status = STATE.SCAN_FAILED
+        logger.warning(f"could not find any existing job with ID {scanjob_identifier}. Skipping request")
+        SCAN_JOBS[scanjob_identifier].status = STATE.SCAN_FAILED
         return
 #    else:
 #        if SCAN_JOBS[scan_identifier].status == STATE.SCAN_PENDING:
@@ -75,44 +75,44 @@ async def run_scan_job(scan_identifier: str):
 
 
     # Ticket abholen, Ergebnis wird direkt in SCAN_JOBS[] geschrieben und gibt true für Erfolg, false für Misserfolg zurück
-    SCAN_JOBS[scan_identifier].status == STATE.SCAN_REQ_TICKET
-    result = asyncio.create_task(request_scan_job_ticket(scan_identifier))
+    SCAN_JOBS[scanjob_identifier].status == STATE.SCAN_REQ_TICKET
+    result = asyncio.create_task(request_scan_job_ticket(scanjob_identifier))
 
     if result:
-        logger.info(f" received scan job id #{SCAN_JOBS[scan_identifier].job_id} and token {SCAN_JOBS[scan_identifier].job_token}")
+        logger.info(f" received scan job id #{SCAN_JOBS[scanjob_identifier].job_id} and token {SCAN_JOBS[scanjob_identifier].job_token}")
     else:
-        logger.info(f" something went wrong with requesting a ticket for job {scan_identifier}")
-        SCAN_JOBS[scan_identifier].status = STATE.SCAN_FAILED
+        logger.info(f" something went wrong with requesting a ticket for job {scanjob_identifier}")
+        SCAN_JOBS[scanjob_identifier].status = STATE.SCAN_FAILED
         return
 
 
     # Bild abholen, Ergebnis wird direkt in SCAN_JOBS[] geschrieben und gibt true für Erfolg, false für Misserfolg zurück
-    SCAN_JOBS[scan_identifier].status == STATE.SCAN_RETRIEVING
-    result = asyncio.create_task(request_retrieve_image(scan_identifier))
+    SCAN_JOBS[scanjob_identifier].status == STATE.SCAN_RETRIEVING
+    result = asyncio.create_task(request_retrieve_image(scanjob_identifier))
 
     if result:
         logger.info(f" received data from scanner (more detailed later)")
     else:
         logger.info(f" something went wrong with receiving data from scanner")
-        SCAN_JOBS[scan_identifier].status = STATE.SCAN_FAILED
+        SCAN_JOBS[scanjob_identifier].status = STATE.SCAN_FAILED
         return
 
 
     # Bild auf HDD abspeichern
-    SCAN_JOBS[scan_identifier].status == STATE.SCAN_SAVING
-    result = save_scanned_image({SCANNERS[SCAN_JOBS[scan_identifier].scan_from_uuid].friendly_name or SCAN_JOBS[scan_identifier].scan_from_uuid}, result):
+    SCAN_JOBS[scanjob_identifier].status == STATE.SCAN_SAVING
+    result = save_scanned_image({SCANNERS[SCAN_JOBS[scanjob_identifier].scan_from_uuid].friendly_name or SCAN_JOBS[scanjob_identifier].scan_from_uuid}, result):
 
     if result:
         logger.info(f" saved  image (more detailed later)")
     else:
-        logger.info(f" something went wrong with saving image")
-        SCAN_JOBS[scan_identifier].status = STATE.SCAN_FAILED
+        logger.info(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} [SCAN_JOB:run_job] something went wrong with saving image")
+        SCAN_JOBS[scanjob_identifier].status = STATE.SCAN_FAILED
         return
 
 
     # alles soweit erledigt
     logger.info(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} [SCAN_JOB:run_job] Scan Job done")
-    SCAN_JOBS[scan_identifier].status == STATE.SCAN_DONE
+    SCAN_JOBS[scanjob_identifier].status == STATE.SCAN_DONE
 
 
 #
