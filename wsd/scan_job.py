@@ -51,7 +51,7 @@ async def run_scan_job(scanjob_identifier: str):
     logger.info(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} [SCAN_JOB:run_job] running scan job {scanjob_identifier}")
 
     await asyncio.sleep(2)                   # Zwangspause für um die Notification erst einmal abzuarbeiten und dann hier nen freien Kopf zu haben.
-    logger.info(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} [SCAN_JOB:run_job] weiter geht's !")
+    logger.info(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} [SCAN_JOB:run_job] short retirement nap is over !")
     
     if scanjob_identifier not in SCAN_JOBS:
         logger.warning(f"could not find any existing job with ID {scanjob_identifier}. Skipping request")
@@ -78,7 +78,8 @@ async def run_scan_job(scanjob_identifier: str):
 
     # Ticket abholen, Ergebnis wird direkt in SCAN_JOBS[] geschrieben und gibt true für Erfolg, false für Misserfolg zurück
     SCAN_JOBS[scanjob_identifier].status == STATE.SCAN_REQ_TICKET
-    result = await asyncio.create_task(request_scan_job_ticket(scanjob_identifier))
+#    result = await asyncio.create_task(request_scan_job_ticket(scanjob_identifier))
+    result = await request_scan_job_ticket(scanjob_identifier)
 
     if result:
         logger.info(f" received scan job id #{SCAN_JOBS[scanjob_identifier].job_id} and token {SCAN_JOBS[scanjob_identifier].job_token}")
@@ -89,7 +90,7 @@ async def run_scan_job(scanjob_identifier: str):
 
 
     # Bild abholen, Ergebnis wird direkt in SCAN_JOBS[] geschrieben und gibt true für Erfolg, false für Misserfolg zurück
-    SCAN_JOBS[scanjob_identifier].status == STATE.SCAN_RETRIEVING
+    SCAN_JOBS[scanjob_identifier].status == STATE.SCAN_RETRIEVE_IMG
     result = asyncio.create_task(request_retrieve_image(scanjob_identifier))
 
     if result:
