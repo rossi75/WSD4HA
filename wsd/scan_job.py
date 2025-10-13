@@ -53,7 +53,7 @@ async def run_scan_job(scanjob_identifier: str):
     await asyncio.sleep(2)                   # Zwangspause für um die Notification erst einmal abzuarbeiten und dann hier nen freien Kopf zu haben.
     logger.info(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} [SCAN_JOB:run_job] weiter geht's !")
     
-    if scan_identifier not in SCAN_JOBS:
+    if scanjob_identifier not in SCAN_JOBS:
         logger.warning(f"could not find any existing job with ID {scanjob_identifier}. Skipping request")
         SCAN_JOBS[scanjob_identifier].status = STATE.SCAN_FAILED
         return
