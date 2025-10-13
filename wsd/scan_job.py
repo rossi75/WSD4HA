@@ -9,7 +9,7 @@ from globals import SCANNERS, SCAN_JOBS, STATE, logger
 from config import OFFLINE_TIMEOUT, LOCAL_IP, HTTP_PORT, USER_AGENT, FROM_UUID, DISPLAY, NOTIFY_PORT
 from scanner import Scanner, Scan_Jobs
 from tools import list_scanners, get_local_ip, save_scanned_image
-from templates import TEMPLATE_SOAP_CREATE_SCANJOB
+#from templates import TEMPLATE_SOAP_CREATE_SCANJOB
 #from parse import parse_request_scan_job_ticket
 from send import request_scan_job_ticket, request_retrieve_image
 
