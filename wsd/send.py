@@ -20,7 +20,7 @@ from parse import parse_wsd_packet, parse_probe, parse_transfer_get, parse_subsc
 from pathlib import Path
 #from scanner import Scanner
 from tools import list_scanners, get_local_ip
-from templates import TEMPLATE_SOAP_PROBE, TEMPLATE_SOAP_TRANSFER_GET, TEMPLATE_SUBSCRIBE_SAE, TEMPLATE_SUBSCRIBE_RENEW, TEMPLATE_SOAP_VALIDATE_SCAN_TICKET_DETAIL, TEMPLATE_SOAP_CREATE_SCANJOB, TEMPLATE_RETRIEVE_DOCUMENT
+from templates import TEMPLATE_PROBE, TEMPLATE_TRANSFER_GET, TEMPLATE_SUBSCRIBE_SAE, TEMPLATE_SUBSCRIBE_RENEW, TEMPLATE_VALIDATE_SCAN_TICKET_DETAIL, TEMPLATE_CREATE_SCANJOB, TEMPLATE_RETRIEVE_DOCUMENT
 
 #logging.basicConfig(level=logging.INFO, format='[%(levelname)s] %(message)s')
 #logging.basicConfig(level=logging.{LOG_LEVEL}, format='[%(levelname)s] %(message)s')
