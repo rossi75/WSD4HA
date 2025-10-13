@@ -266,7 +266,8 @@ def parse_subscribe(subscr_uuid, xml_body):
 
 # ---------------- parse Scan available ----------------
 #async def parse_notify_msg(notifier_uuid, xml) -> string:
-async def parse_notify_msg(notifier_uuid, xml):
+#async def parse_notify_msg(notifier_uuid, xml):
+def parse_notify_msg(notifier_uuid, xml):
     """
     Parse ScanAvailableEvent and update scanner state.
 
