@@ -11,7 +11,8 @@ import xml.etree.ElementTree as ET
 import subprocess
 import uuid
 #from globals import SCANNERS, list_scanners, FROM_UUID, USER_AGENT, LOG_LEVEL
-from globals import SCANNERS, FROM_UUID, USER_AGENT, LOG_LEVEL, SCAN_FOLDER
+from globals import SCANNERS, FROM_UUID, USER_AGENT, LOG_LEVEL, SCAN_FOLDER, logger
+#from globals import SCANNERS, SCAN_JOBS, NAMESPACES, STATE, logger
 from tools import list_scanners, check_port, get_local_ip
 
 # ----------------- To Do -----------------
@@ -39,8 +40,8 @@ from tools import list_scanners, check_port, get_local_ip
 #logging.basicConfig(level=logging.INFO, format='[%(levelname)s] %(message)s')
 #logging.basicConfig(level=logging.DEBUG, format='[%(levelname)s] %(message)s')
 #logging.basicConfig(level=logging.LOG_LEVEL, format='[%(levelname)s] %(message)s')
-logging.basicConfig(level=LOG_LEVEL, format='[%(levelname)s] %(message)s')
-logger = logging.getLogger("wsd-addon")
+#logging.basicConfig(level=LOG_LEVEL, format='[%(levelname)s] %(message)s')
+#logger = logging.getLogger("wsd-addon")
 
 logger.info(f" ")
 logger.info(f"***********************************************************")
