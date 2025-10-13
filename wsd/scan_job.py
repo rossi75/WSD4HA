@@ -1,15 +1,17 @@
 import asyncio
 import datetime
-import uuid
-import aiohttp
+#import uuid
+#import aiohttp
 from pathlib import Path
 #from globals import SCANNERS, SCAN_JOBS, STATE, WSD_SCAN_FOLDER, MAX_SEMAPHORE, logger
 #from globals import SCANNERS, SCAN_JOBS, STATE, SCAN_FOLDER, logger, USER_AGENT
 from globals import SCANNERS, SCAN_JOBS, STATE, logger
 #from config import OFFLINE_TIMEOUT, LOCAL_IP, HTTP_PORT, USER_AGENT, FROM_UUID, DISPLAY, NOTIFY_PORT
-from config import LOCAL_IP, FROM_UUID, DISPLAY, NOTIFY_PORT
+#from config import LOCAL_IP, FROM_UUID, DISPLAY, NOTIFY_PORT
+#from config import FROM_UUID, DISPLAY, NOTIFY_PORT
 from scanner import Scanner, Scan_Jobs
-from tools import list_scanners, get_local_ip, save_scanned_image
+#from tools import list_scanners, get_local_ip, save_scanned_image
+from tools import save_scanned_image
 #from templates import TEMPLATE_SOAP_CREATE_SCANJOB
 #from parse import parse_request_scan_job_ticket
 from send import request_scan_job_ticket, request_retrieve_image
