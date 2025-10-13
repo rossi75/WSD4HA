@@ -8,10 +8,10 @@ from pathlib import Path
 from globals import SCANNERS, SCAN_JOBS, STATE, logger
 from config import OFFLINE_TIMEOUT, LOCAL_IP, HTTP_PORT, USER_AGENT, FROM_UUID, DISPLAY, NOTIFY_PORT
 from scanner import Scanner, Scan_Jobs
-from tools import list_scanners, get_local_ip
+from tools import list_scanners, get_local_ip, save_scanned_image
 from templates import TEMPLATE_SOAP_CREATE_SCANJOB
-from parse import parse_request_scan_job_ticket
-from send import request_scan_job_ticket
+#from parse import parse_request_scan_job_ticket
+from send import request_scan_job_ticket, request_retrieve_image
 
 #import logging
 #import os
@@ -47,6 +47,9 @@ from send import request_scan_job_ticket
 async def run_scan_job(scan_identifier: str):
     logger.info(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} [SCAN_JOB:run_job] running scan job {scan_identifier}")
 
+    await asyncio.sleep(2)                   # Zwangspause für um die Notification erst einmal abzuarbeiten und dann hier nen freien Kopf zu haben.
+    logger.info(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} [SCAN_JOB:run_job] weiter geht's !")
+    
     if scan_identifier not in SCAN_JOBS:
         logger.warning(f"could not find any existing job with ID {scan_identifier}. Skipping request")
         SCAN_JOBS[scan_identifier].status = STATE.SCAN_FAILED
@@ -96,7 +99,7 @@ async def run_scan_job(scan_identifier: str):
 
     # Bild auf HDD abspeichern
     SCAN_JOBS[scan_identifier].status == STATE.SCAN_SAVING
-    result=save_scanned_image({SCANNERS[SCAN_JOBS[scan_identifier].scan_from_uuid].friendly_name or SCAN_JOBS[scan_identifier].scan_from_uuid}, result):
+    result = save_scanned_image({SCANNERS[SCAN_JOBS[scan_identifier].scan_from_uuid].friendly_name or SCAN_JOBS[scan_identifier].scan_from_uuid}, result):
 
     if result:
         logger.info(f" saved  image (more detailed later)")
@@ -158,7 +161,7 @@ async def _create_scan_job_ticket(renew_uuid: str):
             SCANNERS[renew_uuid].state = STATE.ERROR
             return None
  
-    parse_subscribe(renew_uuid, body)
+#    parse_subscribe(renew_uuid, body)
 
 
     
