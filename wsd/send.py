@@ -221,6 +221,44 @@ async def send_subscription_renew(renew_uuid: str):
  
     parse_subscribe(renew_uuid, body)
 
+
+
+###################################################################################
+# GetScannerElements[State] before requesting a ticket, do nothing while not in IDLE
+# ---------------------------------------------------------------------------------
+# Parameters:
+# scan_from_uuid = Scanners uuid, but taken from the scan job
+# ---------------------------------------------------------------------------------
+def request_scanner_elements_state(scanjob_identifier: str):
+    logger.info(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} [SEND:gse_state] asking scanner about its state for scan job {scanjob_identifier}")
+
+    if scanjob_identifier not in SCAN_JOBS:
+        logger.warning(f"could not find any existing job with ID {scanjob_identifier}. Skipping state request")
+        SCAN_JOBS[scanjob_identifier].status = STATE.SCAN_FAILED
+        return False
+    else:
+#        if SCAN_JOBS[scanjob_identifier].status == STATE.SCAN_PENDING:
+#            SCAN_JOBS[scanjob_identifier].status == STATE.SCAN_REQ_TICKET
+
+###################################################################################
+# GetScannerElements[DefaultScanTicket]
+# ---------------------------------------------------------------------------------
+# Parameters:
+# scan_from_uuid = Scanners uuid, but taken from the scan job
+# ---------------------------------------------------------------------------------
+def request_scanner_elements_def_ticket(scanjob_identifier: str):
+    logger.info(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} [SEND:gse_state] asking scanner about its default ticket for scan job {scanjob_identifier}")
+
+###################################################################################
+# ValidateScanTicket Detail
+# ---------------------------------------------------------------------------------
+# Parameters:
+# scan_from_uuid = Scanners uuid, but taken from the scan job
+# ---------------------------------------------------------------------------------
+def request_scanner_elements_def_ticket(scanjob_identifier: str):
+    logger.info(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} [SEND:validate_scan_ticket] validatin scan ticket for scan job {scanjob_identifier}")
+
+
 ###################################################################################
 # Create/Request Scan Job Ticket
 # ---------------------------------------------------------------------------------
@@ -303,10 +341,6 @@ async def request_scan_job_ticket(scanjob_identifier: str):
     logger.info(f" Result from parsing: {result}")
 
     return result
-#    if result:
-#        return true
-#    else:
-#        return false
 
 
 
