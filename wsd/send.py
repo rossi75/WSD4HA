@@ -1,12 +1,12 @@
 import asyncio
 import aiohttp
 import datetime
-import logging
+#import logging
 import os
-import re
-import socket
-import subprocess
-import sys
+#import re
+#import socket
+#import subprocess
+#import sys
 import time
 import threading
 import uuid
@@ -15,10 +15,10 @@ import xml.etree.ElementTree as ET
 #from globals import SCANNERS, list_scanners, NAMESPACES, STATE, USER_AGENT, LOG_LEVEL
 from config import OFFLINE_TIMEOUT, LOCAL_IP, HTTP_PORT, FROM_UUID, DISPLAY, NOTIFY_PORT
 #from globals import SCANNERS, NAMESPACES, STATE, USER_AGENT, LOG_LEVEL
-from globals import SCANNERS, NAMESPACES, STATE, USER_AGENT, logger
+from globals import SCANNERS, SCAN_JOBS, NAMESPACES, STATE, USER_AGENT, logger
 from parse import parse_wsd_packet, parse_probe, parse_transfer_get, parse_subscribe, parse_create_scan_job_response, parse_retrieve_image_response
 from pathlib import Path
-from scanner import Scanner
+#from scanner import Scanner
 from tools import list_scanners, get_local_ip
 from templates import TEMPLATE_SOAP_PROBE, TEMPLATE_SOAP_TRANSFER_GET, TEMPLATE_SUBSCRIBE_SAE, TEMPLATE_SUBSCRIBE_RENEW, TEMPLATE_SOAP_VALIDATE_SCAN_TICKET_DETAIL, TEMPLATE_SOAP_CREATE_SCANJOB, TEMPLATE_RETRIEVE_DOCUMENT
 
@@ -331,7 +331,7 @@ async def request_retrieve_image(scanjob_identifier: str):
     msg_id = uuid.uuid4()
     url = SCAN_JOBS[scanjob_identifier].xaddr  # z.B. http://192.168.0.3:8018/wsd
 
-    xml = TEMPLATE_SOAP_CREATE_SCANJOB.format(
+    xml = TEMPLATE_RETRIEVE_DOCUMENT.format(
         xaddr = url,
         msg_id = msg_id,
         from_uuid = FROM_UUID,
