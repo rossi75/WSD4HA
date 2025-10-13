@@ -100,7 +100,7 @@ async def run_scan_job(scanjob_identifier: str):
 
     # Bild auf HDD abspeichern
     SCAN_JOBS[scanjob_identifier].status == STATE.SCAN_SAVING
-    result = save_scanned_image({SCANNERS[SCAN_JOBS[scanjob_identifier].scan_from_uuid].friendly_name or SCAN_JOBS[scanjob_identifier].scan_from_uuid}, result):
+    result = save_scanned_image({SCANNERS[SCAN_JOBS[scanjob_identifier].scan_from_uuid].friendly_name or SCAN_JOBS[scanjob_identifier].scan_from_uuid}, result)
 
     if result:
         logger.info(f" saved  image (more detailed later)")
