@@ -4,13 +4,14 @@ import socket
 import sys
 from config import OFFLINE_TIMEOUT
 from datetime import timedelta
-from globals import SCANNERS, NAMESPACES, STATE, LOG_LEVEL
+#from globals import SCANNERS, NAMESPACES, STATE, LOG_LEVEL
+from globals import SCANNERS, NAMESPACES, STATE, LOG_LEVEL, logger
 from tools import list_scanners, marry_endpoints
 
 #logging.basicConfig(level=logging.INFO, format='[%(levelname)s] %(message)s')
 #logging.basicConfig(level=logging.LOG_LEVEL, format='[%(levelname)s] %(message)s')
-logging.basicConfig(level=LOG_LEVEL, format='[%(levelname)s] %(message)s')
-logger = logging.getLogger("wsd-addon")
+#logging.basicConfig(level=LOG_LEVEL, format='[%(levelname)s] %(message)s')
+#logger = logging.getLogger("wsd-addon")
 
 # ---------------- Scanner-Datenstruktur ----------------
 class Scanner:
