@@ -118,35 +118,6 @@ except ValueError:
     logger.debug(f"Reset to fallback value (should never reach this point)")
 logger.info(f"max scanned files to show: {MAX_FILES}")
 
-# ---------------- lokale IP abfragen ----------------
-def _get_local_ip():
-    try:
-        # UDP-Socket zu einer externen Adresse öffnen (wird nicht gesendet)
-        s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-        s.connect(("8.8.8.8", 80))  # Google DNS, nur für Routing
-        ip = s.getsockname()[0]
-        s.close()
-        return ip
-    except Exception:
-        logger.warning(f"[CONFIG] Could not obtain Host IP: {e}")
-        return "undefined"
-
-LOCAL_IP = get_local_ip()
-
-# ---------------- Portprüfung ----------------
-def _check_port(port):
-    with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
-        try:
-            s.bind(('', port))
-            return True
-        except OSError:
-            return False
-
-if not check_port(HTTP_PORT):
-    logger.error(f"[CONFIG] Port {HTTP_PORT} is already in use!")
-    sys.exit(1)
-else:
-    logger.info(f"Statusserver reachable at {LOCAL_IP}:{HTTP_PORT}")
 
 #
 #
