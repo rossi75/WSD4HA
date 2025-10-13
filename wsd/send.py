@@ -228,7 +228,7 @@ async def send_subscription_renew(renew_uuid: str):
 # job_id = scan job identifier
 # ---------------------------------------------------------------------------------
 async def request_scan_job_ticket(scanjob_identifier: str):
-    logger.info(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} [SEND:sj_ticket] creating/requesting ticket for scan job {scanjob_identifier}")
+    logger.info(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} [SEND:sj_ticket] creating/requesting Ticket ID and Token for scan job {scanjob_identifier}")
 
     if scanjob_identifier not in SCAN_JOBS:
         logger.warning(f"could not find any existing job with ID {scanjob_identifier}. Skipping request")
@@ -297,7 +297,8 @@ async def request_scan_job_ticket(scanjob_identifier: str):
     logger.info(f"   --->  Answer XML:\n{body}")
     
 #    result = asyncio.create_task(parse_request_scan_job_ticket(scanjob_identifier, body))
-    result = parse_request_scan_job_ticket(scanjob_identifier, body)
+#    result = parse_request_scan_job_ticket(scanjob_identifier, body)
+    result = parse_create_scan_job(scanjob_identifier, body)
 
     logger.info(f" Result from parsing: {result}")
 
