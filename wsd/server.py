@@ -172,7 +172,8 @@ async def notify_handler(request):
     try:
         root = ET.fromstring(xml_payload)
 #        task_fill = asyncio.create_task(parse_notify_msg(scanner_uuid, xml_payload))      # hier wird dann der Abholauftrag an sich gefüllt
-        scanjob_identifier = asyncio.create_task(parse_notify_msg(scanner_uuid, xml_payload))      # hier wird dann der Abholauftrag an sich erzeugt
+#        scanjob_identifier = asyncio.create_task(parse_notify_msg(scanner_uuid, xml_payload))      # hier wird dann der Abholauftrag an sich erzeugt
+        scanjob_identifier = parse_notify_msg(scanner_uuid, xml_payload)      # hier werden die Metadaten zum Abholauftrag zusammengetragen
     except Exception as e:
         logger.warning(f"[SERVER:notify_handler] invalid xml: {e}")
         return web.Response(status=400, text="bad xml")
