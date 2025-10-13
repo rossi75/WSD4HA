@@ -10,6 +10,10 @@
 - implement GetScannerElements[ScannerConfiguration]
 - write bin to harddisk
 - merge globals.py + config.py to globalconfig.py
+- webinterface improvements:
+ - left column for tree with config/scanners/jobs/scans
+  - display several details only in debug mode
+- make manual configuration functional
 - ...
 
 
