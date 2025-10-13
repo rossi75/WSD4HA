@@ -16,7 +16,7 @@ import xml.etree.ElementTree as ET
 from config import OFFLINE_TIMEOUT, LOCAL_IP, HTTP_PORT, FROM_UUID, DISPLAY, NOTIFY_PORT
 #from globals import SCANNERS, NAMESPACES, STATE, USER_AGENT, LOG_LEVEL
 from globals import SCANNERS, SCAN_JOBS, NAMESPACES, STATE, USER_AGENT, logger
-from parse import parse_wsd_packet, parse_probe, parse_transfer_get, parse_subscribe, parse_create_scan_job_response, parse_retrieve_image_response
+from parse import parse_wsd_packet, parse_probe, parse_transfer_get, parse_subscribe, parse_create_scan_job, parse_retrieve_image
 from pathlib import Path
 #from scanner import Scanner
 from tools import list_scanners, get_local_ip
@@ -294,9 +294,10 @@ async def request_scan_job_ticket(scanjob_identifier: str):
             return false
 
     logger.info(f"trying to parse the ticket answer")
-    logger.info(f"   --->  Answer XML:\n{xml}")
+    logger.info(f"   --->  Answer XML:\n{body}")
     
-    result = asyncio.create_task(parse_request_scan_job_ticket(scanjob_identifier, body))
+#    result = asyncio.create_task(parse_request_scan_job_ticket(scanjob_identifier, body))
+    result = parse_request_scan_job_ticket(scanjob_identifier, body)
 
     logger.info(f" Result from parsing: {result}")
 
