@@ -29,10 +29,11 @@ import logging
 import re
 import socket
 import xml.etree.ElementTree as ET
-from globals import SCANNERS, LOG_LEVEL, NAMESPACES
+#from globals import SCANNERS, LOG_LEVEL, NAMESPACES
+from globals import SCANNERS, NAMESPACES, logger
 
-logging.basicConfig(level=LOG_LEVEL, format='[%(levelname)s] %(message)s')
-logger = logging.getLogger("wsd-addon")
+#logging.basicConfig(level=LOG_LEVEL, format='[%(levelname)s] %(message)s')
+#logger = logging.getLogger("wsd-addon")
 
 
 
