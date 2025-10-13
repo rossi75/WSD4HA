@@ -1,11 +1,12 @@
 import datetime
-import logging
-import socket
-import sys
+#import logging
+#import socket
+#import sys
 from config import OFFLINE_TIMEOUT
 from datetime import timedelta
 #from globals import SCANNERS, NAMESPACES, STATE, LOG_LEVEL
-from globals import SCANNERS, NAMESPACES, STATE, LOG_LEVEL, logger
+#from globals import SCANNERS, NAMESPACES, STATE, LOG_LEVEL, logger
+from globals import SCANNERS, NAMESPACES, STATE, logger
 from tools import list_scanners, marry_endpoints
 
 #logging.basicConfig(level=logging.INFO, format='[%(levelname)s] %(message)s')
