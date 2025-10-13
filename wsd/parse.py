@@ -331,8 +331,9 @@ def parse_notify_msg(notifier_uuid, xml):
     return scanjob_identifier
 
 
-# ---------------- parse Scan available ----------------
-async def parse_create_scan_job_response(scan_identifier, xml: str) -> bool:
+# ---------------- parse create Scan Job Response ----------------
+#async def parse_create_scan_job_response(scan_identifier, xml: str) -> bool:
+def parse_create_scan_job_response(scan_identifier, xml: str):
     """Parst die Antwort vom Scanner und speichert Werte in SCAN_JOBS."""
     logger.info(f"[PARSE:sj_ticket] parsing ticket request for {SCAN_JOBS[scan_identifier]} from {SCANNERS[SCAN_JOBS[scan_identifier].notifier_uuid].friendly_name or notifier_uuid} @ {SCANNERS[notifier_uuid].ip}")
     logger.info(f"   XML:\n{xml}")
@@ -341,7 +342,7 @@ async def parse_create_scan_job_response(scan_identifier, xml: str) -> bool:
         root = ET.fromstring(xml)
     except ET.ParseError as e:
         logger.error(f"[PARSE:sj_ticket] failed to parse CreateScanJobResponse: {e}")
-        scan_job.state = STATE.SCAN_FAIL
+        SCAN_JOBS[scan_identifier].status = STATE.SCAN_FAIL
         return False
 
 #        job_id = root.findtext(".//wscn:JobId", NAMESPACES)
@@ -352,7 +353,9 @@ async def parse_create_scan_job_response(scan_identifier, xml: str) -> bool:
         job_id = job_id_elem.text.strip()
         SCAN_JOBS[scan_identifier].job_id = job_id
     else:
-        return false
+        logger.warning(f" cannot extract JobId from Response")
+        SCAN_JOBS[scan_identifier].status = STATE.SCAN_FAIL
+        return False
 
 #        job_token = root.findtext(".//wscn:JobToken", namespaces=ns)
     # JobToken
@@ -362,7 +365,9 @@ async def parse_create_scan_job_response(scan_identifier, xml: str) -> bool:
         job_token = job_token_elem.text.strip()
         SCAN_JOBS[scan_identifier].job_token = job_token
     else:
-        return false
+        logger.warning(f" cannot extract JobToken from Response")
+        SCAN_JOBS[scan_identifier].status = STATE.SCAN_FAIL
+        return False
 
 #        job_token = root.findtext(".//wscn:JobToken", namespaces=ns)
     # FileFormat
@@ -372,7 +377,9 @@ async def parse_create_scan_job_response(scan_identifier, xml: str) -> bool:
         format = format_elem.text.strip()
         SCANNERS[{SCAN_JOBS[scan_identifier].notifier_uuid}].DocPar_FileFormat = format
     else:
-        return false
+        logger.warning(f" cannot extract Format from Response")
+        SCAN_JOBS[scan_identifier].status = STATE.SCAN_FAIL
+        return False
         
 #        pixels_per_line = root.findtext(".//wscn:PixelsPerLine", namespaces=ns)
 #        num_lines = root.findtext(".//wscn:NumberOfLines", namespaces=ns)
@@ -382,7 +389,10 @@ async def parse_create_scan_job_response(scan_identifier, xml: str) -> bool:
  #       scan_job.pixels_per_line = int(pixels_per_line or 0)
  #       scan_job.number_of_lines = int(num_lines or 0)
 
-    logger.info(f" received JobId={job_id} and JobToken={job_token} with format {format}")
+    logger.info(f"   --->    JobId: {SCAN_JOBS[scan_identifier].job_id}")
+    logger.info(f"   ---> JobToken: {SCAN_JOBS[scan_identifier].job_token}")
+    logger.info(f"   --->   Format: {SCANNERS[{SCAN_JOBS[scan_identifier].notifier_uuid}].DocPar_FileFormat}")
+
     return True
 
 
