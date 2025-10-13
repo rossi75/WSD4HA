@@ -151,6 +151,36 @@ TEMPLATE_SUBSCRIBE_RENEW = """<?xml version="1.0" encoding="utf-8"?>
 
 
 ################################################################################
+# TEMPLATE_GET_SCANNER_ELEMENTS_DEFAULT_TICKET
+# ---------------------------------------------------------------------------------
+# xaddr = destination adress
+# msg_id = random message ID
+# from_uuid = sender UUID
+# ---------------------------------------------------------------------------------
+TEMPLATE_GET_SCANNER_ELEMENTS_DEFAULT_TICKET = """<?xml version="1.0" encoding="utf-8"?>
+<soap:Envelope
+    xmlns:soap="http://www.w3.org/2003/05/soap-envelope"
+    xmlns:wsa="http://schemas.xmlsoap.org/ws/2004/08/addressing"
+    xmlns:sca="http://schemas.microsoft.com/windows/2006/08/wdp/scan">
+    <soap:Header>
+        <wsa:To>{xaddr}</wsa:To>
+        <wsa:Action>http://schemas.microsoft.com/windows/2006/08/wdp/scan/GetScannerElements</wsa:Action>
+        <wsa:MessageID>urn:uuid:{msg_id}</wsa:MessageID>
+        <wsa:From>
+            <wsa:Address>urn:uuid:{from_uuid}</wsa:Address>
+            </wsa:From>
+        </soap:Header>
+    <soap:Body>
+        <sca:GetScannerElementsRequest>
+            <sca:RequestedElements>
+                <sca:Name>sca:DefaultScanTicket</sca:Name>
+                </sca:RequestedElements>
+            </sca:GetScannerElementsRequest>
+        </soap:Body>
+    </soap:Envelope>
+"""
+
+################################################################################
 # TEMPLATE_SOAP_VALIDATE_SCAN_TICKET
 # ---------------------------------------------------------------------------------
 # xaddr = destination adress
@@ -175,7 +205,6 @@ TEMPLATE_VALIDATE_SCAN_TICKET_DETAIL = """<?xml version="1.0" encoding="utf-8"?>
  xmlns:soap="http://www.w3.org/2003/05/soap-envelope"
  xmlns:wsa="http://schemas.xmlsoap.org/ws/2004/08/addressing"
  xmlns:sca="http://schemas.microsoft.com/windows/2006/08/wdp/scan">
-
   <soap:Header>
     <wsa:To>{to_addr}</wsa:To>
     <wsa:Action>http://schemas.microsoft.com/windows/2006/08/wdp/scan/ValidateScanTicket</wsa:Action>
