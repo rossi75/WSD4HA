@@ -20,7 +20,7 @@ from pathlib import Path
 from scanner import Scanner
 from tools import list_scanners, get_local_ip
 from templates import TEMPLATE_SOAP_PROBE, TEMPLATE_SOAP_TRANSFER_GET, TEMPLATE_SUBSCRIBE_SAE, TEMPLATE_SUBSCRIBE_RENEW
-
+parse_create_scan_job_response
 #logging.basicConfig(level=logging.INFO, format='[%(levelname)s] %(message)s')
 #logging.basicConfig(level=logging.{LOG_LEVEL}, format='[%(levelname)s] %(message)s')
 logging.basicConfig(level=LOG_LEVEL, format='[%(levelname)s] %(message)s')
@@ -286,16 +286,22 @@ async def request_scan_job_ticket(job_id: str):
                 else:
                     SCAN_JOBS[job_id].state = STATE.SCAN_FAILED
                     logger.error(f"[SCAN_JOB:ticket] Request for ticket failed with Statuscode {resp.status}")
-                    return
+                    return false
         except Exception as e:
             logger.error(f"[SCAN_JOB:ticket] anything went wrong with {SCAN_JOBS[job_id]}: {e}")
             SCAN_JOBS[job_id].state = STATE.SCAN_FAILED
-            return
+            return false
 
     logger.info(f"trying to parse the ticket answer")
     logger.info(f"   --->  Answer XML:\n{xml}")
     
-    asyncio.create_task(parse_request_scan_job_ticket(job_id, body))
+    result = asyncio.create_task(parse_request_scan_job_ticket(job_id, body))
+
+    if result:
+        return true
+    else:
+        return false
+
 
 
 
