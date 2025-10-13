@@ -12,12 +12,12 @@ import threading
 import uuid
 import xml.etree.ElementTree as ET
 from datetime import timedelta
-from config import OFFLINE_TIMEOUT, LOCAL_IP, HTTP_PORT, FROM_UUID
+#from config import OFFLINE_TIMEOUT, LOCAL_IP, HTTP_PORT, FROM_UUID
 #from globals import SCANNERS, SCAN_JOBS, NAMESPACES, STATE, LOG_LEVEL
 from globals import SCANNERS, SCAN_JOBS, NAMESPACES, STATE, logger
-from pathlib import Path
+#from pathlib import Path
 from scanner import Scanner, Scan_Jobs
-from templates import TEMPLATE_SOAP_PROBE, TEMPLATE_SOAP_TRANSFER_GET
+#from templates import TEMPLATE_SOAP_PROBE, TEMPLATE_SOAP_TRANSFER_GET
 from tools import list_scanners, pick_best_xaddr, calc_w3c_duration
 #from scan_job import request_scan_job_ticket
 
