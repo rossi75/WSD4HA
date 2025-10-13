@@ -264,38 +264,6 @@ def parse_subscribe(subscr_uuid, xml_body):
             logger.error(f"finished function [PARSE:subscribe] with state {SCANNERS[subscr_uuid].state}, but don't know what to do with it (should never reach this point !)")
             SCANNERS[subscr_uuid].state = STATE.ERROR
 
-# ---------------- parse w3c timer ----------------
-# parse_w3c_duration("PT1H")   # -> 3600
-def _parse_w3c_duration(duration: str) -> int:
-    """
-    Wandelt W3C/ISO8601 Duration (z.B. 'PT1H30M') in Sekunden um.
-    Unterstützt Tage, Stunden, Minuten, Sekunden.
-    """
-    
-    logger.debug(f"[PARSE:w3c_dur]   ---> duration: {duration}")
-    
-    pattern = (
-        r'P'                                  # Beginn 'P'
-        r'(?:(?P<days>\d+)D)?'                # Tage
-        r'(?:T'                               # Beginn Zeitabschnitt
-        r'(?:(?P<hours>\d+)H)?'
-        r'(?:(?P<minutes>\d+)M)?'
-        r'(?:(?P<seconds>\d+)S)?'
-        r')?'
-    )
-    
-    m = re.match(pattern, duration)
-    if not m:
-        return 0
-    d = m.groupdict(default='0')
-    
-    seconds = int(d['days']) * 86400 + int(d['hours']) * 3600 + int(d['minutes']) * 60 + int(d['seconds'])
-    
-    logger.debug(f"[PARSE:w3c_dur]   ---> d: {d}")
-    logger.debug(f"[PARSE:w3c_dur]   ---> seconds: {seconds}")
-
-    return seconds
-
 # ---------------- parse Scan available ----------------
 async def parse_notify_msg(notifier_uuid, xml) -> string:
     """
