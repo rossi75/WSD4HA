@@ -76,6 +76,10 @@ logger.info(f"NOTIFY-Port for Scan Events: {NOTIFY_PORT}")
 # ---------------- User-Agent ----------------
 logger.info(f"User-Agent: {USER_AGENT}")
 
+# ---------------- Local IP ----------------
+LOCAL_IP = get_local_ip()
+logger.info(f"Local IP: {LOCAL_IP}")
+
 # ---------------- UUID ----------------
 FROM_UUID = f"{uuid.uuid4()}"
 #logger.info("[GLOBAL:uuid] set FROM_UUID: {FROM_UUID}")
