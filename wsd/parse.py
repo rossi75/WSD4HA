@@ -145,12 +145,12 @@ def parse_transfer_get(xml_body, tf_g_uuid):
     # Model
     md_elem = root.find(".//wsdp:ModelName", NAMESPACES)
     if md_elem is not None:
-        SCANNERS[tf_g_uuid].serial_number = md_elem.text.strip()
+        SCANNERS[tf_g_uuid].model = md_elem.text.strip()
 
     # SerialNumber
     sn_elem = root.find(".//wsdp:SerialNumber", NAMESPACES)
     if sn_elem is not None:
-        SCANNERS[tf_g_uuid].serial_number = sn_elem.text.strip()
+        SCANNERS[tf_g_uuid].serial = sn_elem.text.strip()
 
     # Firmware
     fw_elem = root.find(".//wsdp:FirmwareVersion", NAMESPACES)
@@ -171,7 +171,7 @@ def parse_transfer_get(xml_body, tf_g_uuid):
             logger.info(f"  ADDR: {SCANNERS[tf_g_uuid].xaddr}")
 
     logger.info(f"   ---> FN: {SCANNERS[tf_g_uuid].friendly_name}")
-    logger.info(f"   ---> SN: {SCANNERS[tf_g_uuid].serial_number}")
+    logger.info(f"   ---> SN: {SCANNERS[tf_g_uuid].serial}")
     logger.info(f"   ---> FW: {SCANNERS[tf_g_uuid].firmware}")
     logger.info(f"   ---> MF: {SCANNERS[tf_g_uuid].manufacturer}")
     logger.info(f"   ---> MD: {SCANNERS[tf_g_uuid].model}")
