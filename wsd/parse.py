@@ -342,7 +342,7 @@ def parse_get_scanner_elements_state(scanjob_identifier, xml):
     if state_elem is not None and state_elem.text:
         state = state_elem.text.strip().lower
         logger.info(f" state: {state}")
-        if state != "idle"
+        if state != "idle":
             SCAN_JOBS[scanjob_identifier].status = STATE.SCAN_FAIL
             return False
 
