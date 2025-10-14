@@ -34,6 +34,7 @@ async def send_probe(probe_uuid: str):
     async with aiohttp.ClientSession() as session:
         try:
             async with session.post(url, data=xml, headers=headers, timeout=5) as resp:
+                logger.debug(f"   ---> statuscode from response: {resp.status}")
                 if resp.status == 200:
                     body = await resp.text()
                 else:
@@ -77,6 +78,7 @@ async def send_transfer_get(tf_g_uuid: str):
     async with aiohttp.ClientSession() as session:
         try:
             async with session.post(url, data=xml, headers=headers, timeout=5) as resp:
+                logger.debug(f"   ---> statuscode from response: {resp.status}")
                 if resp.status == 200:
                     body = await resp.text()
                 else:
@@ -142,6 +144,7 @@ async def send_subscription_ScanAvailableEvent(sae_uuid: str):
     async with aiohttp.ClientSession() as session:
         try:
             async with session.post(url, data=xml, headers=headers, timeout=5) as resp:
+                logger.debug(f"   ---> statuscode from response: {resp.status}")
                 if resp.status == 200:
                     body = await resp.text()
                 else:
@@ -197,6 +200,7 @@ async def send_subscription_renew(renew_uuid: str):
     async with aiohttp.ClientSession() as session:
         try:
             async with session.post(url, data=xml, headers=headers, timeout=5) as resp:
+                logger.debug(f"   ---> statuscode from response: {resp.status}")
                 if resp.status == 200:
                     body = await resp.text()
                 else:
@@ -252,6 +256,7 @@ async def request_scanner_elements_state(scanjob_identifier: str):
     async with aiohttp.ClientSession() as session:
         try:
             async with session.post(url, data=xml, headers=headers, timeout=5) as resp:
+                logger.debug(f"   ---> statuscode from response: {resp.status}")
                 if resp.status == 200:
                     body = await resp.text()
                 else:
@@ -314,6 +319,7 @@ async def request_scanner_elements_configuration(scanjob_identifier: str):
     async with aiohttp.ClientSession() as session:
         try:
             async with session.post(url, data=xml, headers=headers, timeout=5) as resp:
+                logger.debug(f"   ---> statuscode from response: {resp.status}")
                 if resp.status == 200:
                     body = await resp.text()
                 else:
@@ -375,6 +381,7 @@ async def request_scanner_elements_def_ticket(scanjob_identifier: str):
     async with aiohttp.ClientSession() as session:
         try:
             async with session.post(url, data=xml, headers=headers, timeout=5) as resp:
+                logger.debug(f"   ---> statuscode from response: {resp.status}")
                 if resp.status == 200:
                     body = await resp.text()
                 else:
@@ -477,6 +484,7 @@ async def request_scan_job_ticket(scanjob_identifier: str):
     async with aiohttp.ClientSession() as session:
         try:
             async with session.post(url, data=xml, headers=headers, timeout=5) as resp:
+                logger.debug(f"   ---> statuscode from response: {resp.status}")
                 if resp.status == 200:
                     body = await resp.text()
                 else:
@@ -545,6 +553,7 @@ async def request_retrieve_image(scanjob_identifier: str):
     async with aiohttp.ClientSession() as session:
         try:
             async with session.post(url, data=xml, headers=headers, timeout=5) as resp:
+                logger.debug(f"   ---> statuscode from response: {resp.status}")
                 if resp.status == 200:
                 #    body = await resp.text()
                     body = await resp.read()
