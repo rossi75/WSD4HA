@@ -333,14 +333,14 @@ def parse_get_scanner_elements_state(scanjob_identifier, xml):
     if data_valid_elem is not None:
 #        data_valid = data_valid_elem.text.strip().lower()
         data_valid = data_valid_elem.attrib.get("Valid", "").strip().lower()
-        logger.info(f" data_valid: {data_valid}")
+        logger.debug(f" data_valid: {data_valid}")
         if data_valid != "true":
             SCAN_JOBS[scanjob_identifier].status = STATE.SCAN_FAILED
             return False
     
     state_elem = root.find(".//wscn:ScannerState", NAMESPACES)
     if state_elem is not None and state_elem.text:
-        state = state_elem.text.strip().lower
+        state = state_elem.text.strip().lower()
         logger.info(f" state: {state}")
         if state != "idle":
             SCAN_JOBS[scanjob_identifier].status = STATE.SCAN_FAILED
