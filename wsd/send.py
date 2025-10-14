@@ -13,11 +13,6 @@ from pathlib import Path
 from tools import list_scanners, get_local_ip
 from templates import TEMPLATE_PROBE, TEMPLATE_TRANSFER_GET, TEMPLATE_SUBSCRIBE_SAE, TEMPLATE_SUBSCRIBE_RENEW, TEMPLATE_GET_SCANNER_ELEMENTS_DEFAULT_TICKET, TEMPLATE_VALIDATE_SCAN_TICKET_DETAIL, TEMPLATE_CREATE_SCANJOB, TEMPLATE_RETRIEVE_DOCUMENT
 
-#logging.basicConfig(level=logging.INFO, format='[%(levelname)s] %(message)s')
-#logging.basicConfig(level=logging.{LOG_LEVEL}, format='[%(levelname)s] %(message)s')
-#logging.basicConfig(level=LOG_LEVEL, format='[%(levelname)s] %(message)s')
-#logger = logging.getLogger("wsd-addon")
-
 # ---------------- Send Scanner Probe ----------------
 async def send_probe(probe_uuid: str):
     logger.info(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} [SEND:send_probe] sending probe for {SCANNERS[probe_uuid].friendly_name} @ {SCANNERS[probe_uuid].ip}")
@@ -213,7 +208,6 @@ async def send_subscription_renew(renew_uuid: str):
     parse_subscribe(renew_uuid, body)
 
 
-
 ###################################################################################
 # GetScannerElements[State] before requesting a ticket, do nothing while not in IDLE
 # ---------------------------------------------------------------------------------
@@ -284,7 +278,7 @@ async def request_scanner_elements_def_ticket(scanjob_identifier: str):
             return false
 
     logger.info(f"trying to parse the default ticket answer")
-    logger.info(f"   --->  Answer XML:\n{body}")
+    logger.debug(f"   --->  Answer XML:\n{body}")
     
     result = parse_get_scanner_elements_default_ticket(scanjob_identifier, body)
 
