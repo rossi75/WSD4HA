@@ -38,6 +38,7 @@ async def send_probe(probe_uuid: str):
                     body = await resp.text()
                 else:
                     logger.error(f"Probe failed with status {resp.status}")
+                    logger.error(f"   --->  Answer XML:\n{body}")
                     SCANNERS[uuid].state = STATE.ABSENT
         except Exception as e:
             logger.error(f"   ---> Probe failed at {url}: {e}")
@@ -81,6 +82,7 @@ async def send_transfer_get(tf_g_uuid: str):
                 else:
                     SCANNERS[tf_g_uuid].state = STATE.ERROR
                     logger.error(f"[WSD:transfer_get] TransferGet failed with Statuscode {resp.status}")
+                    logger.error(f"   --->  Answer XML:\n{body}")
                     return None
         except Exception as e:
             logger.error(f"[WSD:transfer_get] failed for {SCANNERS[tf_g_uuid].uuid}: {e}")
@@ -145,6 +147,7 @@ async def send_subscription_ScanAvailableEvent(sae_uuid: str):
                 else:
                     SCANNERS[sae_uuid].state = STATE.ERROR
                     logger.error(f"[SEND:sae] Subscribe to ScanAvailableEvents failed with Statuscode {resp.status}")
+                    logger.error(f"   --->  Answer XML:\n{body}")
                     return None
         except Exception as e:
             logger.error(f"[SEND:sae] failed for {SCANNERS[tf_g_uuid].uuid}: {e}")
@@ -199,6 +202,7 @@ async def send_subscription_renew(renew_uuid: str):
                 else:
                     SCANNERS[renew_uuid].state = STATE.ERROR
                     logger.error(f"[SEND:rnw] Renew to ScanAvailableEvents failed with Statuscode {resp.status}")
+                    logger.error(f"   --->  Answer XML:\n{body}")
                     return None
         except Exception as e:
             logger.error(f"[SEND:rnw] failed for {SCANNERS[renew_uuid].uuid}: {e}")
@@ -221,9 +225,9 @@ async def request_scanner_elements_state(scanjob_identifier: str):
         logger.warning(f"could not find any existing job with ID {scanjob_identifier}. Skipping state request")
         SCAN_JOBS[scanjob_identifier].status = STATE.SCAN_FAILED
         return False
-    else:
+#    else:
 #        SCAN_JOBS[scanjob_identifier].status == STATE.REQ_SCAN_STATE
-        return True
+#        return True
 
     # tbd
     body = ""
@@ -253,6 +257,7 @@ async def request_scanner_elements_state(scanjob_identifier: str):
                 else:
                     SCAN_JOBS[scanjob_identifier].state = STATE.SCAN_FAILED
                     logger.error(f"[SEND:def_ticket] Request for scanners state failed with Statuscode {resp.status}")
+                    logger.error(f"   --->  Answer XML:\n{body}")
                     return False
         except Exception as e:
             logger.error(f"[SEND:def_ticket] anything went wrong with scanners state for scan job {SCAN_JOBS[scanjob_identifier]}:\n{e}")
@@ -276,7 +281,7 @@ async def request_scanner_elements_state(scanjob_identifier: str):
 # scan_from_uuid = Scanners uuid, but taken from the scan job
 # ---------------------------------------------------------------------------------
 async def request_scanner_elements_configuration(scanjob_identifier: str):
-    logger.info(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} [SEND:gse_scan_config] asking scanner about its configuration (explicit for maxWidth and maxHeight) {scanjob_identifier}")
+    logger.info(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} [SEND:gse_config] asking scanner about its configuration (explicit for maxWidth and maxHeight) {scanjob_identifier}")
 
     if scanjob_identifier not in SCAN_JOBS:
         logger.warning(f"could not find any existing job with ID {scanjob_identifier}. Skipping configuration request")
@@ -304,7 +309,7 @@ async def request_scanner_elements_configuration(scanjob_identifier: str):
     logger.debug(f"   --->        FROM: {FROM_UUID}")
     logger.debug(f"   --->      MSG_ID: {msg_id}")
     logger.debug(f"   --->         URL: {url}")
-    logger.debug(f"   ---> Request XML:\n{xml}")
+    logger.info(f"   ---> Request XML:\n{xml}")
 
     async with aiohttp.ClientSession() as session:
         try:
@@ -314,6 +319,7 @@ async def request_scanner_elements_configuration(scanjob_identifier: str):
                 else:
                     SCAN_JOBS[scanjob_identifier].state = STATE.SCAN_FAILED
                     logger.error(f"[SEND:scan_config] Request for scanners configuration failed with Statuscode {resp.status}")
+                    logger.error(f"   --->  Answer XML:\n{body}")
                     return False
         except Exception as e:
             logger.error(f"[SEND:scan_config] anything went wrong with scanners configuration for scan job {SCAN_JOBS[scanjob_identifier]}:\n{e}")
@@ -321,7 +327,6 @@ async def request_scanner_elements_configuration(scanjob_identifier: str):
             return False
 
     logger.info(f"trying to parse the scanners configuration")
-    logger.debug(f"   --->  Answer XML:\n{body}")
     
     result = parse_get_scanner_elements_configuration(scanjob_identifier, body)
 
@@ -375,6 +380,7 @@ async def request_scanner_elements_def_ticket(scanjob_identifier: str):
                 else:
                     SCAN_JOBS[scanjob_identifier].state = STATE.SCAN_FAILED
                     logger.error(f"[SEND:def_ticket] Request for default ticket failed with Statuscode {resp.status}")
+                    logger.error(f"   --->  Answer XML:\n{body}")
                     return False
         except Exception as e:
             logger.error(f"[SEND:def_ticket] anything went wrong with Scan Job {SCAN_JOBS[scanjob_identifier]}:\n{e}")
@@ -476,6 +482,7 @@ async def request_scan_job_ticket(scanjob_identifier: str):
                 else:
                     SCAN_JOBS[scanjob_identifier].state = STATE.SCAN_FAILED
                     logger.error(f"[SCAN_JOB:ticket] Request for ticket failed with Statuscode {resp.status}")
+                    logger.error(f"   --->  Answer XML:\n{body}")
                     return False
         except Exception as e:
             logger.error(f"[SCAN_JOB:ticket] anything went wrong with {SCAN_JOBS[scanjob_identifier]}: {e}")
