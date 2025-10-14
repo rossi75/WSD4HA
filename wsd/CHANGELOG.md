@@ -2,19 +2,22 @@
 
 ### todo
 - make manual configuration functional
+- implement GetScannerElements[State] before requesting a ticket, do nothing while not in IDLE
 - implement detailled variant of ValdiateScanTicket
 - implement simple variant of ValdiateScanTicket
 - decide automatically between simple and detailled variant of ValdiateScanTicket
-- implement GetScannerElements[State] before requesting a ticket, do nothing while not in IDLE
 - implement GetScannerElements[ScannerDescription]
-- implement GetScannerElements[DefaultScanTicket]
 - implement GetScannerElements[ScannerConfiguration]
 - write bin to harddisk
 - merge globals.py + config.py to globalconfig.py
 - webinterface improvements:
-  - left column for tree with config/scanners/jobs/scans
+  - left column for tree with config_output/scanners/jobs/scans
   - display several details only in debug mode
+  - download files
 - ...
+
+## 0.63 - 2025-10-14
+- implement GetScannerElements[DefaultScanTicket]
 
 ## 0.61 - 2025-10-12
 - filled scan_job.py with live
