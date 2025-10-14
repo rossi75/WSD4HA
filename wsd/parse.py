@@ -266,8 +266,6 @@ def parse_subscribe(subscr_uuid, xml_body):
 
 
 # ---------------- parse Scan available ----------------
-#async def parse_notify_msg(notifier_uuid, xml) -> string:
-#async def parse_notify_msg(notifier_uuid, xml):
 def parse_notify_msg(notifier_uuid, xml):
     """
     Parse ScanAvailableEvent and update scanner state.
@@ -335,8 +333,7 @@ def parse_notify_msg(notifier_uuid, xml):
 # ---------------- Default Ticket Parser ----------------
 def parse_get_scanner_elements_default_ticket(scanjob_identifier, xml):
     logger.info(f"[PARSE:def_ticket] parsing default Ticket for {SCANNERS[SCAN_JOBS[scanjob_identifier].scan_from_uuid].friendly_name or SCAN_JOBS[scanjob_identifier].scan_from_uuid} @ {SCANNERS[SCAN_JOBS[scanjob_identifier].scan_from_uuid].ip}")
-    #{SCANNERS[scanner_uuid].friedly_name or scanner_uuid} @ {SCANNERS[notifier_uuid].ip}")
-    logger.debug(f"   XML:\n{xml}")
+    logger.info(f"   XML:\n{xml}")
 
     try:
         root = ET.fromstring(xml)
