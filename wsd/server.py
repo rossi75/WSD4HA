@@ -171,14 +171,11 @@ async def notify_handler(request):
     scanjob_identifier = None
     try:
         root = ET.fromstring(xml_payload)
-#        task_fill = asyncio.create_task(parse_notify_msg(scanner_uuid, xml_payload))      # hier wird dann der Abholauftrag an sich gefüllt
-#        scanjob_identifier = asyncio.create_task(parse_notify_msg(scanner_uuid, xml_payload))      # hier wird dann der Abholauftrag an sich erzeugt
         scanjob_identifier = parse_notify_msg(scanner_uuid, xml_payload)      # hier werden die Metadaten zum Abholauftrag zusammengetragen
     except Exception as e:
         logger.warning(f"[SERVER:notify_handler] invalid xml: {e}")
         return web.Response(status=400, text="bad xml")
 
-#    if not task_fill:
     if not scanjob_identifier:
         return web.Response(status=400, text="could not extract any scanjob identifier from xml")
     
@@ -186,25 +183,9 @@ async def notify_handler(request):
 
     loop = asyncio.get_event_loop()
     loop.call_soon(asyncio.create_task, run_scan_job(scanjob_identifier))
-
-    logger.info(f"should start soon...!")
-
-     # --- Danach asynchron Scan starten ---
-    # call_soon sorgt dafür, dass der Task erst nach Rückgabe gestartet wird
-#    if job_id:
-#        loop = asyncio.get_event_loop()
-#        loop.call_soon(asyncio.create_task, run_scan_job(job_id))
-#        logger.info(f"[SERVER:notify_handler] scheduled scan job {job_id} for scanner {scanner_uuid}")
-#    else:
-#        logger.debug(f"[SERVER:notify_handler] no job created from notify message")
-
-    logger.info(f"  LOGPOINT A, hier sollten wir noch landen")
-
-
+    logger.debug(f"task should start soon...!")
 
     return web.Response(status=202, text="Alles juut")
-
-    logger.info(f"  LOGPOINT B, hier sollten wir nicht mehr ankommen")
 
 
 #
