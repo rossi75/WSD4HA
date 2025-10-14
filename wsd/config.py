@@ -49,7 +49,7 @@ logger.info(f" ")
 logger.info(f"***********************************************************")
 logger.info(f"*             Starting up WSD Scanner Service             *")
 logger.info(f"*                   {datetime.datetime.now():%d.%m.%Y, %H:%M:%S}                  *")
-logger.info(f"*  from Startup_dt: {STARTUP_DT}                  *")
+logger.info(f"*  from Startup_dt: {STARTUP_DT:%d.%m.%Y, %H:%M:%S}                  *")
 logger.info(f"***********************************************************")
 logger.info(f"---------------------  Configuration  ---------------------")
 # ---------------- Optionen aus Environment ----------------
