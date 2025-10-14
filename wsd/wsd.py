@@ -1,9 +1,6 @@
 import asyncio
-#import aiohttp
 import datetime
-#import logging
 import os
-#import re
 import socket
 import subprocess
 import sys
@@ -11,20 +8,12 @@ import time
 import threading
 import uuid
 import xml.etree.ElementTree as ET
-#from config import OFFLINE_TIMEOUT, LOCAL_IP, HTTP_PORT, FROM_UUID
 from config import OFFLINE_TIMEOUT, FROM_UUID
-#from globals import SCANNERS, SCAN_JOBS, NAMESPACES, STATE, LOG_LEVEL
 from globals import SCANNERS, SCAN_JOBS, NAMESPACES, STATE, logger
-#from parse import parse_wsd_packet, parse_probe, parse_transfer_get, parse_subscribe
 from pathlib import Path
 from scanner import Scanner
 from send import send_probe, send_transfer_get, send_subscription_ScanAvailableEvent, send_subscription_renew
-#from templates import TEMPLATE_PROBE, TEMPLATE_TRANSFER_GET
 from tools import list_scanners, pick_best_xaddr
-
-#logging.basicConfig(level=logging.INFO, format='[%(levelname)s] %(message)s')
-#logging.basicConfig(level=LOG_LEVEL, format='[%(levelname)s] %(message)s')
-#logger = logging.getLogger("wsd-addon")
 
 # ---------------- Message handler ----------------
 async def discovery_processor(data, addr):
@@ -250,7 +239,7 @@ async def state_monitor():
                                       STATE.ERROR}
                 for scanner in SCANNERS.values()):
             logger.debug(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} [WSD:sleep] short nap")
-            await asyncio.sleep(2)
+            await asyncio.sleep(1)
         # sonst die lange Pause
         else:
             logger.debug(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} [WSD:sleep] goodbye")
