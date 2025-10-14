@@ -7,6 +7,10 @@ configuration:
     name: Displayziel
     description: >-
       Eintrag der im Scanner als Ziel auftauchen soll
+  not_idle:
+    name: Beschäftigt-Status (not idle)
+    description: >-
+      Wie verhalten wir uns wenn der Scanner ein Dokument übermitteln möchte, sich aber als beschäftigt ausgibt?
   scan_folder:
     name: Scan Verzeichnis
     description: >-
@@ -20,6 +24,6 @@ configuration:
     description: >-
       Wie viele Informationen möchten wir im Log sehen?
 network:
-  8110/tcp: WSD4HA Webserver
-  5357/tcp: WSD4HA Fileserver
+  8110/tcp: WSD4HA Benutzeroberfläche
+  5357/tcp: WSD Serviceport
 #  3702/udp: port to receive the WSD notifications
