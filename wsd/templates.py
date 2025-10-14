@@ -202,10 +202,10 @@ TEMPLATE_GET_SCANNER_ELEMENTS_STATE = """<?xml version="1.0" encoding="utf-8"?>
         <wsa:From>
             <wsa:Address>urn:uuid:{from_uuid}</wsa:Address>
             </wsa:From>
-        </soap:Header>
         <wsa:ReplyTo>
             <wsa:Address>http://schemas.xmlsoap.org/ws/2004/08/addressing/role/anonymous</wsa:Address>
             </wsa:ReplyTo>
+        </soap:Header>
     <soap:Body>
         <sca:GetScannerElementsRequest>
             <sca:RequestedElements>
