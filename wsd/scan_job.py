@@ -4,7 +4,7 @@ from pathlib import Path
 from globals import SCANNERS, SCAN_JOBS, STATE, logger
 from scanner import Scanner, Scan_Jobs
 from tools import save_scanned_image
-from send import request_scanner_elements_state, request_scanner_elements_def_ticket, request_validate_scan_ticket, request_scan_job_ticket, request_retrieve_image
+from send import request_scanner_elements_state, request_scanner_elements_configuration, request_scanner_elements_def_ticket, request_validate_scan_ticket, request_scan_job_ticket, request_retrieve_image
 
 ###################################################################################
 # Run Scan Job
@@ -16,7 +16,7 @@ async def run_scan_job(scanjob_identifier: str):
     logger.info(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} [SCAN_JOB:run_job] running scan job {scanjob_identifier}")
 
     await asyncio.sleep(2)                   # Zwangspause für um die Notification erst einmal abzuarbeiten und dann hier nen freien Kopf zu haben.
-    logger.info(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} [SCAN_JOB:run_job] short retirement nap is over !")
+    logger.debug(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} [SCAN_JOB:run_job] short retirement nap is over !")
     
     if scanjob_identifier not in SCAN_JOBS:
         logger.warning(f"could not find any existing job with ID {scanjob_identifier}. Skipping request")
@@ -28,15 +28,15 @@ async def run_scan_job(scanjob_identifier: str):
     result = await request_scanner_elements_state(scanjob_identifier)
 
     if result:
-        logger.info(f" verified that scanner is ready for doing job #{scanjob_identifier}")
+        logger.info(f" verified that scanner is ready for doing job {scanjob_identifier}")
     else:
         logger.info(f" seems scanner is busy with anything. What to do now? re-schedule? forget? scan anyways?")
         SCAN_JOBS[scanjob_identifier].status = STATE.SCAN_FAILED
         return
 
-    # GetScannerElements[DefaultScanTicket]
+    # GetScannerElements[ScannerConfiguration]
     SCAN_JOBS[scanjob_identifier].status == STATE.REQ_DEF_TICKET
-    result = await request_scanner_elements_scanner_configuration(scanjob_identifier)
+    result = await request_scanner_elements_configuration(scanjob_identifier)
 
     if result:
         logger.info(f" received valid scanner configuration")
