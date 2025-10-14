@@ -238,7 +238,7 @@ def request_scanner_elements_state(scanjob_identifier: str):
 # scan_from_uuid = Scanners uuid, but taken from the scan job
 # ---------------------------------------------------------------------------------
 def request_scanner_elements_def_ticket(scanjob_identifier: str):
-    logger.info(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} [SEND:gse_state] asking scanner about its default ticket for scan job {scanjob_identifier}")
+    logger.info(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} [SEND:def_ticket] asking scanner about its default ticket for scan job {scanjob_identifier}")
 
     if scanjob_identifier not in SCAN_JOBS:
         logger.warning(f"could not find any existing job with ID {scanjob_identifier}. Skipping request")
@@ -273,17 +273,17 @@ def request_scanner_elements_def_ticket(scanjob_identifier: str):
                     body = await resp.text()
                 else:
                     SCAN_JOBS[job_id].state = STATE.SCAN_FAILED
-                    logger.error(f"[SCAN_JOB:ticket] Request for default ticket failed with Statuscode {resp.status}")
+                    logger.error(f"[SEND:def_ticket] Request for default ticket failed with Statuscode {resp.status}")
                     return false
         except Exception as e:
-            logger.error(f"[SCAN_JOB:ticket] anything went wrong with {SCAN_JOBS[scanjob_identifier]}: {e}")
+            logger.error(f"[SEND:def_ticket] anything went wrong with Scan Job {SCAN_JOBS[scanjob_identifier]}:\n{e}")
             SCAN_JOBS[scanjob_identifier].state = STATE.SCAN_FAILED
             return false
 
     logger.info(f"trying to parse the default ticket answer")
     logger.info(f"   --->  Answer XML:\n{body}")
     
-    result = parse_get_scanner_elements_default_ticket(scanjob_identifier, body)
+    result = parse_get_scanner_elements_default_ticket(SCAN_JOBS[scanjob_identifier].scan_from_uuid, body)
 
     logger.info(f" Result from parsing: {result}")
 
