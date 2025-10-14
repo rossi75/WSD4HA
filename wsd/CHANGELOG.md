@@ -18,6 +18,7 @@
 
 ## 0.63 - 2025-10-14
 - implement GetScannerElements[DefaultScanTicket]
+- SCANNERS[].serial and SCANNERS[].model are now parsed correctly
 
 ## 0.61 - 2025-10-12
 - filled scan_job.py with live
