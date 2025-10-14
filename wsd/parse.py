@@ -315,7 +315,38 @@ def parse_notify_msg(notifier_uuid, xml):
         return None
 
     return scanjob_identifier
+    
+# ---------------- Status Parser ----------------
+def parse_get_scanner_elements_state(scanjob_identifier, xml):
+    logger.info(f"[PARSE:gse_state] parsing scanners state for {SCANNERS[SCAN_JOBS[scanjob_identifier].scan_from_uuid].friendly_name or SCAN_JOBS[scanjob_identifier].scan_from_uuid} @ {SCANNERS[SCAN_JOBS[scanjob_identifier].scan_from_uuid].ip}")
+    logger.info(f"   XML:\n{xml}")
 
+    try:
+        root = ET.fromstring(xml)
+    except ET.ParseError as e:
+        logger.error(f"[PARSE:def_ticket] XML ParseError:\n{e}")
+        return False
+
+    #check for ElementData true !!
+    data_valid_elem = root.find(".//wscn:ElementData", NAMESPACES)
+#    if data_valid_elem is not None and data_valid_elem.text:
+    if data_valid_elem is not None:
+#        data_valid = data_valid_elem.text.strip().lower()
+        data_valid = data_valid_elem.attrib.get("Valid", "").strip().lower()
+        logger.info(f" data_valid: {data_valid}")
+        if data_valid != "true":
+            SCAN_JOBS[scanjob_identifier].status = STATE.SCAN_FAIL
+            return False
+    
+    state_elem = root.find(".//wscn:ScannerState", NAMESPACES)
+    if state_elem is not None and state_elem.text:
+        state = state_elem.text.strip().lower
+        logger.info(f" state: {state}")
+        if state != "idle"
+            SCAN_JOBS[scanjob_identifier].status = STATE.SCAN_FAIL
+            return False
+
+    return True
 
 # ---------------- Default Ticket Parser ----------------
 def parse_get_scanner_elements_default_ticket(scanjob_identifier, xml):
