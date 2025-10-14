@@ -2,11 +2,9 @@
 
 ### todo
 - make manual configuration functional
-- implement detailled variant of ValdiateScanTicket
-- implement simple variant of ValdiateScanTicket
+- implement simple variant of ValidateScanTicket
 - decide automatically between simple and detailled variant of ValdiateScanTicket
 - implement GetScannerElements[ScannerDescription]
-- implement GetScannerElements[ScannerConfiguration]
 - write bin to harddisk
 - merge globals.py + config.py to globalconfig.py
 - webinterface improvements:
@@ -17,8 +15,10 @@
 
 ## 0.65 - 2025-10-14
 - implement GetScannerElements[State] before requesting a ticket, do nothing while not in IDLE
+- implement GetScannerElements[ScannerConfiguration] only for MaxWidth and MaxHeight into RegionW/R and ...?
 
 ## 0.63 - 2025-10-14
+- implement detailed variant of ValidateScanTicket
 - implement GetScannerElements[DefaultScanTicket]
 - SCANNERS[].serial and SCANNERS[].model are now parsed correctly
 
