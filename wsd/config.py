@@ -43,7 +43,8 @@ from tools import list_scanners, check_port, get_local_ip
 #logging.basicConfig(level=LOG_LEVEL, format='[%(levelname)s] %(message)s')
 #logger = logging.getLogger("wsd-addon")
 
-STARTUP_DT = datetime.datetime.now():%d.%m.%Y, %H:%M:%S
+STARTUP_DT = datetime.datetime.now().replace(microsecond=0)
+
 logger.info(f" ")
 logger.info(f"***********************************************************")
 logger.info(f"*             Starting up WSD Scanner Service             *")
