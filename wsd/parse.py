@@ -12,22 +12,9 @@ import threading
 import uuid
 import xml.etree.ElementTree as ET
 from datetime import timedelta
-#from config import OFFLINE_TIMEOUT, LOCAL_IP, HTTP_PORT, FROM_UUID
-#from globals import SCANNERS, SCAN_JOBS, NAMESPACES, STATE, LOG_LEVEL
 from globals import SCANNERS, SCAN_JOBS, NAMESPACES, STATE, logger
-#from pathlib import Path
 from scanner import Scanner, Scan_Jobs
-#from templates import TEMPLATE_SOAP_PROBE, TEMPLATE_SOAP_TRANSFER_GET
 from tools import list_scanners, pick_best_xaddr, calc_w3c_duration
-#from scan_job import request_scan_job_ticket
-
-
-
-#logging.basicConfig(level=logging.INFO, format='[%(levelname)s] %(message)s')
-#logging.basicConfig(level=logging.LOG_LEVEL, format='[%(levelname)s] %(message)s')
-
-#logging.basicConfig(level=LOG_LEVEL, format='[%(levelname)s] %(message)s')
-#logger = logging.getLogger("wsd-addon")
 
 # ---------------- WSD SOAP Parser ----------------
 def parse_wsd_packet(data: bytes):
@@ -339,17 +326,19 @@ def parse_get_scanner_elements_default_ticket(scanjob_identifier, xml):
         root = ET.fromstring(xml)
     except ET.ParseError as e:
         logger.error(f"[PARSE:def_ticket] XML ParseError:\n{e}")
-        return None
+        return False
 
     #check for ElementData true !!
     data_valid_elem = root.find(".//wscn:ElementData", NAMESPACES)
-    if data_valid_elem is not None and data_valid_elem.text:
-        data_valid = data_valid_elem.text.strip().lower()
+#    if data_valid_elem is not None and data_valid_elem.text:
+    if data_valid_elem is not None:
+#        data_valid = data_valid_elem.text.strip().lower()
+        data_valid = data_valid_elem.attrib.get("Valid", "").strip().lower()
         logger.info(f" data_valid: {data_valid}")
         if data_valid != "true":
             SCAN_JOBS[scanjob_identifier].status = STATE.SCAN_FAIL
             return False
-
+    
     format_elem = root.find(".//wscn:Format", NAMESPACES)
     if format_elem is not None and format_elem.text:
         format = format_elem.text.strip()
