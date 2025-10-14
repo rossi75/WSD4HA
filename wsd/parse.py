@@ -334,7 +334,7 @@ def parse_notify_msg(notifier_uuid, xml):
 
 # ---------------- Default Ticket Parser ----------------
 def parse_get_scanner_elements_default_ticket(scanjob_identifier, body):
-    logger.info(f"[PARSE:def_ticket] parsing default Ticket for {SCANNERS[SCAN_JOBS[scanjob_identifier].scan_from_uuid].friendly_name or SCAN_JOBS[scanjob_identifier].scan_from_uuid} @ SCANNERS[SCAN_JOBS[scanjob_identifier].scan_from_uuid].ip}")
+    logger.info(f"[PARSE:def_ticket] parsing default Ticket for {SCANNERS[SCAN_JOBS[scanjob_identifier].scan_from_uuid].friendly_name or SCAN_JOBS[scanjob_identifier].scan_from_uuid} @ {SCANNERS[SCAN_JOBS[scanjob_identifier].scan_from_uuid].ip}")
     #{SCANNERS[scanner_uuid].friedly_name or scanner_uuid} @ {SCANNERS[notifier_uuid].ip}")
     logger.debug(f"   XML:\n{xml}")
 
