@@ -286,7 +286,8 @@ async def request_scanner_elements_def_ticket(scanjob_identifier: str):
     logger.info(f"trying to parse the default ticket answer")
     logger.info(f"   --->  Answer XML:\n{body}")
     
-    result = parse_get_scanner_elements_default_ticket(SCAN_JOBS[scanjob_identifier].scan_from_uuid, body)
+#    result = parse_get_scanner_elements_default_ticket(SCAN_JOBS[scanjob_identifier].scan_from_uuid, body)
+    result = parse_get_scanner_elements_default_ticket(scanjob_identifier, body)
 
     logger.info(f" Result from parsing: {result}")
 
