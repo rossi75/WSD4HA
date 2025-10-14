@@ -269,6 +269,71 @@ async def request_scanner_elements_state(scanjob_identifier: str):
     return result
 
 
+TEMPLATE_GET_SCANNER_ELEMENTS_SCANNER_CONFIGURATION
+
+###################################################################################
+# GetScannerElements[ScannerConfiguration]
+# ---------------------------------------------------------------------------------
+# Parameters:
+# scan_from_uuid = Scanners uuid, but taken from the scan job
+# ---------------------------------------------------------------------------------
+async def request_scanner_elements_scanner_configuration(scanjob_identifier: str):
+    logger.info(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} [SEND:gse_scan_config] asking scanner about its configuration (explicit for maxWidth and maxHeight) {scanjob_identifier}")
+
+    if scanjob_identifier not in SCAN_JOBS:
+        logger.warning(f"could not find any existing job with ID {scanjob_identifier}. Skipping configuration request")
+        SCAN_JOBS[scanjob_identifier].status = STATE.SCAN_FAILED
+        return False
+    else:
+#        SCAN_JOBS[scanjob_identifier].status == STATE.REQ_SCAN_STATE
+        return True
+
+    # tbd
+    body = ""
+    msg_id = uuid.uuid4()
+    url = SCAN_JOBS[scanjob_identifier].xaddr  # z.B. http://192.168.0.3:8018/wsd
+
+    xml = TEMPLATE_GET_SCANNER_ELEMENTS_SCANNER_CONFIGURATION.format(
+        xaddr = url,
+        msg_id = msg_id,
+        from_uuid = FROM_UUID,
+    )
+    headers = {
+        "Content-Type": "application/soap+xml",
+        "User-Agent": USER_AGENT
+    }
+
+    logger.debug(f"   --->        FROM: {FROM_UUID}")
+    logger.debug(f"   --->      MSG_ID: {msg_id}")
+    logger.debug(f"   --->         URL: {url}")
+    logger.debug(f"   ---> Request XML:\n{xml}")
+
+    async with aiohttp.ClientSession() as session:
+        try:
+            async with session.post(url, data=xml, headers=headers, timeout=5) as resp:
+                if resp.status == 200:
+                    body = await resp.text()
+                else:
+                    SCAN_JOBS[job_id].state = STATE.SCAN_FAILED
+                    logger.error(f"[SEND:scan_config] Request for scanners configuration failed with Statuscode {resp.status}")
+                    return false
+        except Exception as e:
+            logger.error(f"[SEND:scan_config] anything went wrong with scanners configuration for scan job {SCAN_JOBS[scanjob_identifier]}:\n{e}")
+            SCAN_JOBS[scanjob_identifier].state = STATE.SCAN_FAILED
+            return false
+
+    logger.info(f"trying to parse the scanners configuration")
+    logger.debug(f"   --->  Answer XML:\n{body}")
+    
+    result = parse_get_scanner_elements_configuration(scanjob_identifier, body)
+
+    logger.info(f" Result from parsing: {result}")
+
+    return result
+
+
+
+
 ###################################################################################
 # GetScannerElements[DefaultScanTicket]
 # ---------------------------------------------------------------------------------
