@@ -275,7 +275,7 @@ async def request_scanner_elements_state(scanjob_identifier: str):
 # Parameters:
 # scan_from_uuid = Scanners uuid, but taken from the scan job
 # ---------------------------------------------------------------------------------
-async def request_scanner_elements_scanner_configuration(scanjob_identifier: str):
+async def request_scanner_elements_configuration(scanjob_identifier: str):
     logger.info(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} [SEND:gse_scan_config] asking scanner about its configuration (explicit for maxWidth and maxHeight) {scanjob_identifier}")
 
     if scanjob_identifier not in SCAN_JOBS:
