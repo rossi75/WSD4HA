@@ -170,11 +170,11 @@ def parse_transfer_get(xml_body, tf_g_uuid):
                 SCANNERS[tf_g_uuid].xaddr = addr
             logger.info(f"  ADDR: {SCANNERS[tf_g_uuid].xaddr}")
 
-    logger.info(f"   ---> FN: {SCANNERS[tf_g_uuid].friendly_name}")
-    logger.info(f"   ---> SN: {SCANNERS[tf_g_uuid].serial}")
-    logger.info(f"   ---> FW: {SCANNERS[tf_g_uuid].firmware}")
-    logger.info(f"   ---> MF: {SCANNERS[tf_g_uuid].manufacturer}")
-    logger.info(f"   ---> MD: {SCANNERS[tf_g_uuid].model}")
+    logger.debug(f"   ---> FN: {SCANNERS[tf_g_uuid].friendly_name}")
+    logger.debug(f"   ---> SN: {SCANNERS[tf_g_uuid].serial}")
+    logger.debug(f"   ---> FW: {SCANNERS[tf_g_uuid].firmware}")
+    logger.debug(f"   ---> MF: {SCANNERS[tf_g_uuid].manufacturer}")
+    logger.debug(f"   ---> MD: {SCANNERS[tf_g_uuid].model}")
 
     SCANNERS[tf_g_uuid].state = STATE.TF_GET_PARSED
 
