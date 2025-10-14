@@ -282,7 +282,7 @@ def parse_notify_msg(notifier_uuid, xml):
     try:
         root = ET.fromstring(xml)
     except ET.ParseError as e:
-        logger.error(f"[PARSE:notify] XML ParseError: {e}")
+        logger.error(f"[PARSE:notify] XML ParseError:\n{e}")
         return None
 
     subscr_identifier_elem = root.find(".//wse:Identifier", NAMESPACES)
@@ -334,13 +334,14 @@ def parse_notify_msg(notifier_uuid, xml):
 
 # ---------------- Default Ticket Parser ----------------
 def parse_get_scanner_elements_default_ticket(scanjob_identifier, body):
-    logger.info(f"[PARSE:def_ticket] parsing default Ticket for {SCANNERS[scanner_uuid].friedly_name or scanner_uuid} @ {SCANNERS[notifier_uuid].ip}")
+    logger.info(f"[PARSE:def_ticket] parsing default Ticket for {SCANNERS[SCAN_JOBS[scanjob_identifier].scan_from_uuid].friendly_name or SCAN_JOBS[scanjob_identifier].scan_from_uuid} @ SCANNERS[SCAN_JOBS[scanjob_identifier].scan_from_uuid].ip}")
+    #{SCANNERS[scanner_uuid].friedly_name or scanner_uuid} @ {SCANNERS[notifier_uuid].ip}")
     logger.debug(f"   XML:\n{xml}")
 
     try:
         root = ET.fromstring(xml)
     except ET.ParseError as e:
-        logger.error(f"[PARSE:notify] XML ParseError: {e}")
+        logger.error(f"[PARSE:def_ticket] XML ParseError:\n{e}")
         return None
 
     #check for ElementData true !!
@@ -482,7 +483,7 @@ def parse_create_scan_job(scan_identifier, xml: str):
     try:
         root = ET.fromstring(xml)
     except ET.ParseError as e:
-        logger.error(f"[PARSE:sj_ticket] failed to parse CreateScanJobResponse: {e}")
+        logger.error(f"[PARSE:sj_ticket] failed to parse CreateScanJobResponse:\n{e}")
         SCAN_JOBS[scan_identifier].status = STATE.SCAN_FAIL
         return False
 
