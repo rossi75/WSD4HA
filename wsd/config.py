@@ -11,7 +11,7 @@ import xml.etree.ElementTree as ET
 import subprocess
 import uuid
 #from globals import SCANNERS, list_scanners, FROM_UUID, USER_AGENT, LOG_LEVEL
-from globals import SCANNERS, FROM_UUID, USER_AGENT, LOG_LEVEL, SCAN_FOLDER, logger
+from globals import SCANNERS, FROM_UUID, USER_AGENT, LOG_LEVEL, SCAN_FOLDER, STARTUP_DT, logger
 #from globals import SCANNERS, SCAN_JOBS, NAMESPACES, STATE, logger
 from tools import list_scanners, check_port, get_local_ip
 
@@ -43,10 +43,12 @@ from tools import list_scanners, check_port, get_local_ip
 #logging.basicConfig(level=LOG_LEVEL, format='[%(levelname)s] %(message)s')
 #logger = logging.getLogger("wsd-addon")
 
+STARTUP_DT = datetime.datetime.now():%d.%m.%Y, %H:%M:%S
 logger.info(f" ")
 logger.info(f"***********************************************************")
 logger.info(f"*             Starting up WSD Scanner Service             *")
 logger.info(f"*                   {datetime.datetime.now():%d.%m.%Y, %H:%M:%S}                  *")
+logger.info(f"*  from Startup_dt: {STARTUP_DT}                  *")
 logger.info(f"***********************************************************")
 logger.info(f"---------------------  Configuration  ---------------------")
 # ---------------- Optionen aus Environment ----------------
