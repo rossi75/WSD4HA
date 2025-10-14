@@ -25,7 +25,7 @@ async def run_scan_job(scanjob_identifier: str):
 
     # GetScannerElements[State] before requesting a ticket, do nothing while not in IDLE
     SCAN_JOBS[scanjob_identifier].status == STATE.SCAN_REQ_TICKET
-    result = await request_scanner_elements_state(scanjob_identifier):
+    result = await request_scanner_elements_state(scanjob_identifier)
 
     if result:
         logger.info(f" verified that scanner is ready for doing job #{scanjob_identifier}")
@@ -47,7 +47,7 @@ async def run_scan_job(scanjob_identifier: str):
 
     # ValidateScanTicket Detail
     SCAN_JOBS[scanjob_identifier].status == STATE.SCAN_TICKET
-    result = await request_validate_scan_ticket(scanjob_identifier):
+    result = await request_validate_scan_ticket(scanjob_identifier)
 
     if result:
         logger.info(f" validated scan ticket for {scanjob_identifier}")
