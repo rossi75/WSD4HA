@@ -89,6 +89,9 @@ class STATE(str, Enum):
     REQ_SCAN_STATE = "Requesting ScannerState"                                             # 45
     CHK_SCAN_STATE = "Checking ScannerState"
     DONE_SCAN_STATE = "Done ScannerState"                                                  # 46
+    REQ_VAL_TICKET = "Requesting Validate Scan Ticket"                                             # 45
+    CHK_VAL_TICKET = "Checking Validate Scan Ticket"
+    DONE_VAL_TICKET = "Done Validate Scan Ticket"                                                  # 46
     ONLINE = "online"
     ONLINE_CHK_1_2 = "online"                                                              # Hälfte der Zeit is rum
     ONLINE_CHK_3_4 = "online"                                                              # 3/4 der Zeit is rum
