@@ -36,6 +36,18 @@ async def run_scan_job(scanjob_identifier: str):
 
     # GetScannerElements[DefaultScanTicket]
     SCAN_JOBS[scanjob_identifier].status == STATE.REQ_DEF_TICKET
+    result = await request_scanner_elements_scanner_configuration(scanjob_identifier)
+
+    if result:
+        logger.info(f" received valid scanner configuration")
+    else:
+        logger.info(f" something went wrong with requesting the scanners configuration for job {scanjob_identifier}")
+        SCAN_JOBS[scanjob_identifier].status = STATE.SCAN_FAILED
+        return
+
+
+    # GetScannerElements[DefaultScanTicket]
+    SCAN_JOBS[scanjob_identifier].status == STATE.REQ_DEF_TICKET
     result = await request_scanner_elements_def_ticket(scanjob_identifier)
 
     if result:
@@ -52,7 +64,7 @@ async def run_scan_job(scanjob_identifier: str):
     if result:
         logger.info(f" validated scan ticket for {scanjob_identifier}")
     else:
-        logger.info(f" something went wrong withvalidating scan ticket for job {scanjob_identifier}")
+        logger.info(f" something went wrong with validating scan ticket for job {scanjob_identifier}")
         SCAN_JOBS[scanjob_identifier].status = STATE.SCAN_FAILED
         return
 
