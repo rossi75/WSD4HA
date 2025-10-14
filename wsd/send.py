@@ -251,7 +251,7 @@ async def request_scanner_elements_state(scanjob_identifier: str):
     logger.debug(f"   --->        FROM: {FROM_UUID}")
     logger.debug(f"   --->      MSG_ID: {msg_id}")
     logger.debug(f"   --->         URL: {url}")
-    logger.info(f"   ---> Request XML:\n{xml}")
+    logger.debug(f"   ---> Request XML:\n{xml}")
 
     async with aiohttp.ClientSession() as session:
         try:
@@ -269,12 +269,11 @@ async def request_scanner_elements_state(scanjob_identifier: str):
             SCAN_JOBS[scanjob_identifier].state = STATE.SCAN_FAILED
             return False
 
-    logger.info(f"trying to parse the scanners state")
-    logger.debug(f"   --->  Answer XML:\n{body}")
+    logger.debug(f"trying to parse the scanners state answer")
     
     result = parse_get_scanner_elements_state(scanjob_identifier, body)
 
-    logger.info(f" Result from parsing: {result}")
+    logger.debug(f" Result from parsing: {result}")
 
     return result
 
@@ -314,7 +313,7 @@ async def request_scanner_elements_configuration(scanjob_identifier: str):
     logger.debug(f"   --->        FROM: {FROM_UUID}")
     logger.debug(f"   --->      MSG_ID: {msg_id}")
     logger.debug(f"   --->         URL: {url}")
-    logger.info(f"   ---> Request XML:\n{xml}")
+    logger.debug(f"   ---> Request XML:\n{xml}")
 
     async with aiohttp.ClientSession() as session:
         try:
@@ -332,11 +331,11 @@ async def request_scanner_elements_configuration(scanjob_identifier: str):
             SCAN_JOBS[scanjob_identifier].state = STATE.SCAN_FAILED
             return False
 
-    logger.info(f"trying to parse the scanners configuration")
+    logger.debug(f"trying to parse the scanners configuration")
     
     result = parse_get_scanner_elements_configuration(scanjob_identifier, body)
 
-    logger.info(f" Result from parsing: {result}")
+    logger.debug(f" Result from parsing: {result}")
 
     return result
 
@@ -395,7 +394,6 @@ async def request_scanner_elements_def_ticket(scanjob_identifier: str):
             return False
 
     logger.info(f"trying to parse the default ticket answer")
-    logger.debug(f"   --->  Answer XML:\n{body}")
     
     result = parse_get_scanner_elements_default_ticket(scanjob_identifier, body)
 
