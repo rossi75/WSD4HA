@@ -291,7 +291,7 @@ async def request_scanner_elements_scanner_configuration(scanjob_identifier: str
     msg_id = uuid.uuid4()
     url = SCAN_JOBS[scanjob_identifier].xaddr  # z.B. http://192.168.0.3:8018/wsd
 
-    xml = TEMPLATE_GET_SCANNER_ELEMENTS_SCANNER_CONFIGURATION.format(
+    xml = TEMPLATE_GET_SCANNER_ELEMENTS_CONFIGURATION.format(
         xaddr = url,
         msg_id = msg_id,
         from_uuid = FROM_UUID,
