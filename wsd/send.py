@@ -266,8 +266,8 @@ async def request_scanner_elements_def_ticket(scanjob_identifier: str):
 
     logger.debug(f"   --->        FROM: {FROM_UUID}")
     logger.debug(f"   --->      MSG_ID: {msg_id}")
-    logger.info(f"   --->         URL: {url}")
-    logger.info(f"   ---> Request XML:\n{xml}")
+    logger.debug(f"   --->         URL: {url}")
+    logger.debug(f"   ---> Request XML:\n{xml}")
 
     async with aiohttp.ClientSession() as session:
         try:
@@ -286,7 +286,6 @@ async def request_scanner_elements_def_ticket(scanjob_identifier: str):
     logger.info(f"trying to parse the default ticket answer")
     logger.info(f"   --->  Answer XML:\n{body}")
     
-#    result = parse_get_scanner_elements_default_ticket(SCAN_JOBS[scanjob_identifier].scan_from_uuid, body)
     result = parse_get_scanner_elements_default_ticket(scanjob_identifier, body)
 
     logger.info(f" Result from parsing: {result}")
