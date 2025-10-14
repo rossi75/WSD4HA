@@ -228,7 +228,7 @@ async def request_scanner_elements_state(scanjob_identifier: str):
         SCAN_JOBS[scanjob_identifier].status = STATE.SCAN_FAILED
         return False
     else:
-        SCAN_JOBS[scanjob_identifier].status == STATE.REQ_SCAN_STATE
+#        SCAN_JOBS[scanjob_identifier].status == STATE.REQ_SCAN_STATE
         return True
 
     # tbd
@@ -247,8 +247,8 @@ async def request_scanner_elements_def_ticket(scanjob_identifier: str):
         logger.warning(f"could not find any existing job with ID {scanjob_identifier}. Skipping request")
 #        SCAN_JOBS[scanjob_identifier].status = STATE.SCAN_FAILED
         return False
-    else:
-        SCAN_JOBS[scanjob_identifier].status == STATE.REQ_DEF_TICKET
+ #   else:
+ #       SCAN_JOBS[scanjob_identifier].status == STATE.REQ_DEF_TICKET
 
     body = ""
     msg_id = uuid.uuid4()
@@ -325,9 +325,9 @@ async def request_scan_job_ticket(scanjob_identifier: str):
         logger.warning(f"could not find any existing job with ID {scanjob_identifier}. Skipping request")
 #        SCAN_JOBS[scanjob_identifier].status = STATE.SCAN_FAILED
         return
-    else:
-        if SCAN_JOBS[scanjob_identifier].status == STATE.SCAN_PENDING:
-            SCAN_JOBS[scanjob_identifier].status == STATE.SCAN_REQ_TICKET
+#    else:
+#        if SCAN_JOBS[scanjob_identifier].status == STATE.SCAN_PENDING:
+#            SCAN_JOBS[scanjob_identifier].status == STATE.SCAN_REQ_TICKET
 
     scanner_uuid = SCAN_JOBS[scanjob_identifier].scan_from_uuid
 
