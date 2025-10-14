@@ -20,10 +20,19 @@ async def run_scan_job(scanjob_identifier: str):
     
     if scanjob_identifier not in SCAN_JOBS:
         logger.warning(f"could not find any existing job with ID {scanjob_identifier}. Skipping request")
-        SCAN_JOBS[scanjob_identifier].status = STATE.SCAN_FAILED
+        SCAN_JOBS[scanjob_identifier].status = STATE.SCAN_FAILED   ## das wird fehlschlagen weil es die scanjob-ID ja nicht gibt !!
         return
 
     # GetScannerElements[State] before requesting a ticket, do nothing while not in IDLE
+    SCAN_JOBS[scanjob_identifier].status == STATE.SCAN_REQ_TICKET
+    result = await request_scanner_elements_state(scanjob_identifier):
+
+    if result:
+        logger.info(f" verified that scanner is ready for doing job #{scanjob_identifier}")
+    else:
+        logger.info(f" seems scanner is busy with anything. What to do now? re-schedule? forget? scan anyways?")
+        SCAN_JOBS[scanjob_identifier].status = STATE.SCAN_FAILED
+        return
 
     # GetScannerElements[DefaultScanTicket]
     SCAN_JOBS[scanjob_identifier].status == STATE.SCAN_REQ_TICKET
@@ -37,6 +46,15 @@ async def run_scan_job(scanjob_identifier: str):
         return
 
     # ValidateScanTicket Detail
+    SCAN_JOBS[scanjob_identifier].status == STATE.SCAN_TICKET
+    result = await request_validate_scan_ticket(scanjob_identifier):
+
+    if result:
+        logger.info(f" validated scan ticket for {scanjob_identifier}")
+    else:
+        logger.info(f" something went wrong withvalidating scan ticket for job {scanjob_identifier}")
+        SCAN_JOBS[scanjob_identifier].status = STATE.SCAN_FAILED
+        return
 
     # Ticket abholen, Ergebnis wird direkt in SCAN_JOBS[] geschrieben und gibt true für Erfolg, false für Misserfolg zurück
     SCAN_JOBS[scanjob_identifier].status == STATE.SCAN_REQ_TICKET
