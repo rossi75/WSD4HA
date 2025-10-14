@@ -388,6 +388,9 @@ def parse_get_scanner_elements_configuration(scanjob_identifier, xml):
         logger.info(f" input_height_elem: {SCAN_JOBS[scanjob_identifier].DocPar_InputHeight}")
         logger.info(f" region_height_elem: {SCAN_JOBS[scanjob_identifier].DocPar_RegionHeight}")
 
+    return True
+
+
 # ---------------- Default Ticket Parser ----------------
 def parse_get_scanner_elements_default_ticket(scanjob_identifier, xml):
     logger.info(f"[PARSE:def_ticket] parsing default Ticket for {SCANNERS[SCAN_JOBS[scanjob_identifier].scan_from_uuid].friendly_name or SCAN_JOBS[scanjob_identifier].scan_from_uuid} @ {SCANNERS[SCAN_JOBS[scanjob_identifier].scan_from_uuid].ip}")
