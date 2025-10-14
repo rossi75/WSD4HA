@@ -348,6 +348,53 @@ def parse_get_scanner_elements_state(scanjob_identifier, xml):
 
     return True
 
+
+
+# ---------------- Scanner Configuration Parser ----------------
+def parse_get_scanner_elements_configuration(scanjob_identifier, xml):
+    logger.info(f"[PARSE:scan_config] parsing scanners configuration, explicit for maxWidth and maxHeight for {SCANNERS[SCAN_JOBS[scanjob_identifier].scan_from_uuid].friendly_name or SCAN_JOBS[scanjob_identifier].scan_from_uuid} @ {SCANNERS[SCAN_JOBS[scanjob_identifier].scan_from_uuid].ip}")
+    logger.info(f"   XML:\n{xml}")
+
+    try:
+        root = ET.fromstring(xml)
+    except ET.ParseError as e:
+        logger.error(f"[PARSE:scan_config] XML ParseError:\n{e}")
+        return False
+
+    #check for ElementData true !!
+    data_valid_elem = root.find(".//wscn:ElementData", NAMESPACES)
+#    if data_valid_elem is not None and data_valid_elem.text:
+    if data_valid_elem is not None:
+#        data_valid = data_valid_elem.text.strip().lower()
+        data_valid = data_valid_elem.attrib.get("Valid", "").strip().lower()
+        logger.info(f" data_valid: {data_valid}")
+        if data_valid != "true":
+            SCAN_JOBS[scanjob_identifier].status = STATE.SCAN_FAIL
+            return False
+    
+    <wscn:PlatenMaximumSize>
+............................................<wscn:Width>
+................................................8503
+................................................</wscn:Width>
+............................................<wscn:Height>
+................................................11732
+
+    width_elem = root.find(".//wscn:ScanRegionWidth", NAMESPACES)
+    if width_elem is not None and width_elem.text:
+        width = width_elem.text.strip()
+        SCAN_JOBS[scanjob_identifier].DocPar_InputWidth = width
+        SCAN_JOBS[scanjob_identifier].DocPar_RegionWidth = width
+        logger.info(f" input_width_elem: {SCAN_JOBS[scanjob_identifier].DocPar_InputWidth}")
+        logger.info(f" region_width_elem: {SCAN_JOBS[scanjob_identifier].DocPar_RegionWidth}")
+
+    height_elem = root.find(".//wscn:ScanRegionWidth", NAMESPACES)
+    if height_elem is not None and height_elem.text:
+        height = height_elem.text.strip()
+        SCAN_JOBS[scanjob_identifier].DocPar_InputHeight = height
+        SCAN_JOBS[scanjob_identifier].DocPar_RegionHeight = height
+        logger.info(f" input_height_elem: {SCAN_JOBS[scanjob_identifier].DocPar_InputHeight}")
+        logger.info(f" region_height_elem: {SCAN_JOBS[scanjob_identifier].DocPar_RegionHeight}")
+
 # ---------------- Default Ticket Parser ----------------
 def parse_get_scanner_elements_default_ticket(scanjob_identifier, xml):
     logger.info(f"[PARSE:def_ticket] parsing default Ticket for {SCANNERS[SCAN_JOBS[scanjob_identifier].scan_from_uuid].friendly_name or SCAN_JOBS[scanjob_identifier].scan_from_uuid} @ {SCANNERS[SCAN_JOBS[scanjob_identifier].scan_from_uuid].ip}")
