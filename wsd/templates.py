@@ -190,6 +190,7 @@ TEMPLATE_GET_SCANNER_ELEMENTS_CONFIGURATION = """<?xml version="1.0" encoding="u
 # msg_id = random message ID
 # from_uuid = sender UUID
 # ---------------------------------------------------------------------------------
+# maybe ReplyTo needs to be removed, as it is not in pcap
 TEMPLATE_GET_SCANNER_ELEMENTS_STATE = """<?xml version="1.0" encoding="utf-8"?>
 <soap:Envelope
     xmlns:soap="http://www.w3.org/2003/05/soap-envelope"
