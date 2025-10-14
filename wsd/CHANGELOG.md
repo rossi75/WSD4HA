@@ -2,7 +2,6 @@
 
 ### todo
 - make manual configuration functional
-- implement GetScannerElements[State] before requesting a ticket, do nothing while not in IDLE
 - implement detailled variant of ValdiateScanTicket
 - implement simple variant of ValdiateScanTicket
 - decide automatically between simple and detailled variant of ValdiateScanTicket
@@ -15,6 +14,9 @@
   - display several details only in debug mode
   - download files
 - ...
+
+## 0.65 - 2025-10-14
+- implement GetScannerElements[State] before requesting a ticket, do nothing while not in IDLE
 
 ## 0.63 - 2025-10-14
 - implement GetScannerElements[DefaultScanTicket]
