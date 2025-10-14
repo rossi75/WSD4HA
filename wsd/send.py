@@ -26,7 +26,7 @@ async def send_probe(probe_uuid: str):
 
     msg_id = uuid.uuid4()
     body = ""
-    xml = TEMPLATE_SOAP_PROBE.format(msg_id=msg_id)
+    xml = TEMPLATE_PROBE.format(msg_id=msg_id)
     headers = {
         "Content-Type": "application/soap+xml",
         "User-Agent": USER_AGENT
@@ -61,7 +61,7 @@ async def send_transfer_get(tf_g_uuid: str):
 
     body = ""
     msg_id = uuid.uuid4()
-    xml = TEMPLATE_SOAP_TRANSFER_GET.format(
+    xml = TEMPLATE_TRANSFER_GET.format(
         to_device_uuid=tf_g_uuid,
         msg_id=msg_id,
         from_uuid=FROM_UUID
@@ -334,7 +334,7 @@ async def request_scan_job_ticket(scanjob_identifier: str):
     msg_id = uuid.uuid4()
     url = SCAN_JOBS[scanjob_identifier].xaddr  # z.B. http://192.168.0.3:8018/wsd
 
-    xml = TEMPLATE_SOAP_CREATE_SCANJOB.format(
+    xml = TEMPLATE_CREATE_SCANJOB.format(
         xaddr = url,
         msg_id = msg_id,
         from_uuid = FROM_UUID,
