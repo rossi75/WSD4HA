@@ -4,7 +4,7 @@ from pathlib import Path
 from globals import SCANNERS, SCAN_JOBS, STATE, logger
 from scanner import Scanner, Scan_Jobs
 from tools import save_scanned_image
-from send import request_scan_job_ticket, request_retrieve_image
+from send import request_scanner_elements_state, request_scanner_elements_def_ticket, request_validate_scan_ticket, request_scan_job_ticket, request_retrieve_image
 
 ###################################################################################
 # Run Scan Job
