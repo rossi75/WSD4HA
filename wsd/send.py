@@ -228,8 +228,10 @@ def request_scanner_elements_state(scanjob_identifier: str):
         SCAN_JOBS[scanjob_identifier].status = STATE.SCAN_FAILED
         return False
     else:
-#        if SCAN_JOBS[scanjob_identifier].status == STATE.SCAN_PENDING:
-#            SCAN_JOBS[scanjob_identifier].status == STATE.SCAN_REQ_TICKET
+        return True
+
+    # tbd
+
 
 ###################################################################################
 # GetScannerElements[DefaultScanTicket]
@@ -298,6 +300,15 @@ def request_scanner_elements_def_ticket(scanjob_identifier: str):
 # ---------------------------------------------------------------------------------
 def request_validate_scan_ticket(scanjob_identifier: str):
     logger.info(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} [SEND:validate_scan_ticket] validating scan ticket for scan job {scanjob_identifier}")
+
+    if scanjob_identifier not in SCAN_JOBS:
+        logger.warning(f"could not find any existing job with ID {scanjob_identifier}. Skipping state request")
+        SCAN_JOBS[scanjob_identifier].status = STATE.SCAN_FAILED
+        return False
+    else:
+        return True
+
+    # tbd
 
 
 ###################################################################################
@@ -382,8 +393,6 @@ async def request_scan_job_ticket(scanjob_identifier: str):
     logger.info(f" Result from parsing: {result}")
 
     return result
-
-
 
 
 ###################################################################################
