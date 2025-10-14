@@ -251,7 +251,7 @@ async def request_scanner_elements_state(scanjob_identifier: str):
                 if resp.status == 200:
                     body = await resp.text()
                 else:
-                    SCAN_JOBS[job_id].state = STATE.SCAN_FAILED
+                    SCAN_JOBS[scanjob_identifier].state = STATE.SCAN_FAILED
                     logger.error(f"[SEND:def_ticket] Request for scanners state failed with Statuscode {resp.status}")
                     return false
         except Exception as e:
@@ -312,7 +312,7 @@ async def request_scanner_elements_configuration(scanjob_identifier: str):
                 if resp.status == 200:
                     body = await resp.text()
                 else:
-                    SCAN_JOBS[job_id].state = STATE.SCAN_FAILED
+                    SCAN_JOBS[scanjob_identifier].state = STATE.SCAN_FAILED
                     logger.error(f"[SEND:scan_config] Request for scanners configuration failed with Statuscode {resp.status}")
                     return false
         except Exception as e:
@@ -373,7 +373,7 @@ async def request_scanner_elements_def_ticket(scanjob_identifier: str):
                 if resp.status == 200:
                     body = await resp.text()
                 else:
-                    SCAN_JOBS[job_id].state = STATE.SCAN_FAILED
+                    SCAN_JOBS[scanjob_identifier].state = STATE.SCAN_FAILED
                     logger.error(f"[SEND:def_ticket] Request for default ticket failed with Statuscode {resp.status}")
                     return false
         except Exception as e:
@@ -474,7 +474,7 @@ async def request_scan_job_ticket(scanjob_identifier: str):
                 if resp.status == 200:
                     body = await resp.text()
                 else:
-                    SCAN_JOBS[job_id].state = STATE.SCAN_FAILED
+                    SCAN_JOBS[scanjob_identifier].state = STATE.SCAN_FAILED
                     logger.error(f"[SCAN_JOB:ticket] Request for ticket failed with Statuscode {resp.status}")
                     return false
         except Exception as e:
