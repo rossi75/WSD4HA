@@ -20,6 +20,9 @@ logger = logging.getLogger("wsd-addon")
 #SCAN_FOLDER.mkdir(parents=True, exist_ok=True)
 #MAX_FILES = int(os.environ.get("MAX_FILES", 5))
 
+# -----------------  define Startup Date and Time  -----------------
+STARTUP_DT = ""
+
 # -----------------  define SCANNERS dict  -----------------
 SCANNERS = {}
 
