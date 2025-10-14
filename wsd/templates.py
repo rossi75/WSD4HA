@@ -151,13 +151,13 @@ TEMPLATE_SUBSCRIBE_RENEW = """<?xml version="1.0" encoding="utf-8"?>
 
 
 ################################################################################
-# TEMPLATE_GET_SCANNER_ELEMENTS_SCANNER_CONFIGURATION
+# TEMPLATE_GET_SCANNER_ELEMENTS_CONFIGURATION
 # ---------------------------------------------------------------------------------
 # xaddr = destination adress
 # msg_id = random message ID
 # from_uuid = sender UUID
 # ---------------------------------------------------------------------------------
-TEMPLATE_GET_SCANNER_ELEMENTS_SCANNER_CONFIGURATION = """<?xml version="1.0" encoding="utf-8"?>
+TEMPLATE_GET_SCANNER_ELEMENTS_CONFIGURATION = """<?xml version="1.0" encoding="utf-8"?>
 <soap:Envelope
     xmlns:soap="http://www.w3.org/2003/05/soap-envelope"
     xmlns:wsa="http://schemas.xmlsoap.org/ws/2004/08/addressing"
