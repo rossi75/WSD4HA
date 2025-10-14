@@ -11,7 +11,7 @@ from globals import SCANNERS, SCAN_JOBS, NAMESPACES, STATE, USER_AGENT, logger
 from parse import parse_wsd_packet, parse_probe, parse_transfer_get, parse_subscribe, parse_get_scanner_elements_default_ticket, parse_create_scan_job, parse_retrieve_image
 from pathlib import Path
 from tools import list_scanners, get_local_ip
-from templates import TEMPLATE_PROBE, TEMPLATE_TRANSFER_GET, TEMPLATE_SUBSCRIBE_SAE, TEMPLATE_SUBSCRIBE_RENEW, TEMPLATE_GET_SCANNER_ELEMENTS_DEFAULT_TICKET, TEMPLATE_VALIDATE_SCAN_TICKET_DETAIL, TEMPLATE_CREATE_SCANJOB, TEMPLATE_RETRIEVE_DOCUMENT
+from templates import TEMPLATE_PROBE, TEMPLATE_TRANSFER_GET, TEMPLATE_SUBSCRIBE_SAE, TEMPLATE_SUBSCRIBE_RENEW, TEMPLATE_GET_SCANNER_ELEMENTS_STATE, TEMPLATE_GET_SCANNER_ELEMENTS_DEFAULT_TICKET, TEMPLATE_VALIDATE_SCAN_TICKET_DETAIL, TEMPLATE_CREATE_SCANJOB, TEMPLATE_RETRIEVE_DOCUMENT
 
 # ---------------- Send Scanner Probe ----------------
 async def send_probe(probe_uuid: str):
@@ -226,6 +226,47 @@ async def request_scanner_elements_state(scanjob_identifier: str):
         return True
 
     # tbd
+    body = ""
+    msg_id = uuid.uuid4()
+    url = SCAN_JOBS[scanjob_identifier].xaddr  # z.B. http://192.168.0.3:8018/wsd
+
+    xml = TEMPLATE_GET_SCANNER_ELEMENTS_STATE.format(
+        xaddr = url,
+        msg_id = msg_id,
+        from_uuid = FROM_UUID,
+    )
+    headers = {
+        "Content-Type": "application/soap+xml",
+        "User-Agent": USER_AGENT
+    }
+
+    logger.debug(f"   --->        FROM: {FROM_UUID}")
+    logger.debug(f"   --->      MSG_ID: {msg_id}")
+    logger.debug(f"   --->         URL: {url}")
+    logger.info(f"   ---> Request XML:\n{xml}")
+
+    async with aiohttp.ClientSession() as session:
+        try:
+            async with session.post(url, data=xml, headers=headers, timeout=5) as resp:
+                if resp.status == 200:
+                    body = await resp.text()
+                else:
+                    SCAN_JOBS[job_id].state = STATE.SCAN_FAILED
+                    logger.error(f"[SEND:def_ticket] Request for scanners state failed with Statuscode {resp.status}")
+                    return false
+        except Exception as e:
+            logger.error(f"[SEND:def_ticket] anything went wrong with scanners state for scan job {SCAN_JOBS[scanjob_identifier]}:\n{e}")
+            SCAN_JOBS[scanjob_identifier].state = STATE.SCAN_FAILED
+            return false
+
+    logger.info(f"trying to parse the scanners state")
+    logger.debug(f"   --->  Answer XML:\n{body}")
+    
+    result = parse_get_scanner_elements_state(scanjob_identifier, body)
+
+    logger.info(f" Result from parsing: {result}")
+
+    return result
 
 
 ###################################################################################
