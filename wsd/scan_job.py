@@ -26,6 +26,15 @@ async def run_scan_job(scanjob_identifier: str):
     # GetScannerElements[State] before requesting a ticket, do nothing while not in IDLE
 
     # GetScannerElements[DefaultScanTicket]
+    SCAN_JOBS[scanjob_identifier].status == STATE.SCAN_REQ_TICKET
+    result = await request_scanner_elements_def_ticket(scanjob_identifier)
+
+    if result:
+        logger.info(f" received valid default scan ticket")
+    else:
+        logger.info(f" something went wrong with requesting the default scan ticket for job {scanjob_identifier}")
+        SCAN_JOBS[scanjob_identifier].status = STATE.SCAN_FAILED
+        return
 
     # ValidateScanTicket Detail
 
