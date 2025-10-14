@@ -265,7 +265,8 @@ def parse_subscribe(subscr_uuid, xml_body):
             SCANNERS[subscr_uuid].state = STATE.ERROR
 
 
-def parse_get_scanner_elements_default_ticket(scanner_uuid, body)
+# ---------------- Default Ticket Parser ----------------
+def parse_get_scanner_elements_default_ticket(scanner_uuid, body):
     logger.info(f"[PARSE:def_ticket] parsing default Ticket for {SCANNERS[scanner_uuid].friedly_name or scanner_uuid} @ {SCANNERS[notifier_uuid].ip}")
     logger.debug(f"   XML:\n{xml}")
 
