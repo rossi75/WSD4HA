@@ -335,7 +335,7 @@ def parse_get_scanner_elements_state(scanjob_identifier, xml):
         data_valid = data_valid_elem.attrib.get("Valid", "").strip().lower()
         logger.info(f" data_valid: {data_valid}")
         if data_valid != "true":
-            SCAN_JOBS[scanjob_identifier].status = STATE.SCAN_FAIL
+            SCAN_JOBS[scanjob_identifier].status = STATE.SCAN_FAILED
             return False
     
     state_elem = root.find(".//wscn:ScannerState", NAMESPACES)
@@ -343,7 +343,7 @@ def parse_get_scanner_elements_state(scanjob_identifier, xml):
         state = state_elem.text.strip().lower
         logger.info(f" state: {state}")
         if state != "idle":
-            SCAN_JOBS[scanjob_identifier].status = STATE.SCAN_FAIL
+            SCAN_JOBS[scanjob_identifier].status = STATE.SCAN_FAILED
             return False
 
     return True
@@ -369,7 +369,7 @@ def parse_get_scanner_elements_configuration(scanjob_identifier, xml):
         data_valid = data_valid_elem.attrib.get("Valid", "").strip().lower()
         logger.info(f" data_valid: {data_valid}")
         if data_valid != "true":
-            SCAN_JOBS[scanjob_identifier].status = STATE.SCAN_FAIL
+            SCAN_JOBS[scanjob_identifier].status = STATE.SCAN_FAILED
             return False
 
     width_elem = root.find(".//wscn:ScanRegionWidth", NAMESPACES)
@@ -407,7 +407,7 @@ def parse_get_scanner_elements_default_ticket(scanjob_identifier, xml):
         data_valid = data_valid_elem.attrib.get("Valid", "").strip().lower()
         logger.info(f" data_valid: {data_valid}")
         if data_valid != "true":
-            SCAN_JOBS[scanjob_identifier].status = STATE.SCAN_FAIL
+            SCAN_JOBS[scanjob_identifier].status = STATE.SCAN_FAILED
             return False
     
     format_elem = root.find(".//wscn:Format", NAMESPACES)
@@ -556,7 +556,7 @@ def parse_create_scan_job(scanjob_identifier, xml: str):
         root = ET.fromstring(xml)
     except ET.ParseError as e:
         logger.error(f"[PARSE:sj_ticket] failed to parse CreateScanJobResponse:\n{e}")
-        SCAN_JOBS[scanjob_identifier].status = STATE.SCAN_FAIL
+        SCAN_JOBS[scanjob_identifier].status = STATE.SCAN_FAILED
         return False
 
 #        job_id = root.findtext(".//wscn:JobId", NAMESPACES)
@@ -568,7 +568,7 @@ def parse_create_scan_job(scanjob_identifier, xml: str):
         SCAN_JOBS[scanjob_identifier].job_id = job_id
     else:
         logger.warning(f" cannot extract JobId from Response")
-        SCAN_JOBS[scanjob_identifier].status = STATE.SCAN_FAIL
+        SCAN_JOBS[scanjob_identifier].status = STATE.SCAN_FAILED
         return False
 
 #        job_token = root.findtext(".//wscn:JobToken", namespaces=ns)
@@ -581,7 +581,7 @@ def parse_create_scan_job(scanjob_identifier, xml: str):
         SCAN_JOBS[scanjob_identifier].job_token = job_token_elem.text.strip()
     else:
         logger.warning(f" cannot extract JobToken from Response")
-        SCAN_JOBS[scanjob_identifier].status = STATE.SCAN_FAIL
+        SCAN_JOBS[scanjob_identifier].status = STATE.SCAN_FAILED
         return False
 
 #        job_token = root.findtext(".//wscn:JobToken", namespaces=ns)
@@ -594,7 +594,7 @@ def parse_create_scan_job(scanjob_identifier, xml: str):
         SCANNERS[{SCAN_JOBS[scanjob_identifier].notifier_uuid}].DocPar_FileFormat = format_elem.text.strip()
     else:
         logger.warning(f" cannot extract Format from Response")
-        SCAN_JOBS[scanjob_identifier].status = STATE.SCAN_FAIL
+        SCAN_JOBS[scanjob_identifier].status = STATE.SCAN_FAILED
         return False
         
 #        pixels_per_line = root.findtext(".//wscn:PixelsPerLine", namespaces=ns)
