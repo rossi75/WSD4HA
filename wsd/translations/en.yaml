@@ -3,15 +3,19 @@ configuration:
   offline_timeout:
     name: Timeout
     description: >-
-      Time interval when a Probe Request expires. DHCP-like, so after half of the time the Probe Request is being sent out to renew the timer.
+      Time interval when a Probe Request expires. DHCP-like, so after half of the time the Probe Request is being sent out to renew the timer
   displayname:
     name: Destination
     description: >-
       Sets the Entry on the Scanner to where the Scanner sends his file
+  not_idle:
+    name: Scan but not idle
+    description: >-
+      What shall we do if the scanner is not idle but asks us to transmit a document?
   scan_folder:
     name: Scan Folder
     description: >-
-      Sets the path to where the scans are saved.
+      Sets the path to where the scans are saved
   max_files:
     name: Max. Files
     description: >-
@@ -19,8 +23,8 @@ configuration:
   log_level:
     name: Log level
     description: >-
-      Controls the level of log details the add-on provides.
+      Controls the level of log details the add-on provides
 network:
-  8110/tcp: The WSD4HA webserver
-  5357/tcp: The WSD4HA fileserver
+  8110/tcp: The WSD4HA UI
+  5357/tcp: The WSD notification port
 #  3702/udp: port to receive the WSD notifications
