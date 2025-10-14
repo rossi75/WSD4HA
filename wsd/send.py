@@ -11,7 +11,7 @@ from globals import SCANNERS, SCAN_JOBS, NAMESPACES, STATE, USER_AGENT, logger
 from parse import parse_wsd_packet, parse_probe, parse_transfer_get, parse_subscribe, parse_get_scanner_elements_default_ticket, parse_create_scan_job, parse_retrieve_image
 from pathlib import Path
 from tools import list_scanners, get_local_ip
-from templates import TEMPLATE_PROBE, TEMPLATE_TRANSFER_GET, TEMPLATE_SUBSCRIBE_SAE, TEMPLATE_SUBSCRIBE_RENEW, TEMPLATE_GET_SCANNER_ELEMENTS_STATE, TEMPLATE_GET_SCANNER_ELEMENTS_DEFAULT_TICKET, TEMPLATE_VALIDATE_SCAN_TICKET_DETAIL, TEMPLATE_CREATE_SCANJOB, TEMPLATE_RETRIEVE_DOCUMENT
+from templates import TEMPLATE_PROBE, TEMPLATE_TRANSFER_GET, TEMPLATE_SUBSCRIBE_SAE, TEMPLATE_SUBSCRIBE_RENEW, TEMPLATE_GET_SCANNER_ELEMENTS_STATE, TEMPLATE_GET_SCANNER_ELEMENTS_CONFIGURATION, TEMPLATE_GET_SCANNER_ELEMENTS_DEFAULT_TICKET, TEMPLATE_VALIDATE_SCAN_TICKET_DETAIL, TEMPLATE_CREATE_SCANJOB, TEMPLATE_RETRIEVE_DOCUMENT
 
 # ---------------- Send Scanner Probe ----------------
 async def send_probe(probe_uuid: str):
@@ -269,8 +269,6 @@ async def request_scanner_elements_state(scanjob_identifier: str):
     return result
 
 
-TEMPLATE_GET_SCANNER_ELEMENTS_SCANNER_CONFIGURATION
-
 ###################################################################################
 # GetScannerElements[ScannerConfiguration]
 # ---------------------------------------------------------------------------------
@@ -284,9 +282,9 @@ async def request_scanner_elements_scanner_configuration(scanjob_identifier: str
         logger.warning(f"could not find any existing job with ID {scanjob_identifier}. Skipping configuration request")
         SCAN_JOBS[scanjob_identifier].status = STATE.SCAN_FAILED
         return False
-    else:
+#    else:
 #        SCAN_JOBS[scanjob_identifier].status == STATE.REQ_SCAN_STATE
-        return True
+#        return True
 
     # tbd
     body = ""
