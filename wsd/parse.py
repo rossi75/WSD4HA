@@ -295,9 +295,9 @@ def parse_notify_msg(notifier_uuid, xml):
         input_source = input_source_elem.text.strip()
 
     logger.debug(f"   --->        Notify UUID: {notifier_uuid}")
-    logger.debug(f"   --->    Subscription ID: {subscr_identifier}")
+    logger.debug(f"   --->   *Subscription ID: {subscr_identifier}")
     logger.debug(f"   --->             Action: {action}")
-    logger.debug(f"   --->     Client Context: {client_context}")
+    logger.debug(f"   --->    *Client Context: {client_context}")
     logger.debug(f"   ---> Scanjob Identifier: {scanjob_identifier}")
     logger.debug(f"   --->       Input Source: {input_source}")
 
@@ -371,13 +371,6 @@ def parse_get_scanner_elements_configuration(scanjob_identifier, xml):
         if data_valid != "true":
             SCAN_JOBS[scanjob_identifier].status = STATE.SCAN_FAIL
             return False
-    
-    <wscn:PlatenMaximumSize>
-............................................<wscn:Width>
-................................................8503
-................................................</wscn:Width>
-............................................<wscn:Height>
-................................................11732
 
     width_elem = root.find(".//wscn:ScanRegionWidth", NAMESPACES)
     if width_elem is not None and width_elem.text:
@@ -419,110 +412,125 @@ def parse_get_scanner_elements_default_ticket(scanjob_identifier, xml):
     
     format_elem = root.find(".//wscn:Format", NAMESPACES)
     if format_elem is not None and format_elem.text:
-        format = format_elem.text.strip()
-        SCAN_JOBS[scanjob_identifier].DocPar_FileFormat = format
+#        format = format_elem.text.strip()
+#        SCAN_JOBS[scanjob_identifier].DocPar_FileFormat = format
+        SCAN_JOBS[scanjob_identifier].DocPar_FileFormat =  format_elem.text.strip()
         logger.info(f" format: {SCAN_JOBS[scanjob_identifier].DocPar_FileFormat}")
 
     images_to_transfer_elem = root.find(".//wscn:ImagesToTransfer", NAMESPACES)
     if images_to_transfer_elem is not None and images_to_transfer_elem.text:
-        images_to_transfer = images_to_transfer_elem.text.strip()
-        SCAN_JOBS[scanjob_identifier].DocPar_ImagesToTransfer = images_to_transfer
+#        images_to_transfer = images_to_transfer_elem.text.strip()
+#        SCAN_JOBS[scanjob_identifier].DocPar_ImagesToTransfer = images_to_transfer
+        SCAN_JOBS[scanjob_identifier].DocPar_ImagesToTransfer = images_to_transfer_elem.text.strip()
         logger.info(f" images_to_transfer: {SCAN_JOBS[scanjob_identifier].DocPar_ImagesToTransfer}")
 
     input_source_elem = root.find(".//wscn:InputSource", NAMESPACES)
     if input_source_elem is not None and input_source_elem.text:
-        input_source = input_source_elem.text.strip()
-        SCAN_JOBS[scanjob_identifier].DocPar_InputSource = input_source
+#        input_source = input_source_elem.text.strip()
+#        SCAN_JOBS[scanjob_identifier].DocPar_InputSource = input_source
+        SCAN_JOBS[scanjob_identifier].DocPar_InputSource = input_source_elem.text.strip()
         logger.info(f" InputSource: {SCAN_JOBS[scanjob_identifier].DocPar_InputSource}")
 
-    input_width_elem = root.find(".//wscn:InputMediaSize/wscn:Width", NAMESPACES)
-    if input_width_elem is not None and input_width_elem.text:
-        input_width = input_width_elem.text.strip()
-        SCAN_JOBS[scanjob_identifier].DocPar_InputWidth = input_width
-        logger.info(f" InputWidth: {SCAN_JOBS[scanjob_identifier].DocPar_InputWidth}")
+#    input_width_elem = root.find(".//wscn:InputMediaSize/wscn:Width", NAMESPACES)
+#    if input_width_elem is not None and input_width_elem.text:
+##        input_width = input_width_elem.text.strip()
+##        SCAN_JOBS[scanjob_identifier].DocPar_InputWidth = input_width
+#        SCAN_JOBS[scanjob_identifier].DocPar_InputWidth = input_width_elem.text.strip()
+#        logger.info(f" InputWidth: {SCAN_JOBS[scanjob_identifier].DocPar_InputWidth}")
 
-    input_height_elem = root.find(".//wscn:InputMediaSize/wscn:Height", NAMESPACES)
-    if input_height_elem is not None and input_height_elem.text:
-        input_height = input_height_elem.text.strip()
-        SCAN_JOBS[scanjob_identifier].DocPar_InputHeight = input_height
-        logger.info(f" InputHeight: {SCAN_JOBS[scanjob_identifier].DocPar_InputHeight}")
+#    input_height_elem = root.find(".//wscn:InputMediaSize/wscn:Height", NAMESPACES)
+#    if input_height_elem is not None and input_height_elem.text:
+#        input_height = input_height_elem.text.strip()
+#        SCAN_JOBS[scanjob_identifier].DocPar_InputHeight = input_height
+#        logger.info(f" InputHeight: {SCAN_JOBS[scanjob_identifier].DocPar_InputHeight}")
 
     contrast_elem = root.find(".//wscn:Contrast", NAMESPACES)
     if contrast_elem is not None and contrast_elem.text:
-        contrast = contrast_elem.text.strip()
-        SCAN_JOBS[scanjob_identifier].DocPar_ExposureContrast = contrast
+#        contrast = contrast_elem.text.strip()
+#        SCAN_JOBS[scanjob_identifier].DocPar_ExposureContrast = contrast
+        SCAN_JOBS[scanjob_identifier].DocPar_ExposureContrast = contrast_elem.text.strip()
         logger.info(f" contrast: {SCAN_JOBS[scanjob_identifier].DocPar_ExposureContrast}")
 
     brightness_elem = root.find(".//wscn:Brightness", NAMESPACES)
     if brightness_elem is not None and brightness_elem.text:
-        brightness = brightness_elem.text.strip()
-        SCAN_JOBS[scanjob_identifier].DocPar_ExposureBrightness = brightness
+#        brightness = brightness_elem.text.strip()
+#        SCAN_JOBS[scanjob_identifier].DocPar_ExposureBrightness = brightness
+        SCAN_JOBS[scanjob_identifier].DocPar_ExposureBrightness = brightness_elem.text.strip()
         logger.info(f" brightness: {SCAN_JOBS[scanjob_identifier].DocPar_ExposureBrightness}")
 
     scaling_width_elem = root.find(".//wscn:ScalingWidth", NAMESPACES)
     if scaling_width_elem is not None and scaling_width_elem.text:
-        scaling_width = scaling_width_elem.text.strip()
-        SCAN_JOBS[scanjob_identifier].DocPar_ScalingWidth = scaling_width
+#        scaling_width = scaling_width_elem.text.strip()
+#        SCAN_JOBS[scanjob_identifier].DocPar_ScalingWidth = scaling_width
+        SCAN_JOBS[scanjob_identifier].DocPar_ScalingWidth = scaling_width_elem.text.strip()
         logger.info(f" scaling_width: {SCAN_JOBS[scanjob_identifier].DocPar_ScalingWidth}")
 
     scaling_height_elem = root.find(".//wscn:ScalingHeight", NAMESPACES)
     if scaling_height_elem is not None and scaling_height_elem.text:
-        scaling_height = scaling_height_elem.text.strip()
-        SCAN_JOBS[scanjob_identifier].DocPar_ScalingHeight = scaling_height
+#        scaling_height = scaling_height_elem.text.strip()
+#        SCAN_JOBS[scanjob_identifier].DocPar_ScalingHeight = scaling_height
+        SCAN_JOBS[scanjob_identifier].DocPar_ScalingHeight = scaling_height_elem.text.strip()
         logger.info(f" scaling_height: {SCAN_JOBS[scanjob_identifier].DocPar_ScalingHeight}")
 
     rotation_elem = root.find(".//wscn:Rotation", NAMESPACES)
     if rotation_elem is not None and rotation_elem.text:
-        rotation = rotation_elem.text.strip()
-        SCAN_JOBS[scanjob_identifier].DocPar_Rotation = rotation
+#        rotation = rotation_elem.text.strip()
+#        SCAN_JOBS[scanjob_identifier].DocPar_Rotation = rotation
+        SCAN_JOBS[scanjob_identifier].DocPar_Rotation = rotation_elem.text.strip()
         logger.info(f" rotation: {SCAN_JOBS[scanjob_identifier].DocPar_Rotation}")
 
     pixels_per_line_elem = root.find(".//wscn:PixelsPerLine", NAMESPACES)
     if pixels_per_line_elem is not None and pixels_per_line_elem.text:
-        pixels_per_line = pixels_per_line_elem.text.strip()
-        SCAN_JOBS[scanjob_identifier].DocPar_PixelsPerLine = pixels_per_line
+#        pixels_per_line = pixels_per_line_elem.text.strip()
+#        SCAN_JOBS[scanjob_identifier].DocPar_PixelsPerLine = pixels_per_line
+        SCAN_JOBS[scanjob_identifier].DocPar_PixelsPerLine = pixels_per_line_elem.text.strip()
         logger.info(f" *PixelsPerLine: {SCAN_JOBS[scanjob_identifier].DocPar_PixelsPerLine}")
 
     number_of_lines_elem = root.find(".//wscn:NumberOfLines", NAMESPACES)
     if number_of_lines_elem is not None and number_of_lines_elem.text:
-        number_of_lines = number_of_lines_elem.text.strip()
-        SCAN_JOBS[scanjob_identifier].DocPar_NumberOfLines = number_of_lines
+#        number_of_lines = number_of_lines_elem.text.strip()
+#        SCAN_JOBS[scanjob_identifier].DocPar_NumberOfLines = number_of_lines
+        SCAN_JOBS[scanjob_identifier].DocPar_NumberOfLines = number_of_lines_elem.text.strip()
         logger.info(f" *number_of_lines: {SCAN_JOBS[scanjob_identifier].DocPar_NumberOfLines}")
 
     bytes_per_line_elem = root.find(".//wscn:BytesPerLine", NAMESPACES)
     if bytes_per_line_elem is not None and bytes_per_line_elem.text:
-        bytes_per_line = bytes_per_line_elem.text.strip()
-        SCAN_JOBS[scanjob_identifier].DocPar_BytesPerLine = bytes_per_line
+#        bytes_per_line = bytes_per_line_elem.text.strip()
+#        SCAN_JOBS[scanjob_identifier].DocPar_BytesPerLine = bytes_per_line
+        SCAN_JOBS[scanjob_identifier].DocPar_BytesPerLine = bytes_per_line_elem.text.strip()
         logger.info(f" *bytes_per_line: {SCAN_JOBS[scanjob_identifier].DocPar_BytesPerLine}")
 
     x_offset_elem = root.find(".//wscn:ScanRegionXOffset", NAMESPACES)
     if x_offset_elem is not None and x_offset_elem.text:
-        x_offset = x_offset_elem.text.strip()
-        SCAN_JOBS[scanjob_identifier].DocPar_RegionXOffset = x_offset
+#        x_offset = x_offset_elem.text.strip()
+#        SCAN_JOBS[scanjob_identifier].DocPar_RegionXOffset = x_offset
+        SCAN_JOBS[scanjob_identifier].DocPar_RegionXOffset = x_offset_elem.text.strip()
         logger.info(f" x_offset: {SCAN_JOBS[scanjob_identifier].DocPar_RegionXOffset}")
 
     y_offset_elem = root.find(".//wscn:ScanRegionYOffset", NAMESPACES)
     if y_offset_elem is not None and y_offset_elem.text:
-        y_offset = y_offset_elem.text.strip()
-        SCAN_JOBS[scanjob_identifier].DocPar_RegionYOffset = y_offset
+#        y_offset = y_offset_elem.text.strip()
+#        SCAN_JOBS[scanjob_identifier].DocPar_RegionYOffset = y_offset
+        SCAN_JOBS[scanjob_identifier].DocPar_RegionYOffset = y_offset_elem.text.strip()
         logger.info(f" y_offset: {SCAN_JOBS[scanjob_identifier].DocPar_RegionYOffset}")
 
-    region_width_elem = root.find(".//wscn:ScanRegionWidth", NAMESPACES)
-    if region_width_elem is not None and region_width_elem.text:
-        region_width = region_width_elem.text.strip()
-        SCAN_JOBS[scanjob_identifier].DocPar_RegionWidth = region_width
-        logger.info(f" region_width: {SCAN_JOBS[scanjob_identifier].DocPar_RegionWidth}")
+#    region_width_elem = root.find(".//wscn:ScanRegionWidth", NAMESPACES)
+#    if region_width_elem is not None and region_width_elem.text:
+#        region_width = region_width_elem.text.strip()
+#        SCAN_JOBS[scanjob_identifier].DocPar_RegionWidth = region_width
+#        logger.info(f" region_width: {SCAN_JOBS[scanjob_identifier].DocPar_RegionWidth}")
 
-    region_height_elem = root.find(".//wscn:ScanRegionHeight", NAMESPACES)
-    if region_height_elem is not None and region_height_elem.text:
-        region_height = region_height_elem.text.strip()
-        SCAN_JOBS[scanjob_identifier].DocPar_RegionHeight = region_height
-        logger.info(f" region_height: {SCAN_JOBS[scanjob_identifier].DocPar_RegionHeight}")
+#    region_height_elem = root.find(".//wscn:ScanRegionHeight", NAMESPACES)
+#    if region_height_elem is not None and region_height_elem.text:
+#        region_height = region_height_elem.text.strip()
+#        SCAN_JOBS[scanjob_identifier].DocPar_RegionHeight = region_height
+#        logger.info(f" region_height: {SCAN_JOBS[scanjob_identifier].DocPar_RegionHeight}")
 
     color_processing_elem = root.find(".//wscn:ColorProcessing", NAMESPACES)
     if color_processing_elem is not None and color_processing_elem.text:
-        color_processing = color_processing_elem.text.strip()
-        SCAN_JOBS[scanjob_identifier].DocPar_ColorProcessing = color_processing
+#        color_processing = color_processing_elem.text.strip()
+#        SCAN_JOBS[scanjob_identifier].DocPar_ColorProcessing = color_processing
+        SCAN_JOBS[scanjob_identifier].DocPar_ColorProcessing = color_processing_elem.text.strip()
         logger.info(f" color_processing: {SCAN_JOBS[scanjob_identifier].DocPar_ColorProcessing}")
 
     resolution_width_elem = root.find(".//wscn:Resolution/wscn:Width", NAMESPACES)
