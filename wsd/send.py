@@ -220,7 +220,7 @@ async def send_subscription_renew(renew_uuid: str):
 # Parameters:
 # scan_from_uuid = Scanners uuid, but taken from the scan job
 # ---------------------------------------------------------------------------------
-def request_scanner_elements_state(scanjob_identifier: str):
+async def request_scanner_elements_state(scanjob_identifier: str):
     logger.info(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} [SEND:gse_state] asking scanner about its state for scan job {scanjob_identifier}")
 
     if scanjob_identifier not in SCAN_JOBS:
@@ -239,7 +239,7 @@ def request_scanner_elements_state(scanjob_identifier: str):
 # Parameters:
 # scan_from_uuid = Scanners uuid, but taken from the scan job
 # ---------------------------------------------------------------------------------
-def request_scanner_elements_def_ticket(scanjob_identifier: str):
+async def request_scanner_elements_def_ticket(scanjob_identifier: str):
     logger.info(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} [SEND:def_ticket] asking scanner about its default ticket for scan job {scanjob_identifier}")
 
     if scanjob_identifier not in SCAN_JOBS:
@@ -298,7 +298,7 @@ def request_scanner_elements_def_ticket(scanjob_identifier: str):
 # Parameters:
 # scan_from_uuid = Scanners uuid, but taken from the scan job
 # ---------------------------------------------------------------------------------
-def request_validate_scan_ticket(scanjob_identifier: str):
+async def request_validate_scan_ticket(scanjob_identifier: str):
     logger.info(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} [SEND:validate_scan_ticket] validating scan ticket for scan job {scanjob_identifier}")
 
     if scanjob_identifier not in SCAN_JOBS:
