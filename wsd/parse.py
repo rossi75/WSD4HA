@@ -346,7 +346,7 @@ def parse_get_scanner_elements_default_ticket(scanjob_identifier, xml):
 
     #check for ElementData true !!
     data_valid_elem = root.find(".//wscn:ElementData", NAMESPACES)
-    if data_valid_elem is not None and datal_valid_elem.text:
+    if data_valid_elem is not None and data_valid_elem.text:
         valid = valid_elem.text.strip().lower()
         logger.info(f" valid: {valid}")
         if valid != "true":
