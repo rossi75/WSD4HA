@@ -253,11 +253,11 @@ async def request_scanner_elements_state(scanjob_identifier: str):
                 else:
                     SCAN_JOBS[scanjob_identifier].state = STATE.SCAN_FAILED
                     logger.error(f"[SEND:def_ticket] Request for scanners state failed with Statuscode {resp.status}")
-                    return false
+                    return False
         except Exception as e:
             logger.error(f"[SEND:def_ticket] anything went wrong with scanners state for scan job {SCAN_JOBS[scanjob_identifier]}:\n{e}")
             SCAN_JOBS[scanjob_identifier].state = STATE.SCAN_FAILED
-            return false
+            return False
 
     logger.info(f"trying to parse the scanners state")
     logger.debug(f"   --->  Answer XML:\n{body}")
@@ -314,11 +314,11 @@ async def request_scanner_elements_configuration(scanjob_identifier: str):
                 else:
                     SCAN_JOBS[scanjob_identifier].state = STATE.SCAN_FAILED
                     logger.error(f"[SEND:scan_config] Request for scanners configuration failed with Statuscode {resp.status}")
-                    return false
+                    return False
         except Exception as e:
             logger.error(f"[SEND:scan_config] anything went wrong with scanners configuration for scan job {SCAN_JOBS[scanjob_identifier]}:\n{e}")
             SCAN_JOBS[scanjob_identifier].state = STATE.SCAN_FAILED
-            return false
+            return False
 
     logger.info(f"trying to parse the scanners configuration")
     logger.debug(f"   --->  Answer XML:\n{body}")
@@ -375,11 +375,11 @@ async def request_scanner_elements_def_ticket(scanjob_identifier: str):
                 else:
                     SCAN_JOBS[scanjob_identifier].state = STATE.SCAN_FAILED
                     logger.error(f"[SEND:def_ticket] Request for default ticket failed with Statuscode {resp.status}")
-                    return false
+                    return False
         except Exception as e:
             logger.error(f"[SEND:def_ticket] anything went wrong with Scan Job {SCAN_JOBS[scanjob_identifier]}:\n{e}")
             SCAN_JOBS[scanjob_identifier].state = STATE.SCAN_FAILED
-            return false
+            return False
 
     logger.info(f"trying to parse the default ticket answer")
     logger.debug(f"   --->  Answer XML:\n{body}")
@@ -476,11 +476,11 @@ async def request_scan_job_ticket(scanjob_identifier: str):
                 else:
                     SCAN_JOBS[scanjob_identifier].state = STATE.SCAN_FAILED
                     logger.error(f"[SCAN_JOB:ticket] Request for ticket failed with Statuscode {resp.status}")
-                    return false
+                    return False
         except Exception as e:
             logger.error(f"[SCAN_JOB:ticket] anything went wrong with {SCAN_JOBS[scanjob_identifier]}: {e}")
             SCAN_JOBS[scanjob_identifier].state = STATE.SCAN_FAILED
-            return false
+            return False
 
     logger.info(f"trying to parse the ticket answer")
     logger.info(f"   --->  Answer XML:\n{body}")
