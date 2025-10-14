@@ -228,6 +228,7 @@ async def request_scanner_elements_state(scanjob_identifier: str):
         SCAN_JOBS[scanjob_identifier].status = STATE.SCAN_FAILED
         return False
     else:
+        SCAN_JOBS[scanjob_identifier].status == STATE.REQ_SCAN_STATE
         return True
 
     # tbd
@@ -247,7 +248,7 @@ async def request_scanner_elements_def_ticket(scanjob_identifier: str):
 #        SCAN_JOBS[scanjob_identifier].status = STATE.SCAN_FAILED
         return False
     else:
-        SCAN_JOBS[scanjob_identifier].status == STATE.SCAN_REQ_DEF_TICKET
+        SCAN_JOBS[scanjob_identifier].status == STATE.REQ_DEF_TICKET
 
     body = ""
     msg_id = uuid.uuid4()
