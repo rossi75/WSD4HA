@@ -8,7 +8,7 @@ import uuid
 import xml.etree.ElementTree as ET
 from config import OFFLINE_TIMEOUT, LOCAL_IP, HTTP_PORT, FROM_UUID, DISPLAY, NOTIFY_PORT
 from globals import SCANNERS, SCAN_JOBS, NAMESPACES, STATE, USER_AGENT, logger
-from parse import parse_wsd_packet, parse_probe, parse_transfer_get, parse_subscribe, parse_get_scanner_element_default_ticket, parse_create_scan_job, parse_retrieve_image
+from parse import parse_wsd_packet, parse_probe, parse_transfer_get, parse_subscribe, parse_get_scanner_elements_default_ticket, parse_create_scan_job, parse_retrieve_image
 from pathlib import Path
 from tools import list_scanners, get_local_ip
 from templates import TEMPLATE_PROBE, TEMPLATE_TRANSFER_GET, TEMPLATE_SUBSCRIBE_SAE, TEMPLATE_SUBSCRIBE_RENEW, TEMPLATE_GET_SCANNER_ELEMENTS_DEFAULT_TICKET, TEMPLATE_VALIDATE_SCAN_TICKET_DETAIL, TEMPLATE_CREATE_SCANJOB, TEMPLATE_RETRIEVE_DOCUMENT
