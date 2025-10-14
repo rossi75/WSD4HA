@@ -1,18 +1,8 @@
 import datetime
-#import logging
-#import socket
-#import sys
 from config import OFFLINE_TIMEOUT
 from datetime import timedelta
-#from globals import SCANNERS, NAMESPACES, STATE, LOG_LEVEL
-#from globals import SCANNERS, NAMESPACES, STATE, LOG_LEVEL, logger
 from globals import SCANNERS, NAMESPACES, STATE, logger
 from tools import list_scanners, marry_endpoints
-
-#logging.basicConfig(level=logging.INFO, format='[%(levelname)s] %(message)s')
-#logging.basicConfig(level=logging.LOG_LEVEL, format='[%(levelname)s] %(message)s')
-#logging.basicConfig(level=LOG_LEVEL, format='[%(levelname)s] %(message)s')
-#logger = logging.getLogger("wsd-addon")
 
 # ---------------- Scanner-Datenstruktur ----------------
 class Scanner:
@@ -64,7 +54,6 @@ class Scanner:
 
     # Scannerservice ist noch online
     # Aufruf mit SCANNER[uuid].update_subscription()
-#    def update_subscription(self, timeout = 3600):
     def update_subscription(self):
         self.subscription_last_seen = datetime.datetime.now().replace(microsecond=0)
         self.last_seen = datetime.datetime.now().replace(microsecond=0)
@@ -86,10 +75,8 @@ class Scanner:
         logger.debug(f"   --> offline_since: {self.offline_since}")
         logger.debug(f"   -->  remove_after: {self.remove_after}")
 
-# ---------------- Scanner-Datenstruktur ----------------
+# ---------------- ScanJob-Datenstruktur ----------------
 class Scan_Jobs:
-#    def __init__(self, scan_job_id, subscription_id, scanner_uuid, xaddr):
-#    def __init__(self, scan_job_id, subscription_id, scanner_uuid):
     def __init__(self, scan_job_idendtifier, scan_from_uuid, input_source):
         logger.debug(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} [SCAN_JOBS:__init__] New instance of a Scan Job")
 
