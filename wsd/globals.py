@@ -80,13 +80,13 @@ class STATE(str, Enum):
 #    GET_SCAN_DESCR = "Requesting ScannerDescription"                                       # 31
 #    CHK_SCAN_DESCR = "Checking ScannerDescription"
 #    DONE_SCAN_DESCR = "Done ScannerDescription"                                            # 33
-    GET_DEF_SCAN_TICK = "Requesting DefaultScannerTicket"                                 # 35
-    CHK_DEF_SCAN_TICK = "Checking DefaultScannerTicket"
-    DONE_DEF_SCAN_TICK = "Done DefaultScannerTicket"                                      # 36
+    REQ_DEF_TICKET = "Requesting DefaultScannerTicket"                                 # 35
+    CHK_DEF_TICKET = "Checking DefaultScannerTicket"
+    DONE_DEF_TICKET = "Done DefaultScannerTicket"                                      # 36
 #    GET_SCAN_CONF = "Requesting ScannerConfiguration"                                     # 40
 #    CHK_SCAN_CONF = "Checking ScannerConfiguration"
 #    DONE_SCAN_CONF = "Done ScannerConfiguration"                                          # 41
-    GET_SCAN_STATE = "Requesting ScannerState"                                             # 45
+    REQ_SCAN_STATE = "Requesting ScannerState"                                             # 45
     CHK_SCAN_STATE = "Checking ScannerState"
     DONE_SCAN_STATE = "Done ScannerState"                                                  # 46
     ONLINE = "online"
