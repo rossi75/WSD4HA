@@ -319,7 +319,7 @@ def parse_notify_msg(notifier_uuid, xml):
 # ---------------- Status Parser ----------------
 def parse_get_scanner_elements_state(scanjob_identifier, xml):
     logger.info(f"[PARSE:gse_state] parsing scanners state for {SCANNERS[SCAN_JOBS[scanjob_identifier].scan_from_uuid].friendly_name or SCAN_JOBS[scanjob_identifier].scan_from_uuid} @ {SCANNERS[SCAN_JOBS[scanjob_identifier].scan_from_uuid].ip}")
-    logger.info(f"   XML:\n{xml}")
+    logger.debug(f"   XML:\n{xml}")
 
     try:
         root = ET.fromstring(xml)
@@ -341,7 +341,7 @@ def parse_get_scanner_elements_state(scanjob_identifier, xml):
     state_elem = root.find(".//wscn:ScannerState", NAMESPACES)
     if state_elem is not None and state_elem.text:
         state = state_elem.text.strip().lower()
-        logger.info(f" state: {state}")
+        logger.info(f"   ---> state: {state}")
         if state != "idle":
             SCAN_JOBS[scanjob_identifier].status = STATE.SCAN_FAILED
             return False
@@ -372,17 +372,17 @@ def parse_get_scanner_elements_configuration(scanjob_identifier, xml):
             SCAN_JOBS[scanjob_identifier].status = STATE.SCAN_FAILED
             return False
 
-    width_elem = root.find(".//wscn:ScanRegionWidth", NAMESPACES)
+    width_elem = root.find(".//wscn:PlatenMaximumSize/wscn:Width", NAMESPACES)
     if width_elem is not None and width_elem.text:
-        width = width_elem.text.strip()
+        width = str(math.floor(int(width_elem.text.strip()) / 10) * 10)
         SCAN_JOBS[scanjob_identifier].DocPar_InputWidth = width
         SCAN_JOBS[scanjob_identifier].DocPar_RegionWidth = width
         logger.info(f" input_width_elem: {SCAN_JOBS[scanjob_identifier].DocPar_InputWidth}")
         logger.info(f" region_width_elem: {SCAN_JOBS[scanjob_identifier].DocPar_RegionWidth}")
 
-    height_elem = root.find(".//wscn:ScanRegionWidth", NAMESPACES)
+    height_elem = root.find(".//wscn:PlatenMaximumSize/wscn:Height", NAMESPACES)
     if height_elem is not None and height_elem.text:
-        height = height_elem.text.strip()
+        height = str(math.floor(int(height_elem.text.strip()) / 10) * 10)
         SCAN_JOBS[scanjob_identifier].DocPar_InputHeight = height
         SCAN_JOBS[scanjob_identifier].DocPar_RegionHeight = height
         logger.info(f" input_height_elem: {SCAN_JOBS[scanjob_identifier].DocPar_InputHeight}")
