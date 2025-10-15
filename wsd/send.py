@@ -557,7 +557,8 @@ async def request_retrieve_image(scanjob_identifier: str):
                     body = await resp.read()
 #                    soap_xml, image_bytes = parse_retrieve_image_response(body, resp.headers.get("Content-Type", ""))
 #                    xml, image_bytes = parse_retrieve_image_response(body, resp.headers.get("Content-Type", ""))
-                    parse_retrieve_image_response(scanjob_identifier, body, resp.headers.get("Content-Type", ""))
+#                    parse_retrieve_image_response(scanjob_identifier, body, resp.headers.get("Content-Type", ""))
+                    parse_retrieve_image(scanjob_identifier, body, resp.headers.get("Content-Type", ""))
                #     if image_bytes:
                #         filename = f"/scans/{scanner.friendly_name or scanner_uuid}_{scan_identifier}.jfif"
                #         os.makedirs(os.path.dirname(filename), exist_ok=True)
