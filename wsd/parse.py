@@ -555,7 +555,7 @@ def parse_create_scan_job(scanjob_identifier, xml: str):
     format = ""
     format_elem = root.find(".//wscn:Format", NAMESPACES)
     if format_elem is not None and format_elem.text:
-        SCANNERS[SCAN_JOBS[scanjob_identifier].scan_from_uuid].DocPar_FileFormat = format_elem.text.strip()
+        SCAN_JOBS[scanjob_identifier].DocPar_FileFormat = format_elem.text.strip()
     else:
         logger.warning(f" cannot extract Format from Response")
         SCAN_JOBS[scanjob_identifier].status = STATE.SCAN_FAILED
@@ -565,7 +565,7 @@ def parse_create_scan_job(scanjob_identifier, xml: str):
     pixels_per_line = ""
     pixels_per_line_elem = root.find(".//wscn:PixelsPerLine", NAMESPACES)
     if pixels_per_line_elem is not None and pixels_per_line_elem.text:
-        SCANNERS[SCAN_JOBS[scanjob_identifier].scan_from_uuid].DocPar_PixelsPerLine = pixels_per_line_elem.text.strip()
+        SCAN_JOBS[scanjob_identifier].DocPar_PixelsPerLine = pixels_per_line_elem.text.strip()
     else:
         logger.warning(f" cannot extract Pixels per Line from Response")
 #        SCAN_JOBS[scanjob_identifier].status = STATE.SCAN_FAILED
@@ -575,7 +575,7 @@ def parse_create_scan_job(scanjob_identifier, xml: str):
     number_of_lines = ""
     number_of_lines_elem = root.find(".//wscn:NumberOfLines", NAMESPACES)
     if number_of_lines_elem is not None and number_of_lines_elem.text:
-        SCANNERS[SCAN_JOBS[scanjob_identifier].scan_from_uuid].DocPar_NumberOfLines = number_of_lines_elem.text.strip()
+        SCAN_JOBS[scanjob_identifier].DocPar_NumberOfLines = number_of_lines_elem.text.strip()
     else:
         logger.warning(f" cannot extract Number of Lines from Response")
 #        SCAN_JOBS[scanjob_identifier].status = STATE.SCAN_FAILED
@@ -585,16 +585,16 @@ def parse_create_scan_job(scanjob_identifier, xml: str):
     bytes_per_line = ""
     bytes_per_line_elem = root.find(".//wscn:BytesPerLine", NAMESPACES)
     if bytes_per_line_elem is not None and bytes_per_line_elem.text:
-        SCANNERS[SCAN_JOBS[scanjob_identifier].scan_from_uuid].DocPar_BytesPerLine = bytes_per_line_elem.text.strip()
+        SCAN_JOBS[scanjob_identifier].DocPar_BytesPerLine = bytes_per_line_elem.text.strip()
     else:
         logger.warning(f" cannot extract Bytes per Line from Response")
 #        SCAN_JOBS[scanjob_identifier].status = STATE.SCAN_FAILED
 #        return False
 
-    logger.info(f"   --->    JobId: {SCAN_JOBS[scanjob_identifier].job_id}")
-    logger.info(f"   ---> JobToken: {SCAN_JOBS[scanjob_identifier].job_token}")
-    logger.info(f"   --->   Format: {SCAN_JOBS[scanjob_identifier].DocPar_FileFormat}")
+    logger.info(f"   --->     JobId: {SCAN_JOBS[scanjob_identifier].job_id}")
+    logger.info(f"   --->  JobToken: {SCAN_JOBS[scanjob_identifier].job_token}")
 
+    logger.info(f"   --->    Format: {SCAN_JOBS[scanjob_identifier].DocPar_FileFormat}")
     logger.info(f"   --->   PxPLine: {SCAN_JOBS[scanjob_identifier].DocPar_PixelsPerLine}")
     logger.info(f"   --->  NbrLines: {SCAN_JOBS[scanjob_identifier].DocPar_NumberOfLines}")
     logger.info(f"   --->Bytes/Line: {SCAN_JOBS[scanjob_identifier].DocPar_BytesPerLine}")
