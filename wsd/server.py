@@ -29,7 +29,7 @@ async def start_http_server():
     # An alle Interfaces binden (0.0.0.0) -> wichtig für Docker / HA
     site = web.TCPSite(runner, "0.0.0.0", HTTP_PORT)
     await site.start()
-    logger.info(f"HTTP/SOAP Server is running on Port {HTTP_PORT}")
+    logger.info(f"HTTP Server for UI is running on Port {HTTP_PORT}")
 
 # ---------------- WebUI ----------------
 async def status_page(request):
