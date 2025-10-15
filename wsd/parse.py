@@ -603,13 +603,13 @@ def parse_create_scan_job(scanjob_identifier, xml: str):
 
 # -------------------------------  ----------------------------------------------------
 # def parse_retrieve_image(body: bytes, content_type: str):
-def parse_retrieve_image_response(scanjob_identifier, data, content-type: str)
+def parse_retrieve_image_response(scanjob_identifier, data, content_type: str)
     """
     Parse multipart/related RetrieveImageResponse from scanner.
     Returns: (soap_xml: str, image_bytes: bytes or None)
     """
     logger.info(f"[PARSE:rtrv_img] parsing {len(data)} bytes for scan job {scanjob_identifier}")
-    logger.info(f" content-type: {content-type}")
+    logger.info(f" content-type: {content_type}")
     logger.info(f"      content:\n{data[:1500]}")
 
     # Boundary extrahieren
@@ -620,7 +620,7 @@ def parse_retrieve_image_response(scanjob_identifier, data, content-type: str)
     boundary = m.group(1).encode()
 
     parts = body.split(b"--" + boundary)
-    soap_xml = None
+    xml = None
     image_bytes = None
     image_content_id = None
 
@@ -636,8 +636,8 @@ def parse_retrieve_image_response(scanjob_identifier, data, content-type: str)
         headers_decoded = headers.decode(errors="ignore")
 
         if "application/xop+xml" in headers_decoded or "application/soap+xml" in headers_decoded:
-            soap_xml = re.sub(rb"^[0-9a-fA-F]+\r\n", b"", data.strip())
-            soap_xml = soap_xml.strip(b"\r\n0\r\n")
+            xml = re.sub(rb"^[0-9a-fA-F]+\r\n", b"", data.strip())
+            xml = xml.strip(b"\r\n0\r\n")
         elif "application/binary" in headers_decoded:
             image_bytes = data.strip()
             m_id = re.search(r"Content-ID:\s*<([^>]+)>", headers_decoded)
