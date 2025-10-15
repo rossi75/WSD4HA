@@ -602,12 +602,15 @@ def parse_create_scan_job(scanjob_identifier, xml: str):
 
 
 # -------------------------------  ----------------------------------------------------
-def parse_retrieve_image(body: bytes, content_type: str):
+# def parse_retrieve_image(body: bytes, content_type: str):
+def parse_retrieve_image_response(scanjob_identifier, data, content-type: str)
     """
     Parse multipart/related RetrieveImageResponse from scanner.
     Returns: (soap_xml: str, image_bytes: bytes or None)
     """
-    logger.info(f"[PARSE:rtrv_img] parsing image bytes")
+    logger.info(f"[PARSE:rtrv_img] parsing {len(data)} bytes for scan job {scanjob_identifier}")
+    logger.info(f" content-type: {content-type}")
+    logger.info(f"      content:\n{data[:1500]}")
 
     # Boundary extrahieren
     m = re.search(r'boundary="?([^";]+)"?', content_type, re.IGNORECASE)
