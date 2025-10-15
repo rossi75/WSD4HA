@@ -521,7 +521,7 @@ def parse_get_scanner_elements_default_ticket(scanjob_identifier, xml):
 def parse_create_scan_job(scanjob_identifier, xml: str):
     """Parst die Antwort vom Scanner und speichert Werte in SCAN_JOBS."""
     logger.info(f"[PARSE:sj_ticket] parsing ticket request for {scanjob_identifier} from {SCANNERS[SCAN_JOBS[scanjob_identifier].scan_from_uuid].friendly_name or SCAN_JOBS[scanjob_identifier].scan_from_uuid} @ {SCANNERS[SCAN_JOBS[scanjob_identifier].scan_from_uuid].ip}")
-    logger.info(f"   XML:\n{xml}")
+    logger.debug(f"   XML:\n{xml}")
 
     try:
         root = ET.fromstring(xml)
@@ -591,13 +591,12 @@ def parse_create_scan_job(scanjob_identifier, xml: str):
 #        SCAN_JOBS[scanjob_identifier].status = STATE.SCAN_FAILED
 #        return False
 
-    logger.info(f"   --->     JobId: {SCAN_JOBS[scanjob_identifier].job_id}")
-    logger.info(f"   --->  JobToken: {SCAN_JOBS[scanjob_identifier].job_token}")
-
-    logger.info(f"   --->    Format: {SCAN_JOBS[scanjob_identifier].DocPar_FileFormat}")
-    logger.info(f"   --->   PxPLine: {SCAN_JOBS[scanjob_identifier].DocPar_PixelsPerLine}")
-    logger.info(f"   --->  NbrLines: {SCAN_JOBS[scanjob_identifier].DocPar_NumberOfLines}")
-    logger.info(f"   --->Bytes/Line: {SCAN_JOBS[scanjob_identifier].DocPar_BytesPerLine}")
+    logger.debug(f"   --->     JobId: {SCAN_JOBS[scanjob_identifier].job_id}")
+    logger.debug(f"   --->  JobToken: {SCAN_JOBS[scanjob_identifier].job_token}")
+    logger.debug(f"   --->    Format: {SCAN_JOBS[scanjob_identifier].DocPar_FileFormat}")
+    logger.debug(f"   --->   PxPLine: {SCAN_JOBS[scanjob_identifier].DocPar_PixelsPerLine}")
+    logger.debug(f"   --->  NbrLines: {SCAN_JOBS[scanjob_identifier].DocPar_NumberOfLines}")
+    logger.debug(f"   --->Bytes/Line: {SCAN_JOBS[scanjob_identifier].DocPar_BytesPerLine}")
 
     return True
 
