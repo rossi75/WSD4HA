@@ -550,7 +550,7 @@ async def request_retrieve_image(scanjob_identifier: str):
     logger.debug(f"   --->         URL: {url}")
     logger.info(f"   --->       JobID: {SCAN_JOBS[scanjob_identifier].job_id}")
     logger.info(f"   --->    JobToken: {SCAN_JOBS[scanjob_identifier].job_token}")
-    logger.info(f"   ---> Request XML:\n{xml}")
+    logger.debug(f"   ---> Request XML:\n{xml}")
 
     logger.info(f"requesting the image")
 
@@ -562,11 +562,11 @@ async def request_retrieve_image(scanjob_identifier: str):
                     logger.error(f"[SEND:rtrv_img] Retrieving image failed with Statuscode {resp.status}")
                     logger.error(f"   --->  Answer XML:\n{body}")
                     return False
-
-    
-                logger.info(f" awaiting data...")
+   
                 total_bytes = 0
                 data = bytearray()
+
+                logger.info(f" awaiting data... ({datetime.datetime.now():%H:%M:%S})")
 
                 # Stream lesen – chunkweise
                 async for chunk in resp.content.iter_chunked(4096):
@@ -574,35 +574,15 @@ async def request_retrieve_image(scanjob_identifier: str):
                         break
                     data.extend(chunk)
                     total_bytes += len(chunk)
-#                    if total_bytes % (256 * 1024) < 4096:  # alle ~256 KB mal loggen
-                    if total_bytes % (8 * 1024) < 4096:  # alle ~8 KB mal loggen
+                    if total_bytes % (64 * 1024) < 4096:  # alle ~64 KB mal loggen
                         logger.info(f"      ...received {total_bytes/1024:.1f} KB")
 
-                logger.info(f"   Image stream finished, total {total_bytes/1024:.1f} KB")
+                logger.info(f"   Image stream finished, total {total_bytes/1024:.1f} KB ({datetime.datetime.now():%H:%M:%S})")
 
                 # Content-Type holen
                 content_type = resp.headers.get("Content-Type", "")
                 logger.info(f" content type: {content_type}")
-          #          body = await resp.read()
-          #          logger.info(f" hdrs:\n{resp.headers}")
-          #          logger.info(f" body:\n{body}")
-#                    soap_xml, image_bytes = parse_retrieve_image_response(body, resp.headers.get("Content-Type", ""))
-#                    xml, image_bytes = parse_retrieve_image_response(body, resp.headers.get("Content-Type", ""))
-#                    parse_retrieve_image_response(scanjob_identifier, body, resp.headers.get("Content-Type", ""))
-#                    parse_retrieve_image(scanjob_identifier, body, resp.headers.get("Content-Type", ""))
                 parse_retrieve_image(scanjob_identifier, bytes(data), resp.headers.get("Content-Type", ""))
-               #     if image_bytes:
-               #         filename = f"/scans/{scanner.friendly_name or scanner_uuid}_{scan_identifier}.jfif"
-               #         os.makedirs(os.path.dirname(filename), exist_ok=True)
-               #         with open(filename, "wb") as f:
-               #             f.write(image_bytes)
-               #         logger.info(f"[SEND:rtrv_img] Image saved to {filename}")
-     #                   job.state = STATE.SCAN_DONE
-  #              else:
-  #                  SCAN_JOBS[scanjob_identifier].state = STATE.SCAN_FAILED
-  #                  logger.error(f"[SEND:rtrv_img] Retrieving image failed with Statuscode {resp.status}")
-  #                  logger.error(f"   --->  Answer XML:\n{body}")
-  #                  return False
         except asyncio.TimeoutError:
             logger.error(f"[SEND:rtrv_img] Timeout while retrieving image for {scanjob_identifier}")
             SCAN_JOBS[scanjob_identifier].state = STATE.SCAN_FAILED
