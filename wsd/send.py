@@ -514,7 +514,7 @@ async def request_scan_job_ticket(scanjob_identifier: str):
 # scanjob_identifier = scan job identifier
 # ---------------------------------------------------------------------------------
 async def request_retrieve_image(scanjob_identifier: str):
-    logger.info(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} [SEND:rtrv_img] retrieving image for scan job {job_id}")
+    logger.info(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} [SEND:rtrv_img] retrieving image for scan job {scanjob_identifier}")
 
     if scanjob_identifier not in SCAN_JOBS:
         logger.warning(f"could not find any existing job with ID {scanjob_identifier}. Skipping retrieve image")
@@ -544,6 +544,8 @@ async def request_retrieve_image(scanjob_identifier: str):
     logger.debug(f"   --->        FROM: {FROM_UUID}")
     logger.debug(f"   --->      MSG_ID: {msg_id}")
     logger.info(f"   --->         URL: {url}")
+    logger.info(f"   --->       JobID: {SCAN_JOBS[scanjob_identifier].job_id}")
+    logger.info(f"   --->    JobToken: {SCAN_JOBS[scanjob_identifier].job_token}")
     logger.info(f"   ---> Request XML:\n{xml}")
 
     logger.info(f"requesting the image")
