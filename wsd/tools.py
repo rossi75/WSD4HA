@@ -214,10 +214,10 @@ def save_scanned_image(scanner_name: str, image_bytes: bytes):
     try:
         with open(filename, "wb") as f:
             f.write(image_bytes)
-        logger.info(f"[SAVE] Image saved: {filename}")
+        logger.info(f"[TOOLS:sv_img] Image saved: {filename}")
         return filename
     except Exception as e:
-        logger.error(f"[SAVE] Could not save image: {e}")
+        logger.error(f"[TOOLS:sv_img] Could not save image: {e}")
         return None
 
 #
