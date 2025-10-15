@@ -124,7 +124,7 @@ class Scan_Jobs:
         logger.info(f"   --->      SUBSCR_ID: {self.subscription_identifier}")
         logger.info(f"   --->          XADDR: {self.xaddr}")
         logger.info(f"   --->     DEST_TOKEN: {self.destination_token}")
-        logger.info(f"   --->         STATUS: {self.status}")
+        logger.info(f"   --->         STATUS: {self.state}")
         logger.info(f"   --->        CREATED: {self.job_created}")
         logger.info(f"   --->   REMOVE_AFTER: {self.remove_after}")
 
