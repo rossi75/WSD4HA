@@ -620,7 +620,7 @@ def parse_retrieve_image(scanjob_identifier, data, content_type: str):
 
     # Den vollständigen MIME-Datensatz künstlich zusammensetzen:
     mime_data = f"Content-Type: {content_type}\r\nMIME-Version: 1.0\r\n\r\n".encode("utf-8") + data
-        logger.info(f"  mime_data:\n{mime_data[:200]}")
+    logger.info(f"  mime_data:\n{mime_data[:200]}")
 
     # multipart nach email-ähnlicher Struktur parsen
     msg = message_from_bytes(mime_data, policy=default)
