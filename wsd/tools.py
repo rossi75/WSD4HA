@@ -166,11 +166,12 @@ def find_scanner_by_endto_addr(endto_addr: str):
 # ---------------- saving scanned image to floppy ----------------
 #def save_scanned_image(scanjob_identifier, scanner_name):
 def save_scanned_image(scanjob_identifier):
-    logger.info(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} [TOOLS:sv_img] saving image from {SCANNERS[SCAN_JOBS[scanjob_identifier].scan_from_uuid].scanner_name}")
+    logger.info(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} [TOOLS:sv_img] saving image from {SCANNERS[SCAN_JOBS[scanjob_identifier].scan_from_uuid].friendly_name}")
+    logger.info(f" doc_length: {len(SCAN_JOBS[scanjob_identifier].document)} Bytes")
 
     if not SCAN_JOBS[scanjob_identifier].document:
         logger.warning(f" No data to save for job ID {scanjob_identifier}")
-        return None
+        return False
 
     # Dateityp erkennen
     header = SCAN_JOBS[scanjob_identifier].document[:8]
@@ -187,7 +188,8 @@ def save_scanned_image(scanjob_identifier):
     logger.info(f"   ---> extension: {ext}")
     
     # Friendly-Name säubern
-    safe_name = re.sub(r"[^A-Za-z0-9_\-]", "_", SCANNERS[SCAN_JOBS[scanjob_identifier].scan_from_uuid].scanner_name.strip() or SCAN_JOBS[scanjob_identifier].scan_from_uuid)
+#    safe_name = re.sub(r"[^A-Za-z0-9_\-]", "_", SCANNERS[SCAN_JOBS[scanjob_identifier].scan_from_uuid].scanner_name.strip() or SCAN_JOBS[scanjob_identifier].scan_from_uuid)
+    safe_name = re.sub(r"[^A-Za-z0-9_\-]", "_", SCANNERS[SCAN_JOBS[scanjob_identifier].scan_from_uuid].scanner_name.strip())
     logger.info(f"   ---> safe_name: {safe_name}")
 
     # Zeitstempel
