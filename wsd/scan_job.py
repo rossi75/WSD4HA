@@ -87,7 +87,7 @@ async def run_scan_job(scanjob_identifier: str):
     if result:
         logger.info(f" received data from scanner (more detailed later)")
         await asyncio.sleep(2)                   # Zwangspause für um das FIN erst einmal abzuarbeiten und dann gleich nen freien Kopf zu haben.
-        logger.debug(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} [SCAN_JOB:run_job] short retirement nap is over !")
+        logger.debug(f" short retirement nap is over !")
     else:
         logger.info(f" something went wrong with receiving data from scanner")
         SCAN_JOBS[scanjob_identifier].state = STATE.SCAN_FAILED
