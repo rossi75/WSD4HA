@@ -581,7 +581,6 @@ def parse_create_scan_job(scanjob_identifier, xml: str):
 #        SCAN_JOBS[scanjob_identifier].status = STATE.SCAN_FAILED
 #        return False
 
-<wscn:BytesPerLine>0</wscn:BytesPerLine>
     # BytesPerLine
     bytes_per_line = ""
     bytes_per_line_elem = root.find(".//wscn:BytesPerLine", NAMESPACES)
