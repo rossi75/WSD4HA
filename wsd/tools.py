@@ -187,7 +187,7 @@ def save_scanned_image(scanjob_identifier):
     logger.info(f"   ---> extension: {ext}")
     
     # Friendly-Name säubern
-    safe_name = re.sub(r"[^A-Za-z0-9_\-]", "_", SCANNERS[SCAN_JOBS[scanjob_identifier].scan_from_uuid].scanner_name.strip())
+    safe_name = re.sub(r"[^A-Za-z0-9_\-]", "_", SCANNERS[SCAN_JOBS[scanjob_identifier].scan_from_uuid].scanner_name.strip() or SCAN_JOBS[scanjob_identifier].scan_from_uuid)
     logger.info(f"   ---> safe_name: {safe_name}")
 
     # Zeitstempel
