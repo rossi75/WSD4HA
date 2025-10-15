@@ -227,10 +227,10 @@ async def request_scanner_elements_state(scanjob_identifier: str):
 
     if scanjob_identifier not in SCAN_JOBS:
         logger.warning(f"could not find any existing job with ID {scanjob_identifier}. Skipping state request")
-        SCAN_JOBS[scanjob_identifier].status = STATE.SCAN_FAILED
+        SCAN_JOBS[scanjob_identifier].state = STATE.SCAN_FAILED
         return False
 #    else:
-#        SCAN_JOBS[scanjob_identifier].status == STATE.REQ_SCAN_STATE
+#        SCAN_JOBS[scanjob_identifier].state == STATE.REQ_SCAN_STATE
 #        return True
 
     # tbd
@@ -289,10 +289,10 @@ async def request_scanner_elements_configuration(scanjob_identifier: str):
 
     if scanjob_identifier not in SCAN_JOBS:
         logger.warning(f"could not find any existing job with ID {scanjob_identifier}. Skipping configuration request")
-        SCAN_JOBS[scanjob_identifier].status = STATE.SCAN_FAILED
+        SCAN_JOBS[scanjob_identifier].state = STATE.SCAN_FAILED
         return False
 #    else:
-#        SCAN_JOBS[scanjob_identifier].status == STATE.REQ_SCAN_STATE
+#        SCAN_JOBS[scanjob_identifier].state == STATE.REQ_SCAN_STATE
 #        return True
 
     # tbd
@@ -353,10 +353,10 @@ async def request_scanner_elements_def_ticket(scanjob_identifier: str):
 
     if scanjob_identifier not in SCAN_JOBS:
         logger.warning(f"could not find any existing job with ID {scanjob_identifier}. Skipping request")
-#        SCAN_JOBS[scanjob_identifier].status = STATE.SCAN_FAILED
+#        SCAN_JOBS[scanjob_identifier].state = STATE.SCAN_FAILED
         return False
  #   else:
- #       SCAN_JOBS[scanjob_identifier].status == STATE.REQ_DEF_TICKET
+ #       SCAN_JOBS[scanjob_identifier].state == STATE.REQ_DEF_TICKET
 
     body = ""
     msg_id = uuid.uuid4()
@@ -413,7 +413,7 @@ async def request_validate_scan_ticket(scanjob_identifier: str):
 
     if scanjob_identifier not in SCAN_JOBS:
         logger.warning(f"could not find any existing job with ID {scanjob_identifier}. Skipping state request")
-        SCAN_JOBS[scanjob_identifier].status = STATE.SCAN_FAILED
+        SCAN_JOBS[scanjob_identifier].state = STATE.SCAN_FAILED
         return False
     else:
         return True
@@ -432,11 +432,11 @@ async def request_scan_job_ticket(scanjob_identifier: str):
 
     if scanjob_identifier not in SCAN_JOBS:
         logger.warning(f"could not find any existing job with ID {scanjob_identifier}. Skipping request")
-#        SCAN_JOBS[scanjob_identifier].status = STATE.SCAN_FAILED
+#        SCAN_JOBS[scanjob_identifier].state = STATE.SCAN_FAILED
         return
 #    else:
-#        if SCAN_JOBS[scanjob_identifier].status == STATE.SCAN_PENDING:
-#            SCAN_JOBS[scanjob_identifier].status == STATE.SCAN_REQ_TICKET
+#        if SCAN_JOBS[scanjob_identifier].state == STATE.SCAN_PENDING:
+#            SCAN_JOBS[scanjob_identifier].state == STATE.SCAN_REQ_TICKET
 
     scanner_uuid = SCAN_JOBS[scanjob_identifier].scan_from_uuid
 
@@ -516,10 +516,10 @@ async def request_retrieve_image(scanjob_identifier: str):
 
     if scanjob_identifier not in SCAN_JOBS:
         logger.warning(f"could not find any existing job with ID {scanjob_identifier}. Skipping retrieve image")
-        SCAN_JOBS[scanjob_identifier].status = STATE.SCAN_FAILED
+        SCAN_JOBS[scanjob_identifier].state = STATE.SCAN_FAILED
         return
 
-    SCAN_JOBS[scanjob_identifier].status == STATE.SCAN_RETRIEVE_IMG
+    SCAN_JOBS[scanjob_identifier].state == STATE.SCAN_RETRIEVE_IMG
 
     scanner_uuid = SCAN_JOBS[scanjob_identifier].scan_from_uuid
 
