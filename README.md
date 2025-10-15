@@ -5,6 +5,10 @@ provides a simple WSD protocol for scanning documents into homeassistants file s
 ## **!! actually in development !!**
 
 Creating a WSD service in Home Assistant for my Samsung C480W.
-So any documents can always be scanned to the anyways and always running server. Afterwards those documents can be processed from any OCR software like paperless or so. Maybe other printers are working too?
+So any documents can always be scanned to the anyways and always running server. Afterwards those documents can be processed from any OCR software like paperless or so. Maybe other ~printers~ scanners are working too?
 
 If WSD4HA is being restarted, the scanner needs to be restarted also ! This is due to the fact that the scanner sends out its discovery message only once directly after booting.
+
+If you want to get added a specific MFD, leave me a wireshark from your windows 7/8/10/10. It may be filtered for your scanners IP from the booting process (for registration), half an hour later (for subscription renewal) and while you scan a document (for retrieval processing).
+
+All options that can be seen in the configurations dialog, are non-functional at the moment...
