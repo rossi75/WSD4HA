@@ -16,6 +16,9 @@ from datetime import timedelta
 from globals import SCANNERS, SCAN_JOBS, NAMESPACES, STATE, logger
 from scanner import Scanner, Scan_Jobs
 from tools import list_scanners, pick_best_xaddr, calc_w3c_duration
+#import re
+from email import message_from_bytes
+from email.policy import default
 
 # ---------------- WSD SOAP Parser ----------------
 def parse_wsd_packet(data: bytes):
@@ -601,7 +604,7 @@ def parse_create_scan_job(scanjob_identifier, xml: str):
     return True
 
 
-# -------------------------------  ----------------------------------------------------
+# ------------------------------- extract image from retrieved content ----------------------------------------------------
 # def parse_retrieve_image(body: bytes, content_type: str):
 def parse_retrieve_image(scanjob_identifier, data, content_type: str):
     """
@@ -612,6 +615,63 @@ def parse_retrieve_image(scanjob_identifier, data, content_type: str):
     logger.info(f" content-type: {content_type}")
     logger.info(f"      content:\n{data[:1500]}")
 
+    SCAN_JOBS[scanjob_identifier].state = STATE.SCAN_EXTRACT_IMG
+
+    # multipart nach email-ähnlicher Struktur parsen
+    msg = message_from_bytes(data, policy=default)
+
+    # Fallback falls boundary nicht automatisch erkannt wird:
+    if not msg.is_multipart():
+#        raise ValueError("received data is no multipart response")
+        logger.error(f"[PARSE:rtrv_img] received data is no multipart response")
+        SCAN_JOBS[scanjob_identifier].state = STATE.SCAN_FAIL
+        return False
+
+    for part in msg.iter_parts():
+        content_type = part.get_content_type()
+        content_id = part.get("Content-ID")
+        logger.info(f"searching part: {content_type} (ID={content_id})")
+
+        # Wir suchen den Binärteil — meist image/jpeg oder application/pdf
+        if content_type in ("application/binary", "image/jpeg", "application/pdf"):
+            logger.info(f" content type found: {content_type} (ID={content_id})")
+#            binary_data = part.get_content()
+#            SCAN_JOBS[scanjob_identifier].document = binary_data
+            SCAN_JOBS[scanjob_identifier].document = part.get_content()
+            logger.info(f" saved {len(SCAN_JOBS[{scanjob_identifier}].document)} Bytes in SCAN_JOBS[{scanjob_identifier}].document")
+            return True
+#            return binary_data
+        else:
+            logger.warning(f"[PARSE:rtrv_img] could not find any of binary|image|pdf in stream for scan job ID {scanjob_identifier}")
+            SCAN_JOBS[scanjob_identifier].state = STATE.SCAN_FAIL
+            return False
+#            return binary_data
+            
+
+#    raise ValueError("Kein Binärteil im Multipart gefunden!")
+
+
+
+
+
+
+
+
+
+
+
+
+
+def _parse_retrieve_image(scanjob_identifier, data, content_type: str):
+    """
+    Parse multipart/related RetrieveImageResponse from scanner.
+    Returns: (soap_xml: str, image_bytes: bytes or None)
+    """
+    logger.info(f"[PARSE:rtrv_img] parsing {len(data)} bytes for scan job {scanjob_identifier}")
+    logger.info(f" content-type: {content_type}")
+    logger.info(f"      content:\n{data[:1500]}")
+
+    
     # Boundary extrahieren
     m = re.search(r'boundary="?([^";]+)"?', content_type, re.IGNORECASE)
     if not m:
