@@ -553,8 +553,11 @@ async def request_retrieve_image(scanjob_identifier: str):
             async with session.post(url, data=xml, headers=headers, timeout=5) as resp:
                 logger.info(f"   ---> statuscode from retrieve image: {resp.status}")
                 if resp.status == 200:
+                    logger.info(f" awaiting body...")
                 #    body = await resp.text()
                     body = await resp.read()
+                    logger.info(f" hdrs:\n{resp.headers}")
+                    logger.info(f" body:\n{body}")
 #                    soap_xml, image_bytes = parse_retrieve_image_response(body, resp.headers.get("Content-Type", ""))
 #                    xml, image_bytes = parse_retrieve_image_response(body, resp.headers.get("Content-Type", ""))
 #                    parse_retrieve_image_response(scanjob_identifier, body, resp.headers.get("Content-Type", ""))
