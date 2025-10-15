@@ -487,11 +487,11 @@ async def request_scan_job_ticket(scanjob_identifier: str):
                     body = await resp.text()
                 else:
                     SCAN_JOBS[scanjob_identifier].state = STATE.SCAN_FAILED
-                    logger.error(f"[SCAN_JOB:ticket] Request for ticket failed with Statuscode {resp.status}")
+                    logger.error(f"[SEND:ticket] Request for ticket failed with Statuscode {resp.status}")
                     logger.error(f"   --->  Answer XML:\n{body}")
                     return False
         except Exception as e:
-            logger.error(f"[SCAN_JOB:ticket] anything went wrong with {SCAN_JOBS[scanjob_identifier]}: {e}")
+            logger.error(f"[SEND:ticket] anything went wrong with {SCAN_JOBS[scanjob_identifier]}: {e}")
             SCAN_JOBS[scanjob_identifier].state = STATE.SCAN_FAILED
             return False
 
@@ -551,24 +551,24 @@ async def request_retrieve_image(scanjob_identifier: str):
     async with aiohttp.ClientSession() as session:
         try:
             async with session.post(url, data=xml, headers=headers, timeout=5) as resp:
-                logger.info(f"   ---> statuscode from response: {resp.status}")
+                logger.info(f"   ---> statuscode from retrieve image: {resp.status}")
                 if resp.status == 200:
                 #    body = await resp.text()
                     body = await resp.read()
-                    soap_xml, image_bytes = parse_retrieve_image_response(body, resp.headers.get("Content-Type", ""))
-                    if image_bytes:
-                        filename = f"/scans/{scanner.friendly_name or scanner_uuid}_{scan_identifier}.jfif"
-                        os.makedirs(os.path.dirname(filename), exist_ok=True)
-                        with open(filename, "wb") as f:
-                            f.write(image_bytes)
-                        logger.info(f"[SEND:rtrv_img] Image saved to {filename}")
-                        job.state = STATE.SCAN_DONE
-                    else:
-                        logger.warning(f"[SEND:rtrv_img] No image found in response")
-                        job.state = STATE.SCAN_FAIL
+#                    soap_xml, image_bytes = parse_retrieve_image_response(body, resp.headers.get("Content-Type", ""))
+#                    xml, image_bytes = parse_retrieve_image_response(body, resp.headers.get("Content-Type", ""))
+                    parse_retrieve_image_response(scanjob_identifier, body, resp.headers.get("Content-Type", ""))
+               #     if image_bytes:
+               #         filename = f"/scans/{scanner.friendly_name or scanner_uuid}_{scan_identifier}.jfif"
+               #         os.makedirs(os.path.dirname(filename), exist_ok=True)
+               #         with open(filename, "wb") as f:
+               #             f.write(image_bytes)
+               #         logger.info(f"[SEND:rtrv_img] Image saved to {filename}")
+     #                   job.state = STATE.SCAN_DONE
                 else:
                     SCAN_JOBS[scanjob_identifier].state = STATE.SCAN_FAILED
                     logger.error(f"[SEND:rtrv_img] Retrieving image failed with Statuscode {resp.status}")
+                    logger.error(f"   --->  Answer XML:\n{body}")
                     return False
         except Exception as e:
             logger.error(f"[SEND:rtrv_img] anything went wrong with {scanjob_identifier}: {e}")
