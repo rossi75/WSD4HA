@@ -352,7 +352,7 @@ def parse_get_scanner_elements_state(scanjob_identifier, xml):
 # ---------------- Scanner Configuration Parser ----------------
 def parse_get_scanner_elements_configuration(scanjob_identifier, xml):
     logger.info(f"[PARSE:scan_config] parsing scanners configuration, explicit for maxWidth and maxHeight for {SCANNERS[SCAN_JOBS[scanjob_identifier].scan_from_uuid].friendly_name or SCAN_JOBS[scanjob_identifier].scan_from_uuid} @ {SCANNERS[SCAN_JOBS[scanjob_identifier].scan_from_uuid].ip}")
-    logger.info(f"   XML:\n{xml}")
+    logger.debug(f"   XML:\n{xml}")
 
     try:
         root = ET.fromstring(xml)
@@ -374,21 +374,16 @@ def parse_get_scanner_elements_configuration(scanjob_identifier, xml):
         width = str(math.floor(int(width_elem.text.strip()) / 10) * 10)
         SCAN_JOBS[scanjob_identifier].DocPar_InputWidth = width
         SCAN_JOBS[scanjob_identifier].DocPar_RegionWidth = width
-#
-        logger.info(f"          width_math: {width}")
-        width = str( ( int(width_elem.text.strip()) / 10 ) * 10)
-        logger.info(f"          width /10*10: {width}")
-#
-        logger.info(f" input_width_elem: {SCAN_JOBS[scanjob_identifier].DocPar_InputWidth}")
-        logger.info(f" region_width_elem: {SCAN_JOBS[scanjob_identifier].DocPar_RegionWidth}")
+        logger.debug(f" input_width_elem: {SCAN_JOBS[scanjob_identifier].DocPar_InputWidth}")
+        logger.debug(f" region_width_elem: {SCAN_JOBS[scanjob_identifier].DocPar_RegionWidth}")
 
     height_elem = root.find(".//wscn:PlatenMaximumSize/wscn:Height", NAMESPACES)
     if height_elem is not None and height_elem.text:
         height = str(math.floor(int(height_elem.text.strip()) / 10) * 10)
         SCAN_JOBS[scanjob_identifier].DocPar_InputHeight = height
         SCAN_JOBS[scanjob_identifier].DocPar_RegionHeight = height
-        logger.info(f" input_height_elem: {SCAN_JOBS[scanjob_identifier].DocPar_InputHeight}")
-        logger.info(f" region_height_elem: {SCAN_JOBS[scanjob_identifier].DocPar_RegionHeight}")
+        logger.debug(f" input_height_elem: {SCAN_JOBS[scanjob_identifier].DocPar_InputHeight}")
+        logger.debug(f" region_height_elem: {SCAN_JOBS[scanjob_identifier].DocPar_RegionHeight}")
 
     return True
 
@@ -396,7 +391,7 @@ def parse_get_scanner_elements_configuration(scanjob_identifier, xml):
 # ---------------- Default Ticket Parser ----------------
 def parse_get_scanner_elements_default_ticket(scanjob_identifier, xml):
     logger.info(f"[PARSE:def_ticket] parsing default Ticket for {SCANNERS[SCAN_JOBS[scanjob_identifier].scan_from_uuid].friendly_name or SCAN_JOBS[scanjob_identifier].scan_from_uuid} @ {SCANNERS[SCAN_JOBS[scanjob_identifier].scan_from_uuid].ip}")
-    logger.info(f"   XML:\n{xml}")
+    logger.debug(f"   XML:\n{xml}")
 
     try:
         root = ET.fromstring(xml)
@@ -428,11 +423,13 @@ def parse_get_scanner_elements_default_ticket(scanjob_identifier, xml):
         SCAN_JOBS[scanjob_identifier].DocPar_InputSource = input_source_elem.text.strip()
         logger.debug(f" InputSource: {SCAN_JOBS[scanjob_identifier].DocPar_InputSource}")
 
+#    diese zwei sind an dieser Stelle leer, wie sieht das mit anderen Scannern aus? Deswegen hole ich mir das aus GetScannerElements/Configuration und runde ab, dafür die XML-Ausgabe wieder auf INFO stellen...
+#
 #    input_width_elem = root.find(".//wscn:InputMediaSize/wscn:Width", NAMESPACES)
 #    if input_width_elem is not None and input_width_elem.text:
 #        SCAN_JOBS[scanjob_identifier].DocPar_InputWidth = input_width_elem.text.strip()
 #        logger.info(f" InputWidth: {SCAN_JOBS[scanjob_identifier].DocPar_InputWidth}")
-
+#
 #    input_height_elem = root.find(".//wscn:InputMediaSize/wscn:Height", NAMESPACES)
 #    if input_height_elem is not None and input_height_elem.text:
 #        SCAN_JOBS[scanjob_identifier].DocPar_InputHeight = input_height_elem.text.strip()
@@ -488,12 +485,14 @@ def parse_get_scanner_elements_default_ticket(scanjob_identifier, xml):
         SCAN_JOBS[scanjob_identifier].DocPar_RegionYOffset = y_offset_elem.text.strip()
         logger.debug(f" y_offset: {SCAN_JOBS[scanjob_identifier].DocPar_RegionYOffset}")
 
+#    diese zwei sind an dieser Stelle leer, wie sieht das mit anderen Scannern aus? Deswegen hole ich mir das aus GetScannerElements/Configuration und runde ab, dafür die XML-Ausgabe wieder auf INFO stellen...
+#
 #    region_width_elem = root.find(".//wscn:ScanRegionWidth", NAMESPACES)
 #    if region_width_elem is not None and region_width_elem.text:
 #        region_width = region_width_elem.text.strip()
 #        SCAN_JOBS[scanjob_identifier].DocPar_RegionWidth = region_width
 #        logger.info(f" region_width: {SCAN_JOBS[scanjob_identifier].DocPar_RegionWidth}")
-
+#
 #    region_height_elem = root.find(".//wscn:ScanRegionHeight", NAMESPACES)
 #    if region_height_elem is not None and region_height_elem.text:
 #        region_height = region_height_elem.text.strip()
@@ -563,7 +562,7 @@ def parse_create_scan_job(scanjob_identifier, xml: str):
     if format_elem is not None and format_elem.text:
 #        format = format_elem.text.strip()
 #        SCANNERS[{SCAN_JOBS[scan_identifier].notifier_uuid}].DocPar_FileFormat = format
-        SCANNERS[{SCAN_JOBS[scanjob_identifier].notifier_uuid}].DocPar_FileFormat = format_elem.text.strip()
+        SCANNERS[{SCAN_JOBS[scanjob_identifier].scan_from_uuid}].DocPar_FileFormat = format_elem.text.strip()
     else:
         logger.warning(f" cannot extract Format from Response")
         SCAN_JOBS[scanjob_identifier].status = STATE.SCAN_FAILED
@@ -579,7 +578,7 @@ def parse_create_scan_job(scanjob_identifier, xml: str):
 
     logger.info(f"   --->    JobId: {SCAN_JOBS[scanjob_identifier].job_id}")
     logger.info(f"   ---> JobToken: {SCAN_JOBS[scanjob_identifier].job_token}")
-    logger.info(f"   --->   Format: {SCANNERS[SCAN_JOBS[scanjob_identifier].notifier_uuid].DocPar_FileFormat}")
+    logger.info(f"   --->   Format: {SCANNERS[SCAN_JOBS[scanjob_identifier].scan_from_uuid].DocPar_FileFormat}")
 
     return True
 
