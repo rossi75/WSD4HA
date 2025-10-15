@@ -44,9 +44,6 @@ from tools import list_scanners, check_port, get_local_ip
 STARTUP_DT = datetime.datetime.now().replace(microsecond=0)
 
 logger.info(f" ")
-#logger.info(f"***********************************************************")
-#logger.info(f"*    Starting up WSD Scanner Service for Home Assistant   *")
-#logger.info(f"*                                                         *")
 logger.info(f"***************************************************************************************************************")
 logger.info(r"*                                                                                                             *")
 logger.info(r"*     __        ______  ____    ____                                    ____                  _               *")
@@ -62,7 +59,7 @@ logger.info(r"*           |_|  \___/|_|    |_| |_|\___/|_| |_| |_|\___| /_/   \_
 logger.info(r"*                                                                                                             *")
 logger.info(f"*                                             {STARTUP_DT:%d.%m.%Y, %H:%M:%S}                                            *")
 logger.info(f"***************************************************************************************************************")
-logger.info(f"*                                                Configuration                                                *")
+logger.info(f"*                                          C O N F I G U R A T I O N                                          *")
 logger.info(f"***************************************************************************************************************")
 # ---------------- Optionen aus Environment ----------------
 # ---------------- Logging ----------------
