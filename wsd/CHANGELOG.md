@@ -11,7 +11,11 @@
   - left column for tree with config_output/scanners/jobs/scans
   - display several details only in debug mode
   - download files
+  - mouseover for tech details
 - ...
+
+## 0.68 - 2525-10-15
+- scan to HA works, now we need to receive the image and save it on disk
 
 ## 0.65 - 2025-10-14
 - implement GetScannerElements[State] before requesting a ticket, do nothing while not in IDLE
