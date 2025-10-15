@@ -530,7 +530,6 @@ def parse_create_scan_job(scanjob_identifier, xml: str):
         SCAN_JOBS[scanjob_identifier].status = STATE.SCAN_FAILED
         return False
 
-#        job_id = root.findtext(".//wscn:JobId", NAMESPACES)
     # JobID
     job_id = ""
     job_id_elem = root.find(".//wscn:JobId", NAMESPACES)
@@ -542,43 +541,64 @@ def parse_create_scan_job(scanjob_identifier, xml: str):
         SCAN_JOBS[scanjob_identifier].status = STATE.SCAN_FAILED
         return False
 
-#        job_token = root.findtext(".//wscn:JobToken", namespaces=ns)
     # JobToken
     job_token = ""
     job_token_elem = root.find(".//wscn:JobToken", NAMESPACES)
     if job_token_elem is not None and job_token_elem.text:
-#        job_token = job_token_elem.text.strip()
-#        SCAN_JOBS[scanjob_identifier].job_token = job_token
         SCAN_JOBS[scanjob_identifier].job_token = job_token_elem.text.strip()
     else:
         logger.warning(f" cannot extract JobToken from Response")
         SCAN_JOBS[scanjob_identifier].status = STATE.SCAN_FAILED
         return False
 
-#        job_token = root.findtext(".//wscn:JobToken", namespaces=ns)
     # FileFormat
     format = ""
-    format_elem = root.find(".//wscn:JobToken", NAMESPACES)
+    format_elem = root.find(".//wscn:Format", NAMESPACES)
     if format_elem is not None and format_elem.text:
-#        format = format_elem.text.strip()
-#        SCANNERS[{SCAN_JOBS[scan_identifier].notifier_uuid}].DocPar_FileFormat = format
-        SCANNERS[{SCAN_JOBS[scanjob_identifier].scan_from_uuid}].DocPar_FileFormat = format_elem.text.strip()
+        SCANNERS[SCAN_JOBS[scanjob_identifier].scan_from_uuid].DocPar_FileFormat = format_elem.text.strip()
     else:
         logger.warning(f" cannot extract Format from Response")
         SCAN_JOBS[scanjob_identifier].status = STATE.SCAN_FAILED
         return False
-        
-#        pixels_per_line = root.findtext(".//wscn:PixelsPerLine", namespaces=ns)
-#        num_lines = root.findtext(".//wscn:NumberOfLines", namespaces=ns)
 
- #       scan_job.job_id = job_id
- #       scan_job.job_token = job_token
- #       scan_job.pixels_per_line = int(pixels_per_line or 0)
- #       scan_job.number_of_lines = int(num_lines or 0)
+    # PixelsPerLine
+    pixels_per_line = ""
+    pixels_per_line_elem = root.find(".//wscn:PixelsPerLine", NAMESPACES)
+    if pixels_per_line_elem is not None and pixels_per_line_elem.text:
+        SCANNERS[SCAN_JOBS[scanjob_identifier].scan_from_uuid].DocPar_PixelsPerLine = pixels_per_line_elem.text.strip()
+    else:
+        logger.warning(f" cannot extract Pixels per Line from Response")
+#        SCAN_JOBS[scanjob_identifier].status = STATE.SCAN_FAILED
+#        return False
+
+    # NumberOfLines
+    number_of_lines = ""
+    number_of_lines_elem = root.find(".//wscn:NumberOfLines", NAMESPACES)
+    if number_of_lines_elem is not None and number_of_lines_elem.text:
+        SCANNERS[SCAN_JOBS[scanjob_identifier].scan_from_uuid].DocPar_NumberOfLines = number_of_lines_elem.text.strip()
+    else:
+        logger.warning(f" cannot extract Number of Lines from Response")
+#        SCAN_JOBS[scanjob_identifier].status = STATE.SCAN_FAILED
+#        return False
+
+<wscn:BytesPerLine>0</wscn:BytesPerLine>
+    # BytesPerLine
+    bytes_per_line = ""
+    bytes_per_line_elem = root.find(".//wscn:BytesPerLine", NAMESPACES)
+    if bytes_per_line_elem is not None and bytes_per_line_elem.text:
+        SCANNERS[SCAN_JOBS[scanjob_identifier].scan_from_uuid].DocPar_BytesPerLine = bytes_per_line_elem.text.strip()
+    else:
+        logger.warning(f" cannot extract Bytes per Line from Response")
+#        SCAN_JOBS[scanjob_identifier].status = STATE.SCAN_FAILED
+#        return False
 
     logger.info(f"   --->    JobId: {SCAN_JOBS[scanjob_identifier].job_id}")
     logger.info(f"   ---> JobToken: {SCAN_JOBS[scanjob_identifier].job_token}")
-    logger.info(f"   --->   Format: {SCANNERS[SCAN_JOBS[scanjob_identifier].scan_from_uuid].DocPar_FileFormat}")
+    logger.info(f"   --->   Format: {SCAN_JOBS[scanjob_identifier].DocPar_FileFormat}")
+
+    logger.info(f"   --->   PxPLine: {SCAN_JOBS[scanjob_identifier].DocPar_PixelsPerLine}")
+    logger.info(f"   --->  NbrLines: {SCAN_JOBS[scanjob_identifier].DocPar_NumberOfLines}")
+    logger.info(f"   --->Bytes/Line: {SCAN_JOBS[scanjob_identifier].DocPar_BytesPerLine}")
 
     return True
 
@@ -594,7 +614,7 @@ def parse_retrieve_image(body: bytes, content_type: str):
     # Boundary extrahieren
     m = re.search(r'boundary="?([^";]+)"?', content_type, re.IGNORECASE)
     if not m:
-        logger.warning("[PARSER] No MIME boundary found in Content-Type")
+        logger.warning(" No MIME boundary found in Content-Type")
         return None, None
     boundary = m.group(1).encode()
 
@@ -603,10 +623,14 @@ def parse_retrieve_image(body: bytes, content_type: str):
     image_bytes = None
     image_content_id = None
 
+    logger.info(" Logpoint A")
+    
     for p in parts:
         if not p.strip() or p.startswith(b"--"):
             continue
 
+        logger.info(" Logpoint B")
+    
         headers, _, data = p.partition(b"\r\n\r\n")
         headers_decoded = headers.decode(errors="ignore")
 
@@ -619,8 +643,10 @@ def parse_retrieve_image(body: bytes, content_type: str):
             if m_id:
                 image_content_id = m_id.group(1)
 
+    logger.info(" Logpoint C")
     # SOAP optional parsen (nur Logging)
     if soap_xml:
+        logger.info(" Logpoint D")
         try:
             root = ET.fromstring(soap_xml)
 #            ns = {
@@ -629,13 +655,17 @@ def parse_retrieve_image(body: bytes, content_type: str):
 #                "xop": "http://www.w3.org/2004/08/xop/include"
 #            }
             href = root.find(".//xop:Include", NAMESPACES)
+            logger.info(" Logpoint E")
             if href is not None:
                 cid = href.attrib.get("href", "").replace("cid:", "")
+                logger.info(" Logpoint F")
                 if image_content_id and cid != image_content_id:
+                    logger.info(" Logpoint A")
                     logger.warning(f"[PARSER] Mismatch CID: {cid} != {image_content_id}")
         except Exception as e:
             logger.warning(f"[PARSER] Could not parse SOAP XML: {e}")
 
+    logger.info(" Logpoint G")
     return soap_xml.decode("utf-8", errors="ignore") if soap_xml else None, image_bytes
 
 
