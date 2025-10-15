@@ -17,7 +17,7 @@ from scan_job import run_scan_job
 
 # ---------------- HTTP Server ----------------
 async def start_http_server():
-    logger.info(f"[SERVER:start_http] configuring HTTP/SOAP Server on Port {HTTP_PORT}")
+    logger.info(f"[SERVER:start_http] configuring HTTP Server for UI on Port {HTTP_PORT}")
     app = web.Application()
     app.router.add_get("/", status_page)
     logger.debug(f"   ---> added endpoint /")
