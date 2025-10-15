@@ -603,7 +603,7 @@ def parse_create_scan_job(scanjob_identifier, xml: str):
 
 # -------------------------------  ----------------------------------------------------
 # def parse_retrieve_image(body: bytes, content_type: str):
-def parse_retrieve_image_response(scanjob_identifier, data, content_type: str):
+def parse_retrieve_image(scanjob_identifier, data, content_type: str):
     """
     Parse multipart/related RetrieveImageResponse from scanner.
     Returns: (soap_xml: str, image_bytes: bytes or None)
