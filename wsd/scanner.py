@@ -116,7 +116,9 @@ class Scan_Jobs:
         self.DocPar_PixelsPerLine = None
         self.DocPar_NumberOfLines = None
         self.DocPar_BytesPerLine = None
- 
+
+        self.document = ""                                                  # hier kommt das eigentliche Dokument hin
+
         logger.info(f"   --->    SCAN_JOB_ID: {self.scanjob_identifier}")
         logger.info(f"   --->          STATE: {self.state.value}")
         logger.info(f"   --->   INPUT_SOURCE: {self.input_source}")
