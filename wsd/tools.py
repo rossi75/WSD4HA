@@ -167,7 +167,7 @@ def find_scanner_by_endto_addr(endto_addr: str):
 def save_scanned_image(scanjob_identifier, scanner_name):
     logger.info(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} [TOOLS:sv_img] saving image {scanner_name}")
 
-    if not SCAN_JOBS[scan_identifier].document:
+    if not SCAN_JOBS[scanjob_identifier].document:
         logger.warning(f" No data to save for job ID {scanjob_identifier}")
         return None
 
