@@ -610,7 +610,7 @@ def parse_create_scan_job(scanjob_identifier, xml: str):
 def parse_retrieve_image(scanjob_identifier, data, content_type: str):
     logger.info(f"[PARSE:rtrv_img] parsing {len(data)} bytes for scan job {scanjob_identifier}")
     logger.info(f" content-type: {content_type}")
-    logger.info(f"      content:\n{data[:1500]}")
+    logger.info(f"      content:\n{data[:200]}")
 
     SCAN_JOBS[scanjob_identifier].state = STATE.SCAN_EXTRACT_IMG
 
@@ -620,6 +620,7 @@ def parse_retrieve_image(scanjob_identifier, data, content_type: str):
 
     # Den vollständigen MIME-Datensatz künstlich zusammensetzen:
     mime_data = f"Content-Type: {content_type}\r\nMIME-Version: 1.0\r\n\r\n".encode("utf-8") + data
+        logger.info(f"  mime_data:\n{mime_data[:200]}")
 
     # multipart nach email-ähnlicher Struktur parsen
     msg = message_from_bytes(mime_data, policy=default)
@@ -627,7 +628,7 @@ def parse_retrieve_image(scanjob_identifier, data, content_type: str):
     # Fallback falls boundary nicht automatisch erkannt wird:
     if not msg.is_multipart():
         logger.error(f"[PARSE:rtrv_img] received data is no multipart response")
-        logger.info(f"first 200 bytes: {data[:200]!r}")
+        logger.info(f"see yourself:\n{data[:200]!r}")
         SCAN_JOBS[scanjob_identifier].state = STATE.SCAN_FAILED
         return False
 
@@ -635,93 +636,29 @@ def parse_retrieve_image(scanjob_identifier, data, content_type: str):
         content_type = part.get_content_type()
         content_id = part.get("Content-ID")
         logger.info(f"searching ID: {content_id}")
-        logger.info(f"Content-Type: {content_type}")
+        logger.info(f"Content-Type: {content_type[:200]!r}")
 
         # Wir suchen den Binärteil — meist image/jpeg oder application/pdf
-        if content_type == "application/xop+xml":
-            logger.info("   Found XML metadata part")
+#        if content_type == "application/xop+xml":
+        if "xml" in content_type:
             metadata = part.get_payload(decode=True)
-            logger.info(f" metadata: {metadata}")
-        elif content_type in ("application/binary", "image/jpeg", "image/png", "image/tiff", "application/pdf"):
-            logger.info(f" content type found: {content_type} (ID={content_id})")
+            logger.info(f"   Found {len(metadata)} Bytes of XML metadata part")
+            logger.info(f" metadata: {metadata[:200]!r}")
+
+#        elif content_type in ("application/binary", "image/jpeg", "image/png", "image/tiff", "application/pdf"):
+        else:
+#            logger.info(f" content type found: {content_type} (ID={content_id})")
+#            logger.info(f"   Found {len(SCAN_JOBS[scanjob_identifier].document)} Bytes of XML metadata part")
 #            SCAN_JOBS[scanjob_identifier].document = part.get_content()
             SCAN_JOBS[scanjob_identifier].document = part.get_payload(decode=True)
             logger.info(f" saved {len(SCAN_JOBS[{scanjob_identifier}].document)} Bytes in SCAN_JOBS[{scanjob_identifier}].document")
-            logger.info(f" first 50 bytes: {SCAN_JOBS[{scanjob_identifier}].document[:200]!r}")
+            logger.info(f" document: {SCAN_JOBS[{scanjob_identifier}].document[:200]!r}")
             return True
-        else:
-            logger.error(f"[PARSE:rtrv_img] could not find any of binary|image|pdf in stream for scan job ID {scanjob_identifier}")
-            SCAN_JOBS[scanjob_identifier].state = STATE.SCAN_FAILED
-            return False
+#        else:
+#            logger.error(f"[PARSE:rtrv_img] could not find any of binary|image|pdf in stream for scan job ID {scanjob_identifier}")
+#            SCAN_JOBS[scanjob_identifier].state = STATE.SCAN_FAILED
+#            return False
 
-
-
-def _parse_retrieve_image(scanjob_identifier, data, content_type: str):
-    """
-    Parse multipart/related RetrieveImageResponse from scanner.
-    Returns: (soap_xml: str, image_bytes: bytes or None)
-    """
-    logger.info(f"[PARSE:rtrv_img] parsing {len(data)} bytes for scan job {scanjob_identifier}")
-    logger.info(f" content-type: {content_type}")
-    logger.info(f"      content:\n{data[:1500]}")
-
-    
-    # Boundary extrahieren
-    m = re.search(r'boundary="?([^";]+)"?', content_type, re.IGNORECASE)
-    if not m:
-        logger.warning(" No MIME boundary found in Content-Type")
-        return None, None
-    boundary = m.group(1).encode()
-
-    parts = data.split(b"--" + boundary)
-    xml = None
-    image_bytes = None
-    image_content_id = None
-
-    logger.info(" Logpoint A")
-    
-    for p in parts:
-        if not p.strip() or p.startswith(b"--"):
-            continue
-
-        logger.info(" Logpoint B")
-    
-        headers, _, data = p.partition(b"\r\n\r\n")
-        headers_decoded = headers.decode(errors="ignore")
-
-        if "application/xop+xml" in headers_decoded or "application/soap+xml" in headers_decoded:
-            xml = re.sub(rb"^[0-9a-fA-F]+\r\n", b"", data.strip())
-            xml = xml.strip(b"\r\n0\r\n")
-        elif "application/binary" in headers_decoded:
-            image_bytes = data.strip()
-            m_id = re.search(r"Content-ID:\s*<([^>]+)>", headers_decoded)
-            if m_id:
-                image_content_id = m_id.group(1)
-
-    logger.info(" Logpoint C")
-    # SOAP optional parsen (nur Logging)
-    if soap_xml:
-        logger.info(" Logpoint D")
-        try:
-            root = ET.fromstring(soap_xml)
-#            ns = {
-#                "soap": "http://www.w3.org/2003/05/soap-envelope",
-#                "wscn": "http://schemas.microsoft.com/windows/2006/08/wdp/scan",
-#                "xop": "http://www.w3.org/2004/08/xop/include"
-#            }
-            href = root.find(".//xop:Include", NAMESPACES)
-            logger.info(" Logpoint E")
-            if href is not None:
-                cid = href.attrib.get("href", "").replace("cid:", "")
-                logger.info(" Logpoint F")
-                if image_content_id and cid != image_content_id:
-                    logger.info(" Logpoint A")
-                    logger.warning(f"[PARSER] Mismatch CID: {cid} != {image_content_id}")
-        except Exception as e:
-            logger.warning(f"[PARSER] Could not parse SOAP XML: {e}")
-
-    logger.info(" Logpoint G")
-    return soap_xml.decode("utf-8", errors="ignore") if soap_xml else None, image_bytes
 
 
 
