@@ -604,61 +604,55 @@ def parse_create_scan_job(scanjob_identifier, xml: str):
     return True
 
 
+#    Parse multipart/related RetrieveImageResponse from scanner.
+#    Returns: (soap_xml: str, image_bytes: bytes or None)
 # ------------------------------- extract image from retrieved content ----------------------------------------------------
-# def parse_retrieve_image(body: bytes, content_type: str):
 def parse_retrieve_image(scanjob_identifier, data, content_type: str):
-    """
-    Parse multipart/related RetrieveImageResponse from scanner.
-    Returns: (soap_xml: str, image_bytes: bytes or None)
-    """
     logger.info(f"[PARSE:rtrv_img] parsing {len(data)} bytes for scan job {scanjob_identifier}")
     logger.info(f" content-type: {content_type}")
     logger.info(f"      content:\n{data[:1500]}")
 
     SCAN_JOBS[scanjob_identifier].state = STATE.SCAN_EXTRACT_IMG
 
+    if not content_type.lower().startswith("multipart/"):
+        logger.error(f"[PARSE:rtrv_img] content-type not multipart: {content_type}")
+        return False
+
+    # Den vollständigen MIME-Datensatz künstlich zusammensetzen:
+    mime_data = f"Content-Type: {content_type}\r\nMIME-Version: 1.0\r\n\r\n".encode("utf-8") + data
+
     # multipart nach email-ähnlicher Struktur parsen
-    msg = message_from_bytes(data, policy=default)
+    msg = message_from_bytes(mime_data, policy=default)
 
     # Fallback falls boundary nicht automatisch erkannt wird:
     if not msg.is_multipart():
-#        raise ValueError("received data is no multipart response")
         logger.error(f"[PARSE:rtrv_img] received data is no multipart response")
-        SCAN_JOBS[scanjob_identifier].state = STATE.SCAN_FAIL
+        logger.info(f"first 200 bytes: {data[:200]!r}")
+        SCAN_JOBS[scanjob_identifier].state = STATE.SCAN_FAILED
         return False
 
     for part in msg.iter_parts():
         content_type = part.get_content_type()
         content_id = part.get("Content-ID")
-        logger.info(f"searching part: {content_type} (ID={content_id})")
+        logger.info(f"searching ID: {content_id}")
+        logger.info(f"Content-Type: {content_type}")
 
         # Wir suchen den Binärteil — meist image/jpeg oder application/pdf
-        if content_type in ("application/binary", "image/jpeg", "application/pdf"):
+        if content_type == "application/xop+xml":
+            logger.info("   Found XML metadata part")
+            metadata = part.get_payload(decode=True)
+            logger.info(f" metadata: {metadata}")
+        elif content_type in ("application/binary", "image/jpeg", "image/png", "image/tiff", "application/pdf"):
             logger.info(f" content type found: {content_type} (ID={content_id})")
-#            binary_data = part.get_content()
-#            SCAN_JOBS[scanjob_identifier].document = binary_data
-            SCAN_JOBS[scanjob_identifier].document = part.get_content()
+#            SCAN_JOBS[scanjob_identifier].document = part.get_content()
+            SCAN_JOBS[scanjob_identifier].document = part.get_payload(decode=True)
             logger.info(f" saved {len(SCAN_JOBS[{scanjob_identifier}].document)} Bytes in SCAN_JOBS[{scanjob_identifier}].document")
+            logger.info(f" first 50 bytes: {SCAN_JOBS[{scanjob_identifier}].document[:200]!r}")
             return True
-#            return binary_data
         else:
-            logger.warning(f"[PARSE:rtrv_img] could not find any of binary|image|pdf in stream for scan job ID {scanjob_identifier}")
-            SCAN_JOBS[scanjob_identifier].state = STATE.SCAN_FAIL
+            logger.error(f"[PARSE:rtrv_img] could not find any of binary|image|pdf in stream for scan job ID {scanjob_identifier}")
+            SCAN_JOBS[scanjob_identifier].state = STATE.SCAN_FAILED
             return False
-#            return binary_data
-            
-
-#    raise ValueError("Kein Binärteil im Multipart gefunden!")
-
-
-
-
-
-
-
-
-
-
 
 
 
