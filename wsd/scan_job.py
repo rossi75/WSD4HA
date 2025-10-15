@@ -112,9 +112,10 @@ async def run_scan_job(scanjob_identifier: str):
 
 
     # alles soweit erledigt
-    logger.info(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} [SCAN_JOB:run_job] Scan Job done")
+    SCAN_JOBS[scanjob_identifier].job_finished = datetime.datetime.now().replace(microsecond=0)
     SCAN_JOBS[scanjob_identifier].state == STATE.SCAN_DONE
     SCANNERS[SCAN_JOBS[scanjob_identifier].scan_from_uuid].state == STATE.ONLINE
+    logger.info(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} [SCAN_JOB:run_job] Scan Job done")
 
 
 #
