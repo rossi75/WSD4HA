@@ -92,7 +92,6 @@ class Scan_Jobs:
         self.state = STATE.SCAN_PENDING
         self.job_created = datetime.datetime.now().replace(microsecond=0)
         self.remove_after = datetime.datetime.now().replace(microsecond=0) + timedelta(minutes=30) # Zeitpunkt zum Löschen des Auftrages = jetzt + 30 Minuten
-        #SCANNERS[scanner_uuid].last_seen = datetime.datetime.now().replace(microsecond=0)
         SCANNERS[scan_from_uuid].update()
 
         # Document related parameters
@@ -118,6 +117,7 @@ class Scan_Jobs:
         self.DocPar_BytesPerLine = None
 
         self.document = ""                                                  # hier kommt das eigentliche Dokument hin
+        self.filepath = ""                                                  # und hier wurde es auf die Floppy geschrieben
 
         logger.info(f"   --->    SCAN_JOB_ID: {self.scanjob_identifier}")
         logger.info(f"   --->          STATE: {self.state.value}")
