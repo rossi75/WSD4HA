@@ -46,12 +46,26 @@ from tools import list_scanners, check_port, get_local_ip
 STARTUP_DT = datetime.datetime.now().replace(microsecond=0)
 
 logger.info(f" ")
-logger.info(f"***********************************************************")
-logger.info(f"*    Starting up WSD Scanner Service for Home Assistant   *")
-#logger.info(f"*                   {datetime.datetime.now():%d.%m.%Y, %H:%M:%S}                  *")
-logger.info(f"*                   {STARTUP_DT:%d.%m.%Y, %H:%M:%S}                  *")
-logger.info(f"***********************************************************")
-logger.info(f"---------------------  Configuration  ---------------------")
+#logger.info(f"***********************************************************")
+#logger.info(f"*    Starting up WSD Scanner Service for Home Assistant   *")
+#logger.info(f"*                                                         *")
+logger.info(f"***************************************************************************************************************")
+logger.info(f"*                                                                                                             *")
+logger.info(f"*     __        ______  ____    ____                                    ____                  _               *")
+logger.info(f"*     \ \      / / ___||  _ \  / ___|  ___ __ _ _ __  _ __   ___ _ __  / ___|  ___ _ ____   _(_) ___ ___      *")
+logger.info(f"*      \ \ /\ / /\___ \| | | | \___ \ / __/ _` | '_ \| '_ \ / _ \ '__| \___ \ / _ \ '__\ \ / / |/ __/ _ \     *")
+logger.info(f"*       \ V  V /  ___) | |_| |  ___) | (_| (_| | | | | | | |  __/ |     ___) |  __/ |   \ V /| | (_|  __/     *")
+logger.info(f"*       _\_/\_/  |____/|____/  |____/ \___\__,_|_| |_|_|_|_|\___|_|  _ |____/ \___|_|    \_/ |_|\___\___|     *")
+logger.info(f"*      / _| ___  _ __  | | | | ___  _ __ ___   ___     / \   ___ ___(_)___| |_ __ _ _ __ | |_                 *")
+logger.info(f"*     | |_ / _ \| '__| | |_| |/ _ \| '_ ` _ \ / _ \   / _ \ / __/ __| / __| __/ _` | '_ \| __|                *")
+logger.info(f"*     |  _| (_) | |    |  _  | (_) | | | | | |  __/  / ___ \\__ \__ \ \__ \ || (_| | | | | |_                 *")
+logger.info(f"*     |_|  \___/|_|    |_| |_|\___/|_| |_| |_|\___| /_/   \_\___/___/_|___/\__\__,_|_| |_|\__|                *")
+logger.info(f"*                                                                                                             *")
+logger.info(f"***************************************************************************************************************")
+logger.info(f"*                                             {STARTUP_DT:%d.%m.%Y, %H:%M:%S}                                            *")
+logger.info(f"***************************************************************************************************************")
+logger.info(f"                                                 Configuration                                                 ")
+logger.info(f"***************************************************************************************************************")
 # ---------------- Optionen aus Environment ----------------
 # ---------------- Logging ----------------
 logger.info(f"Loglevel: {LOG_LEVEL}")
@@ -63,7 +77,7 @@ try:
     HTTP_PORT = int(raw)  # Sekunden
 except ValueError:
     HTTP_PORT = 8110  # Fallback vom Fallback
-    logger.debug(f"HTTP-Port Reset to fallback value 8110 (should never reach this point)")
+    logger.warning(f"HTTP-Port Reset to fallback value 8110 (should never reach this point)")
 logger.info(f"HTTP-Port for UI: {HTTP_PORT}")
 
 # ---------------- NOTIFY-Port ----------------
@@ -73,7 +87,7 @@ try:
     NOTIFY_PORT = int(raw)  # Sekunden
 except ValueError:
     NOTIFY_PORT = 5357  # Fallback vom Fallback
-    logger.debug(f"NOTIFY-Port Reset to fallback value 5357 (should never reach this point)")
+    logger.warning(f"NOTIFY-Port Reset to fallback value 5357 (should never reach this point)")
 logger.info(f"NOTIFY-Port for Scan Events: {NOTIFY_PORT}")
 
 # ---------------- User-Agent ----------------
@@ -95,7 +109,7 @@ try:
     DISPLAY = raw  # Sekunden
 except ValueError:
     DISPLAY = "Scan to Homeassistant FB"  # Fallback vom Fallback
-    logger.debug(f"Reset to fallback Display setting (should never reach this point)")
+    logger.warning(f"Reset to fallback Display setting (should never reach this point)")
 logger.info(f"Destinations Entry on Scanner: {DISPLAY}")
 
 # ---------------- OFFLINE_TIMEOUT ----------------
@@ -123,7 +137,7 @@ try:
     MAX_FILES = int(raw)
 except ValueError:
     MAX_FILES = 50 # Fallback vom Fallback
-    logger.debug(f"Reset to fallback value (should never reach this point)")
+    logger.warning(f"Reset to fallback value (should never reach this point)")
 logger.info(f"max scanned files to show: {MAX_FILES}")
 
 
