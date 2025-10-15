@@ -10,16 +10,10 @@ import re
 import xml.etree.ElementTree as ET
 import subprocess
 from config import OFFLINE_TIMEOUT, SCAN_FOLDER, HTTP_PORT, MAX_FILES, NOTIFY_PORT
-#from globals import SCANNERS, SCAN_JOBS, NAMESPACES, STATE, USER_AGENT, LOG_LEVEL
 from globals import SCANNERS, SCAN_JOBS, NAMESPACES, STATE, USER_AGENT, logger
-#from scanner import Scanner
 from parse import parse_notify_msg
 from tools import find_scanner_by_endto_addr
 from scan_job import run_scan_job
-
-#logging.basicConfig(level=LOG_LEVEL, format='[%(levelname)s] %(message)s')
-#logger = logging.getLogger("wsd-addon")
-
 
 # ---------------- HTTP Server ----------------
 async def start_http_server():
@@ -94,7 +88,7 @@ async def status_page(request):
         job_list += f"{j.destination_token}</td>"
         job_list += f"<td style='text-align:center;'>{j.job_id}<br>"
         job_list += f"{j.job_token}</td>"
-        job_list += f"<td style='text-align:center;'>{j.status.value}</td>"
+        job_list += f"<td style='text-align:center;'>{j.state.value}</td>"
         job_list += f"<td style='text-align:center;'>{j.job_created.strftime('%Y-%m-%d %H:%M:%S')}<br>"
         job_list += f"{j.remove_after.strftime('%Y-%m-%d %H:%M:%S')}</td>"
         job_list += "</tr>"
