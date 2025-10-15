@@ -96,10 +96,12 @@ async def run_scan_job(scanjob_identifier: str):
     # Bild auf HDD abspeichern
     SCAN_JOBS[scanjob_identifier].state == STATE.SCAN_SAVING_DOCUMENT
 #    result = save_scanned_image({SCANNERS[SCAN_JOBS[scanjob_identifier].scan_from_uuid].friendly_name or SCAN_JOBS[scanjob_identifier].scan_from_uuid}, result)
-    src_name = SCANNERS[SCAN_JOBS[scanjob_identifier].scan_from_uuid].friendly_name or SCAN_JOBS[scanjob_identifier].scan_from_uuid
-    logger.info(f" saving image (more detailed later) from {src_name}")
+#    src_name = SCANNERS[SCAN_JOBS[scanjob_identifier].scan_from_uuid].friendly_name or SCAN_JOBS[scanjob_identifier].scan_from_uuid
+#    logger.info(f" saving image (more detailed later) from {src_name}")
+    logger.info(f" saving image (more detailed later) from {SCANNERS[SCAN_JOBS[scanjob_identifier].scan_from_uuid].friendly_name or SCAN_JOBS[scanjob_identifier].scan_from_uuid}")
 #    result = save_scanned_image(SCANNERS[SCAN_JOBS[scanjob_identifier].scan_from_uuid].friendly_name or SCAN_JOBS[scanjob_identifier].scan_from_uuid, result)
-    result = await save_scanned_image(scanjob_identifier, src_name)
+#    result = await save_scanned_image(scanjob_identifier, src_name)
+    result = await save_scanned_image(scanjob_identifier)
 
     if result:
         logger.info(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} [SCAN_JOB:run_job] saved image (more detailed later)")
