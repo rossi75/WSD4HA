@@ -551,7 +551,7 @@ async def request_retrieve_image(scanjob_identifier: str):
     async with aiohttp.ClientSession() as session:
         try:
             async with session.post(url, data=xml, headers=headers, timeout=5) as resp:
-                logger.debug(f"   ---> statuscode from response: {resp.status}")
+                logger.info(f"   ---> statuscode from response: {resp.status}")
                 if resp.status == 200:
                 #    body = await resp.text()
                     body = await resp.read()
@@ -561,21 +561,24 @@ async def request_retrieve_image(scanjob_identifier: str):
                         os.makedirs(os.path.dirname(filename), exist_ok=True)
                         with open(filename, "wb") as f:
                             f.write(image_bytes)
-                        logger.info(f"[RETRIEVE] Image saved to {filename}")
+                        logger.info(f"[SEND:rtrv_img] Image saved to {filename}")
                         job.state = STATE.SCAN_DONE
                     else:
-                        logger.warning(f"[RETRIEVE] No image found in response")
+                        logger.warning(f"[SEND:rtrv_img] No image found in response")
                         job.state = STATE.SCAN_FAIL
                 else:
                     SCAN_JOBS[scanjob_identifier].state = STATE.SCAN_FAILED
-                    logger.error(f"[SCAN_JOB:rtrv_img] Retrieving image failed with Statuscode {resp.status}")
-                    return
+                    logger.error(f"[SEND:rtrv_img] Retrieving image failed with Statuscode {resp.status}")
+                    return False
         except Exception as e:
-            logger.error(f"[SCAN_JOB:rtrv_img] anything went wrong with {SCAN_JOBS[scanjob_identifier]}: {e}")
+            logger.error(f"[SEND:rtrv_img] anything went wrong with {scanjob_identifier}: {e}")
             SCAN_JOBS[scanjob_identifier].state = STATE.SCAN_FAILED
-            return
+            return False
 
-    logger.info(f"finished reading image from scanner")
+    logger.info(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} finished reading image from scanner")
+
+    return True
+
 
 #
 #
