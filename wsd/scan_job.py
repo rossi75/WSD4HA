@@ -80,10 +80,11 @@ async def run_scan_job(scanjob_identifier: str):
         return
 
 
-    # Bild abholen, Ergebnis wird direkt in SCAN_JOBS[] geschrieben und gibt true für Erfolg, false für Misserfolg zurück
+    # Bild abholen, Ergebnis wird direkt in SCAN_JOBS[].document geschrieben und gibt true für Erfolg, false für Misserfolg zurück
     SCANNERS[SCAN_JOBS[scanjob_identifier].scan_from_uuid].state == STATE.ONLINE_BUSY
     SCAN_JOBS[scanjob_identifier].state == STATE.SCAN_RETRIEVE_IMG
-    result = asyncio.create_task(request_retrieve_image(scanjob_identifier))
+#    result = asyncio.create_task(request_retrieve_image(scanjob_identifier))
+    result = await request_retrieve_image(scanjob_identifier)
 
     if result:
         logger.info(f" received data from scanner (more detailed later)")
@@ -99,7 +100,7 @@ async def run_scan_job(scanjob_identifier: str):
     src_name = SCANNERS[SCAN_JOBS[scanjob_identifier].scan_from_uuid].friendly_name or SCAN_JOBS[scanjob_identifier].scan_from_uuid
     logger.info(f" saving image (more detailed later) from {src_name}")
 #    result = save_scanned_image(SCANNERS[SCAN_JOBS[scanjob_identifier].scan_from_uuid].friendly_name or SCAN_JOBS[scanjob_identifier].scan_from_uuid, result)
-    result = save_scanned_image(src_name, result)
+    result = await save_scanned_image(src_name, result)
 
     if result:
         logger.info(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} [SCAN_JOB:run_job] saved image (more detailed later)")
