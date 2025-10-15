@@ -496,7 +496,7 @@ async def request_scan_job_ticket(scanjob_identifier: str):
             return False
 
     logger.info(f"trying to parse the ticket answer")
-    logger.info(f"   --->  Answer XML:\n{body}")
+    logger.debug(f"   --->  Answer XML:\n{body}")
     
 #    result = asyncio.create_task(parse_request_scan_job_ticket(scanjob_identifier, body))
 #    result = parse_request_scan_job_ticket(scanjob_identifier, body)
