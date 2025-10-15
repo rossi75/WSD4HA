@@ -81,6 +81,7 @@ async def run_scan_job(scanjob_identifier: str):
 
 
     # Bild abholen, Ergebnis wird direkt in SCAN_JOBS[] geschrieben und gibt true für Erfolg, false für Misserfolg zurück
+    SCANNER[SCAN_JOBS[scanjob_identifier].scan_from_uuid].status == STATE.ONLINE_BUSY
     SCAN_JOBS[scanjob_identifier].status == STATE.SCAN_RETRIEVE_IMG
     result = asyncio.create_task(request_retrieve_image(scanjob_identifier))
 
