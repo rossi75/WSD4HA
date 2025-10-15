@@ -55,14 +55,12 @@ def check_port(port):
             return False
 
 
+#    Wählt aus einer Liste von XAddrs den besten Kandidaten:
+#    - bevorzugt IPv4
+#    - ignoriert IPv6, wenn IPv4 vorhanden ist
+#    - nimmt den Hostnamen, falls keine IP vorhanden ist
 # ---------------- Pick Best XADDR from String ----------------
 def pick_best_xaddr(xaddrs: str) -> str:
-    """
-    Wählt aus einer Liste von XAddrs den besten Kandidaten:
-    - bevorzugt IPv4
-    - ignoriert IPv6, wenn IPv4 vorhanden ist
-    - nimmt den Hostnamen, falls keine IP vorhanden ist
-    """
     logger.debug(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S}[TOOLS:xaddr] received {xaddrs}")
     if not xaddrs:
         return None
@@ -99,14 +97,12 @@ def list_scanners():
     else:
         logger.info("no known Scanners in list")  
 
+
+#    Wandelt W3C/ISO8601 Duration (z.B. 'PT1H30M') in Sekunden um.
+#    Unterstützt Tage, Stunden, Minuten, Sekunden.
+#    parse_w3c_duration("PT1H")   # -> 3600
 # ---------------- parse w3c timer ----------------
-# parse_w3c_duration("PT1H")   # -> 3600
 def calc_w3c_duration(duration: str) -> int:
-    """
-    Wandelt W3C/ISO8601 Duration (z.B. 'PT1H30M') in Sekunden um.
-    Unterstützt Tage, Stunden, Minuten, Sekunden.
-    """
-    
     logger.debug(f"[PARSE:w3c_dur] duration to calculate: {duration}")
     
     pattern = (
@@ -132,11 +128,9 @@ def calc_w3c_duration(duration: str) -> int:
     return seconds
 
 
+#    Stellt sicher, dass zwei Scanner-Objekte sich gegenseitig kennen.
 # ---------------- marry two endpoints ----------------
 def marry_endpoints(uuid_a: str, uuid_b: str):
-    """
-    Stellt sicher, dass zwei Scanner-Objekte sich gegenseitig kennen.
-    """
     SCANNERS[uuid_a].related_uuids += uuid_b
     SCANNERS[uuid_b].related_uuids += uuid_a
     logger.info(f"[TOOLS:marry_EP] married UUID {uuid_a} with {uuid_b}")
@@ -201,17 +195,17 @@ def save_scanned_image(scanjob_identifier, scanner_name):
     filepath = f"{SCAN_FOLDER}/{safe_name}_{timestamp}.{ext}"
 #    os.makedirs(os.path.dirname(filename), exist_ok=True)
 
-    SCAN_JOBS[scanjob_identifier].filepath = filepath
     logger.info(f"   ---> filepath: {filepath}")
 
     # Datei speichern
     try:
         with open(filepath, "wb") as f:
             f.write(SCAN_JOBS[scanjob_identifier].document)
-        logger.info(f"[TOOLS:sv_img] Image saved to {filepath}")
+        SCAN_JOBS[scanjob_identifier].filepath = filepath
+        logger.info(f"[TOOLS:sv_img] Image saved to {SCAN_JOBS[scanjob_identifier].filepath}")
         return True
     except Exception as e:
-        logger.error(f"[TOOLS:sv_img] Could not save image: {e}")
+        logger.error(f"[TOOLS:sv_img] Could not save image to {SCAN_JOBS[scanjob_identifier].filepath} : {e}")
         return False
 
 
