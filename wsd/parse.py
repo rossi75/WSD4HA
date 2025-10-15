@@ -374,6 +374,11 @@ def parse_get_scanner_elements_configuration(scanjob_identifier, xml):
         width = str(math.floor(int(width_elem.text.strip()) / 10) * 10)
         SCAN_JOBS[scanjob_identifier].DocPar_InputWidth = width
         SCAN_JOBS[scanjob_identifier].DocPar_RegionWidth = width
+#
+        logger.info(f"          width_math: {width}")
+        width = str( ( int(width_elem.text.strip()) / 10 ) * 10)
+        logger.info(f"          width /10*10: {width}")
+#
         logger.info(f" input_width_elem: {SCAN_JOBS[scanjob_identifier].DocPar_InputWidth}")
         logger.info(f" region_width_elem: {SCAN_JOBS[scanjob_identifier].DocPar_RegionWidth}")
 
