@@ -29,13 +29,7 @@ import logging
 import re
 import socket
 import xml.etree.ElementTree as ET
-#from globals import SCANNERS, LOG_LEVEL, NAMESPACES
-from globals import SCANNERS, NAMESPACES, logger
-
-#logging.basicConfig(level=LOG_LEVEL, format='[%(levelname)s] %(message)s')
-#logger = logging.getLogger("wsd-addon")
-
-
+from globals import SCANNERS, NAMESPACES, SCAN_FOLDER, SCAN_JOBS, logger
 
 # ---------------- lokale IP abfragen ----------------
 def get_local_ip():
@@ -171,8 +165,58 @@ def find_scanner_by_endto_addr(endto_addr: str):
     return None
 
 
-# ---------------- saving scanned image to harddisk ----------------
-def save_scanned_image(scanner_name: str, image_bytes: bytes):
+#    Speichert das empfangene Scan-Image auf der Festplatte mit
+#    - automatisch erkannter Dateiendung
+#    - bereinigtem Dateinamen
+#    - Zeitstempel
+# ---------------- saving scanned image to floppy ----------------
+def save_scanned_image(scanjob_identifier, scanner_name):
+    logger.info(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} [TOOLS:sv_img] saving image {scanner_name}")
+
+    if not SCAN_JOBS[scan_identifier].document:
+        logger.warning(f" No data to save for job ID {scanjob_identifier}")
+        return None
+
+    # Dateityp erkennen
+    header = SCAN_JOBS[scanjob_identifier].document[:8]
+    if header.startswith(b"\xFF\xD8\xFF"):
+        ext = "jpg"
+    elif header.startswith(b"\x89PNG"):
+        ext = "png"
+    elif header.startswith(b"II*\x00") or header.startswith(b"MM\x00*"):
+        ext = "tiff"
+    elif header.startswith(b"%PDF"):
+        ext = "pdf"
+    else:
+        ext = "bin"  # Fallback
+
+    # Friendly-Name säubern
+    safe_name = re.sub(r"[^A-Za-z0-9_\-]", "_", scanner_name.strip())
+
+    # Zeitstempel
+    timestamp = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
+
+    # Zielpfad
+#    filename = f"/scans/{safe_name}_{timestamp}{ext}"
+    filepath = f"{SCAN_FOLDER}/{safe_name}_{timestamp}.{ext}"
+#    os.makedirs(os.path.dirname(filename), exist_ok=True)
+
+    SCAN_JOBS[scanjob_identifier].filepath = filepath
+    logger.info(f"   ---> filepath: {filepath}")
+
+    # Datei speichern
+    try:
+        with open(filepath, "wb") as f:
+            f.write(SCAN_JOBS[scanjob_identifier].document)
+        logger.info(f"[TOOLS:sv_img] Image saved to {filepath}")
+        return True
+    except Exception as e:
+        logger.error(f"[TOOLS:sv_img] Could not save image: {e}")
+        return False
+
+
+######################################################################
+def _save_scanned_image(scanner_name: str, image_bytes: bytes):
     """
     Speichert das empfangene Scan-Image auf der Festplatte mit
     - automatisch erkannter Dateiendung
