@@ -171,7 +171,7 @@ def find_scanner_by_endto_addr(endto_addr: str):
     return None
 
 
-# ---------------- which scanner notified to end_to? ----------------
+# ---------------- saving scanned image to harddisk ----------------
 def save_scanned_image(scanner_name: str, image_bytes: bytes):
     """
     Speichert das empfangene Scan-Image auf der Festplatte mit
@@ -179,10 +179,14 @@ def save_scanned_image(scanner_name: str, image_bytes: bytes):
     - bereinigtem Dateinamen
     - Zeitstempel
     """
+    logger.info(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} [TOOLS:sv_img] saving image {scanner_name}")
+
     if not image_bytes:
-        logger.warning("[SAVE] No image data to save")
+        logger.warning(" No image data to save")
         return None
 
+    logger.info(f" saving image {scanner_name}")
+    
     # Dateityp erkennen
     header = image_bytes[:8]
     if header.startswith(b"\xFF\xD8\xFF"):
