@@ -619,7 +619,7 @@ def parse_retrieve_image(scanjob_identifier, data, content_type: str):
         return None, None
     boundary = m.group(1).encode()
 
-    parts = body.split(b"--" + boundary)
+    parts = data.split(b"--" + boundary)
     xml = None
     image_bytes = None
     image_content_id = None
