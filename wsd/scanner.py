@@ -91,6 +91,7 @@ class Scan_Jobs:
 
         self.state = STATE.SCAN_PENDING
         self.job_created = datetime.datetime.now().replace(microsecond=0)
+        self.job_finished = None
         self.remove_after = datetime.datetime.now().replace(microsecond=0) + timedelta(minutes=30) # Zeitpunkt zum Löschen des Auftrages = jetzt + 30 Minuten
         SCANNERS[scan_from_uuid].update()
 
