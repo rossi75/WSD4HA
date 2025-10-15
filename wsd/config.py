@@ -47,7 +47,7 @@ STARTUP_DT = datetime.datetime.now().replace(microsecond=0)
 
 logger.info(f" ")
 logger.info(f"***********************************************************")
-logger.info(f"*             Starting up WSD Scanner Service             *")
+logger.info(f"*    Starting up WSD Scanner Service for Home Assistant   *")
 #logger.info(f"*                   {datetime.datetime.now():%d.%m.%Y, %H:%M:%S}                  *")
 logger.info(f"*                   {STARTUP_DT:%d.%m.%Y, %H:%M:%S}                  *")
 logger.info(f"***********************************************************")
