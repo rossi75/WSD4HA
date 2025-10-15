@@ -42,7 +42,7 @@ async def send_probe(probe_uuid: str):
                     logger.error(f"   --->  Answer XML:\n{body}")
                     SCANNERS[uuid].state = STATE.ABSENT
         except Exception as e:
-            logger.error(f"   ---> Probe failed at {url}: {e}")
+            logger.exception(f"   ---> Probe failed at {url}: {e}")
             SCANNERS[probe_uuid].state = STATE.ABSENT
 
     logger.debug(f"ProbeMatch from {SCANNERS[probe_uuid].ip}:\n{body}")
@@ -87,7 +87,7 @@ async def send_transfer_get(tf_g_uuid: str):
                     logger.error(f"   --->  Answer XML:\n{body}")
                     return None
         except Exception as e:
-            logger.error(f"[WSD:transfer_get] failed for {SCANNERS[tf_g_uuid].uuid}: {e}")
+            logger.exception(f"[WSD:transfer_get] failed for {SCANNERS[tf_g_uuid].uuid}: {e}")
             SCANNERS[tf_g_uuid].state = STATE.ERROR
             return None
  
@@ -153,7 +153,7 @@ async def send_subscription_ScanAvailableEvent(sae_uuid: str):
                     logger.error(f"   --->  Answer XML:\n{body}")
                     return None
         except Exception as e:
-            logger.error(f"[SEND:sae] failed for {SCANNERS[tf_g_uuid].uuid}: {e}")
+            logger.exception(f"[SEND:sae] failed for {SCANNERS[tf_g_uuid].uuid}: {e}")
             SCANNERS[tf_g_uuid].state = STATE.ERROR
             return None
  
@@ -209,7 +209,7 @@ async def send_subscription_renew(renew_uuid: str):
                     logger.error(f"   --->  Answer XML:\n{body}")
                     return None
         except Exception as e:
-            logger.error(f"[SEND:rnw] failed for {SCANNERS[renew_uuid].uuid}: {e}")
+            logger.exception(f"[SEND:rnw] failed for {SCANNERS[renew_uuid].uuid}: {e}")
             SCANNERS[renew_uuid].state = STATE.ERROR
             return None
  
@@ -265,7 +265,7 @@ async def request_scanner_elements_state(scanjob_identifier: str):
                     logger.error(f"   --->  Answer XML:\n{body}")
                     return False
         except Exception as e:
-            logger.error(f"[SEND:def_ticket] anything went wrong with scanners state for scan job {SCAN_JOBS[scanjob_identifier]}:\n{e}")
+            logger.exception(f"[SEND:def_ticket] anything went wrong with scanners state for scan job {SCAN_JOBS[scanjob_identifier]}:\n{e}")
             SCAN_JOBS[scanjob_identifier].state = STATE.SCAN_FAILED
             return False
 
@@ -327,7 +327,7 @@ async def request_scanner_elements_configuration(scanjob_identifier: str):
                     logger.error(f"   --->  Answer XML:\n{body}")
                     return False
         except Exception as e:
-            logger.error(f"[SEND:scan_config] anything went wrong with scanners configuration for scan job {SCAN_JOBS[scanjob_identifier]}:\n{e}")
+            logger.exception(f"[SEND:scan_config] anything went wrong with scanners configuration for scan job {SCAN_JOBS[scanjob_identifier]}:\n{e}")
             SCAN_JOBS[scanjob_identifier].state = STATE.SCAN_FAILED
             return False
 
@@ -389,7 +389,7 @@ async def request_scanner_elements_def_ticket(scanjob_identifier: str):
                     logger.error(f"   --->  Answer XML:\n{body}")
                     return False
         except Exception as e:
-            logger.error(f"[SEND:def_ticket] anything went wrong with Scan Job {SCAN_JOBS[scanjob_identifier]}:\n{e}")
+            logger.exception(f"[SEND:def_ticket] anything went wrong with Scan Job {SCAN_JOBS[scanjob_identifier]}:\n{e}")
             SCAN_JOBS[scanjob_identifier].state = STATE.SCAN_FAILED
             return False
 
@@ -491,7 +491,7 @@ async def request_scan_job_ticket(scanjob_identifier: str):
                     logger.error(f"   --->  Answer XML:\n{body}")
                     return False
         except Exception as e:
-            logger.error(f"[SEND:ticket] anything went wrong with {SCAN_JOBS[scanjob_identifier]}: {e}")
+            logger.exception(f"[SEND:ticket] anything went wrong with {SCAN_JOBS[scanjob_identifier]}: {e}")
             SCAN_JOBS[scanjob_identifier].state = STATE.SCAN_FAILED
             return False
 
@@ -538,30 +538,59 @@ async def request_retrieve_image(scanjob_identifier: str):
         "Content-Type": "application/soap+xml",
         "User-Agent": USER_AGENT
     }
+    timeout = aiohttp.ClientTimeout(
+        total=180,            # Gesamtzeitlimit (Request + Lesen)
+        connect=10,           # Verbindungsaufbau
+        sock_read=160,        # Zeit für Lesen (z. B. Bilddaten)
+        sock_connect=10       # Zeit bis Verbindung hergestellt ist
+    )
 
     logger.debug(f"   --->        FROM: {FROM_UUID}")
     logger.debug(f"   --->      MSG_ID: {msg_id}")
-    logger.info(f"   --->         URL: {url}")
+    logger.debug(f"   --->         URL: {url}")
     logger.info(f"   --->       JobID: {SCAN_JOBS[scanjob_identifier].job_id}")
     logger.info(f"   --->    JobToken: {SCAN_JOBS[scanjob_identifier].job_token}")
     logger.info(f"   ---> Request XML:\n{xml}")
 
     logger.info(f"requesting the image")
 
-    async with aiohttp.ClientSession() as session:
+    async with aiohttp.ClientSession(timeout=timeout) as session:
         try:
-            async with session.post(url, data=xml, headers=headers, timeout=5) as resp:
+            async with session.post(url, data=xml, headers=headers) as resp:
                 logger.info(f"   ---> statuscode from retrieve image: {resp.status}")
-                if resp.status == 200:
-                    logger.info(f" awaiting body...")
-                #    body = await resp.text()
-                    body = await resp.read()
-                    logger.info(f" hdrs:\n{resp.headers}")
-                    logger.info(f" body:\n{body}")
+                if resp.status != 200:
+                    logger.error(f"[SEND:rtrv_img] Retrieving image failed with Statuscode {resp.status}")
+                    logger.error(f"   --->  Answer XML:\n{body}")
+                    return False
+
+    
+                logger.info(f" awaiting data...")
+                total_bytes = 0
+                data = bytearray()
+
+                # Stream lesen – chunkweise
+                async for chunk in resp.content.iter_chunked(4096):
+                    if not chunk:
+                        break
+                    data.extend(chunk)
+                    total_bytes += len(chunk)
+#                    if total_bytes % (256 * 1024) < 4096:  # alle ~256 KB mal loggen
+                    if total_bytes % (8 * 1024) < 4096:  # alle ~8 KB mal loggen
+                        logger.info(f"      ...received {total_bytes/1024:.1f} KB")
+
+                logger.info(f"   Image stream finished, total {total_bytes/1024:.1f} KB")
+
+                # Content-Type holen
+                content_type = resp.headers.get("Content-Type", "")
+                logger.info(f" content type: {content_type}")
+          #          body = await resp.read()
+          #          logger.info(f" hdrs:\n{resp.headers}")
+          #          logger.info(f" body:\n{body}")
 #                    soap_xml, image_bytes = parse_retrieve_image_response(body, resp.headers.get("Content-Type", ""))
 #                    xml, image_bytes = parse_retrieve_image_response(body, resp.headers.get("Content-Type", ""))
 #                    parse_retrieve_image_response(scanjob_identifier, body, resp.headers.get("Content-Type", ""))
-                    parse_retrieve_image(scanjob_identifier, body, resp.headers.get("Content-Type", ""))
+#                    parse_retrieve_image(scanjob_identifier, body, resp.headers.get("Content-Type", ""))
+                parse_retrieve_image(scanjob_identifier, bytes(data), resp.headers.get("Content-Type", ""))
                #     if image_bytes:
                #         filename = f"/scans/{scanner.friendly_name or scanner_uuid}_{scan_identifier}.jfif"
                #         os.makedirs(os.path.dirname(filename), exist_ok=True)
@@ -569,13 +598,17 @@ async def request_retrieve_image(scanjob_identifier: str):
                #             f.write(image_bytes)
                #         logger.info(f"[SEND:rtrv_img] Image saved to {filename}")
      #                   job.state = STATE.SCAN_DONE
-                else:
-                    SCAN_JOBS[scanjob_identifier].state = STATE.SCAN_FAILED
-                    logger.error(f"[SEND:rtrv_img] Retrieving image failed with Statuscode {resp.status}")
-                    logger.error(f"   --->  Answer XML:\n{body}")
-                    return False
+  #              else:
+  #                  SCAN_JOBS[scanjob_identifier].state = STATE.SCAN_FAILED
+  #                  logger.error(f"[SEND:rtrv_img] Retrieving image failed with Statuscode {resp.status}")
+  #                  logger.error(f"   --->  Answer XML:\n{body}")
+  #                  return False
+        except asyncio.TimeoutError:
+            logger.error(f"[SEND:rtrv_img] Timeout while retrieving image for {scanjob_identifier}")
+            SCAN_JOBS[scanjob_identifier].state = STATE.SCAN_FAILED
+            return False
         except Exception as e:
-            logger.error(f"[SEND:rtrv_img] anything went wrong with {scanjob_identifier}: {e}")
+            logger.exception(f"[SEND:rtrv_img] anything went wrong with {scanjob_identifier}: {e}")
             SCAN_JOBS[scanjob_identifier].state = STATE.SCAN_FAILED
             return False
 
