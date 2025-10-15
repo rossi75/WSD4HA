@@ -476,8 +476,8 @@ async def request_scan_job_ticket(scanjob_identifier: str):
 
     logger.debug(f"   --->        FROM: {FROM_UUID}")
     logger.debug(f"   --->      MSG_ID: {msg_id}")
-    logger.info(f"   --->         URL: {url}")
-    logger.info(f"   ---> Request XML:\n{xml}")
+    logger.debug(f"   --->         URL: {url}")
+    logger.debug(f"   ---> Request XML:\n{xml}")
 
     async with aiohttp.ClientSession() as session:
         try:
@@ -498,8 +498,6 @@ async def request_scan_job_ticket(scanjob_identifier: str):
     logger.info(f"trying to parse the ticket answer")
     logger.debug(f"   --->  Answer XML:\n{body}")
     
-#    result = asyncio.create_task(parse_request_scan_job_ticket(scanjob_identifier, body))
-#    result = parse_request_scan_job_ticket(scanjob_identifier, body)
     result = parse_create_scan_job(scanjob_identifier, body)
 
     logger.info(f" Result from parsing: {result}")
