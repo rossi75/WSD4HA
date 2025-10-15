@@ -20,6 +20,7 @@
 
 ## 0.69 - 2025-10-15
 - receiving the data works, now we need to extract it and save it into SCAN_JOBS[].document
+- nice banner at startup
 
 ## 0.68 - 2025-10-15
 - scan to HA works, the scanner moves...
