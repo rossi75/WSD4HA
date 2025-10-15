@@ -642,7 +642,7 @@ def parse_retrieve_image(scanjob_identifier, data, content_type: str):
 #        if content_type == "application/xop+xml":
         if "xml" in content_type:
             metadata = part.get_payload(decode=True)
-            logger.info(f"   Found {len(metadata)} Bytes of XML metadata part")
+            logger.info(f"   Found {len(metadata)} Bytes of XML metadata part, discarding")
             logger.info(f" metadata: {metadata[:300]!r} [...]")
 
 #        elif content_type in ("application/binary", "image/jpeg", "image/png", "image/tiff", "application/pdf"):
@@ -653,14 +653,16 @@ def parse_retrieve_image(scanjob_identifier, data, content_type: str):
             SCAN_JOBS[scanjob_identifier].document = part.get_payload(decode=True)
             logger.info(f" saved {len(SCAN_JOBS[{scanjob_identifier}].document)} Bytes in SCAN_JOBS[{scanjob_identifier}].document")
             logger.info(f" document: {SCAN_JOBS[{scanjob_identifier}].document[:300]!r} [...]")
-            return True
+#            return True
 #        else:
 #            logger.error(f"[PARSE:rtrv_img] could not find any of binary|image|pdf in stream for scan job ID {scanjob_identifier}")
 #            SCAN_JOBS[scanjob_identifier].state = STATE.SCAN_FAILED
 #            return False
 
-
-
+    if len(SCAN_JOBS[{scanjob_identifier}].document) == 0:
+        return False
+    else:
+        return True
 
 #
 #
