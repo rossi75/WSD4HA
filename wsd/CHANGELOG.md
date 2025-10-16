@@ -12,6 +12,7 @@
   - display several details only in debug mode
   - download files
   - mouseover for tech details
+  - scan from UI
 - ...
 
 
