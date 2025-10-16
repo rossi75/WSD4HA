@@ -1,22 +1,5 @@
 # Changelog
 
-### todo
-- make manual configuration functional
-- implement simple variant of ValidateScanTicket
-- decide automatically between simple and detailled variant of ValdiateScanTicket
-- implement GetScannerElements[ScannerDescription]
-- write bin to harddisk
-- merge globals.py + config.py to globalconfig.py
-- add WSD secure (Port 5358)
-- webinterface improvements:
-  - left column for tree with config_output/scanners/jobs/scans
-  - display several details only in debug mode
-  - download files
-  - mouseover for tech details
-  - scan from UI
-- ...
-
-
 ## 0.73 - 2025-10-16
 - added probe exceptions
 - save to floppy disk works fine
