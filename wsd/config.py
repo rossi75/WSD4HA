@@ -11,7 +11,8 @@ import xml.etree.ElementTree as ET
 import subprocess
 import uuid
 import globals
-from globals import SCANNERS, FROM_UUID, USER_AGENT, LOG_LEVEL, SCAN_FOLDER, STARTUP_DT, logger
+#from globals import SCANNERS, FROM_UUID, USER_AGENT, LOG_LEVEL, SCAN_FOLDER, STARTUP_DT, logger
+from globals import SCANNERS, FROM_UUID, USER_AGENT, LOG_LEVEL, STARTUP_DT, logger
 from tools import list_scanners, check_port, get_local_ip
 
 # ----------------- To Do -----------------
