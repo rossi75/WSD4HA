@@ -18,8 +18,9 @@ from tools import list_scanners, pick_best_xaddr
 # ---------------- Message handler ----------------
 async def discovery_processor(data, addr):
     logger.info(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} [WSD:Disc_Proc] Processing something from {addr[0]}")
-    logger.debug(f" [Message]    ---> received data {data}")
-    logger.debug(f" [Message]    ---> received addr {addr}")
+    logger.debug(f"   ---> received addr: {addr}")
+    logger.debug(f"   ---> received data:\n{data}")
+
     ip = addr[0] if addr else "?"
 
     try:
