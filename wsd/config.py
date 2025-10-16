@@ -10,6 +10,7 @@ import re
 import xml.etree.ElementTree as ET
 import subprocess
 import uuid
+import globals
 from globals import SCANNERS, FROM_UUID, USER_AGENT, LOG_LEVEL, SCAN_FOLDER, STARTUP_DT, logger
 from tools import list_scanners, check_port, get_local_ip
 
@@ -121,12 +122,12 @@ if OFFLINE_TIMEOUT < 120:
 logger.info(f"Offline Timeout: {OFFLINE_TIMEOUT}s")
 
 # ---------------- SCAN-Folder Path ----------------
-SCAN_FOLDER = Path(os.environ.get("SCAN_FOLDER", "/share/scans"))
-SCAN_FOLDER.mkdir(parents=True, exist_ok=True)
-logger.info(f"Scan-Path: {SCAN_FOLDER}")
+globals.SCAN_FOLDER = Path(os.environ.get("SCAN_FOLDER", "/share/scans"))
+#SCAN_FOLDER.mkdir(parents=True, exist_ok=True)
+logger.info(f"Scan-Path: {globals.SCAN_FOLDER}")
 
 # ---------------- TMUX env ----------------
-TMUX = Path(os.environ.get("TMUX", "---"))
+TMUX = os.environ.get("TMUX", "---")
 logger.info(f" TMUX env: {TMUX}")
 
 # ---------------- SCAN-Folder Path ----------------
