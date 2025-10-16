@@ -608,7 +608,7 @@ def parse_create_scan_job(scanjob_identifier, xml: str):
 #    Returns: (soap_xml: str, image_bytes: bytes or None)
 # ------------------------------- extract image from retrieved content ----------------------------------------------------
 def parse_retrieve_image(scanjob_identifier, data, content_type: str):
-    logger.info(f"[PARSE:rtrv_img] parsing {len(data)} bytes for scan job {scanjob_identifier}")
+    logger.info(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} [PARSE:rtrv_img] parsing {len(data)} bytes for scan job {scanjob_identifier}")
     preview_bytes = 400
     logger.info(f" content-type: {content_type}")
     logger.info(f"      content:\n{data[:preview_bytes]} [...]")
