@@ -13,19 +13,8 @@ import uuid
 import globals
 #from globals import SCANNERS, FROM_UUID, USER_AGENT, LOG_LEVEL, SCAN_FOLDER, STARTUP_DT, logger
 from globals import SCANNERS, FROM_UUID, USER_AGENT, LOG_LEVEL, STARTUP_DT, logger
+#from globals import SCANNERS, FROM_UUID, USER_AGENT, STARTUP_DT, logger
 from tools import list_scanners, check_port, get_local_ip
-
-# ----------------- To Do -----------------
-# + Drucker oder Scanner name übernehmen
-# + passende antwort schreiben
-# + Logs mit D/T
-# - scanauftrag entgegennehmen
-# - Daten in ne Datei schreiben
-# - Dateiliste auslesen
-# + webserver zum laufen bekommen
-# + nach einem neuzugang die liste anzeigen
-# + nach einem abgang diesen im log ausführlich ausgeben
-# + neuer scanner wird zu oft erkannt
 
 STARTUP_DT = datetime.datetime.now().replace(microsecond=0)
 
@@ -48,6 +37,12 @@ logger.info(f"******************************************************************
 logger.info(f"*                                          C O N F I G U R A T I O N                                          *")
 logger.info(f"***************************************************************************************************************")
 # ---------------- Optionen aus Environment ----------------
+# Create main config
+LOG_LEVEL_=$(bashio::config 'log_level')
+logger.info(f"LogLevel from bashio: {LOG_LEVEL_}")
+SCAN_FOLDER_=$(bashio::config 'scan_folder')
+logger.info(f"Scan Folder from bashio: {SCAN_FOLDER_}")
+
 # ---------------- Logging ----------------
 logger.info(f"Loglevel: {LOG_LEVEL}")
 
