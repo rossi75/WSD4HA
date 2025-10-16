@@ -85,9 +85,9 @@ async def run_scan_job(scanjob_identifier: str):
     result = await request_retrieve_image(scanjob_identifier)
 
     if result:
-        logger.info(f" received any {len(SCAN_JOBS[scanjob_identifier].document)} Bytes from {SCANNERS[SCAN_JOBS[scanjob_identifier].scan_from_uuid].friendly_name or SCAN_JOBS[scanjob_identifier].scan_from_uuid}")
-        await asyncio.sleep(2)                                        # Zwangspause für um vom Scanner das FIN erst einmal abzuarbeiten und dann gleich nen freien Kopf zu haben.
-        logger.debug(f" short retirement nap is over !")
+        logger.info(f" received any document with {len(SCAN_JOBS[scanjob_identifier].document)} Bytes from {SCANNERS[SCAN_JOBS[scanjob_identifier].scan_from_uuid].friendly_name or SCAN_JOBS[scanjob_identifier].scan_from_uuid}")
+#        await asyncio.sleep(2)                                        # Zwangspause für um vom Scanner das FIN erst einmal abzuarbeiten und dann gleich nen freien Kopf zu haben.
+#        logger.debug(f" short retirement nap is over !")
     else:
         logger.info(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} [SCAN_JOB:run_job] something went wrong with receiving data from scanner. Document {len(SCAN_JOBS[scanjob_identifier].document)} Bytes ")
         SCAN_JOBS[scanjob_identifier].state = STATE.SCAN_FAILED
