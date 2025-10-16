@@ -609,8 +609,9 @@ def parse_create_scan_job(scanjob_identifier, xml: str):
 # ------------------------------- extract image from retrieved content ----------------------------------------------------
 def parse_retrieve_image(scanjob_identifier, data, content_type: str):
     logger.info(f"[PARSE:rtrv_img] parsing {len(data)} bytes for scan job {scanjob_identifier}")
+    preview_bytes = 400
     logger.info(f" content-type: {content_type}")
-    logger.info(f"      content:\n{data[:200]}")
+    logger.info(f"      content:\n{data[:preview_bytes]} [...]")
 
     SCAN_JOBS[scanjob_identifier].state = STATE.SCAN_EXTRACT_IMG
 
@@ -620,7 +621,7 @@ def parse_retrieve_image(scanjob_identifier, data, content_type: str):
 
     # Den vollständigen MIME-Datensatz künstlich zusammensetzen:
     mime_data = f"Content-Type: {content_type}\r\nMIME-Version: 1.0\r\n\r\n".encode("utf-8") + data
-    logger.info(f"  mime_data:\n{mime_data[:300]} [...]")
+    logger.info(f"  mime_data:\n{mime_data[:preview_bytes]} [...]")
 
     # multipart nach email-ähnlicher Struktur parsen
     msg = message_from_bytes(mime_data, policy=default)
@@ -628,7 +629,7 @@ def parse_retrieve_image(scanjob_identifier, data, content_type: str):
     # Fallback falls boundary nicht automatisch erkannt wird:
     if not msg.is_multipart():
         logger.error(f"[PARSE:rtrv_img] received data is no multipart response")
-        logger.info(f"see yourself:\n{data[:300]!r} [...]")
+        logger.info(f"see yourself:\n{data[:preview_bytes]!r} [...]")
         SCAN_JOBS[scanjob_identifier].state = STATE.SCAN_FAILED
         return False
 
@@ -636,14 +637,14 @@ def parse_retrieve_image(scanjob_identifier, data, content_type: str):
         content_type = part.get_content_type()
         content_id = part.get("Content-ID")
         logger.info(f"searching ID: {content_id}")
-        logger.info(f"Content-Type: {content_type[:300]!r} [...]")
+        logger.info(f"Content-Type: {content_type[:preview_bytes]!r} [...]")
 
         # Wir suchen den Binärteil — meist image/jpeg oder application/pdf
 #        if content_type == "application/xop+xml":
         if "xml" in content_type:
             metadata = part.get_payload(decode=True)
             logger.info(f"   Found {len(metadata)} Bytes of XML metadata part, discarding")
-            logger.info(f" metadata: {metadata[:300]!r} [...]")
+            logger.info(f" metadata: {metadata[:preview_bytes]!r} [...]")
 
 #        elif content_type in ("application/binary", "image/jpeg", "image/png", "image/tiff", "application/pdf"):
         else:
@@ -651,15 +652,16 @@ def parse_retrieve_image(scanjob_identifier, data, content_type: str):
 #            logger.info(f"   Found {len(SCAN_JOBS[scanjob_identifier].document)} Bytes of XML metadata part")
 #            SCAN_JOBS[scanjob_identifier].document = part.get_content()
             SCAN_JOBS[scanjob_identifier].document = part.get_payload(decode=True)
-            logger.info(f" saved {len(SCAN_JOBS[{scanjob_identifier}].document)} Bytes in SCAN_JOBS[{scanjob_identifier}].document")
-            logger.info(f" document: {SCAN_JOBS[{scanjob_identifier}].document[:300]!r} [...]")
+            logger.info(f" saved {len(SCAN_JOBS[scanjob_identifier].document)} Bytes in SCAN_JOBS[].document")
+            logger.info(f" document: {SCAN_JOBS[scanjob_identifier].document[:preview_bytes]!r} [...]")
 #            return True
 #        else:
 #            logger.error(f"[PARSE:rtrv_img] could not find any of binary|image|pdf in stream for scan job ID {scanjob_identifier}")
 #            SCAN_JOBS[scanjob_identifier].state = STATE.SCAN_FAILED
 #            return False
 
-    if len(SCAN_JOBS[{scanjob_identifier}].document) == 0:
+    if len(SCAN_JOBS[scanjob_identifier].document) == 0:
+        SCAN_JOBS[scanjob_identifier].state = STATE.SCAN_FAILED
         return False
     else:
         return True
