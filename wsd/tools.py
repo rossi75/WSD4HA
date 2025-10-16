@@ -31,8 +31,10 @@ import socket
 import xml.etree.ElementTree as ET
 #from globals import SCANNERS, NAMESPACES, SCAN_FOLDER, SCAN_JOBS, logger
 #from globals import SCANNERS, SCAN_JOBS, SCAN_FOLDER, logger
+import globals
 from globals import SCANNERS, SCAN_JOBS, logger
-from config import SCAN_FOLDER, FROM_UUID
+#from config import SCAN_FOLDER, FROM_UUID
+from config import FROM_UUID
 
 # ---------------- lokale IP abfragen ----------------
 def get_local_ip():
@@ -176,7 +178,8 @@ def save_scanned_image(scanjob_identifier):
         return False
 
     # FilePath checken
-    logger.info(f"   --->  scan_path: {SCAN_FOLDER}")
+    logger.info(f"   --->  scan_path: {globals.SCAN_FOLDER}")
+#    logger.info(f"   --->  scan_path: {SCAN_FOLDER}")
     logger.info(f"   --->  from_uuid: {FROM_UUID}")
 
     # Friendly-Name säubern
@@ -202,7 +205,8 @@ def save_scanned_image(scanjob_identifier):
     logger.info(f"   --->  extension: {ext}")
     
     # Zielpfad
-    filepath = f"{SCAN_FOLDER}/{safe_name}_{timestamp}.{ext}"
+#    filepath = f"{SCAN_FOLDER}/{safe_name}_{timestamp}.{ext}"
+    filepath = f"{globals.SCAN_FOLDER}/{safe_name}_{timestamp}.{ext}"
 #    os.makedirs(os.path.dirname(filename), exist_ok=True)
 
     logger.info(f"   --->   filepath: {filepath}")
