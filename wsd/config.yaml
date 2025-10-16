@@ -25,7 +25,6 @@ options:
   not_idle: []
   scan_folder: "/share/scans"
   max_files: 50
-#  log_level: "INFO"
   log_level: []
 schema:
   offline_timeout: int(120,3600)
