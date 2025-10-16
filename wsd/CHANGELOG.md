@@ -17,6 +17,10 @@
 - ...
 
 
+## 0.73 - 2025-10-16
+- added probe exceptions
+- save to floppy disk works fine
+
 ## 0.72 - 2025-10-16
 - extracting data works, saving into SCAN_JOBS[].document. Now we need to save it to the floppy disk
 
