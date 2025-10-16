@@ -16,6 +16,9 @@
 - ...
 
 
+## 0.72 - 2025-10-16
+- extracting data works, saving into SCAN_JOBS[].document. Now we need to save it to the floppy disk
+
 ## 0.70 - 2025-10-15
 - SCAN_JOBS[].job_finished + .filepath
 
