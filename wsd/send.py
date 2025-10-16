@@ -434,9 +434,6 @@ async def request_scan_job_ticket(scanjob_identifier: str):
         logger.warning(f"could not find any existing job with ID {scanjob_identifier}. Skipping request")
 #        SCAN_JOBS[scanjob_identifier].state = STATE.SCAN_FAILED
         return
-#    else:
-#        if SCAN_JOBS[scanjob_identifier].state == STATE.SCAN_PENDING:
-#            SCAN_JOBS[scanjob_identifier].state == STATE.SCAN_REQ_TICKET
 
     scanner_uuid = SCAN_JOBS[scanjob_identifier].scan_from_uuid
 
@@ -581,8 +578,7 @@ async def request_retrieve_image(scanjob_identifier: str):
 
                 # Content-Type holen
                 content_type = resp.headers.get("Content-Type", "")
-#                logger.info(f" content type: {content_type}")
-                parse_retrieve_image(scanjob_identifier, bytes(data), resp.headers.get("Content-Type", ""))
+                await parse_retrieve_image(scanjob_identifier, bytes(data), resp.headers.get("Content-Type", ""))
         except asyncio.TimeoutError:
             logger.error(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} [SEND:rtrv_img] Timeout while retrieving image for {scanjob_identifier}")
             SCAN_JOBS[scanjob_identifier].state = STATE.SCAN_FAILED
