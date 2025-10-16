@@ -141,8 +141,10 @@ async def start_notify_server():
     site = web.TCPSite(runner, "0.0.0.0", NOTIFY_PORT)
     await site.start()
     logger.info(f"Notify Server is running on Port {NOTIFY_PORT}")
-    logger.info(f"-----------------------  Events  -------------------------")
-
+#    logger.info(f"-----------------------  Events  -------------------------")
+    logger.info(f"***************************************************************************************************************")
+    logger.info(f"*                                                E V E N T S                                                  *")
+    logger.info(f"***************************************************************************************************************")
 # ---------------- NOTIFY handler ----------------
 # Fängt alles hinter / ab, z.B. /6ccf7716-4dc8-47bf-aca4-5a2ae5a959ca
 routes = web.RouteTableDef()
