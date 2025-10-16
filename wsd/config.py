@@ -13,7 +13,6 @@ import uuid
 import globals
 #from globals import SCANNERS, FROM_UUID, USER_AGENT, LOG_LEVEL, SCAN_FOLDER, STARTUP_DT, logger
 from globals import SCANNERS, FROM_UUID, USER_AGENT, LOG_LEVEL, STARTUP_DT, logger
-#from globals import SCANNERS, FROM_UUID, USER_AGENT, STARTUP_DT, logger
 from tools import list_scanners, check_port, get_local_ip
 
 STARTUP_DT = datetime.datetime.now().replace(microsecond=0)
@@ -38,10 +37,10 @@ logger.info(f"*                                          C O N F I G U R A T I O
 logger.info(f"***************************************************************************************************************")
 # ---------------- Optionen aus Environment ----------------
 # Create main config
-LOG_LEVEL_=$(bashio::config 'log_level')
-logger.info(f"LogLevel from bashio: {LOG_LEVEL_}")
-SCAN_FOLDER_=$(bashio::config 'scan_folder')
-logger.info(f"Scan Folder from bashio: {SCAN_FOLDER_}")
+#LOG_LEVEL_=$(bashio::config 'log_level')
+#logger.info(f"LogLevel from bashio: {LOG_LEVEL_}")
+#SCAN_FOLDER_=$(bashio::config 'scan_folder')
+#logger.info(f"Scan Folder from bashio: {SCAN_FOLDER_}")
 
 # ---------------- Logging ----------------
 logger.info(f"Loglevel: {LOG_LEVEL}")
