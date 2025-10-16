@@ -644,7 +644,7 @@ def parse_retrieve_image(scanjob_identifier, data, content_type: str):
         if "xml" in content_type:
             metadata = part.get_payload(decode=True)
             logger.info(f"   Found {len(metadata)} Bytes of XML metadata part, discarding")
-            logger.info(f" metadata: {metadata[:preview_bytes]!r} [...]")
+            logger.info(f" metadata part:\n{metadata[:preview_bytes]!r} [...]")
 
 #        elif content_type in ("application/binary", "image/jpeg", "image/png", "image/tiff", "application/pdf"):
         else:
@@ -653,7 +653,7 @@ def parse_retrieve_image(scanjob_identifier, data, content_type: str):
 #            SCAN_JOBS[scanjob_identifier].document = part.get_content()
             SCAN_JOBS[scanjob_identifier].document = part.get_payload(decode=True)
             logger.info(f" saved {len(SCAN_JOBS[scanjob_identifier].document)} Bytes in SCAN_JOBS[].document")
-            logger.info(f" document: {SCAN_JOBS[scanjob_identifier].document[:preview_bytes]!r} [...]")
+            logger.info(f" document data:\n{SCAN_JOBS[scanjob_identifier].document[:preview_bytes]!r} [...]")
 #            return True
 #        else:
 #            logger.error(f"[PARSE:rtrv_img] could not find any of binary|image|pdf in stream for scan job ID {scanjob_identifier}")
