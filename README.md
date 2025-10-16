@@ -9,7 +9,7 @@ So any documents can always be scanned to the anyways and always running server.
 
 If WSD4HA is being restarted, the scanner needs to be restarted also ! This is due to the fact that the scanner (C480W) sends out its discovery message only once (technically twice) directly after booting. WSD4HA only supports IPv4
 
-## Where is your scanner?
+## Where is YOUR scanner?
 If you want to get added a specific MFD, leave me a wireshark from your windows (!) 7/8/10/11. It may be filtered for your scanners IP and must contain
 - the scanners booting process (for registration)
 - half an hour later (for subscription renewal)
@@ -33,5 +33,6 @@ Sadly, all options that can be seen in the configurations dialog, are non-functi
   - scan from UI
   - save scanner in a permanent list
   - subscribe permanent devices from UI
+
 ... 
 
