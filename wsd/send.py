@@ -581,19 +581,20 @@ async def request_retrieve_image(scanjob_identifier: str):
 
                 # Content-Type holen
                 content_type = resp.headers.get("Content-Type", "")
-                logger.info(f" content type: {content_type}")
+#                logger.info(f" content type: {content_type}")
                 parse_retrieve_image(scanjob_identifier, bytes(data), resp.headers.get("Content-Type", ""))
         except asyncio.TimeoutError:
-            logger.error(f"[SEND:rtrv_img] Timeout while retrieving image for {scanjob_identifier}")
+            logger.error(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} [SEND:rtrv_img] Timeout while retrieving image for {scanjob_identifier}")
             SCAN_JOBS[scanjob_identifier].state = STATE.SCAN_FAILED
             return False
         except Exception as e:
-            logger.exception(f"[SEND:rtrv_img] anything went wrong with {scanjob_identifier}: {e}")
+            logger.exception(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} [SEND:rtrv_img] anything went wrong with {scanjob_identifier}: {e}")
             SCAN_JOBS[scanjob_identifier].state = STATE.SCAN_FAILED
             return False
 
     logger.info(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} finished reading image from scanner")
 
+    SCAN_JOBS[scanjob_identifier].state = STATE.SCAN_DONE
     return True
 
 
