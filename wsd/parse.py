@@ -621,8 +621,20 @@ def parse_retrieve_image(scanjob_identifier, data, content_type: str):
         logger.error(f"[PARSE:rtrv_img] content-type not multipart: {content_type}")
         return False
 
+    # Sicherstellen, dass der MIME-Body mit CRLF beginnt
+    if not data.startswith(b"\r\n--"):
+        data = b"\r\n" + data
+
+    # MIME-Header ergänzen
+    mime_header = (
+        f"Content-Type: {content_type}\r\n"
+        "MIME-Version: 1.0\r\n"
+        "\r\n"
+    ).encode("utf-8")
+
     # Den vollständigen MIME-Datensatz künstlich zusammensetzen:
-    mime_data = f"Content-Type: {content_type}\r\nMIME-Version: 1.0\r\n\r\n".encode("utf-8") + data
+#    mime_data = f"Content-Type: {content_type}\r\nMIME-Version: 1.0\r\n\r\n".encode("utf-8") + data
+    mime_data = mime_header + data
     logger.info(f"  mime_data:\n{mime_data[:preview_bytes]} [...]")
 
     # multipart nach email-ähnlicher Struktur parsen
@@ -631,7 +643,7 @@ def parse_retrieve_image(scanjob_identifier, data, content_type: str):
     # Fallback falls boundary nicht automatisch erkannt wird:
     if not msg.is_multipart():
         logger.error(f"[PARSE:rtrv_img] received data is no multipart response")
-        logger.info(f"see yourself:\n{data[:preview_bytes]!r} [...]")
+        logger.info(f" see yourself:\n{data[:preview_bytes]!r} [...]")
         SCAN_JOBS[scanjob_identifier].state = STATE.SCAN_FAILED
         return False
 
