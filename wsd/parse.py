@@ -614,7 +614,7 @@ async def parse_retrieve_image(scanjob_identifier, data, content_type: str):
     logger.info(f"      content:\n{data[:preview_bytes]} [...]")
 
     SCAN_JOBS[scanjob_identifier].state = STATE.SCAN_EXTRACT_IMG
-    await asyncio.sleep(2)
+    await asyncio.sleep(10)
     logger.debug(f" short nap is done")
     
     if not content_type.lower().startswith("multipart/"):
