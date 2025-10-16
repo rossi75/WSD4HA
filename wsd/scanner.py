@@ -118,18 +118,18 @@ class Scan_Jobs:
         self.DocPar_BytesPerLine = None
 
         self.document = ""                                                  # hier kommt das eigentliche Dokument hin
-        self.filepath = ""                                                  # und hier wurde es auf die Floppy geschrieben
+        self.filepath = ""                                                  # und hier wird/wurde es auf die Floppy geschrieben
 
         logger.info(f"   --->    SCAN_JOB_ID: {self.scanjob_identifier}")
-        logger.info(f"   --->          STATE: {self.state.value}")
-        logger.info(f"   --->   INPUT_SOURCE: {self.input_source}")
-        logger.info(f"   ---> SCAN FROM UUID: {self.scan_from_uuid}")
-        logger.info(f"   --->      SUBSCR_ID: {self.subscription_identifier}")
-        logger.info(f"   --->          XADDR: {self.xaddr}")
-        logger.info(f"   --->     DEST_TOKEN: {self.destination_token}")
-        logger.info(f"   --->         STATUS: {self.state}")
-        logger.info(f"   --->        CREATED: {self.job_created}")
-        logger.info(f"   --->   REMOVE_AFTER: {self.remove_after}")
+        logger.debug(f"   --->          STATE: {self.state.value}")
+        logger.debug(f"   --->   INPUT_SOURCE: {self.input_source}")
+        logger.debug(f"   ---> SCAN FROM UUID: {self.scan_from_uuid}")
+        logger.debug(f"   --->      SUBSCR_ID: {self.subscription_identifier}")
+        logger.debug(f"   --->          XADDR: {self.xaddr}")
+        logger.debug(f"   --->     DEST_TOKEN: {self.destination_token}")
+        logger.debug(f"   --->         STATUS: {self.state}")
+        logger.debug(f"   --->        CREATED: {self.job_created}")
+        logger.debug(f"   --->   REMOVE_AFTER: {self.remove_after}")
 
 
 #
