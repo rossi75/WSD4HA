@@ -41,6 +41,16 @@ async def send_probe(probe_uuid: str):
                     logger.error(f"Probe failed with status {resp.status}")
                     logger.error(f"   --->  Answer XML:\n{body}")
                     SCANNERS[uuid].state = STATE.ABSENT
+        except asyncio.CancelledError:
+            # Wird manchmal intern geworfen, wenn der Request abbricht.
+            logger.warning(f"   ---> Probe cancelled for {url}")
+            return
+        except asyncio.TimeoutError:
+            logger.warning(f"   ---> Probe timeout for {url} after 5s")
+            return
+        except aiohttp.ClientConnectorError as e:
+            logger.warning(f"   ---> Connection failed for {url}: {e}")
+            return
         except Exception as e:
             logger.exception(f"   ---> Probe failed at {url}: {e}")
             SCANNERS[probe_uuid].state = STATE.ABSENT
