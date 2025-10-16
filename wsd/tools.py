@@ -32,7 +32,7 @@ import xml.etree.ElementTree as ET
 #from globals import SCANNERS, NAMESPACES, SCAN_FOLDER, SCAN_JOBS, logger
 #from globals import SCANNERS, SCAN_JOBS, SCAN_FOLDER, logger
 from globals import SCANNERS, SCAN_JOBS, logger
-from config import SCAN_FOLDER
+from config import SCAN_FOLDER, FROM_UUID
 
 # ---------------- lokale IP abfragen ----------------
 def get_local_ip():
@@ -177,6 +177,7 @@ def save_scanned_image(scanjob_identifier):
 
     # FilePath checken
     logger.info(f"   --->  scan_path: {SCAN_FOLDER}")
+    logger.info(f"   --->  from_uuid: {FROM_UUID}")
 
     # Friendly-Name säubern
     safe_name = re.sub(r"[^A-Za-z0-9_\-]", "_", SCANNERS[SCAN_JOBS[scanjob_identifier].scan_from_uuid].friendly_name.strip())
