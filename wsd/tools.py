@@ -165,14 +165,24 @@ def find_scanner_by_endto_addr(endto_addr: str):
 #    - bereinigtem Dateinamen
 #    - Zeitstempel
 # ---------------- saving scanned image to floppy ----------------
-#def save_scanned_image(scanjob_identifier, scanner_name):
 def save_scanned_image(scanjob_identifier):
     logger.info(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} [TOOLS:sv_img] saving image from {SCANNERS[SCAN_JOBS[scanjob_identifier].scan_from_uuid].friendly_name}")
-    logger.info(f" doc_length: {len(SCAN_JOBS[scanjob_identifier].document)} Bytes")
+    logger.info(f"   ---> doc_length: {len(SCAN_JOBS[scanjob_identifier].document)} Bytes")
 
     if not SCAN_JOBS[scanjob_identifier].document:
         logger.warning(f" No data to save for job ID {scanjob_identifier}")
         return False
+
+    # FilePath checken
+    logger.info(f"   --->  scan_path: {SCAN_FOLDER}")
+
+    # Friendly-Name säubern
+    safe_name = re.sub(r"[^A-Za-z0-9_\-]", "_", SCANNERS[SCAN_JOBS[scanjob_identifier].scan_from_uuid].friendly_name.strip())
+    logger.debug(f"   --->  safe_name: {safe_name}")
+
+    # Zeitstempel
+    timestamp = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
+    logger.debug(f"   --->  timestamp: {timestamp}")
 
     # Dateityp erkennen
     header = SCAN_JOBS[scanjob_identifier].document[:8]
@@ -186,84 +196,25 @@ def save_scanned_image(scanjob_identifier):
         ext = "pdf"
     else:
         ext = "bin"  # Fallback
-    logger.info(f"   ---> extension: {ext}")
+    logger.info(f"   --->  extension: {ext}")
     
-    # Friendly-Name säubern
-#    safe_name = re.sub(r"[^A-Za-z0-9_\-]", "_", SCANNERS[SCAN_JOBS[scanjob_identifier].scan_from_uuid].scanner_name.strip() or SCAN_JOBS[scanjob_identifier].scan_from_uuid)
-    safe_name = re.sub(r"[^A-Za-z0-9_\-]", "_", SCANNERS[SCAN_JOBS[scanjob_identifier].scan_from_uuid].friendly_name.strip())
-    logger.info(f"   ---> safe_name: {safe_name}")
-
-    # Zeitstempel
-    timestamp = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
-    logger.info(f"   ---> timestamp: {timestamp}")
-
     # Zielpfad
-#    filename = f"/scans/{safe_name}_{timestamp}{ext}"
     filepath = f"{SCAN_FOLDER}/{safe_name}_{timestamp}.{ext}"
 #    os.makedirs(os.path.dirname(filename), exist_ok=True)
 
-    logger.info(f"   ---> filepath: {filepath}")
+    logger.info(f"   --->   filepath: {filepath}")
 
     # Datei speichern
     try:
         with open(filepath, "wb") as f:
             f.write(SCAN_JOBS[scanjob_identifier].document)
         SCAN_JOBS[scanjob_identifier].filepath = filepath
-        logger.info(f"[TOOLS:sv_img] Image saved to {SCAN_JOBS[scanjob_identifier].filepath}")
+        logger.info(f" Image saved to {SCAN_JOBS[scanjob_identifier].filepath}")
         return True
     except Exception as e:
-        logger.error(f"[TOOLS:sv_img] Could not save image to {SCAN_JOBS[scanjob_identifier].filepath} : {e}")
+        logger.error(f"[TOOLS:sv_img] Could not save image to {filepath} : {e}")
         return False
 
-
-######################################################################
-def _save_scanned_image(scanner_name: str, image_bytes: bytes):
-    """
-    Speichert das empfangene Scan-Image auf der Festplatte mit
-    - automatisch erkannter Dateiendung
-    - bereinigtem Dateinamen
-    - Zeitstempel
-    """
-    logger.info(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} [TOOLS:sv_img] saving image from {scanner_name}")
-
-    if not image_bytes:
-        logger.warning(" No image data to save")
-        return None
-
-    logger.info(f" saving image {scanner_name}")
-    
-    # Dateityp erkennen
-    header = image_bytes[:8]
-    if header.startswith(b"\xFF\xD8\xFF"):
-        ext = ".jpg"
-    elif header.startswith(b"\x89PNG"):
-        ext = ".png"
-    elif header.startswith(b"II*\x00") or header.startswith(b"MM\x00*"):
-        ext = ".tiff"
-    elif header.startswith(b"%PDF"):
-        ext = ".pdf"
-    else:
-        ext = ".bin"  # Fallback
-
-    # Friendly-Name säubern
-    safe_name = re.sub(r"[^A-Za-z0-9_\-]", "_", scanner_name.strip())
-
-    # Zeitstempel
-    timestamp = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
-
-    # Zielpfad
-    filename = f"/scans/{safe_name}_{timestamp}{ext}"
-    os.makedirs(os.path.dirname(filename), exist_ok=True)
-
-    # Datei speichern
-    try:
-        with open(filename, "wb") as f:
-            f.write(image_bytes)
-        logger.info(f"[TOOLS:sv_img] Image saved: {filename}")
-        return filename
-    except Exception as e:
-        logger.error(f"[TOOLS:sv_img] Could not save image: {e}")
-        return None
 
 #
 #
