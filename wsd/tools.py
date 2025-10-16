@@ -30,7 +30,9 @@ import re
 import socket
 import xml.etree.ElementTree as ET
 #from globals import SCANNERS, NAMESPACES, SCAN_FOLDER, SCAN_JOBS, logger
-from globals import SCANNERS, SCAN_JOBS, SCAN_FOLDER, logger
+#from globals import SCANNERS, SCAN_JOBS, SCAN_FOLDER, logger
+from globals import SCANNERS, SCAN_JOBS, logger
+from config import SCAN_FOLDER
 
 # ---------------- lokale IP abfragen ----------------
 def get_local_ip():
