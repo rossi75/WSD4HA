@@ -27,22 +27,6 @@ from tools import list_scanners, check_port, get_local_ip
 # + nach einem abgang diesen im log ausführlich ausgeben
 # + neuer scanner wird zu oft erkannt
 
-# ---------------- Logging ----------------
-#LOG_LEVEL = os.environ.get("LOG_LEVEL", "INFO").upper()
-#LOG_LEVEL = os.environ.get("LOG_LEVEL", "DEBUG").upper()
-# dynamisches loglevel
-#logging.basicConfig(
-#    level=getattr(logging, LOG_LEVEL, logging.INFO),
-#    format="[%(levelname)s] %(message)s",
-#)
-#    format="%(asctime)s [%(levelname)s] %(message)s",
-# festes Loglevel
-#logging.basicConfig(level=logging.INFO, format='[%(levelname)s] %(message)s')
-#logging.basicConfig(level=logging.DEBUG, format='[%(levelname)s] %(message)s')
-#logging.basicConfig(level=logging.LOG_LEVEL, format='[%(levelname)s] %(message)s')
-#logging.basicConfig(level=LOG_LEVEL, format='[%(levelname)s] %(message)s')
-#logger = logging.getLogger("wsd-addon")
-
 STARTUP_DT = datetime.datetime.now().replace(microsecond=0)
 
 logger.info(f" ")
