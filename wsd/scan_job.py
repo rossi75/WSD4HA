@@ -29,7 +29,7 @@ async def run_scan_job(scanjob_identifier: str):
     if result:
         logger.info(f" verified that scanner is ready for doing job {scanjob_identifier}")
     else:
-        logger.info(f" seems scanner is busy with anything. What to do now? re-schedule? forget? scan anyways?")
+        logger.info(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} [SCAN_JOB:run_job] seems scanner is busy with anything. What to do now? re-schedule? forget? scan anyways?")
         SCAN_JOBS[scanjob_identifier].state = STATE.SCAN_FAILED
         return
 
@@ -40,7 +40,7 @@ async def run_scan_job(scanjob_identifier: str):
     if result:
         logger.info(f" received valid scanner configuration")
     else:
-        logger.info(f" something went wrong with requesting the scanners configuration for job {scanjob_identifier}")
+        logger.info(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} [SCAN_JOB:run_job]  something went wrong with requesting the scanners configuration for job {scanjob_identifier}")
         SCAN_JOBS[scanjob_identifier].state = STATE.SCAN_FAILED
         return
 
@@ -52,7 +52,7 @@ async def run_scan_job(scanjob_identifier: str):
     if result:
         logger.info(f" received valid default scan ticket")
     else:
-        logger.info(f" something went wrong with requesting the default scan ticket for job {scanjob_identifier}")
+        logger.info(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} [SCAN_JOB:run_job]  something went wrong with requesting the default scan ticket for job {scanjob_identifier}")
         SCAN_JOBS[scanjob_identifier].state = STATE.SCAN_FAILED
         return
 
@@ -63,7 +63,7 @@ async def run_scan_job(scanjob_identifier: str):
     if result:
         logger.info(f" validated scan ticket for {scanjob_identifier}")
     else:
-        logger.info(f" something went wrong with validating scan ticket for job {scanjob_identifier}")
+        logger.info(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} [SCAN_JOB:run_job]  something went wrong with validating scan ticket for job {scanjob_identifier}")
         SCAN_JOBS[scanjob_identifier].state = STATE.SCAN_FAILED
         return
 
@@ -72,24 +72,24 @@ async def run_scan_job(scanjob_identifier: str):
     result = await request_scan_job_ticket(scanjob_identifier)
 
     if result:
-        logger.info(f" received scan job id #{SCAN_JOBS[scanjob_identifier].job_id} and token {SCAN_JOBS[scanjob_identifier].job_token}")
+        logger.info(f" received valid scan job id #{SCAN_JOBS[scanjob_identifier].job_id} and token {SCAN_JOBS[scanjob_identifier].job_token}")
     else:
-        logger.info(f" something went wrong with requesting a ticket for job {scanjob_identifier}")
+        logger.info(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} [SCAN_JOB:run_job]  something went wrong with requesting a ticket for job {scanjob_identifier}")
         SCAN_JOBS[scanjob_identifier].state = STATE.SCAN_FAILED
         return
 
 
-    # Bild abholen, Ergebnis wird direkt in SCAN_JOBS[].document geschrieben und gibt true für Erfolg, false für Misserfolg zurück
+    # Bild abholen, Ergebnis wird direkt geparsed und der .document-Anteil in SCAN_JOBS[].document geschrieben. Gibt true für Erfolg, false für Misserfolg zurück
     SCANNERS[SCAN_JOBS[scanjob_identifier].scan_from_uuid].state == STATE.ONLINE_BUSY
     SCAN_JOBS[scanjob_identifier].state == STATE.SCAN_RETRIEVE_IMG
     result = await request_retrieve_image(scanjob_identifier)
 
     if result:
-        logger.info(f" received data from scanner (more detailed later)")
-        await asyncio.sleep(2)                   # Zwangspause für um das FIN erst einmal abzuarbeiten und dann gleich nen freien Kopf zu haben.
+        logger.info(f" received any {len(SCAN_JOBS[scanjob_identifier].document)} Bytes from {SCANNERS[SCAN_JOBS[scanjob_identifier].scan_from_uuid].friendly_name or SCAN_JOBS[scanjob_identifier].scan_from_uuid}")
+        await asyncio.sleep(2)                                        # Zwangspause für um vom Scanner das FIN erst einmal abzuarbeiten und dann gleich nen freien Kopf zu haben.
         logger.debug(f" short retirement nap is over !")
     else:
-        logger.info(f" something went wrong with receiving data from scanner")
+        logger.info(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} [SCAN_JOB:run_job] something went wrong with receiving data from scanner. Document {len(SCAN_JOBS[scanjob_identifier].document)} Bytes ")
         SCAN_JOBS[scanjob_identifier].state = STATE.SCAN_FAILED
         SCANNERS[SCAN_JOBS[scanjob_identifier].scan_from_uuid].state == STATE.ONLINE
         return
@@ -102,7 +102,7 @@ async def run_scan_job(scanjob_identifier: str):
     result = save_scanned_image(scanjob_identifier)
 
     if result:
-        logger.info(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} [SCAN_JOB:run_job] saved image (more detailed later)")
+        logger.info(f" saved image (more detailed later)")
     else:
         logger.info(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} [SCAN_JOB:run_job] something went wrong with saving image")
         SCAN_JOBS[scanjob_identifier].state = STATE.SCAN_FAILED
