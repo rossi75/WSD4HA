@@ -610,12 +610,12 @@ def parse_create_scan_job(scanjob_identifier, xml: str):
 async def parse_retrieve_image(scanjob_identifier, data, content_type: str):
     logger.info(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} [PARSE:rtrv_img] parsing {len(data)} bytes for scan job {scanjob_identifier}")
     preview_bytes = 800
-    logger.info(f" content-type: {content_type}")
-    logger.info(f"      content:\n{data[:preview_bytes]} [...]")
+    logger.debug(f" content-type:\n{content_type}")
+    logger.debug(f"      content:\n{data[:preview_bytes]} [...]")
 
 
     logger.info(f" waiting for scanner to finish its stream")
-    await asyncio.sleep(10)
+    await asyncio.sleep(2)
     logger.debug(f" short nap is done")
 
     SCAN_JOBS[scanjob_identifier].state = STATE.SCAN_EXTRACT_IMG
@@ -636,7 +636,8 @@ async def parse_retrieve_image(scanjob_identifier, data, content_type: str):
     for i, part in enumerate(parts):
         part = part.strip()
         if not part or part == b'--':
-            logger.error(f"[PARSE:rtrv_img] analyzed data is no multipart response, see yourself:\n{part[:preview_bytes]!r} [...]")
+            logger.warning(f"[PARSE:rtrv_img] analyzed data is no multipart response")
+            logger.info(f"see yourself:\n{part[:preview_bytes]!r} [...]")
             continue
 
         logger.info(f"   analyzing part #{i} ({len(part)} bytes)")
@@ -649,7 +650,7 @@ async def parse_retrieve_image(scanjob_identifier, data, content_type: str):
             continue
 
         header_text = header_raw.decode("utf-8", errors="ignore")
-        logger.info(f"   headers:\n{header_text[:preview_bytes]} [...]")
+        logger.debug(f"   headers:\n{header_text[:preview_bytes]} [...]")
 
         # MIME-Typ erkennen
         if "xml" in header_text:
@@ -685,11 +686,11 @@ async def parse_retrieve_image(scanjob_identifier, data, content_type: str):
 async def _parse_retrieve_image(scanjob_identifier, data, content_type: str):
     logger.info(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} [PARSE:rtrv_img] parsing {len(data)} bytes for scan job {scanjob_identifier}")
     preview_bytes = 400
-    logger.info(f" content-type: {content_type}")
+    logger.debug(f" content-type:\n{content_type}")
     logger.info(f"      content:\n{data[:preview_bytes]} [...]")
 
     SCAN_JOBS[scanjob_identifier].state = STATE.SCAN_EXTRACT_IMG
-    await asyncio.sleep(10)
+    await asyncio.sleep(2)
     logger.debug(f" short nap is done")
     
     if not content_type.lower().startswith("multipart/"):
