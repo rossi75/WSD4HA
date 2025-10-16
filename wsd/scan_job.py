@@ -86,8 +86,6 @@ async def run_scan_job(scanjob_identifier: str):
 
     if result:
         logger.info(f" received any document with {len(SCAN_JOBS[scanjob_identifier].document)} Bytes from {SCANNERS[SCAN_JOBS[scanjob_identifier].scan_from_uuid].friendly_name or SCAN_JOBS[scanjob_identifier].scan_from_uuid}")
-#        await asyncio.sleep(2)                                        # Zwangspause für um vom Scanner das FIN erst einmal abzuarbeiten und dann gleich nen freien Kopf zu haben.
-#        logger.debug(f" short retirement nap is over !")
     else:
         logger.info(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} [SCAN_JOB:run_job] something went wrong with receiving data from scanner. Document {len(SCAN_JOBS[scanjob_identifier].document)} Bytes ")
         SCAN_JOBS[scanjob_identifier].state = STATE.SCAN_FAILED
@@ -97,8 +95,7 @@ async def run_scan_job(scanjob_identifier: str):
 
     # Bild auf HDD abspeichern
     SCAN_JOBS[scanjob_identifier].state == STATE.SCAN_SAVING_DOCUMENT
-    logger.info(f" saving image (more detailed later) from {SCANNERS[SCAN_JOBS[scanjob_identifier].scan_from_uuid].friendly_name or SCAN_JOBS[scanjob_identifier].scan_from_uuid}")
-#    result = await save_scanned_image(scanjob_identifier)
+    logger.info(f" saving document (more detailed later) from {SCANNERS[SCAN_JOBS[scanjob_identifier].scan_from_uuid].friendly_name or SCAN_JOBS[scanjob_identifier].scan_from_uuid} with scanjob ID {scanjob_identifier}")
     result = save_scanned_image(scanjob_identifier)
 
     if result:
