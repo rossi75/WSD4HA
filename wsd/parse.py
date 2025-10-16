@@ -310,7 +310,7 @@ def parse_notify_msg(notifier_uuid, xml):
         if scanjob_identifier not in SCAN_JOBS:
             logger.info(f"+++   surprising News, it seems Scanner {SCANNERS[notifier_uuid].friendly_name or notifier_uuid} @ {SCANNERS[notifier_uuid].ip} has a document for us to scan. Let's go and grab it !   +++")
             SCAN_JOBS[scanjob_identifier] = Scan_Jobs(scanjob_identifier, notifier_uuid, input_source)         # ==> hier wird der Task erstellt für um das Ticket und das Bild abzuholen
-            SCANNERS[notifier_uuid].update()
+#            SCANNERS[notifier_uuid].update()
         else:
             logger.info(f"the job that should be added [{scanjob_identifier}] is still in the list")
             return scanjob_identifer    # or return NONE?
