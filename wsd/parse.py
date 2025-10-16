@@ -607,7 +607,7 @@ def parse_create_scan_job(scanjob_identifier, xml: str):
 #    Parse multipart/related RetrieveImageResponse from scanner.
 #    Returns: (soap_xml: str, image_bytes: bytes or None)
 # ------------------------------- extract image from retrieved content ----------------------------------------------------
-def parse_retrieve_image(scanjob_identifier, data, content_type: str):
+async def parse_retrieve_image(scanjob_identifier, data, content_type: str):
     logger.info(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} [PARSE:rtrv_img] parsing {len(data)} bytes for scan job {scanjob_identifier}")
     preview_bytes = 400
     logger.info(f" content-type: {content_type}")
@@ -624,13 +624,17 @@ def parse_retrieve_image(scanjob_identifier, data, content_type: str):
     # Sicherstellen, dass der MIME-Body mit CRLF beginnt
     if not data.startswith(b"\r\n--"):
         data = b"\r\n" + data
-
+        logger.info(f"prepended multipart boundary start")
     # MIME-Header ergänzen
     mime_header = (
         f"Content-Type: {content_type}\r\n"
         "MIME-Version: 1.0\r\n"
         "\r\n"
     ).encode("utf-8")
+    # Sicherstellen, dass der MIME-Body mit -- endet
+    if not data.strip().endswith(b"--"):
+        data += b"\r\n--"
+        logger.info(f"appended multipart boundary final")
 
     # Den vollständigen MIME-Datensatz künstlich zusammensetzen:
 #    mime_data = f"Content-Type: {content_type}\r\nMIME-Version: 1.0\r\n\r\n".encode("utf-8") + data
