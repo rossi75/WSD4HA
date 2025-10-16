@@ -8,7 +8,7 @@ import uuid
 LOG_LEVEL="ERROR"
 LOG_LEVEL="WARNING"
 LOG_LEVEL="INFO"
-#LOG_LEVEL="DEBUG"
+LOG_LEVEL="DEBUG"
 #logging.basicConfig(level=logging.INFO, format='[%(levelname)s] %(message)s')
 #logging.basicConfig(level=logging.LOG_LEVEL, format='[%(levelname)s] %(message)s')
 logging.basicConfig(level=LOG_LEVEL, format='[%(levelname)s] %(message)s')
