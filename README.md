@@ -17,3 +17,21 @@ If you want to get added a specific MFD, leave me a wireshark from your windows 
 
 ## What else?
 Sadly, all options that can be seen in the configurations dialog, are non-functional at the moment... (seems I need some help at this point)
+
+## open topics / todo
+- make manual configuration functional
+- implement simple variant of ValidateScanTicket
+- decide automatically between simple and detailled variant of ValdiateScanTicket
+- implement GetScannerElements[ScannerDescription]
+- merge globals.py + config.py to globalconfig.py
+- add WSD secure (Port 5358)
+- webinterface improvements:
+  - left column for tree with config_output/scanners/jobs/scans
+  - display several details only in debug mode
+  - download files
+  - mouseover for tech details
+  - scan from UI
+  - save scanner in a permanent list
+  - subscribe permanent devices from UI
+... 
+
