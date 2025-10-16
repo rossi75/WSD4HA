@@ -588,7 +588,7 @@ async def request_retrieve_image(scanjob_identifier: str):
             SCAN_JOBS[scanjob_identifier].state = STATE.SCAN_FAILED
             return False
 
-    logger.info(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} finished reading image from scanner")
+   # logger.info(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} finished reading image from scanner")
 
     SCAN_JOBS[scanjob_identifier].state = STATE.SCAN_DONE
     return True
