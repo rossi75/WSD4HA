@@ -626,34 +626,8 @@ async def parse_retrieve_image(scanjob_identifier, data, content_type: str):
         logger.error(f" No boundary found in Content-Type: {content_type}")
         return False
 
-#    if not content_type.lower().startswith("multipart/"):
-#        logger.error(f"[PARSE:rtrv_img] content-type not multipart: {content_type}")
-#        return False
-
-    # Sicherstellen, dass der MIME-Body mit CRLF beginnt
-#    if not data.startswith(b"\r\n--"):
-#        data = b"\r\n" + data
-#        logger.info(f"prepended multipart boundary start")
-    # MIME-Header ergänzen
-#    mime_header = (
-#        f"Content-Type: {content_type}\r\n"
-#        "MIME-Version: 1.0\r\n"
-#        "\r\n"
-#    ).encode("utf-8")
-    # Sicherstellen, dass der MIME-Body mit -- endet
-#    if not data.strip().endswith(b"--"):
-#        data += b"\r\n--"
-#        logger.info(f"appended multipart boundary final")
-
-    # Den vollständigen MIME-Datensatz künstlich zusammensetzen:
-#    mime_data = f"Content-Type: {content_type}\r\nMIME-Version: 1.0\r\n\r\n".encode("utf-8") + data
-#    mime_data = mime_header + data
-#    logger.info(f"  mime_data:\n{mime_data[:preview_bytes]} [...]")
-
-    # multipart nach email-ähnlicher Struktur parsen
-#    msg = message_from_bytes(mime_data, policy=default)
-    boundary = m.group(1).strip().strip('"')
-    logger.info(f"   boundary: {boundary}")
+    boundary = mime.group(1).strip().strip('"')
+    logger.info(f"   boundary: {boundary[:preview_bytes]} [...]")
 
     # Daten in einzelne Parts splitten
     parts = data.split(b"--" + boundary.encode())
