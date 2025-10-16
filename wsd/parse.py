@@ -609,6 +609,107 @@ def parse_create_scan_job(scanjob_identifier, xml: str):
 # ------------------------------- extract image from retrieved content ----------------------------------------------------
 async def parse_retrieve_image(scanjob_identifier, data, content_type: str):
     logger.info(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} [PARSE:rtrv_img] parsing {len(data)} bytes for scan job {scanjob_identifier}")
+    preview_bytes = 800
+    logger.info(f" content-type: {content_type}")
+    logger.info(f"      content:\n{data[:preview_bytes]} [...]")
+
+
+    logger.info(f" waiting for scanner to finish its stream")
+    await asyncio.sleep(10)
+    logger.debug(f" short nap is done")
+
+    SCAN_JOBS[scanjob_identifier].state = STATE.SCAN_EXTRACT_IMG
+
+    # boundary extrahieren aus dem Content-Type
+    mime = re.search(r'boundary=([^;]+)', content_type)
+    if not mime:
+        logger.error(f" No boundary found in Content-Type: {content_type}")
+        return False
+
+#    if not content_type.lower().startswith("multipart/"):
+#        logger.error(f"[PARSE:rtrv_img] content-type not multipart: {content_type}")
+#        return False
+
+    # Sicherstellen, dass der MIME-Body mit CRLF beginnt
+#    if not data.startswith(b"\r\n--"):
+#        data = b"\r\n" + data
+#        logger.info(f"prepended multipart boundary start")
+    # MIME-Header ergänzen
+#    mime_header = (
+#        f"Content-Type: {content_type}\r\n"
+#        "MIME-Version: 1.0\r\n"
+#        "\r\n"
+#    ).encode("utf-8")
+    # Sicherstellen, dass der MIME-Body mit -- endet
+#    if not data.strip().endswith(b"--"):
+#        data += b"\r\n--"
+#        logger.info(f"appended multipart boundary final")
+
+    # Den vollständigen MIME-Datensatz künstlich zusammensetzen:
+#    mime_data = f"Content-Type: {content_type}\r\nMIME-Version: 1.0\r\n\r\n".encode("utf-8") + data
+#    mime_data = mime_header + data
+#    logger.info(f"  mime_data:\n{mime_data[:preview_bytes]} [...]")
+
+    # multipart nach email-ähnlicher Struktur parsen
+#    msg = message_from_bytes(mime_data, policy=default)
+    boundary = m.group(1).strip().strip('"')
+    logger.info(f"   boundary: {boundary}")
+
+    # Daten in einzelne Parts splitten
+    parts = data.split(b"--" + boundary.encode())
+
+    found_image = False
+    for i, part in enumerate(parts):
+        part = part.strip()
+        if not part or part == b'--':
+            logger.error(f"[PARSE:rtrv_img] analyzed data is no multipart response, see yourself:\n{part[:preview_bytes]!r} [...]")
+            continue
+
+        logger.info(f"   analyzing part #{i} ({len(part)} bytes)")
+
+        # Header und Body trennen
+        try:
+            header_raw, body = part.split(b"\r\n\r\n", 1)
+        except ValueError:
+            logger.warning("   could not split headers/body")
+            continue
+
+        header_text = header_raw.decode("utf-8", errors="ignore")
+        logger.info(f"   headers:\n{header_text[:preview_bytes]} [...]")
+
+        # MIME-Typ erkennen
+        if "xml" in header_text:
+            logger.info("   recognized as XML metadata part, skipping")
+#            logger.info(f" metadata part:\n{header_text[:preview_bytes]!r} [...]")
+            continue
+
+        elif "image" in header_text or "application/binary" in header_text:
+            # Bilddaten gefunden
+            SCAN_JOBS[scanjob_identifier].document = body.strip(b"\r\n")
+            found_image = True
+            logger.info(f" found document data with {len(SCAN_JOBS[scanjob_identifier].document)} bytes")
+            logger.info(f" document data:\n{SCAN_JOBS[scanjob_identifier].document[:preview_bytes]!r} [...]")
+            break
+
+    if not found_image:
+        logger.error(f"[PARSE:rtrv_img] No image part found in multipart response")
+        SCAN_JOBS[scanjob_identifier].state = STATE.SCAN_FAILED
+        return False
+
+    #return True
+
+    if len(SCAN_JOBS[scanjob_identifier].document) == 0:
+        SCAN_JOBS[scanjob_identifier].state = STATE.SCAN_FAILED
+        return False
+    else:
+        logger.info(f"[PARSE:rtrv_img] successfully extracted image with {len(SCAN_JOBS[scanjob_identifier].document)} bytes")
+        return True
+
+
+
+#----------------------------------------------------------------------------------------------------
+async def _parse_retrieve_image(scanjob_identifier, data, content_type: str):
+    logger.info(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} [PARSE:rtrv_img] parsing {len(data)} bytes for scan job {scanjob_identifier}")
     preview_bytes = 400
     logger.info(f" content-type: {content_type}")
     logger.info(f"      content:\n{data[:preview_bytes]} [...]")
@@ -683,7 +784,6 @@ async def parse_retrieve_image(scanjob_identifier, data, content_type: str):
         return False
     else:
         return True
-
 #
 #
 # **************************************************
