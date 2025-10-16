@@ -19,7 +19,7 @@
 # def find_scanner_by_endto_addr(endto_addr: str):
 #
 #
-# def save_scanned_image(scanner_name: str, image_bytes: bytes):
+# def save_scanned_image(scanjob_id: str):
 #
 #
 # ----------------------------------------------------------------------------
