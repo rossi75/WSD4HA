@@ -36,6 +36,6 @@ COPY wsd.py .
 
 EXPOSE 8110
 EXPOSE 5357
-VOLUME ["/share/scans"]
+VOLUME ["/share/scans":"/share/scans"]
 
 CMD ["python3", "main.py"]
