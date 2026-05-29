@@ -145,6 +145,7 @@ async def status_page(request):
         <html>
         <head>
             <title>WSD4HA</title>
+            <meta http-equiv="refresh" content="60">
             <style>
                 table {{ border-collapse: collapse; width: 100%; }}
                 th, td {{ border: 1px solid #ddd; padding: 8px; }}
