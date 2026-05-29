@@ -43,6 +43,10 @@ async def status_page(request):
         timestamp = datetime.datetime.fromtimestamp(stat.st_mtime).strftime("%Y-%m-%d %H:%M:%S")
         size_kb = stat.st_size / 1024
         file_list += f"<tr><td>{f.name}</td><td>{timestamp}</td><td>{size_kb:.1f} KB</td></tr>"
+    logger.info(f"file_list from {SCAN_FOLDER}:")
+    logger.info(f"{file_list}")
+    logger.info(f"files from {SCAN_FOLDER}:")
+    logger.info(f"{files}")
 
     # Scanner
     scanner_list = ''
@@ -73,6 +77,10 @@ async def status_page(request):
         scanner_list += f"<td style='text-align:center;'>{s.firmware if s.firmware else ''}<br>"
         scanner_list += f"{s.serial if s.serial else ''}</td>"
         scanner_list += "</tr>"
+    logger.info(f"scanner_list:")
+    logger.info(f"{scanner_list}")
+    logger.info(f"SCANNER:")
+    logger.info(f"{SCANNER}")
 
 
     # Jobs
@@ -92,8 +100,12 @@ async def status_page(request):
         job_list += f"<td style='text-align:center;'>{j.job_created.strftime('%Y-%m-%d %H:%M:%S')}<br>"
         job_list += f"{j.remove_after.strftime('%Y-%m-%d %H:%M:%S')}</td>"
         job_list += "</tr>"
-        
-    logger.debug(f"   ---> probably delivered http-response")
+    logger.info(f"job_list:")
+    logger.info(f"{job_list}")
+    logger.info(f"SCAN_JOBS:")
+    logger.info(f"{SCAN_JOBS}")
+
+    logger.debug(f"   ---> probably delivering http-response")
     return web.Response(text=f"""
         <html>
         <head>
