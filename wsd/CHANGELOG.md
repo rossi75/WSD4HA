@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.74 - 2026-05-29
+- save to floppy disk worked only within its container
+- new filepath is /share/wsd4ha/scans
+
 ## 0.73 - 2025-10-16
 - added probe exceptions
 - save to floppy disk works fine
