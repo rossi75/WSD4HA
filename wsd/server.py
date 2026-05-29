@@ -91,16 +91,18 @@ async def status_page(request):
         size_kb = stat.st_size / 1024
         filepath = f"{SCAN_FOLDER}/{f.name}"
         logger.info(f"{timestamp}, {size_kb:.1f} kB, {filepath}")
-        file_list += f"<tr>"
-            "<td>{f.name}</td>"
-            "<td style='text-align:center;'>{timestamp}</td>"
-            "<td style='text-align:center;'>{size_kb:.1f} kB</td>"
-            "<td style='text-align:center;'>"
-                f"<button onclick=\"window.location.href='/download/{f.name}'\">⬇</button>"
-                f"&nbsp;"
-                f"<button onclick=\"confirmDelete('{f.name}')\">🗑</button>"
-            "</td>"
-            "</tr>"
+        file_list += (
+            f"<tr>"
+            f"<td>{f.name}</td>"
+            f"<td style='text-align:center;'>{timestamp}</td>"
+            f"<td style='text-align:center;'>{size_kb:.1f} kB</td>"
+            f"<td style='text-align:center;'>"
+            f"<button onclick=\"window.location.href='/download/{f.name}'\">⬇</button>"
+            f"&nbsp;"
+            f"<button onclick=\"confirmDelete('{f.name}')\">🗑</button>"
+            f"</td>"
+            f"</tr>"
+        )
 
     # Scanner
     scanner_list = ''
