@@ -38,14 +38,15 @@ async def status_page(request):
     # Dateien
     files = sorted(SCAN_FOLDER.iterdir(), reverse=True)[:MAX_FILES]
     file_list = ''
+    logger.info(f"files from {SCAN_FOLDER}:")
     for f in files:
         stat = f.stat()
         timestamp = datetime.datetime.fromtimestamp(stat.st_mtime).strftime("%Y-%m-%d %H:%M:%S")
         size_kb = stat.st_size / 1024
-        file_list += f"<tr><td>{f.name}</td><td>{timestamp}</td><td>{size_kb:.1f} KB</td></tr>"
-    logger.info(f"file_list from {SCAN_FOLDER}:")
-    logger.info(f"{file_list}")
-    logger.info(f"files from {SCAN_FOLDER}:")
+        filepath = f"{SCAN_FOLDER}/{f.name}"
+        logger.info(f"{timestamp}, {size_kb} kB, {filepath}")
+#        file_list += f"<tr><td>{f.name}</td><td>{timestamp}</td><td>{size_kb:.1f} KB</td><td>Download</td></tr>"
+        file_list += f"<tr><td>{f.name}</td><td>{timestamp}</td><td>{size_kb:.1f} kB</td><td><button onclick="window.location={filepath}">Download</button></td></tr>"
     logger.info(f"{files}")
 
     # Scanner
@@ -130,7 +131,7 @@ async def status_page(request):
             </table>
             <h2>Last {MAX_FILES} Scans:</h2>
             <table>
-                <tr><th>Filename</th><th>Date/Time</th><th>Size (KB)</th></tr>
+                <tr><th>Filename</th><th>Date/Time</th><th>Size (kB)</th><th>Download</th></tr>
                 {file_list}
             </table>
         </body>
