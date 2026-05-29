@@ -100,20 +100,20 @@ if OFFLINE_TIMEOUT < 120:
     logger.warning("OFFLINE_TIMEOUT too small, set to minimal value 120 seconds")
 logger.info(f"Offline Timeout: {OFFLINE_TIMEOUT}s")
 
-# ---------------- SCAN-Folder Path ----------------
-#globals.SCAN_FOLDER = Path(os.environ.get("SCAN_FOLDER", "/share/scans"))
-globals.SCAN_FOLDER = Path(os.environ.get("SCAN_FOLDER", "/config/wsd4ha/scans"))
-#SCAN_FOLDER.mkdir(parents=True, exist_ok=True)
-logger.info(f"Scan-Path: {globals.SCAN_FOLDER}")
-
 # ---------------- TMUX env ----------------
 TMUX = os.environ.get("TMUX", "---")
 logger.info(f" TMUX env: {TMUX}")
 
 # ---------------- SCAN-Folder Path ----------------
-#SCAN_FOLDER = Path(os.environ.get("SCAN_FOLDER", "/share/scans"))
+#globals.SCAN_FOLDER = Path(os.environ.get("SCAN_FOLDER", "/share/scans"))
+globals.SCAN_FOLDER = Path(os.environ.get("SCAN_FOLDER", "/config/wsd4ha/scans"))
 #SCAN_FOLDER.mkdir(parents=True, exist_ok=True)
-#logger.info(f"Scan-Path: {SCAN_FOLDER}")
+logger.info(f"global Scan-Path: {globals.SCAN_FOLDER}")
+
+#SCAN_FOLDER = Path(os.environ.get("SCAN_FOLDER", "/share/scans"))
+SCAN_FOLDER = globals.SCAN_FOLDER
+logger.info(f"local Scan-Path: {SCAN_FOLDER}")
+SCAN_FOLDER.mkdir(parents=True, exist_ok=True)
 
 # ---------------- Max Files to show in GUI ----------------
 raw = int(os.environ.get("MAX_FILES", 50))
