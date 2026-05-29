@@ -16,7 +16,7 @@ from tools import find_scanner_by_endto_addr
 from scan_job import run_scan_job
 
 
-# ---------------- Route für Dowload-Link ----------------
+# ---------------- Download a scanned file ----------------
 # http://homeassistant:8110/download/file.jpg
 async def download_file(request):
     filename = os.path.basename(request.match_info["filename"])
@@ -37,15 +37,36 @@ async def download_file(request):
         }
     )
 
+# ---------------- delete a scanned file ----------------
+# http://homeassistant:8110/download/file.jpg
+async def delete_file(request):
+    filename = os.path.basename(request.match_info["filename"])
+    filepath = os.path.join(globals.SCAN_FOLDER, filename)
+
+    if not os.path.isfile(filepath):
+        raise web.HTTPNotFound(text="File not found")
+
+    try:
+        os.remove(filepath)
+
+    except Exception as e:
+        raise web.HTTPInternalServerError(
+            text=str(e)
+        )
+
+    raise web.HTTPFound("/")
+
 # ---------------- HTTP Server ----------------
 async def start_http_server():
     logger.info(f"[SERVER:start_http] configuring HTTP Server for UI on Port {HTTP_PORT}")
     app = web.Application()
     app.router.add_get("/", status_page)
-    logger.debug("   ---> added endpoint /")
+    logger.info("   ---> added endpoint /")
     app.router.add_get("/download/{filename}", download_file)
-    logger.info("   ---> added endpoint /download/filename")
-    
+    logger.info("   ---> added endpoint /download/{filename}")
+    app.router.add_get("/delete/{filename}", delete_file)
+    logger.info("   ---> added endpoint /delete/{filename}")
+
     runner = web.AppRunner(app)
     await runner.setup()
     logger.debug(f"   ---> runner.setup().web.AppRunner(app)")
@@ -70,7 +91,16 @@ async def status_page(request):
         size_kb = stat.st_size / 1024
         filepath = f"{SCAN_FOLDER}/{f.name}"
         logger.info(f"{timestamp}, {size_kb:.1f} kB, {filepath}")
-        file_list += f"<tr><td>{f.name}</td><td style='text-align:center;'>{timestamp}</td><td style='text-align:center;'>{size_kb:.1f} kB</td><td style='text-align:center;'><button onclick='window.location.href=\"/download/{f.name}\"'>Download</button></td></tr>"
+        file_list += f"<tr>"
+            "<td>{f.name}</td>"
+            "<td style='text-align:center;'>{timestamp}</td>"
+            "<td style='text-align:center;'>{size_kb:.1f} kB</td>"
+            "<td style='text-align:center;'>"
+                "<button onclick='window.location.href=\"/download/{f.name}\"'>Download</button>"
+                f"&nbsp;"
+                f"<button onclick=\"confirmDelete('{f.name}')\">🗑</button>"
+            "</td>"
+            "</tr>"
 
     # Scanner
     scanner_list = ''
@@ -121,6 +151,13 @@ async def status_page(request):
                 th, td {{ border: 1px solid #ddd; padding: 8px; }}
                 th {{ background-color: #f2f2f2; }}
             </style>
+            <script>
+            function confirmDelete(filename) {
+                if (confirm("Delete file '" + filename + "' ?")) {
+                    window.location.href = "/delete/" + filename;
+                }
+            }
+            </script>
         </head>
         <body>
             <h1>WSD4HA seems to be running</h1>
