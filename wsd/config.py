@@ -111,9 +111,9 @@ TMUX = os.environ.get("TMUX", "---")
 logger.info(f" TMUX env: {TMUX}")
 
 # ---------------- SCAN-Folder Path ----------------
-SCAN_FOLDER = Path(os.environ.get("SCAN_FOLDER", "/share/scans"))
-SCAN_FOLDER.mkdir(parents=True, exist_ok=True)
-logger.info(f"Scan-Path: {SCAN_FOLDER}")
+#SCAN_FOLDER = Path(os.environ.get("SCAN_FOLDER", "/share/scans"))
+#SCAN_FOLDER.mkdir(parents=True, exist_ok=True)
+#logger.info(f"Scan-Path: {SCAN_FOLDER}")
 
 # ---------------- Max Files to show in GUI ----------------
 raw = int(os.environ.get("MAX_FILES", 50))
