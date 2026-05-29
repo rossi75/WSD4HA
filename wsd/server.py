@@ -154,11 +154,11 @@ async def status_page(request):
                 th {{ background-color: #f2f2f2; }}
             </style>
             <script>
-            function confirmDelete(filename) {
-                if (confirm("Delete file '" + filename + "' ?")) {
+            function confirmDelete(filename) {{
+                if (confirm("Delete file '" + filename + "' ?")) {{
                     window.location.href = "/delete/" + filename;
-                }
-            }
+                }}
+            }}
             </script>
         </head>
         <body>
