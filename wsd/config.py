@@ -105,13 +105,8 @@ TMUX = os.environ.get("TMUX", "---")
 logger.info(f" TMUX env: {TMUX}")
 
 # ---------------- SCAN-Folder Path ----------------
-#globals.SCAN_FOLDER = Path(os.environ.get("SCAN_FOLDER", "/share/scans"))
-#globals.SCAN_FOLDER = Path(os.environ.get("SCAN_FOLDER", "/config/wsd4ha/scans"))
 globals.SCAN_FOLDER = Path(os.environ.get("SCAN_FOLDER", "/share/wsd4ha/scans"))
-#SCAN_FOLDER.mkdir(parents=True, exist_ok=True)
 logger.info(f"global Scan-Path: {globals.SCAN_FOLDER}")
-
-#SCAN_FOLDER = Path(os.environ.get("SCAN_FOLDER", "/share/scans"))
 SCAN_FOLDER = globals.SCAN_FOLDER
 logger.info(f"local Scan-Path: {SCAN_FOLDER}")
 SCAN_FOLDER.mkdir(parents=True, exist_ok=True)
