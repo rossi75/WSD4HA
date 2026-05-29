@@ -19,6 +19,7 @@ host_network: true
 map:
 #  - "{{ options.scan_folder }}:rw"
   - config:rw
+  - share:rw
 options:
   offline_timeout: 300
   displayname: "Scan to Home Assistant"
