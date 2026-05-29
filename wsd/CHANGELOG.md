@@ -6,6 +6,7 @@
 - download button in GUI
 - delete button in GUI
 - sort by D/T
+- GUI Auto-Reload all 60 seconds
 
 ## 0.73 - 2025-10-16
 - added probe exceptions
