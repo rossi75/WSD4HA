@@ -36,6 +36,7 @@ COPY wsd.py .
 
 EXPOSE 8110
 EXPOSE 5357
-VOLUME ["/share/scans":"/share/scans"]
+#VOLUME ["/share/scans":"/share/scans"]
+VOLUME ["/config/wsd4ha/scans"]
 
 CMD ["python3", "main.py"]
