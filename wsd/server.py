@@ -20,10 +20,8 @@ from scan_job import run_scan_job
 # http://homeassistant:8110/download/file.jpg
 async def download_file(request):
     filename = os.path.basename(request.match_info["filename"])
-#    filename_sec = secure_filename(filename)
     filepath = os.path.join(SCAN_FOLDER, filename)
-#    logger.info(f"received download request from {request} for {filename} / {filename_sec} / {filepath}")
-    logger.info(f"received download request from {request} for {filename} / {filepath}")
+    logger.info(f"received download request for {filename}, which is at {filepath}")
 
     if not os.path.isfile(filepath):
         raise web.HTTPNotFound(text="File not found")
@@ -38,10 +36,9 @@ async def download_file(request):
     )
 
 # ---------------- delete a scanned file ----------------
-# http://homeassistant:8110/download/file.jpg
+# http://homeassistant:8110/delete/file.jpg
 async def delete_file(request):
     filename = os.path.basename(request.match_info["filename"])
-#    filepath = os.path.join(globals.SCAN_FOLDER, filename)
     filepath = os.path.join(SCAN_FOLDER, filename)
 
     if not os.path.isfile(filepath):
@@ -82,7 +79,6 @@ async def status_page(request):
     logger.info(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} [SERVER:status_page] received request for status page")
 
     # Dateien
-#    files = sorted(SCAN_FOLDER.iterdir(), reverse=True)[:MAX_FILES]
     files = sorted(SCAN_FOLDER.iterdir(), key=lambda f: f.stat().st_mtime, reverse=True)[:MAX_FILES]
     file_list = ''
     logger.info(f"files from {SCAN_FOLDER}:")
@@ -199,7 +195,6 @@ async def start_notify_server():
     site = web.TCPSite(runner, "0.0.0.0", NOTIFY_PORT)
     await site.start()
     logger.info(f"Notify Server is running on Port {NOTIFY_PORT}")
-#    logger.info(f"-----------------------  Events  -------------------------")
     logger.info(f"***************************************************************************************************************")
     logger.info(f"*                                                E V E N T S                                                  *")
     logger.info(f"***************************************************************************************************************")
