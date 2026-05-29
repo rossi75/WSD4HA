@@ -101,7 +101,8 @@ if OFFLINE_TIMEOUT < 120:
 logger.info(f"Offline Timeout: {OFFLINE_TIMEOUT}s")
 
 # ---------------- SCAN-Folder Path ----------------
-globals.SCAN_FOLDER = Path(os.environ.get("SCAN_FOLDER", "/share/scans"))
+#globals.SCAN_FOLDER = Path(os.environ.get("SCAN_FOLDER", "/share/scans"))
+globals.SCAN_FOLDER = Path(os.environ.get("SCAN_FOLDER", "/config/wsd4ha/scans"))
 #SCAN_FOLDER.mkdir(parents=True, exist_ok=True)
 logger.info(f"Scan-Path: {globals.SCAN_FOLDER}")
 
