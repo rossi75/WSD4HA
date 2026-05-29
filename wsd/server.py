@@ -41,7 +41,8 @@ async def download_file(request):
 # http://homeassistant:8110/download/file.jpg
 async def delete_file(request):
     filename = os.path.basename(request.match_info["filename"])
-    filepath = os.path.join(globals.SCAN_FOLDER, filename)
+#    filepath = os.path.join(globals.SCAN_FOLDER, filename)
+    filepath = os.path.join(SCAN_FOLDER, filename)
 
     if not os.path.isfile(filepath):
         raise web.HTTPNotFound(text="File not found")
@@ -97,9 +98,9 @@ async def status_page(request):
             f"<td style='text-align:center;'>{timestamp}</td>"
             f"<td style='text-align:center;'>{size_kb:.1f} kB</td>"
             f"<td style='text-align:center;'>"
-            f"<button onclick=\"window.location.href='/download/{f.name}'\">⬇</button>"
+            f"<button title=\"Download\"onclick=\"window.location.href='/download/{f.name}'\">⬇</button>"
             f"&nbsp;"
-            f"<button onclick=\"confirmDelete('{f.name}')\">🗑</button>"
+            f"<button title=\"Delete\" onclick=\"confirmDelete('{f.name}')\">🗑</button>"
             f"</td>"
             f"</tr>"
         )
