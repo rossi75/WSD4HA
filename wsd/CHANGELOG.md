@@ -2,7 +2,8 @@
 
 ## 0.74 - 2026-05-29
 - save to floppy disk worked only within its container
-- new filepath is /share/wsd4ha/scans
+- new filepath is /share/wsd4ha/scans, persists restarts
+- download button in GUI
 
 ## 0.73 - 2025-10-16
 - added probe exceptions
