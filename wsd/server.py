@@ -14,6 +14,21 @@ from globals import SCANNERS, SCAN_JOBS, NAMESPACES, STATE, USER_AGENT, logger
 from parse import parse_notify_msg
 from tools import find_scanner_by_endto_addr
 from scan_job import run_scan_job
+from flask import send_file
+from werkzeug.utils import secure_filename
+
+# ---------------- Route für Dowload-Link ----------------
+# http://homeassistant:8110/download/file.jpg
+@app.route("/download/<path:filename>")
+def download_file(filename):
+    filename = secure_filename(filename)
+    filepath = os.path.join(globals.SCAN_FOLDER, filename)
+
+    if not os.path.isfile(filepath):
+        return "File not found", 404
+
+    return send_file(filepath, as_attachment=True)
+
 
 # ---------------- HTTP Server ----------------
 async def start_http_server():
@@ -46,7 +61,8 @@ async def status_page(request):
         filepath = f"{SCAN_FOLDER}/{f.name}"
         logger.info(f"{timestamp}, {size_kb} kB, {filepath}")
 #        file_list += f"<tr><td>{f.name}</td><td>{timestamp}</td><td>{size_kb:.1f} KB</td><td>Download</td></tr>"
-        file_list += f"<tr><td>{f.name}</td><td>{timestamp}</td><td>{size_kb:.1f} kB</td><td><button onclick="window.location={filepath}">Download</button></td></tr>"
+        file_list += f"<tr><td>{f.name}</td><td>{timestamp}</td><td>{size_kb:.1f} kB</td><td><button onclick='window.location.href=\"/download/{f.name}\"'>Download</button></td></tr>"
+#f'<button onclick="window.location.href=\'/download/{f.name}\'">
     logger.info(f"{files}")
 
     # Scanner
