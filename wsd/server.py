@@ -14,29 +14,13 @@ from globals import SCANNERS, SCAN_JOBS, NAMESPACES, STATE, USER_AGENT, logger
 from parse import parse_notify_msg
 from tools import find_scanner_by_endto_addr
 from scan_job import run_scan_job
-#from flask import send_file
-#from werkzeug.utils import secure_filename
-
-# ---------------- Route für Dowload-Link ----------------
-# http://homeassistant:8110/download/file.jpg
-#@app.route("/download/<path:filename>")
-#def download_file(filename):
-#    filename = secure_filename(filename)
-#    filepath = os.path.join(globals.SCAN_FOLDER, filename)#
-
-#    if not os.path.isfile(filepath):
-#        return "File not found", 404
-
-#    return send_file(filepath, as_attachment=True)
 
 
 # ---------------- Route für Dowload-Link ----------------
 # http://homeassistant:8110/download/file.jpg
-#@app.route("/download/<path:filename>")
 async def download_file(request):
     filename = os.path.basename(request.match_info["filename"])
 #    filename_sec = secure_filename(filename)
-#    filepath = os.path.join(globals.SCAN_FOLDER, filename)
     filepath = os.path.join(SCAN_FOLDER, filename)
 #    logger.info(f"received download request from {request} for {filename} / {filename_sec} / {filepath}")
     logger.info(f"received download request from {request} for {filename} / {filepath}")
@@ -92,15 +76,7 @@ async def status_page(request):
 
     # Scanner
     scanner_list = ''
-#    now = datetime.datetime.now()
     for s in SCANNERS.values():
-#        delta = (now - s.last_seen).total_seconds()
-#        if delta > OFFLINE_TIMEOUT:
-#            s.online = False
-#            s.state = False
-#        color = "green" if s.online else ("orange" if delta < 2*OFFLINE_TIMEOUT else "red")
-#        formats = ", ".join(s.formats)
-        #formats = ", ".join(s.types)
         scanner_list = "<tr style='color:{color}'>"
         scanner_list += f"<td style='text-align:center;'>{s.friendly_name}</td>"
         scanner_list += f"<td style='text-align:center;'>{s.ip}<br>{s.mac if s.mac else ''}</td>"
@@ -127,7 +103,6 @@ async def status_page(request):
 
     # Jobs
     job_list = ''
-#    now = datetime.datetime.now()
     for j in SCAN_JOBS.values():
         job_list = "<tr style='color:{color}'>"
         job_list += f"<td style='text-align:center;'>{j.scanjob_identifier}</td>"
