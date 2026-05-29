@@ -68,10 +68,8 @@ async def status_page(request):
         timestamp = datetime.datetime.fromtimestamp(stat.st_mtime).strftime("%Y-%m-%d %H:%M:%S")
         size_kb = stat.st_size / 1024
         filepath = f"{SCAN_FOLDER}/{f.name}"
-        logger.info(f"{timestamp}, {size_kb} kB, {filepath}")
-#        file_list += f"<tr><td>{f.name}</td><td>{timestamp}</td><td>{size_kb:.1f} KB</td><td>Download</td></tr>"
-        file_list += f"<tr><td>{f.name}</td><td>{timestamp}</td><td>{size_kb:.1f} kB</td><td><button onclick='window.location.href=\"/download/{f.name}\"'>Download</button></td></tr>"
-#f'<button onclick="window.location.href=\'/download/{f.name}\'">
+        logger.info(f"{timestamp}, {size_kb:.1f} kB, {filepath}")
+        file_list += f"<tr><td>{f.name}</td><td style='text-align:center;'>{timestamp}</td><td style='text-align:center;'>{size_kb:.1f} kB</td><td style='text-align:center;'><button onclick='window.location.href=\"/download/{f.name}\"'>Download</button></td></tr>"
     logger.info(f"{files}")
 
     # Scanner
@@ -95,11 +93,6 @@ async def status_page(request):
         scanner_list += f"<td style='text-align:center;'>{s.firmware if s.firmware else ''}<br>"
         scanner_list += f"{s.serial if s.serial else ''}</td>"
         scanner_list += "</tr>"
-    logger.info(f"scanner_list:")
-    logger.info(f"{scanner_list}")
-    logger.info(f"SCANNERS:")
-    logger.info(f"{SCANNERS}")
-
 
     # Jobs
     job_list = ''
@@ -117,10 +110,6 @@ async def status_page(request):
         job_list += f"<td style='text-align:center;'>{j.job_created.strftime('%Y-%m-%d %H:%M:%S')}<br>"
         job_list += f"{j.remove_after.strftime('%Y-%m-%d %H:%M:%S')}</td>"
         job_list += "</tr>"
-    logger.info(f"job_list:")
-    logger.info(f"{job_list}")
-    logger.info(f"SCAN_JOBS:")
-    logger.info(f"{SCAN_JOBS}")
 
     logger.debug(f"   ---> probably delivering http-response")
     return web.Response(text=f"""
