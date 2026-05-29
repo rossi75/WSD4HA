@@ -32,7 +32,7 @@ from scan_job import run_scan_job
 
 # ---------------- Route für Dowload-Link ----------------
 # http://homeassistant:8110/download/file.jpg
-@app.route("/download/<path:filename>")
+#@app.route("/download/<path:filename>")
 async def download_file(request):
     filename = os.path.basename(request.match_info["filename"])
 #    filename_sec = secure_filename(filename)
