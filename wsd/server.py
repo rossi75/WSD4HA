@@ -79,8 +79,8 @@ async def status_page(request):
         scanner_list += "</tr>"
     logger.info(f"scanner_list:")
     logger.info(f"{scanner_list}")
-    logger.info(f"SCANNER:")
-    logger.info(f"{SCANNER}")
+    logger.info(f"SCANNERS:")
+    logger.info(f"{SCANNERS}")
 
 
     # Jobs
