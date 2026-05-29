@@ -70,7 +70,6 @@ async def status_page(request):
         filepath = f"{SCAN_FOLDER}/{f.name}"
         logger.info(f"{timestamp}, {size_kb:.1f} kB, {filepath}")
         file_list += f"<tr><td>{f.name}</td><td style='text-align:center;'>{timestamp}</td><td style='text-align:center;'>{size_kb:.1f} kB</td><td style='text-align:center;'><button onclick='window.location.href=\"/download/{f.name}\"'>Download</button></td></tr>"
-    logger.info(f"{files}")
 
     # Scanner
     scanner_list = ''
