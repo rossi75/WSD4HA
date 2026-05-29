@@ -14,28 +14,51 @@ from globals import SCANNERS, SCAN_JOBS, NAMESPACES, STATE, USER_AGENT, logger
 from parse import parse_notify_msg
 from tools import find_scanner_by_endto_addr
 from scan_job import run_scan_job
-from flask import send_file
+#from flask import send_file
 from werkzeug.utils import secure_filename
 
 # ---------------- Route für Dowload-Link ----------------
 # http://homeassistant:8110/download/file.jpg
+#@app.route("/download/<path:filename>")
+#def download_file(filename):
+#    filename = secure_filename(filename)
+#    filepath = os.path.join(globals.SCAN_FOLDER, filename)#
+
+#    if not os.path.isfile(filepath):
+#        return "File not found", 404
+
+#    return send_file(filepath, as_attachment=True)
+
+
+# ---------------- Route für Dowload-Link ----------------
+# http://homeassistant:8110/download/file.jpg
 @app.route("/download/<path:filename>")
-def download_file(filename):
-    filename = secure_filename(filename)
+async def download_file(request):
+    filename = os.path.basename(request.match_info["filename"])
+    filename_sec = secure_filename(filename)
     filepath = os.path.join(globals.SCAN_FOLDER, filename)
+    logger.info(f"received download request from {request} for {filename} / {filename_sec} / {filepath}")
 
     if not os.path.isfile(filepath):
-        return "File not found", 404
+        raise web.HTTPNotFound(text="File not found")
+#        return "File not found", 404
 
-    return send_file(filepath, as_attachment=True)
-
+    return web.FileResponse(
+        path=filepath,
+        headers={
+            "Content-Disposition":
+            f'attachment; filename="{filename}"'
+        }
+    )
 
 # ---------------- HTTP Server ----------------
 async def start_http_server():
     logger.info(f"[SERVER:start_http] configuring HTTP Server for UI on Port {HTTP_PORT}")
     app = web.Application()
     app.router.add_get("/", status_page)
-    logger.debug(f"   ---> added endpoint /")
+    logger.debug("   ---> added endpoint /")
+    app.router.add_get("/download/{filename}", download_file)
+    logger.info("   ---> added endpoint /download/filename")
     
     runner = web.AppRunner(app)
     await runner.setup()
