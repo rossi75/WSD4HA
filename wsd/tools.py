@@ -208,9 +208,9 @@ def save_scanned_image(scanjob_identifier):
     # Zielpfad
 #    filepath = f"{SCAN_FOLDER}/{safe_name}_{timestamp}.{ext}"
     filepath = f"{globals.SCAN_FOLDER}/{safe_name}_{timestamp}.{ext}"
-    os.makedirs(os.path.dirname(filename), exist_ok=True)
-
     logger.info(f"   --->   filepath: {filepath}")
+#    os.makedirs(os.path.dirname(filename), exist_ok=True)
+    os.makedirs(os.path.dirname(filepath), exist_ok=True)
 
     # Datei speichern
     try:
