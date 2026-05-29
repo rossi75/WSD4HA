@@ -209,8 +209,11 @@ def save_scanned_image(scanjob_identifier):
 #    filepath = f"{SCAN_FOLDER}/{safe_name}_{timestamp}.{ext}"
     filepath = f"{globals.SCAN_FOLDER}/{safe_name}_{timestamp}.{ext}"
     logger.info(f"   --->   filepath: {filepath}")
-#    os.makedirs(os.path.dirname(filename), exist_ok=True)
     os.makedirs(os.path.dirname(filepath), exist_ok=True)
+
+    logger.info(f" --> realpath: {os.path.realpath("/config/wsd4ha/scans")}")
+    logger.info(f" -->  listdir: {os.listdir("/config/wsd4ha/scans")}")
+    logger.info(f" -->     stat: {os.stat("/config/wsd4ha/scans")}")
 
     # Datei speichern
     try:
