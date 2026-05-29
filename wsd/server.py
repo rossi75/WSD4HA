@@ -96,7 +96,7 @@ async def status_page(request):
             "<td style='text-align:center;'>{timestamp}</td>"
             "<td style='text-align:center;'>{size_kb:.1f} kB</td>"
             "<td style='text-align:center;'>"
-                "<button onclick='window.location.href=\"/download/{f.name}\"'>Download</button>"
+                f"<button onclick=\"window.location.href='/download/{f.name}'\">⬇</button>"
                 f"&nbsp;"
                 f"<button onclick=\"confirmDelete('{f.name}')\">🗑</button>"
             "</td>"
@@ -173,7 +173,7 @@ async def status_page(request):
             </table>
             <h2>Last {MAX_FILES} Scans:</h2>
             <table>
-                <tr><th>Filename</th><th>Date/Time</th><th>Size (kB)</th><th>Download</th></tr>
+                <tr><th>Filename</th><th>Date/Time</th><th>Size (kB)</th><th>File Operation</th></tr>
                 {file_list}
             </table>
         </body>
