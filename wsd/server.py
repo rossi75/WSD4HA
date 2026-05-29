@@ -60,7 +60,8 @@ async def status_page(request):
     logger.info(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} [SERVER:status_page] received request for status page")
 
     # Dateien
-    files = sorted(SCAN_FOLDER.iterdir(), reverse=True)[:MAX_FILES]
+#    files = sorted(SCAN_FOLDER.iterdir(), reverse=True)[:MAX_FILES]
+    files = sorted(SCAN_FOLDER.iterdir(), key=lambda f: f.stat().st_mtime, reverse=True)[:MAX_FILES]
     file_list = ''
     logger.info(f"files from {SCAN_FOLDER}:")
     for f in files:
