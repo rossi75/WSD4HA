@@ -36,7 +36,8 @@ from scan_job import run_scan_job
 async def download_file(request):
     filename = os.path.basename(request.match_info["filename"])
 #    filename_sec = secure_filename(filename)
-    filepath = os.path.join(globals.SCAN_FOLDER, filename)
+#    filepath = os.path.join(globals.SCAN_FOLDER, filename)
+    filepath = os.path.join(SCAN_FOLDER, filename)
 #    logger.info(f"received download request from {request} for {filename} / {filename_sec} / {filepath}")
     logger.info(f"received download request from {request} for {filename} / {filepath}")
 
