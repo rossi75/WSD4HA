@@ -15,7 +15,7 @@ from parse import parse_notify_msg
 from tools import find_scanner_by_endto_addr
 from scan_job import run_scan_job
 #from flask import send_file
-from werkzeug.utils import secure_filename
+#from werkzeug.utils import secure_filename
 
 # ---------------- Route für Dowload-Link ----------------
 # http://homeassistant:8110/download/file.jpg
@@ -35,9 +35,10 @@ from werkzeug.utils import secure_filename
 @app.route("/download/<path:filename>")
 async def download_file(request):
     filename = os.path.basename(request.match_info["filename"])
-    filename_sec = secure_filename(filename)
+#    filename_sec = secure_filename(filename)
     filepath = os.path.join(globals.SCAN_FOLDER, filename)
-    logger.info(f"received download request from {request} for {filename} / {filename_sec} / {filepath}")
+#    logger.info(f"received download request from {request} for {filename} / {filename_sec} / {filepath}")
+    logger.info(f"received download request from {request} for {filename} / {filepath}")
 
     if not os.path.isfile(filepath):
         raise web.HTTPNotFound(text="File not found")
