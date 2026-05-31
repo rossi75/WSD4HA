@@ -2,7 +2,7 @@
 
 ## 0.74 - 2026-05-29
 - save to floppy disk worked only within its container
-- new filepath is /share/wsd4ha/scans, persists restarts
+- new filepath is /share/wsd4ha/scans, scanned files persist any restarts now
 - download button in GUI
 - delete button in GUI
 - sort by D/T
@@ -82,3 +82,4 @@
 # ToDo:
 - Scan receive
 - Parameter from HA-/Docker-Config to PY
+- hold scanners in memory after any reboot, retry after reboot and every x seconds if not online
