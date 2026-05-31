@@ -1,11 +1,11 @@
 # Changelog
 
 ## 0.74 - 2026-05-29
-- save to floppy disk worked only within its container
-- new filepath is /share/wsd4ha/scans, scanned files persist any restarts now
-- download button in GUI
-- delete button in GUI
-- sort by D/T
+- save documents to floppy disk worked only within its container
+- new filepath is /share/wsd4ha/scans, scanned documents persist any restarts now
+- document download button in GUI
+- document delete button in GUI
+- documents sorted by D/T
 - GUI Auto-Reload all 60 seconds
 
 ## 0.73 - 2025-10-16
