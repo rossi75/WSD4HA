@@ -81,6 +81,8 @@ class Scanner:
     # wird aufgerufen wenn ein Scanner angepinnt wird
     # Aufruf mit SCANNER[uuid].pin_scanner() aus /pin/{uuid}
     def pin_scanner(self):
+        from config import PINNED_FILE
+
         uuid = self.uuid
         if uuid is None:
             logger.info(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} [SCANNER:p_scnr] UUID {uuid} not found, cannot pin")
@@ -106,6 +108,8 @@ class Scanner:
     # wird aufgerufen wenn ein Scanner nicht mehr angepinnt sein soll
     # Aufruf mit SCANNER[uuid].unpin_scanner() aus /unpin/{uuid}
     def unpin_scanner(self):
+        from config import PINNED_FILE
+
         uuid = self.uuid
         if uuid is None:
             logger.info(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} [SCANNER:p_scnr] UUID {uuid} not found, cannot unpin")
