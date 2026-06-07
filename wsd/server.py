@@ -27,13 +27,7 @@ async def download_file(request):
         raise web.HTTPNotFound(text="File not found")
 #        return "File not found", 404
 
-    return web.FileResponse(
-        path=filepath,
-        headers={
-            "Content-Disposition":
-            f'attachment; filename="{filename}"'
-        }
-    )
+    return web.FileResponse(path=filepath, headers={"Content-Disposition": f'attachment; filename="{filename}"'})
 
 # ---------------- delete a scanned file ----------------
 # http://homeassistant:8110/delete/file.jpg
@@ -46,12 +40,24 @@ async def delete_file(request):
 
     try:
         os.remove(filepath)
-
     except Exception as e:
-        raise web.HTTPInternalServerError(
-            text=str(e)
-        )
+        raise web.HTTPInternalServerError(text=str(e))
+    raise web.HTTPFound("/")
 
+# ---------------- pin a Scanner to File ----------------
+# http://homeassistant:8110/pin/{uuid}
+async def pin_scanner_handler(request):
+    uuid = request.match_info["uuid"]
+#    pin_scanner(uuid)
+    SCANNERS[uuid].pin_scanner()
+    raise web.HTTPFound("/")
+
+# ---------------- unpin a Scanner from File ----------------
+# http://homeassistant:8110/unpin/{uuid}
+async def unpin_scanner_handler(request):
+    uuid = request.match_info["uuid"]
+#    unpin_scanner(uuid)
+    SCANNERS[uuid].unpin_scanner()
     raise web.HTTPFound("/")
 
 # ---------------- HTTP Server ----------------
@@ -64,7 +70,11 @@ async def start_http_server():
     logger.info("   ---> added endpoint /download/{filename}")
     app.router.add_get("/delete/{filename}", delete_file)
     logger.info("   ---> added endpoint /delete/{filename}")
-
+    app.router.add_get("/pin/{uuid}", pin_scanner_handler)
+    logger.info("   ---> added endpoint /pin/{filename}")
+    app.router.add_get("/unpin/{uuid}", unpin_scanner_handler)
+    logger.info("   ---> added endpoint /unpin/{filename}")
+    
     runner = web.AppRunner(app)
     await runner.setup()
     logger.debug(f"   ---> runner.setup().web.AppRunner(app)")
