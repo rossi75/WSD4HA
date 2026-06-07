@@ -2,9 +2,10 @@
 provides a simple WSD protocol for scanning documents into homeassistants file system
 
 Creating a WSD service in Home Assistant for my Samsung C480W.
-So any documents can always be scanned to the anyways and always running server. The files are saved into /share/wsd4ha/scans/. Afterwards those documents can be processed from any OCR software like paperless or so. Maybe other ~printers~ scanners are working too?
+So any documents can always be scanned to the anyways and always running server. The files are saved into /share/wsd4ha/scans/. Afterwards those documents can be downloaded or processed from any OCR software like paperless or so. Maybe other ~printers~ scanners are working too?
 
-If WSD4HA is being restarted, the scanner needs to be restarted also ! This is due to the fact that the (my!) scanner (C480W) sends out its discovery message only once (technically twice) directly after booting. WSD4HA only supports IPv4
+If WSD4HA (or HomeAssistant) is being restarted, it looses its knowledge about any available scanners that are online. This is due to the fact that the (my!) scanner (C480W) sends out its discovery message only once (technically twice) directly after booting. With version 0.75 I introduced a pinned_scanners.json, which will be read at startup. Any scanner added to this list will be contacted after restart.
+WSD4HA only supports IPv4
 
 ## Where is YOUR scanner?
 If you want to get added a specific MFD, leave me a wireshark from your windows (!) 7/8/10/11. It may be filtered for your scanners IP and must contain
@@ -15,10 +16,14 @@ If you want to get added a specific MFD, leave me a wireshark from your windows 
 ## What else?
 Sadly, all options that can be seen in the configurations dialog, are non-functional at the moment... (seems I need some help at this point)
 
+## Installation
+Go to Settings/Apps, click on "Install App", you will see the App Store. In the three dots menu (upper right) choose "Repositories". Hence you click on "Add" once again and enter "https://github.com/rossi75/WSD4HA".
+Go back to the App Store and search for "WSD4HA". Open it and you will see an "Install" button which you may click.
+
 ## open topics / todo
 - make manual configuration functional
 - implement simple variant of ValidateScanTicket
-- decide automatically between simple and detailled variant of ValdiateScanTicket
+- decide automatically between simple and detailled variant of ValidateScanTicket
 - implement GetScannerElements[ScannerDescription]
 - merge globals.py + config.py to globalconfig.py
 - add WSD secure (Port 5358)
@@ -27,8 +32,6 @@ Sadly, all options that can be seen in the configurations dialog, are non-functi
   - display several details only in debug mode
   - mouseover for tech details
   - scan from UI
-  - save scanner in a permanent list
-  - subscribe permanent devices from UI
-
 ... 
+
 
