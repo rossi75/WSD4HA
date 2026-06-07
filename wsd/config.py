@@ -14,7 +14,7 @@ import globals
 #from globals import SCANNERS, FROM_UUID, USER_AGENT, LOG_LEVEL, SCAN_FOLDER, STARTUP_DT, logger
 from globals import SCANNERS, FROM_UUID, USER_AGENT, LOG_LEVEL, STARTUP_DT, logger
 from scanner import Scanner
-from tools import list_scanners, check_port, get_local_ip, load_pinned_scanners
+from tools import list_scanners, check_port, get_local_ip#, load_pinned_scanners
 from urllib.parse import urlparse
 
 STARTUP_DT = datetime.datetime.now().replace(microsecond=0)
@@ -120,15 +120,15 @@ PINNED_FILE = globals.PINNED_FILE
 logger.info(f"local Pinned-File: {PINNED_FILE}")
 PINNED_FILE.mkdir(parents=True, exist_ok=True)
 
-for entry in load_pinned_scanners():
-    scanner = Scanner()
-    scanner.uuid = entry["uuid"]
-    scanner.friendly_name = entry["friendly_name"]
-    scanner.xaddr = entry["xaddr"]
-    scanner.ip = urlparse(scanner.xaddr).hostname
-    SCANNERS[scanner.uuid] = scanner
-    SCANNERS[scanner.uuid].pinned = True
-    SCANNERS[scanner.uuid].state  = PINNED
+#for entry in load_pinned_scanners():
+#    scanner = Scanner()
+#    scanner.uuid = entry["uuid"]
+#    scanner.friendly_name = entry["friendly_name"]
+#    scanner.xaddr = entry["xaddr"]
+#    scanner.ip = urlparse(scanner.xaddr).hostname
+#    SCANNERS[scanner.uuid] = scanner
+#    SCANNERS[scanner.uuid].pinned = True
+#    SCANNERS[scanner.uuid].state  = PINNED
 
 # ---------------- Max Files to show in GUI ----------------
 raw = int(os.environ.get("MAX_FILES", 50))
