@@ -1,5 +1,8 @@
 # Changelog
 
+## 0.75 - 2026-06-07
+# 07.06.2026: Please do NOT UPDATE to this version unless this comment is gone !
+
 ## 0.74 - 2026-05-29
 - save documents to floppy disk worked only within its container
 - new filepath is /share/wsd4ha/scans, scanned documents persist any restarts now
