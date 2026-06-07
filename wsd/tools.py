@@ -43,6 +43,7 @@ from globals import SCANNERS, SCAN_JOBS, logger
 #from config import FROM_UUID, PINNED_FILE
 from config import FROM_UUID
 from urllib.parse import urlparse
+from scanner import Scanner
 
 # ---------------- lokale IP abfragen ----------------
 def get_local_ip():
@@ -246,17 +247,15 @@ def load_pinned_scanners():
 # ---------------- create the pinned scanners ----------------
 def create_pinned_scanners():
     for entry in load_pinned_scanners():
-        logger.info(f"found pinned scanner: {entry}")
-        scanner = Scanner()
-        scanner.uuid = entry["uuid"]
-        scanner.xaddr = entry["xaddr"]
-        scanner.ip = urlparse(scanner.xaddr).hostname
-        SCANNERS[scanner.uuid].pinned = True
-        SCANNERS[scanner.uuid] = scanner
-        SCANNERS[scanner.uuid].friendly_name = entry["friendly_name"]
-        SCANNERS[scanner.uuid].pinned = True
-        SCANNERS[scanner.uuid].state = PINNED
-        logger.info(f"created pinned scanner: {SCANNERS[scanner.uuid]}")
+        logger.info(f"creating pinned scanner: {entry}")
+        uuid = entry["uuid"]
+        xaddr = entry["xaddr"]
+        ip = urlparse(xaddr).hostname
+        SCANNERS[uuid] = Scanner(uuid=uuid, ip=ip, xaddr=xaddr)
+        SCANNERS[uuid].friendly_name = entry["friendly_name"]
+        SCANNERS[uuid].pinned = True
+        SCANNERS[uuid].state = PINNED
+        logger.info(f"created pinned scanner: {SCANNERS[uuid]}")
 
 #
 #
