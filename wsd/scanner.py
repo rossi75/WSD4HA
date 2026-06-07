@@ -121,6 +121,8 @@ class Scanner:
             logger.info(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} [SCANNER:p_scnr] UUID {uuid} not found, cannot unpin")
             return False
 
+        self.pinned = False
+
         scanners = load_pinned_scanners()
         scanners = [
             s
@@ -132,7 +134,6 @@ class Scanner:
                 os.remove(PINNED_FILE)
             return True
 
-        self.pinned = False
         with open(PINNED_FILE, "w", encoding="utf-8") as f:
             json.dump({"scanners": scanners}, f, indent=2)
         logger.info(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} [SCANNER:up_scnr] unpinned {self.friendly_name} @ {self.ip}")
