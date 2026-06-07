@@ -105,6 +105,11 @@ logger.info(f"Offline Timeout: {OFFLINE_TIMEOUT}s")
 TMUX = os.environ.get("TMUX", "---")
 logger.info(f" TMUX env: {TMUX}")
 
+# ---------------- Work Path ----------------
+WORK_PATH = Path(os.environ.get("WORK_PATH", "/share/wsd4ha"))
+SCAN_FOLDER.mkdir(parents=True, exist_ok=True)
+logger.info(f"local Work-Path: {WORK_PATH}")
+
 # ---------------- SCAN-Folder Path ----------------
 globals.SCAN_FOLDER = Path(os.environ.get("SCAN_FOLDER", "/share/wsd4ha/scans"))
 logger.info(f"global Scan-Path: {globals.SCAN_FOLDER}")
@@ -113,21 +118,12 @@ logger.info(f"local Scan-Path: {SCAN_FOLDER}")
 SCAN_FOLDER.mkdir(parents=True, exist_ok=True)
 
 # ---------------- Pinned-File Path ----------------
-globals.PINNED_FILE = Path(os.environ.get("PINNED_FILE", "/share/wsd4ha/pinned_scanners.json"))
-logger.info(f"global Pinned-File: {globals.PINNED_FILE}")
-PINNED_FILE = globals.PINNED_FILE
+#globals.PINNED_FILE = Path(os.environ.get("PINNED_FILE", "/share/wsd4ha/pinned_scanners.json"))
+#logger.info(f"global Pinned-File: {globals.PINNED_FILE}")
+#PINNED_FILE = globals.PINNED_FILE
+PINNED_FILE = Path(os.environ.get("PINNED_FILE", "/share/wsd4ha/pinned_scanners.json"))
 logger.info(f"local Pinned-File: {PINNED_FILE}")
-PINNED_FILE.mkdir(parents=True, exist_ok=True)
-
-#for entry in load_pinned_scanners():
-#    scanner = Scanner()
-#    scanner.uuid = entry["uuid"]
-#    scanner.friendly_name = entry["friendly_name"]
-#    scanner.xaddr = entry["xaddr"]
-#    scanner.ip = urlparse(scanner.xaddr).hostname
-#    SCANNERS[scanner.uuid] = scanner
-#    SCANNERS[scanner.uuid].pinned = True
-#    SCANNERS[scanner.uuid].state  = PINNED
+#PINNED_FILE.mkdir(parents=True, exist_ok=True)
 
 # ---------------- Max Files to show in GUI ----------------
 raw = int(os.environ.get("MAX_FILES", 50))
