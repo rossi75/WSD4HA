@@ -50,7 +50,6 @@ async def delete_file(request):
 async def pin_scanner_handler(request):
     uuid = request.match_info["uuid"]
     logger.info(f"received pinning request for {uuid}")
-#    pin_scanner(uuid)
     SCANNERS[uuid].pin_scanner()
     raise web.HTTPFound("/")
 
@@ -59,8 +58,8 @@ async def pin_scanner_handler(request):
 async def unpin_scanner_handler(request):
     uuid = request.match_info["uuid"]
     logger.info(f"received unpinning request for {uuid}")
-#    unpin_scanner(uuid)
     SCANNERS[uuid].unpin_scanner()
+    await asyncio.sleep(2)
     raise web.HTTPFound("/")
 
 # ---------------- HTTP Server ----------------
