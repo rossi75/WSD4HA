@@ -71,9 +71,14 @@ class Scanner:
     # Aufruf mit SCANNER[uuid].mark_offline()
     def mark_absent(self):
         self.state = STATE.ABSENT
+#        if not self.offline_since:
         if not self.offline_since:
             self.offline_since = datetime.datetime.now().replace(microsecond=0)
-            self.remove_after = self.offline_since + datetime.timedelta(seconds=OFFLINE_TIMEOUT)
+            if self.pinned is True:
+                logger.info(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} [SCANNER:m_offl] marked {self.friendly_name} @ {self.ip} as offline and prevented from being deleted due to pinned status")
+                self.remove_after = None
+            else:
+                self.remove_after = self.offline_since + datetime.timedelta(seconds=OFFLINE_TIMEOUT)
         logger.info(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} [SCANNER:m_offl] marked {self.friendly_name} @ {self.ip} as offline")
         logger.debug(f"   -->         state: {self.state}")
         logger.debug(f"   --> offline_since: {self.offline_since}")
