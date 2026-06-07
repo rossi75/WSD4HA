@@ -107,7 +107,7 @@ logger.info(f" TMUX env: {TMUX}")
 
 # ---------------- Work Path ----------------
 WORK_PATH = Path(os.environ.get("WORK_PATH", "/share/wsd4ha"))
-SCAN_FOLDER.mkdir(parents=True, exist_ok=True)
+WORK_PATH.mkdir(parents=True, exist_ok=True)
 logger.info(f"local Work-Path: {WORK_PATH}")
 
 # ---------------- SCAN-Folder Path ----------------
