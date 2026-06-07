@@ -43,7 +43,6 @@ from globals import SCANNERS, SCAN_JOBS, logger
 #from config import FROM_UUID, PINNED_FILE
 from config import FROM_UUID
 from urllib.parse import urlparse
-from scanner import Scanner
 
 # ---------------- lokale IP abfragen ----------------
 def get_local_ip():
@@ -246,6 +245,7 @@ def load_pinned_scanners():
 
 # ---------------- create the pinned scanners ----------------
 def create_pinned_scanners():
+    from scanner import Scanner
     for entry in load_pinned_scanners():
         logger.info(f"creating pinned scanner: {entry}")
         uuid = entry["uuid"]
