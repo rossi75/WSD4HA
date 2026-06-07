@@ -1,8 +1,10 @@
 import datetime
+import os
 #from config import OFFLINE_TIMEOUT
 from datetime import timedelta
 from globals import SCANNERS, NAMESPACES, STATE, logger
 from tools import list_scanners, marry_endpoints, load_pinned_scanners
+from urllib.parse import urlparse
 
 # ---------------- Scanner-Datenstruktur ----------------
 class Scanner:
@@ -27,7 +29,7 @@ class Scanner:
         self.serial = None
         self.model = None
         self.manufacturer = None
-        self.pinned = False
+        self.pinned = pinned
         self.related_uuids = set()
         self.ScanTicket_Dialect = None              # SIMPLE or DETAIL
 
