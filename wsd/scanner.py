@@ -29,7 +29,7 @@ class Scanner:
         self.serial = None
         self.model = None
         self.manufacturer = None
-        self.pinned = pinned
+        self.pinned = False
         self.related_uuids = set()
         self.ScanTicket_Dialect = None              # SIMPLE or DETAIL
 
