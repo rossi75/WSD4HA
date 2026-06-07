@@ -210,7 +210,7 @@ async def state_monitor():
                 scanner.mark_absent()
 
             # Nach Ablauf von Timeout+Offline → entfernen
-            if status == "absent" and scanner.remove_after is not None and now >= scanner.remove_after:
+            if status == "absent" and scanner.remove_after is not None and now >= scanner.remove_after and scanner.pinned is False:
                 logger.info(f"[WSD:Heartbeat] --> Marking {scanner.friendly_name} @ {scanner.ip} to remove")
                 to_remove.append(scanner)
 
