@@ -22,9 +22,11 @@
 # def save_scanned_image(scanjob_id: str):
 #
 #
+# def load_pinned_scanners():
 # ----------------------------------------------------------------------------
 
 import datetime
+import json
 import logging
 import os
 import re
@@ -35,7 +37,7 @@ import xml.etree.ElementTree as ET
 import globals
 from globals import SCANNERS, SCAN_JOBS, logger
 #from config import SCAN_FOLDER, FROM_UUID
-from config import FROM_UUID
+from config import FROM_UUID, PINNED_FILE
 
 # ---------------- lokale IP abfragen ----------------
 def get_local_ip():
@@ -220,6 +222,19 @@ def save_scanned_image(scanjob_identifier):
         logger.error(f"[TOOLS:sv_img] Could not save image to {filepath} : {e}")
         return False
 
+# ---------------- load the pinned scanners into SCANNERS[] ----------------
+def load_pinned_scanners():
+    if not os.path.exists(PINNED_FILE):
+        logger.error(f"Could not find file {PINNED_FILE}")
+        return []
+    try:
+        with open(PINNED_FILE, "r", encoding="utf-8") as f:
+            data = json.load(f)
+        logger.error(f"Found any pinned scanners in {PINNED_FILE}")
+        return data.get("scanners", [])
+    except Exception as e:
+        logger.error(f"Could not load pinned scanners: {e}")
+        return []
 
 #
 #
