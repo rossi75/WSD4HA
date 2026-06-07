@@ -111,12 +111,12 @@ SCAN_FOLDER = globals.SCAN_FOLDER
 logger.info(f"local Scan-Path: {SCAN_FOLDER}")
 SCAN_FOLDER.mkdir(parents=True, exist_ok=True)
 
-# ---------------- Pinning-File Path ----------------
-globals.PINNING_FILE = Path(os.environ.get("PINNING_FILE", "/share/wsd4ha/pinned_scanners.json"))
-logger.info(f"global Pinning-File: {globals.PINNING_FILE}")
-PINNING_FILE = globals.PINNING_FILE
-logger.info(f"local Pinning-File: {PINNING_FILE}")
-PINNING_FILE.mkdir(parents=True, exist_ok=True)
+# ---------------- Pinned-File Path ----------------
+globals.PINNED_FILE = Path(os.environ.get("PINNED_FILE", "/share/wsd4ha/pinned_scanners.json"))
+logger.info(f"global Pinned-File: {globals.PINNED_FILE}")
+PINNED_FILE = globals.PINNED_FILE
+logger.info(f"local Pinned-File: {PINNED_FILE}")
+PINNED_FILE.mkdir(parents=True, exist_ok=True)
 
 # ---------------- Max Files to show in GUI ----------------
 raw = int(os.environ.get("MAX_FILES", 50))
