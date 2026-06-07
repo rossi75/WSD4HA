@@ -23,6 +23,9 @@
 #
 #
 # def load_pinned_scanners():
+#
+#
+# def create_pinned_scanners():
 # ----------------------------------------------------------------------------
 
 import datetime
@@ -38,6 +41,7 @@ import globals
 from globals import SCANNERS, SCAN_JOBS, logger
 #from config import SCAN_FOLDER, FROM_UUID
 from config import FROM_UUID, PINNED_FILE
+from urllib.parse import urlparse
 
 # ---------------- lokale IP abfragen ----------------
 def get_local_ip():
@@ -222,7 +226,7 @@ def save_scanned_image(scanjob_identifier):
         logger.error(f"[TOOLS:sv_img] Could not save image to {filepath} : {e}")
         return False
 
-# ---------------- load the pinned scanners into SCANNERS[] ----------------
+# ---------------- load the pinned scanners ----------------
 def load_pinned_scanners():
     if not os.path.exists(PINNED_FILE):
         logger.error(f"Could not find file {PINNED_FILE}")
@@ -235,6 +239,20 @@ def load_pinned_scanners():
     except Exception as e:
         logger.error(f"Could not load pinned scanners: {e}")
         return []
+
+
+# ---------------- create the pinned scanners ----------------
+def create_pinned_scanners():
+    for entry in load_pinned_scanners():
+        logger.info(f"found pinned device: {entry}")
+        scanner = Scanner()
+        scanner.uuid = entry["uuid"]
+        scanner.xaddr = entry["xaddr"]
+        scanner.ip = urlparse(scanner.xaddr).hostname
+        SCANNERS[scanner.uuid] = scanner
+        SCANNERS[scanner.uuid].friendly_name = entry["friendly_name"]
+        SCANNERS[scanner.uuid].pinned = True
+        SCANNERS[scanner.uuid].state = PINNED
 
 #
 #
