@@ -40,7 +40,8 @@ import xml.etree.ElementTree as ET
 import globals
 from globals import SCANNERS, SCAN_JOBS, logger
 #from config import SCAN_FOLDER, FROM_UUID
-from config import FROM_UUID, PINNED_FILE
+#from config import FROM_UUID, PINNED_FILE
+from config import FROM_UUID
 from urllib.parse import urlparse
 
 # ---------------- lokale IP abfragen ----------------
@@ -243,6 +244,7 @@ def load_pinned_scanners():
 
 # ---------------- create the pinned scanners ----------------
 def create_pinned_scanners():
+    from config import FROM_UUID, PINNED_FILE
     for entry in load_pinned_scanners():
         logger.info(f"found pinned device: {entry}")
         scanner = Scanner()
