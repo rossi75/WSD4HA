@@ -2,7 +2,7 @@ import datetime
 from config import OFFLINE_TIMEOUT
 from datetime import timedelta
 from globals import SCANNERS, NAMESPACES, STATE, logger
-from tools import list_scanners, marry_endpoints
+from tools import list_scanners, marry_endpoints, load_pinned_scanners
 
 # ---------------- Scanner-Datenstruktur ----------------
 class Scanner:
@@ -27,6 +27,7 @@ class Scanner:
         self.serial = None
         self.model = None
         self.manufacturer = None
+        self.pinned = False
         self.related_uuids = set()
         self.ScanTicket_Dialect = None              # SIMPLE or DETAIL
 
@@ -74,6 +75,56 @@ class Scanner:
         logger.debug(f"   -->         state: {self.state}")
         logger.debug(f"   --> offline_since: {self.offline_since}")
         logger.debug(f"   -->  remove_after: {self.remove_after}")
+
+    # wird aufgerufen wenn ein Scanner angepinnt wird
+    # Aufruf mit SCANNER[uuid].pin_scanner() aus /pin/{uuid}
+    def pin_scanner(self):
+        uuid = self.uuid
+        if uuid is None:
+            logger.info(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} [SCANNER:p_scnr] UUID {uuid} not found, cannot pin")
+            return False
+        scanners = load_pinned_scanners()
+        if any(s["uuid"] == uuid for s in scanners):
+            logger.info(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} [SCANNER:p_scnr] {self.friendly_name} @ {self.ip} is already pinned")
+            return True
+    
+        self.pinned = True
+        scanners.append({
+            "uuid": uuid,
+            "friendly_name": SCANNERS[uuid].friendly_name,
+            "xaddr": SCANNERS[uuid].xaddr
+        })
+    
+        os.makedirs(os.path.dirname(PINNED_FILE), exist_ok=True)
+        with open(PINNED_FILE, "w", encoding="utf-8") as f:
+            json.dump({"scanners": scanners}, f, indent=2)
+        logger.info(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} [SCANNER:p_scnr] pinned {self.friendly_name} @ {self.ip}")
+        return True
+
+    # wird aufgerufen wenn ein Scanner nicht mehr angepinnt sein soll
+    # Aufruf mit SCANNER[uuid].unpin_scanner() aus /unpin/{uuid}
+    def unpin_scanner(self):
+        uuid = self.uuid
+        if uuid is None:
+            logger.info(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} [SCANNER:p_scnr] UUID {uuid} not found, cannot unpin")
+            return False
+
+        scanners = load_pinned_scanners()
+        scanners = [
+            s
+            for s in scanners
+            if s["uuid"] != uuid
+        ]
+        if len(scanners) == 0:
+            if os.path.exists(PINNED_FILE):
+                os.remove(PINNED_FILE)
+            return True
+
+        self.pinned = False
+        with open(PINNED_FILE, "w", encoding="utf-8") as f:
+            json.dump({"scanners": scanners}, f, indent=2)
+        logger.info(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} [SCANNER:up_scnr] unpinned {self.friendly_name} @ {self.ip}")
+        return True
 
 # ---------------- ScanJob-Datenstruktur ----------------
 class Scan_Jobs:
