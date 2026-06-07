@@ -246,15 +246,17 @@ def load_pinned_scanners():
 # ---------------- create the pinned scanners ----------------
 def create_pinned_scanners():
     for entry in load_pinned_scanners():
-        logger.info(f"found pinned device: {entry}")
+        logger.info(f"found pinned scanner: {entry}")
         scanner = Scanner()
         scanner.uuid = entry["uuid"]
         scanner.xaddr = entry["xaddr"]
         scanner.ip = urlparse(scanner.xaddr).hostname
+        SCANNERS[scanner.uuid].pinned = True
         SCANNERS[scanner.uuid] = scanner
         SCANNERS[scanner.uuid].friendly_name = entry["friendly_name"]
         SCANNERS[scanner.uuid].pinned = True
         SCANNERS[scanner.uuid].state = PINNED
+        logger.info(f"created pinned scanner: {SCANNERS[scanner.uuid]}")
 
 #
 #
