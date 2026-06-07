@@ -57,6 +57,7 @@ NAMESPACES = {
 #class ScannerStatus(str, Enum):
 class STATE(str, Enum):
     DISCOVERED = "discovered"
+    PINNED = "pinned"                                        # fresh loaded from file
     PROBING = "probing"
     PROBE_PARSING = "Probe matched, parsing Probe"
     PROBE_PARSED = "Probe/Match parsed"
