@@ -1,3 +1,5 @@
+# 07.06.2026: Please do NOT UPDATE today
+
 # WSD4HA
 provides a simple WSD protocol for scanning documents into homeassistants file system
 
