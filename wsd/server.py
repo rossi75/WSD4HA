@@ -34,6 +34,7 @@ async def download_file(request):
 async def delete_file(request):
     filename = os.path.basename(request.match_info["filename"])
     filepath = os.path.join(SCAN_FOLDER, filename)
+    logger.info(f"received request for delete {filename}, which is at {filepath}")
 
     if not os.path.isfile(filepath):
         raise web.HTTPNotFound(text="File not found")
@@ -48,6 +49,7 @@ async def delete_file(request):
 # http://homeassistant:8110/pin/{uuid}
 async def pin_scanner_handler(request):
     uuid = request.match_info["uuid"]
+    logger.info(f"received pinning request for {uuid}")
 #    pin_scanner(uuid)
     SCANNERS[uuid].pin_scanner()
     raise web.HTTPFound("/")
@@ -56,6 +58,7 @@ async def pin_scanner_handler(request):
 # http://homeassistant:8110/unpin/{uuid}
 async def unpin_scanner_handler(request):
     uuid = request.match_info["uuid"]
+    logger.info(f"received unpinning request for {uuid}")
 #    unpin_scanner(uuid)
     SCANNERS[uuid].unpin_scanner()
     raise web.HTTPFound("/")
@@ -71,9 +74,9 @@ async def start_http_server():
     app.router.add_get("/delete/{filename}", delete_file)
     logger.info("   ---> added endpoint /delete/{filename}")
     app.router.add_get("/pin/{uuid}", pin_scanner_handler)
-    logger.info("   ---> added endpoint /pin/{filename}")
+    logger.info("   ---> added endpoint /pin/{uuid}")
     app.router.add_get("/unpin/{uuid}", unpin_scanner_handler)
-    logger.info("   ---> added endpoint /unpin/{filename}")
+    logger.info("   ---> added endpoint /unpin/{uuid}")
     
     runner = web.AppRunner(app)
     await runner.setup()
