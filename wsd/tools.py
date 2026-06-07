@@ -38,7 +38,7 @@ import xml.etree.ElementTree as ET
 #from globals import SCANNERS, NAMESPACES, SCAN_FOLDER, SCAN_JOBS, logger
 #from globals import SCANNERS, SCAN_JOBS, SCAN_FOLDER, logger
 import globals
-from globals import SCANNERS, SCAN_JOBS, logger
+from globals import SCANNERS, SCAN_JOBS, STATE, logger
 #from config import SCAN_FOLDER, FROM_UUID
 #from config import FROM_UUID, PINNED_FILE
 from config import FROM_UUID
