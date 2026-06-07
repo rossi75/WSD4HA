@@ -254,7 +254,7 @@ def create_pinned_scanners():
         SCANNERS[uuid] = Scanner(uuid=uuid, ip=ip, xaddr=xaddr)
         SCANNERS[uuid].friendly_name = entry["friendly_name"]
         SCANNERS[uuid].pinned = True
-        SCANNERS[uuid].state = PINNED
+        SCANNERS[uuid].state = STATE.PINNED
         logger.info(f"created pinned scanner: {SCANNERS[uuid]}")
 
 #
