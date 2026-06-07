@@ -14,8 +14,7 @@ import globals
 #from globals import SCANNERS, FROM_UUID, USER_AGENT, LOG_LEVEL, SCAN_FOLDER, STARTUP_DT, logger
 from globals import SCANNERS, FROM_UUID, USER_AGENT, LOG_LEVEL, STARTUP_DT, logger
 #from scanner import Scanner
-from tools import list_scanners, check_port, get_local_ip#, load_pinned_scanners
-from urllib.parse import urlparse
+from tools import list_scanners, check_port, get_local_ip
 
 STARTUP_DT = datetime.datetime.now().replace(microsecond=0)
 
