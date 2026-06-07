@@ -1,10 +1,11 @@
 # Changelog
 
 ## 0.75 - 2026-06-07
-# 07.06.2026: Please do NOT UPDATE to this version unless this comment is gone !
+- added new option to permanently add this scanner to the list. After an application (WSD4HA/Home Assistant) restart, the scanner is being contacted by WSD4HA itself. So the scanner does not need to be rebooted to receive its initial packets
+  First column + means you can add this scanner to the list, - means you can delete this from the list. You can find all permanent added scanners in /share/wsd4ha/pinned_scanners.json
 
 ## 0.74 - 2026-05-29
-- save documents to floppy disk worked only within its container
+- save documents to floppy disk worked only within its container, now in the Hosts filesystem
 - new filepath is /share/wsd4ha/scans, scanned documents persist any restarts now
 - document download button in GUI
 - document delete button in GUI
