@@ -188,6 +188,14 @@ async def state_monitor():
                     scanner.state = STATE.ERROR
                     logger.warning(f"Anything went wrong while parsing the XML-Probe from {scanner.friendly_name} @ {scanner.ip}, response is {str(e)}")
 
+            if scanner.state in STATE.PINNED:
+                logger.info(f"[WSD:state_mon] Fresh loaded from pinning, now probing...")
+                try:
+                    asyncio.create_task(send_probe(uuid))
+                except Exception as e:
+                    scanner.state = STATE.ERROR
+                    logger.warning(f"Anything went wrong while probing {scanner.friendly_name} @ {scanner.ip}, response is {str(e)}")
+
             if scanner.state in STATE.DISCOVERED:
                 logger.info(f"[WSD:state_mon] Fresh discovered, now probing...")
                 try:
