@@ -37,6 +37,7 @@
 | related_uuids                   | UUIDs       |                  |
 | _ScanTicket_Dialect             | String      | [SIMPLE\|DETAIL] |
 | __State__                       |             |                  |
+| pinned                          | Boolean     |                  |
 | first_seen                      | DateTime    |                  |
 | last_seen                       | DateTime    |                  |
 | state                           | switch      |                  |
