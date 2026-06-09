@@ -95,7 +95,7 @@ async def status_page(request):
     for s in SCANNERS.values():
         if s.pinned:
             pin_button = (
-                f"<td style='text-align:center;'>Pinned<br></td>"
+                f"Pinned<br>"
                 f"<button "
                 f"title=\"Unpin Scanner\" "
                 f"onclick=\"window.location.href='/unpin/{s.uuid}'\">"
@@ -104,7 +104,7 @@ async def status_page(request):
             )
         else:
             pin_button = (
-                f"<td style='text-align:center;'>Unpinned<br></td>"
+                f"Unpinned<br>"
                 f"<button "
                 f"title=\"Pin Scanner\" "
                 f"onclick=\"window.location.href='/pin/{s.uuid}'\">"
