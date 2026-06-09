@@ -102,6 +102,8 @@ async def status_page(request):
         logger.info(f"{timestamp}, {size_kb:.1f} kB, {filepath}")
         file_list += (
             f"<tr>"
+#            f"<td>{f.name}</td>"
+            f"<a href="/download/{f.name}">{f.name}</a>"
             f"<td>{f.name}</td>"
             f"<td style='text-align:center;'>{timestamp}</td>"
             f"<td style='text-align:center;'>{size_kb:.1f} kB</td>"
@@ -117,9 +119,11 @@ async def status_page(request):
     scanner_list = ''
     for s in SCANNERS.values():
         if s.pinned:
-            pin_button = f'<a href="/unpin/{s.uuid}">-</a>'
+#            pin_button = f'<a href="/unpin/{s.uuid}">-</a>'
+            pin_button = f'<a href="/unpin/{s.uuid}">unpin</a>'
         else:
-            pin_button = f'<a href="/pin/{s.uuid}">+</a>'
+#            pin_button = f'<a href="/pin/{s.uuid}">+</a>'
+            pin_button = f'<a href="/pin/{s.uuid}">pin</a>'
         scanner_list = "<tr style='color:{color}'>"
         scanner_list += (f"<td style='text-align:center;'>{pin_button}</td>")
         scanner_list += f"<td style='text-align:center;'>{s.friendly_name}</td>"
