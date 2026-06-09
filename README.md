@@ -1,4 +1,7 @@
 # WSD4HA
+
+## PLEASE DO NOT UPDATE OR INSTALL UNLESS THIS TEXT IS READABLE !!
+
 provides a simple WSD protocol for scanning documents into homeassistants file system
 
 Creating a WSD service in Home Assistant for my Samsung C480W.
