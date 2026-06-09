@@ -103,7 +103,7 @@ async def status_page(request):
 #            f"<td>{f.name}</td>"
         file_list += (
             f"<tr>"
-            f"<td><a href="/download/{f.name}">{f.name}</a></td>"
+            f"<td><a href='/download/{f.name}'>{f.name}</a></td>"
             f"<td style='text-align:center;'>{timestamp}</td>"
             f"<td style='text-align:center;'>{size_kb:.1f} kB</td>"
             f"<td style='text-align:center;'>"
