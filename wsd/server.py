@@ -90,39 +90,31 @@ async def start_http_server():
 async def status_page(request):
     logger.info(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} [SERVER:status_page] received request for status page")
 
-    # Dateien
-    files = sorted(SCAN_FOLDER.iterdir(), key=lambda f: f.stat().st_mtime, reverse=True)[:MAX_FILES]
-    file_list = ''
-    logger.info(f"files from {SCAN_FOLDER}:")
-    for f in files:
-        stat = f.stat()
-        timestamp = datetime.datetime.fromtimestamp(stat.st_mtime).strftime("%Y-%m-%d %H:%M:%S")
-        size_kb = stat.st_size / 1024
-        filepath = f"{SCAN_FOLDER}/{f.name}"
-        logger.info(f"{timestamp}, {size_kb:.1f} kB, {filepath}")
-#            f"<td>{f.name}</td>"
-        file_list += (
-            f"<tr>"
-            f"<td><a href='/download/{f.name}'>{f.name}</a></td>"
-            f"<td style='text-align:center;'>{timestamp}</td>"
-            f"<td style='text-align:center;'>{size_kb:.1f} kB</td>"
-            f"<td style='text-align:center;'>"
-            f"<button title=\"Download\"onclick=\"window.location.href='/download/{f.name}'\">⬇</button>"
-            f"&nbsp;"
-            f"<button title=\"Delete\" onclick=\"confirmDelete('{f.name}')\">🗑</button>"
-            f"</td>"
-            f"</tr>"
-        )
-
     # Scanner
     scanner_list = ''
     for s in SCANNERS.values():
         if s.pinned:
-#            pin_button = f'<a href="/unpin/{s.uuid}">-</a>'
-            pin_button = f'<a href="/unpin/{s.uuid}">unpin</a>'
+            pin_button = (
+                f"<button "
+                f"title=\"Unpin Scanner\" "
+                f"onclick=\"window.location.href='/unpin/{s.uuid}'\">"
+                f"📌"
+                f"</button>"
+            )
         else:
+            pin_button = (
+                f"<button "
+                f"title=\"Pin Scanner\" "
+                f"onclick=\"window.location.href='/pin/{s.uuid}'\">"
+                f"📍"
+                f"</button>"
+            )
+#    if s.pinned:
+#            pin_button = f'<a href="/unpin/{s.uuid}">-</a>'
+#            pin_button = f'<a href="/unpin/{s.uuid}">unpin</a>'
+#        else:
 #            pin_button = f'<a href="/pin/{s.uuid}">+</a>'
-            pin_button = f'<a href="/pin/{s.uuid}">pin</a>'
+#            pin_button = f'<a href="/pin/{s.uuid}">pin</a>'
         scanner_list = "<tr style='color:{color}'>"
         scanner_list += (f"<td style='text-align:center;'>{pin_button}</td>")
         scanner_list += f"<td style='text-align:center;'>{s.friendly_name}</td>"
@@ -159,6 +151,30 @@ async def status_page(request):
         job_list += f"<td style='text-align:center;'>{j.job_created.strftime('%Y-%m-%d %H:%M:%S')}<br>"
         job_list += f"{j.remove_after.strftime('%Y-%m-%d %H:%M:%S')}</td>"
         job_list += "</tr>"
+
+    # Dateien
+    files = sorted(SCAN_FOLDER.iterdir(), key=lambda f: f.stat().st_mtime, reverse=True)[:MAX_FILES]
+    file_list = ''
+    logger.info(f"files from {SCAN_FOLDER}:")
+    for f in files:
+        stat = f.stat()
+        timestamp = datetime.datetime.fromtimestamp(stat.st_mtime).strftime("%Y-%m-%d %H:%M:%S")
+        size_kb = stat.st_size / 1024
+        filepath = f"{SCAN_FOLDER}/{f.name}"
+        logger.info(f"{timestamp}, {size_kb:.1f} kB, {filepath}")
+#            f"<td>{f.name}</td>"
+        file_list += (
+            f"<tr>"
+            f"<td><a href='/download/{f.name}'>{f.name}</a></td>"
+            f"<td style='text-align:center;'>{timestamp}</td>"
+            f"<td style='text-align:center;'>{size_kb:.1f} kB</td>"
+            f"<td style='text-align:center;'>"
+            f"<button title=\"Download\"onclick=\"window.location.href='/download/{f.name}'\">⬇</button>"
+            f"&nbsp;"
+            f"<button title=\"Delete\" onclick=\"confirmDelete('{f.name}')\">🗑</button>"
+            f"</td>"
+            f"</tr>"
+        )
 
     logger.debug(f"   ---> probably delivering http-response")
     return web.Response(text=f"""
