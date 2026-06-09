@@ -100,11 +100,10 @@ async def status_page(request):
         size_kb = stat.st_size / 1024
         filepath = f"{SCAN_FOLDER}/{f.name}"
         logger.info(f"{timestamp}, {size_kb:.1f} kB, {filepath}")
+#            f"<td>{f.name}</td>"
         file_list += (
             f"<tr>"
-#            f"<td>{f.name}</td>"
-            f"<a href="/download/{f.name}">{f.name}</a>"
-            f"<td>{f.name}</td>"
+            f"<td><a href="/download/{f.name}">{f.name}</a></td>"
             f"<td style='text-align:center;'>{timestamp}</td>"
             f"<td style='text-align:center;'>{size_kb:.1f} kB</td>"
             f"<td style='text-align:center;'>"
