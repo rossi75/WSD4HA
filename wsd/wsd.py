@@ -236,23 +236,43 @@ async def state_monitor():
             for job_id in expired_jobs:
                 del SCAN_JOBS[job_id]
 
-        # bei allen Zuständen außer [...] die kurze Pause
-        if any (scanner.state not in {STATE.ONLINE,
-                                      STATE.ABSENT,
-#                                      STATE.SCAN_PENDING,
-#                                      STATE.SCAN_REQ_TICKET,
-#                                      STATE.SCAN_RETRIEVING,
-#                                      STATE.SCAN_DONE,
-#                                      STATE.SCAN_FAILED,
-                                      STATE.TO_REMOVE,
-                                      STATE.ERROR}
-                for scanner in SCANNERS.values()):
-            logger.debug(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} [WSD:sleep] short nap")
+        active_states = {
+            STATE.ONLINE,
+            STATE.ABSENT,
+            STATE.TO_REMOVE,
+#            STATE.ERROR,
+            STATE.PINNED
+        }
+        if any(scanner.state not in active_states
+               for scanner in SCANNERS.values()):                                        # Es läuft gerade etwas → schnell pollen
+            logger.debug(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} [WSD:sleep] short nap because something is happening")
             await asyncio.sleep(1)
-        # sonst die lange Pause
-        else:
+        elif any(scanner.state == STATE.PINNED
+                 for scanner in SCANNERS.values()):                                      # Nur angepinnte Scanner überwachen
+            logger.debug(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} [WSD:sleep] waiting for pinned Scanners")
+            await asyncio.sleep(20)
+        else:                                                                            # Keine aktiven Scanner
             logger.debug(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} [WSD:sleep] goodbye")
-            await asyncio.sleep(OFFLINE_TIMEOUT / 7) # damit wir iwie auf nen krummen Wert kommen
+            await asyncio.sleep(OFFLINE_TIMEOUT / 7)
+
+
+        # bei allen Zuständen außer [...] die kurze Pause
+#        if any (scanner.state not in {STATE.ONLINE,
+#                                      STATE.ABSENT,
+##                                      STATE.SCAN_PENDING,
+##                                      STATE.SCAN_REQ_TICKET,
+##                                      STATE.SCAN_RETRIEVING,
+##                                      STATE.SCAN_DONE,
+##                                      STATE.SCAN_FAILED,
+#                                      STATE.TO_REMOVE,
+#                                      STATE.ERROR}
+#                for scanner in SCANNERS.values()):
+#            logger.debug(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} [WSD:sleep] short nap")
+#            await asyncio.sleep(1)
+#        # sonst die lange Pause
+#        else:
+#            logger.debug(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} [WSD:sleep] goodbye")
+#            await asyncio.sleep(OFFLINE_TIMEOUT / 7) # damit wir iwie auf nen krummen Wert kommen
 
         logger.debug(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} [WSD:sleep] back in town")
 
