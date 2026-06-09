@@ -95,6 +95,7 @@ async def status_page(request):
     for s in SCANNERS.values():
         if s.pinned:
             pin_button = (
+                f"<td style='text-align:center;'>Pinned<br></td>"
                 f"<button "
                 f"title=\"Unpin Scanner\" "
                 f"onclick=\"window.location.href='/unpin/{s.uuid}'\">"
@@ -103,6 +104,7 @@ async def status_page(request):
             )
         else:
             pin_button = (
+                f"<td style='text-align:center;'>Unpinned<br></td>"
                 f"<button "
                 f"title=\"Pin Scanner\" "
                 f"onclick=\"window.location.href='/pin/{s.uuid}'\">"
@@ -199,7 +201,7 @@ async def status_page(request):
             <h1>WSD4HA seems to be running</h1>
             <h2>Active Scanners:</h2>
             <table>
-                <tr><th>Action</th><th>Name</th><th>IP<br>[MAC]</th><th>State<br>Last Subscr</th><th>First seen<br>Last seen<br>[Remove after]</th><th>UUID<br>XADDR</th><th>Subscr ID<br>Subscr EndToAddr<br>Destination Token</th><th>Manufacturer<br>Model</th><th>Firmware<br>Serial</th></tr>
+                <tr><th>Pin</th><th>Name</th><th>IP<br>[MAC]</th><th>State<br>Last Subscr</th><th>First seen<br>Last seen<br>[Remove after]</th><th>UUID<br>XADDR</th><th>Subscr ID<br>Subscr EndToAddr<br>Destination Token</th><th>Manufacturer<br>Model</th><th>Firmware<br>Serial</th></tr>
                 {scanner_list}
             </table>
             <h2>List of Scans:</h2>
