@@ -237,7 +237,7 @@ def load_pinned_scanners():
     try:
         with open(PINNED_FILE, "r", encoding="utf-8") as f:
             data = json.load(f)
-        logger.error(f"Found any pinned scanners in {PINNED_FILE}")
+        logger.debug(f"Found any pinned scanners in {PINNED_FILE}")
         return data.get("scanners", [])
     except Exception as e:
         logger.error(f"Could not load pinned scanners: {e}")
