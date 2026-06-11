@@ -256,7 +256,6 @@ def create_pinned_scanners():
         SCANNERS[uuid].friendly_name = entry["friendly_name"]
         SCANNERS[uuid].pinned = True
         SCANNERS[uuid].state = STATE.PINNED
-        logger.info(f"created pinned scanner: {SCANNERS[uuid]}")
 
 #
 #
