@@ -1,5 +1,8 @@
 # Changelog
 
+## 0.77 - 2026-06-11
+PLEASE DO NOT INSTALL THIS VERSION UNLESS YOU SEE THIS MESSAGE
+
 ## 0.76 - 2026-06-09
 - improved Pin/Unpin Action
 - direct download from filename
