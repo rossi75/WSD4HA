@@ -1,7 +1,9 @@
 # Changelog
 
 ## 0.77 - 2026-06-11
-PLEASE DO NOT INSTALL THIS VERSION UNLESS YOU SEE THIS MESSAGE
+- fixed issue if you have multiple scanners, only the last one was shown
+- fixed issue #1 where the service stops randomly
+- changed output for known scanners, added pinned-state
 
 ## 0.76 - 2026-06-09
 - improved Pin/Unpin Action
