@@ -111,13 +111,8 @@ async def status_page(request):
                 f"📍"
                 f"</button>"
             )
-#    if s.pinned:
-#            pin_button = f'<a href="/unpin/{s.uuid}">-</a>'
-#            pin_button = f'<a href="/unpin/{s.uuid}">unpin</a>'
-#        else:
-#            pin_button = f'<a href="/pin/{s.uuid}">+</a>'
-#            pin_button = f'<a href="/pin/{s.uuid}">pin</a>'
-        scanner_list = "<tr style='color:{color}'>"
+#        scanner_list = "<tr style='color:{color}'>"
+        scanner_list += "<tr>"
         scanner_list += (f"<td style='text-align:center;'>{pin_button}</td>")
         scanner_list += f"<td style='text-align:center;'>{s.friendly_name}</td>"
         scanner_list += f"<td style='text-align:center;'>{s.ip}<br>{s.mac if s.mac else ''}</td>"
