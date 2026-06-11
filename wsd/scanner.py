@@ -1,7 +1,7 @@
 import datetime
 import os
 import json
-#from config import OFFLINE_TIMEOUT
+from config import OFFLINE_TIMEOUT
 from datetime import timedelta
 from globals import SCANNERS, NAMESPACES, STATE, logger
 from tools import list_scanners, marry_endpoints, load_pinned_scanners
