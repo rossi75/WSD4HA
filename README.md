@@ -8,6 +8,10 @@ So any documents can always be scanned to the anyways and always running server.
 If WSD4HA (or HomeAssistant) is being restarted, it looses its knowledge about any available scanners that are online. This is due to the fact that the (my!) scanner (C480W) sends out its discovery message only once (technically twice) directly after booting. With version 0.75 I introduced a pinned_scanners.json, which will be read at startup. Any scanner added to this list will be contacted after restart.
 WSD4HA only supports IPv4
 
+## Tested/confirmed scanners
+- Samsung C480W
+- Samsung C460FW
+
 ## Where is YOUR scanner?
 If you want to get added a specific MFD, leave me a wireshark from your windows (!) 7/8/10/11. It may be filtered for your scanners IP and must contain
 - the scanners booting process (for registration)
