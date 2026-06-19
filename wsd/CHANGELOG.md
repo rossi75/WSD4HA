@@ -1,5 +1,8 @@
 # Changelog
 
+## 0.78 - 2026-06-19
+- added rename button in UI
+
 ## 0.77 - 2026-06-11
 - fixed issue if you have multiple scanners, only the last one was shown
 - fixed issue #1 where the service stops randomly
