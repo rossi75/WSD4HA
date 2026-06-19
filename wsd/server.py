@@ -68,8 +68,8 @@ async def rename_file(request):
     oldname = os.path.basename(request.match_info["oldname"])
     newname = os.path.basename(request.match_info["newname"])
     logger.info(f"received renaming request for {oldname} to {newname}")
-    oldpath = os.path.join(globals.SCAN_FOLDER, oldname)
-    newpath = os.path.join(globals.SCAN_FOLDER, newname)
+    oldpath = os.path.join(SCAN_FOLDER, oldname)
+    newpath = os.path.join(SCAN_FOLDER, newname)
     if not os.path.isfile(oldpath):
         raise web.HTTPNotFound(text=f"could not find old file: {oldpath}")
     if os.path.exists(newpath):
