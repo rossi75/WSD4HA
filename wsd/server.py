@@ -62,6 +62,21 @@ async def unpin_scanner_handler(request):
     await asyncio.sleep(2)
     raise web.HTTPFound("/")
 
+# ---------------- rename a File ----------------
+# http://homeassistant:8110/old_filename/new_filename
+async def rename_file(request):
+    oldname = os.path.basename(request.match_info["oldname"])
+    newname = os.path.basename(request.match_info["newname"])
+    logger.info(f"received renaming request for {oldname} to {newname}")
+    oldpath = os.path.join(globals.SCAN_FOLDER, oldname)
+    newpath = os.path.join(globals.SCAN_FOLDER, newname)
+    if not os.path.isfile(oldpath):
+        raise web.HTTPNotFound(text=f"could not find old file: {oldpath}")
+    if os.path.exists(newpath):
+        raise web.HTTPConflict(text=f"new file {newfile} already exists")
+    os.rename(oldpath, newpath)
+    raise web.HTTPFound("/")
+
 # ---------------- HTTP Server ----------------
 async def start_http_server():
     logger.info(f"[SERVER:start_http] configuring HTTP Server for UI on Port {HTTP_PORT}")
@@ -76,7 +91,7 @@ async def start_http_server():
     logger.info("   ---> added endpoint /pin/{uuid}")
     app.router.add_get("/unpin/{uuid}", unpin_scanner_handler)
     logger.info("   ---> added endpoint /unpin/{uuid}")
-    
+    app.router.add_get("/rename/{oldname}/{newname}", rename_file)
     runner = web.AppRunner(app)
     await runner.setup()
     logger.debug(f"   ---> runner.setup().web.AppRunner(app)")
@@ -111,7 +126,6 @@ async def status_page(request):
                 f"📍"
                 f"</button>"
             )
-#        scanner_list = "<tr style='color:{color}'>"
         scanner_list += "<tr>"
         scanner_list += (f"<td style='text-align:center;'>{pin_button}</td>")
         scanner_list += f"<td style='text-align:center;'>{s.friendly_name}</td>"
@@ -159,7 +173,6 @@ async def status_page(request):
         size_kb = stat.st_size / 1024
         filepath = f"{SCAN_FOLDER}/{f.name}"
         logger.info(f"{timestamp}, {size_kb:.1f} kB, {filepath}")
-#            f"<td>{f.name}</td>"
         file_list += (
             f"<tr>"
             f"<td><a href='/download/{f.name}'>{f.name}</a></td>"
@@ -167,6 +180,8 @@ async def status_page(request):
             f"<td style='text-align:center;'>{size_kb:.1f} kB</td>"
             f"<td style='text-align:center;'>"
             f"<button title=\"Download\"onclick=\"window.location.href='/download/{f.name}'\">⬇</button>"
+            f"&nbsp;"
+            f"<button title=\"Rename\" onclick=\"renameFile('{f.name}')\">✏️</button>"
             f"&nbsp;"
             f"<button title=\"Delete\" onclick=\"confirmDelete('{f.name}')\">🗑</button>"
             f"</td>"
@@ -189,6 +204,15 @@ async def status_page(request):
                 if (confirm("Delete file '" + filename + "' ?")) {{
                     window.location.href = "/delete/" + filename;
                 }}
+            }}
+
+            function renameFile(filename) {{
+                let newname = prompt("New filename:", filename);
+                if (newname === null)
+                    return;
+                if (newname.trim() === "")
+                    return;
+                window.location.href = "/rename/" + encodeURIComponent(filename) + "/" + encodeURIComponent(newname);
             }}
             </script>
         </head>
