@@ -14,7 +14,7 @@
 - if scanner is pinned, probing every 20 seconds instead of every single second
 
 ## 0.75 - 2026-06-07
-- added new option to permanently add this scanner to the list. After an application (WSD4HA/Home Assistant) restart, the scanner is being contacted by WSD4HA itself. So the scanner does not need to be rebooted to receive its initial packets
+- added new option to permanently add this scanner to the list. After an application (WSD4HA/Home Assistant) restart, the scanner is being contacted by WSD4HA itself. So the scanner does not need to be rebooted to receive its initial packets  
   First column + means you can add this scanner to the list, - means you can delete this from the list. You can find all permanent added scanners in /share/wsd4ha/pinned_scanners.json
 
 ## 0.74 - 2026-05-29
