@@ -73,7 +73,7 @@ async def rename_file(request):
     if not os.path.isfile(oldpath):
         raise web.HTTPNotFound(text=f"could not find old file: {oldpath}")
     if os.path.exists(newpath):
-        raise web.HTTPConflict(text=f"new file {newfile} already exists")
+        raise web.HTTPConflict(text=f"new file {newpath} already exists")
     os.rename(oldpath, newpath)
     raise web.HTTPFound("/")
 
