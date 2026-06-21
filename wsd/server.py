@@ -68,6 +68,9 @@ async def rename_file(request):
     oldname = os.path.basename(request.match_info["oldname"])
     newname = os.path.basename(request.match_info["newname"])
     logger.info(f"received renaming request for {oldname} to {newname}")
+    if "/" in newname or "\\" in newname:
+        logger.info("declined renaming request due to invalid characters in filename")
+        raise web.HTTPBadRequest(text="Invalid filename")
     oldpath = os.path.join(SCAN_FOLDER, oldname)
     newpath = os.path.join(SCAN_FOLDER, newname)
     if not os.path.isfile(oldpath):
