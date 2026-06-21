@@ -95,6 +95,7 @@ async def start_http_server():
     app.router.add_get("/unpin/{uuid}", unpin_scanner_handler)
     logger.info("   ---> added endpoint /unpin/{uuid}")
     app.router.add_get("/rename/{oldname}/{newname}", rename_file)
+    logger.info("   ---> added endpoint /rename/{oldname}/{newname}")
     runner = web.AppRunner(app)
     await runner.setup()
     logger.debug(f"   ---> runner.setup().web.AppRunner(app)")
