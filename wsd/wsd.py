@@ -145,7 +145,7 @@ async def state_monitor():
                         asyncio.create_task(send_subscription_renew(uuid))                # update_subscription() später im parser
                     except Exception as e:
                         scanner.state = STATE.ABSENT
-                        logger.warning(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} Could not reach scanner {scanner.friendly_name} @ {scanner.ip}. Last seen at {scanner.subscription_last_seen}. Response is {str(e)}")
+                        logger.warning(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} Could not reach scanner {scanner.friendly_name} @ {scanner.ip}. Last subscription at {scanner.subscription_last_seen}. Response is {str(e)}")
 
                 # Halbzeit-Check for subscription
                 elif subscr_age >= (SCANNERS[uuid].subscription_timeout / 2):
@@ -154,7 +154,7 @@ async def state_monitor():
                     try:
                         asyncio.create_task(send_subscription_renew(uuid))                # update_subscription() später im parser
                     except Exception as e:
-                        logger.warning(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} Could not reach scanner {scanner.friendly_name} @ {scanner.ip}. Last seen at {scanner.subscription_last_seen}. Response is {str(e)}")
+                        logger.warning(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} Could not reach scanner {scanner.friendly_name} @ {scanner.ip}. Last subscription at {scanner.subscription_last_seen}. Response is {str(e)}")
 
                 # 3/4-Check Online
                 elif age >= (OFFLINE_TIMEOUT * 0.75):
@@ -212,6 +212,7 @@ async def state_monitor():
             # Nach Ablauf von Timeout+Offline → entfernen
             if status == "absent" and scanner.remove_after is not None and now >= scanner.remove_after and scanner.pinned is False:
                 logger.info(f"[WSD:Heartbeat] --> Marking {scanner.friendly_name} @ {scanner.ip} to remove")
+                logger.info(f"[WSD:Heartbeat] Status={status}, RemoveAfter={scanner.remove_after}, now={now}, Pinned={scanner.pinned}")
                 to_remove.append(scanner)
 
             logger.info(f"    =====> state: {SCANNERS[uuid].state.value}")
