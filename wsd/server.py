@@ -65,27 +65,31 @@ async def unpin_scanner_handler(request):
 # ---------------- rename a File ----------------
 # http://homeassistant:8110/old_filename/new_filename
 async def rename_file(request):
-    oldname = os.path.basename(request.match_info["oldname"])
-    newname = os.path.basename(request.match_info["newname"])
-    logger.info(f"[SERVER:rename] received renaming request for {oldname} to {newname}")
+    old_name = os.path.basename(request.match_info["oldname"])
+    new_name = os.path.basename(request.match_info["newname"])
+    logger.info(f"[SERVER:rename] received renaming request for {old_name} to {new_name}")
 
 #    _, old_ext = os.path.splitext(oldname)
 #    _, new_ext = os.path.splitext(newname)
-    old_ext = os.path.splitext(oldname)
-    new_ext = os.path.splitext(newname)
+    old_ext = os.path.splitext(old_name)
+    new_ext = os.path.splitext(new_name)
+    logger.info(f"old-ext={old_ext}, new-ext={new_ext}")
     if new_ext == "":                   # Falls keine neue Endung angegeben wurde,
-        newname += old_ext              # die alte übernehmen.
+        new_name += old_ext              # die alte übernehmen.
 
-    if "/" in newname or "\\" in newname:
+    if "/" in new_name or "\\" in new_name:
         logger.info("declined renaming request due to invalid characters in filename")
         raise web.HTTPBadRequest(text="Invalid filename")
 
-    oldpath = os.path.join(SCAN_FOLDER, oldname)
-    newpath = os.path.join(SCAN_FOLDER, newname)
-    if not os.path.isfile(oldpath):
-        raise web.HTTPNotFound(text=f"could not find old file: {oldpath}")
-    if os.path.exists(newpath):
-        raise web.HTTPConflict(text=f"new file {newpath} already exists")
+    old_path = os.path.join(SCAN_FOLDER, old_name)
+    new_path = os.path.join(SCAN_FOLDER, new_name)
+    logger.info(f"old-path={old_path}, new-path={new_path}")
+    if not os.path.isfile(old_path):
+        logger.info(f"could not find old-path {old_path}")
+        raise web.HTTPNotFound(text=f"could not find old file {old_path}, cannot proceed")
+    if os.path.exists(new_path):
+        logger.info(f"new-path {new_path} still exists, cannot change name")
+        raise web.HTTPConflict(text=f"new file {new_path} already exists")
 
     try:
         os.rename(oldpath, newpath)
