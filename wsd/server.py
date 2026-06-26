@@ -69,10 +69,10 @@ async def rename_file(request):
     new_name = os.path.basename(request.match_info["newname"])
     logger.info(f"[SERVER:rename] received renaming request for {old_name} to {new_name}")
 
-#    _, old_ext = os.path.splitext(oldname)
-#    _, new_ext = os.path.splitext(newname)
-    old_ext = os.path.splitext(old_name)
-    new_ext = os.path.splitext(new_name)
+    _, old_ext = os.path.splitext(old_name)
+    _, new_ext = os.path.splitext(new_name)
+#    old_ext = os.path.splitext(old_name)
+#    new_ext = os.path.splitext(new_name)
     logger.info(f"old-ext={old_ext}, new-ext={new_ext}")
     if new_ext == "":                   # Falls keine neue Endung angegeben wurde,
         new_name += old_ext              # die alte übernehmen.
