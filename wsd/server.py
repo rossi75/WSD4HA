@@ -92,7 +92,7 @@ async def rename_file(request):
         raise web.HTTPConflict(text=f"new file {new_path} already exists")
 
     try:
-        os.rename(oldpath, newpath)
+        os.rename(old_path, new_path)
     except Exception as e:
         raise web.HTTPInternalServerError(text=str(e))
     raise web.HTTPFound("/")
