@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.79 - 2026-06-25
+- fixed a bug where a pinned scanner was removed from the UIs list (and internally also), after a pinned scanner was switched off
+- changed page renew delay from 2 seconds to 1 second after un-/pinning
+- improved texts for subscription check
+- name change adopts file extension if not given
+
 ## 0.78 - 2026-06-19
 - added rename button in UI
 
