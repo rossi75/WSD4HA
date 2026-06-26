@@ -54,7 +54,7 @@ def get_local_ip():
         s.close()
         return ip
     except Exception:
-        logger.warning(f"[CONFIG] Could not obtain Host IP: {e}")
+        logger.warning(f"[TOOLS:local_ip] Could not obtain Host IP: {e}")
         return "undefined"
 
 
@@ -100,7 +100,7 @@ def pick_best_xaddr(xaddrs: str) -> str:
 # -----------------  Nach jedem Update: Liste loggen  -----------------
 def list_scanners():
     if SCANNERS:
-        logger.info("   ------>   known Scanners   <------")
+        logger.info("[TOOLS:list]   ------>   known Scanners   <------")
         for i, s in enumerate(SCANNERS.values(), start=1):
             logger.info(f"   [{i}] {s.friendly_name or s.uuid} @ {s.ip}, Pinned = {s.pinned}, State = {s.state.value}")
             logger.debug(f"       --->  XADDR={s.xaddr}, first_seen={s.last_seen}, last_seen={s.first_seen}")
@@ -109,7 +109,7 @@ def list_scanners():
 #            logger.debug(f"       ---> first_seen: {s.last_seen}")
 #            logger.debug(f"       --->  last_seen: {s.first_seen}")
     else:
-        logger.info("no known Scanners in list")  
+        logger.info("[TOOLS:list] no known Scanners in list")  
 
 
 #    Wandelt W3C/ISO8601 Duration (z.B. 'PT1H30M') in Sekunden um.
@@ -136,8 +136,7 @@ def calc_w3c_duration(duration: str) -> int:
     
     seconds = int(d['days']) * 86400 + int(d['hours']) * 3600 + int(d['minutes']) * 60 + int(d['seconds'])
     
-    logger.debug(f"   ---> d: {d}")
-    logger.debug(f"   ---> seconds: {seconds}")
+    logger.debug(f"[TOOLS:w3c]   ---> d={d}, seconds={seconds}")
 
     return seconds
 
@@ -237,10 +236,10 @@ def load_pinned_scanners():
     try:
         with open(PINNED_FILE, "r", encoding="utf-8") as f:
             data = json.load(f)
-        logger.debug(f"Found any pinned scanners in {PINNED_FILE}")
+        logger.debug(f"[TOOLS:load_scanners] Found any pinned scanners in {PINNED_FILE}")
         return data.get("scanners", [])
     except Exception as e:
-        logger.error(f"Could not load pinned scanners: {e}")
+        logger.error(f"[TOOLS:load_scanners] Could not load pinned scanners: {e}")
         return []
 
 
@@ -248,7 +247,7 @@ def load_pinned_scanners():
 def create_pinned_scanners():
     from scanner import Scanner
     for entry in load_pinned_scanners():
-        logger.info(f"creating pinned scanner: {entry}")
+        logger.info(f"[TOOLS:create_pinned] creating pinned scanner: {entry}")
         uuid = entry["uuid"]
         xaddr = entry["xaddr"]
         ip = urlparse(xaddr).hostname
