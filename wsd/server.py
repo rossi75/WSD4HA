@@ -76,6 +76,7 @@ async def rename_file(request):
     logger.info(f"old-ext={old_ext}, new-ext={new_ext}")
     if new_ext == "":                   # Falls keine neue Endung angegeben wurde,
         new_name += old_ext              # die alte übernehmen.
+        logger.info(f"missing file extension for new filename, added old extension: new-name={new_name}")
 
     if "/" in new_name or "\\" in new_name:
         logger.info("declined renaming request due to invalid characters in filename")
