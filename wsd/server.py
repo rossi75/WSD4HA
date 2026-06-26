@@ -21,7 +21,7 @@ from scan_job import run_scan_job
 async def download_file(request):
     filename = os.path.basename(request.match_info["filename"])
     filepath = os.path.join(SCAN_FOLDER, filename)
-    logger.info(f"received download request for {filename}, which is at {filepath}")
+    logger.info(f"[SERVER:download] received download request for {filename}, which is at {filepath}")
 
     if not os.path.isfile(filepath):
         raise web.HTTPNotFound(text="File not found")
@@ -34,7 +34,7 @@ async def download_file(request):
 async def delete_file(request):
     filename = os.path.basename(request.match_info["filename"])
     filepath = os.path.join(SCAN_FOLDER, filename)
-    logger.info(f"received request for delete {filename}, which is at {filepath}")
+    logger.info(f"[SERVER:del] received request for delete {filename}, which is at {filepath}")
 
     if not os.path.isfile(filepath):
         raise web.HTTPNotFound(text="File not found")
@@ -49,7 +49,7 @@ async def delete_file(request):
 # http://homeassistant:8110/pin/{uuid}
 async def pin_scanner_handler(request):
     uuid = request.match_info["uuid"]
-    logger.info(f"received pinning request for {uuid}")
+    logger.info(f"[SERVER:pin] received pinning request for {uuid}")
     SCANNERS[uuid].pin_scanner()
     raise web.HTTPFound("/")
 
@@ -57,7 +57,7 @@ async def pin_scanner_handler(request):
 # http://homeassistant:8110/unpin/{uuid}
 async def unpin_scanner_handler(request):
     uuid = request.match_info["uuid"]
-    logger.info(f"received unpinning request for {uuid}")
+    logger.info(f"[SERVER:unpin] received unpinning request for {uuid}")
     SCANNERS[uuid].unpin_scanner()
     await asyncio.sleep(2)
     raise web.HTTPFound("/")
@@ -67,17 +67,30 @@ async def unpin_scanner_handler(request):
 async def rename_file(request):
     oldname = os.path.basename(request.match_info["oldname"])
     newname = os.path.basename(request.match_info["newname"])
-    logger.info(f"received renaming request for {oldname} to {newname}")
+    logger.info(f"[SERVER:rename] received renaming request for {oldname} to {newname}")
+
+#    _, old_ext = os.path.splitext(oldname)
+#    _, new_ext = os.path.splitext(newname)
+    old_ext = os.path.splitext(oldname)
+    new_ext = os.path.splitext(newname)
+    if new_ext == "":                   # Falls keine neue Endung angegeben wurde,
+        newname += old_ext              # die alte übernehmen.
+
     if "/" in newname or "\\" in newname:
         logger.info("declined renaming request due to invalid characters in filename")
         raise web.HTTPBadRequest(text="Invalid filename")
+
     oldpath = os.path.join(SCAN_FOLDER, oldname)
     newpath = os.path.join(SCAN_FOLDER, newname)
     if not os.path.isfile(oldpath):
         raise web.HTTPNotFound(text=f"could not find old file: {oldpath}")
     if os.path.exists(newpath):
         raise web.HTTPConflict(text=f"new file {newpath} already exists")
-    os.rename(oldpath, newpath)
+
+    try:
+        os.rename(oldpath, newpath)
+    except Exception as e:
+        raise web.HTTPInternalServerError(text=str(e))
     raise web.HTTPFound("/")
 
 # ---------------- HTTP Server ----------------
