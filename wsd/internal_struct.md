@@ -49,6 +49,8 @@
 | update()              | from self. | update last-seen timestamp    |
 | update_subscription() | from self. | update subscription timestamp |
 | mark_as_offline()     | from self. | remove from list              |
+| pin_scanner()         | from self. | pin scanner to list           |
+| unpin_scanner()       | from self. | unpin scanner from list       |
 
 
 ## __SCAN_JOBS[scanjob_identifier].__
