@@ -73,10 +73,30 @@ async def discovery_processor(data, addr):
             SCANNERS[uuid] = Scanner(uuid=uuid, ip=ip, xaddr=xaddr)
             logger.info(f"[WSD:HELLO] New Scanner: {SCANNERS[uuid].uuid} ({ip})")
         else:
-            if SCANNERS[uuid].state.value == "online":
-                SCANNERS[uuid].update()
-            logger.info(f"[WSD:HELLO] known Scanner seen again: {SCANNERS[uuid].friendly_name} ({ip})")
+#            if SCANNERS[uuid].state.value == "online":
+#                SCANNERS[uuid].update()
+#            logger.info(f"[WSD:HELLO] known Scanner seen again: {SCANNERS[uuid].friendly_name} ({ip})")
 
+
+            # Bereits vorhandenen Scanner aktualisieren
+            s = SCANNERS[uuid]
+    
+            s.ip = ip
+            s.xaddr = xaddr
+            s.last_seen = datetime.datetime.now()
+    
+            # Falls der Scanner nur aus der Persistenz geladen wurde
+            if s.state == STATE.PINNED:
+                logger.info(f"[WSD:HELLO] Pinned scanner '{s.friendly_name}' is now online.")
+                s.state = STATE.ONLINE
+    
+            else:
+                s.update()
+    
+            logger.info(f"[WSD:HELLO] Known scanner seen again: {s.friendly_name} ({ip})")
+
+
+        
         list_scanners()
 
     elif action_text == "Bye":
