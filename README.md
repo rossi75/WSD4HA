@@ -25,6 +25,10 @@ Sadly, all options that can be seen in the configurations dialog, are non-functi
 Go to Settings/Apps, click on "Install App", you will see the App Store. In the three dots menu (upper right) choose "Repositories". Hence you click on "Add" once again and enter "https://github.com/rossi75/WSD4HA".
 Go back to the App Store and search for "WSD4HA". Open it and you will see an "Install" button which you may click.
 
+## Issue with parallel SAMBA App
+If you have installed the SAMBA App parallel to WSD4HA, there will be some issue. Since version 12.7.0 there is a WSDD service for Windows that shows up the HA instance as a network drive. This WSDD service occupies the WSD port 5357, which this App will also use.
+Already pinned Scanners will work fine, new scanners will only be detected if at their boot-up the Samba App was not running. I will implement a red/green light for the services in the next days.
+
 ## open topics / todo
 - make manual configuration functional
 - implement simple variant of ValidateScanTicket
