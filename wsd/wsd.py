@@ -9,7 +9,7 @@ import threading
 import uuid
 import xml.etree.ElementTree as ET
 from config import OFFLINE_TIMEOUT, FROM_UUID
-from globals import SCANNERS, SCAN_JOBS, NAMESPACES, STATE, logger
+from globals import LISTENING_UDP_3702_WSD, SCANNERS, SCAN_JOBS, NAMESPACES, STATE, logger
 from pathlib import Path
 from scanner import Scanner
 from send import send_probe, send_transfer_get, send_subscription_ScanAvailableEvent, send_subscription_renew
@@ -121,13 +121,19 @@ async def UDP_listener_3702():
     MCAST_GRP = "239.255.255.250"
     MCAST_PORT = 3702
 
-    sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM, socket.IPPROTO_UDP)
-    sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
-    sock.bind(("", MCAST_PORT))
-    mreq = socket.inet_aton(MCAST_GRP) + socket.inet_aton("0.0.0.0")
-    sock.setsockopt(socket.IPPROTO_IP, socket.IP_ADD_MEMBERSHIP, mreq)
-    sock.setblocking(False)   # WICHTIG für asyncio!
-    logger.info("WSD-Listener running on Port 3702/UDP")
+    try:
+        sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM, socket.IPPROTO_UDP)
+        sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+        sock.bind(("", MCAST_PORT))
+        mreq = socket.inet_aton(MCAST_GRP) + socket.inet_aton("0.0.0.0")
+        sock.setsockopt(socket.IPPROTO_IP, socket.IP_ADD_MEMBERSHIP, mreq)
+        sock.setblocking(False)   # WICHTIG für asyncio!
+        logger.info("WSD-Listener running on Port 3702/UDP")
+        globals.LISTENING_UDP_3702_WSD = True
+    except Exception as e:
+        globals.LISTENING_UDP_3702_WSD = False
+        logger.warning(f"Could not bind UDP/3702: {e}")
+        return
 
     # Daten abholen
     loop = asyncio.get_running_loop()
