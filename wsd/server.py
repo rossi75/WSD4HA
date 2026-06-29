@@ -210,17 +210,17 @@ async def status_page(request):
             f"</tr>"
         )
 
-    status_udp_3704_wsd = (
+    statuscolor_udp_3704_wsd = (
         "limegreen"
-        if globals.LISTENING_UDP_3702_WSD
+        if LISTENING_UDP_3702_WSD
         else "lightgray"
     )
-    status_tcp_5357_notify = (
+    statuscolor_tcp_5357_notify = (
         "limegreen"
-        if globals.LISTENING_TCP_5357_NOTIFY
+        if LISTENING_TCP_5357_NOTIFY
         else "lightgray"
     )
-    logger.info(f"udp_3702_wsd={globals.LISTENING_UDP_3702_WSD}, tcp_5357_notify={globals.LISTENING_TCP_5357_NOTIFY}")
+    logger.info(f"udp_3702_wsd={LISTENING_UDP_3702_WSD}, tcp_5357_notify={LISTENING_TCP_5357_NOTIFY}")
 
     
     logger.debug(f"   ---> probably delivering http-response")
@@ -255,9 +255,9 @@ async def status_page(request):
             <h1>WSD4HA seems to be running</h1>
             <span 
                 title="Listening on UDP/3702"
-                style="display:inline-block; width:14px; height:14px; border:1px solid black; border-radius:50%; background:{status_udp_3704_wsd};">
+                style="display:inline-block; width:14px; height:14px; border:1px solid black; border-radius:50%; background:{statuscolor_udp_3704_wsd};">
                 title="Listening on TCP/5357"
-                style="display:inline-block; width:14px; height:14px; border:1px solid black; border-radius:50%; background:{status_tcp_5357_notify};">
+                style="display:inline-block; width:14px; height:14px; border:1px solid black; border-radius:50%; background:{statuscolor_tcp_5357_notify};">
             </span>
             <h2>Active Scanners:</h2>
             <table>
