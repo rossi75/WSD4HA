@@ -102,8 +102,11 @@ async def discovery_processor(data, addr):
     elif action_text == "Bye":
         logger.info(f"[WSD:BYE] Bye for uuid: {uuid}")
         if uuid in SCANNERS:
-            logger.warning(f"[WSD:BYE] Scanner offline: {SCANNERS[uuid].friendly_name} ({ip})")
-            del SCANNERS[uuid]
+            if SCANNERS[uuid].pinned is True:
+                logger.info(f"[WSD:BYE] Scanner has gone, but needs to stay known as it is pinned: {SCANNERS[uuid].friendly_name} ({ip})")
+            else:
+                logger.warning(f"[WSD:BYE] Scanner has gone, deleting: {SCANNERS[uuid].friendly_name} ({ip})")
+                del SCANNERS[uuid]
         list_scanners()
 
     else:
