@@ -282,18 +282,29 @@ async def status_page(request):
 # ---------------- NOTIFY Server ----------------
 async def start_notify_server():
     logger.info(f"[SERVER:start_notify] configuring Notify Server on Port {NOTIFY_PORT}")
-
+LISTENING_TCP_5357_NOTIFY
     app = web.Application()
     app.add_routes(routes)
 
     runner = web.AppRunner(app)
-    await runner.setup()
-    logger.debug(f"   ---> runner.setup().web.AppRunner(app)")
+    try:
+        await runner.setup()
+        logger.debug(f"   ---> runner.setup().web.AppRunner(app)")
+    
+        # An alle Interfaces binden (0.0.0.0) -> wichtig für Docker / HA
+        site = web.TCPSite(runner, "0.0.0.0", NOTIFY_PORT)
+        await site.start()
+        globals.LISTENING_TCP_5357_NOTIFY = True
+        logger.info(f"Notify Server is running on Port {NOTIFY_PORT}")
+    except OSError as e:
+        globals.LISTENING_TCP_5357_NOTIFY = False
+        logger.error(f"Could not start Notify Server on TCP/{NOTIFY_PORT}: {e}")
+        return
+    except Exception as e:
+        globals.LISTENING_TCP_5357_NOTIFY = False
+        logger.exception(f"Unexpected error while starting Notify Server: {e}")
+        return        
 
-    # An alle Interfaces binden (0.0.0.0) -> wichtig für Docker / HA
-    site = web.TCPSite(runner, "0.0.0.0", NOTIFY_PORT)
-    await site.start()
-    logger.info(f"Notify Server is running on Port {NOTIFY_PORT}")
     logger.info(f"***************************************************************************************************************")
     logger.info(f"*                                                E V E N T S                                                  *")
     logger.info(f"***************************************************************************************************************")
