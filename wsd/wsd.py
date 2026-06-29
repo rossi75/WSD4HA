@@ -72,7 +72,7 @@ async def discovery_processor(data, addr):
 
         if uuid not in globals.SCANNERS:
             globals.SCANNERS[uuid] = Scanner(uuid=uuid, ip=ip, xaddr=xaddr)
-            logger.info(f"[WSD:HELLO] New Scanner: {globals.SCANNERS[uuid].uuid} ({ip})")
+            globals.logger.info(f"[WSD:HELLO] New Scanner: {globals.SCANNERS[uuid].uuid} ({ip})")
         else:
 #            if SCANNERS[uuid].state.value == "online":
 #                SCANNERS[uuid].update()
@@ -145,119 +145,119 @@ async def UDP_listener_3702():
 # ---------------- Scanner Probe ----------------
 async def state_monitor():
     while True:
-        logger.debug(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} [WSD:state_mon] wake-up")
+        globals.logger.debug(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} [WSD:state_mon] wake-up")
         to_remove = []
         now = datetime.datetime.now().replace(microsecond=0)
         subscr_age = 0
 
         for uuid, scanner in globals.SCANNERS.items():
-            logger.info(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} [WSD:state_mon] Checking State and Timer for {scanner.friendly_name} @ {scanner.ip}...")
+            globals.logger.info(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} [WSD:state_mon] Checking State and Timer for {scanner.friendly_name} @ {scanner.ip}...")
             status = scanner.state.value
             age = (now - scanner.last_seen).total_seconds()
-            logger.info(f"   --->            state: {status} ({scanner.state})")
-            logger.debug(f"   --->       first_seen: {scanner.first_seen}")
-            logger.info(f"   --->        last_seen: {scanner.last_seen}          age: {age} seconds old")
+            globals.logger.info(f"   --->            state: {status} ({scanner.state})")
+            globals.logger.debug(f"   --->       first_seen: {scanner.first_seen}")
+            globals.logger.info(f"   --->        last_seen: {scanner.last_seen}          age: {age} seconds old")
             if scanner.subscription_last_seen is not None:
                 subscr_age = (now - scanner.subscription_last_seen).total_seconds()
-                logger.info(f"   ---> subscr_last_seen: {scanner.subscription_last_seen}          age: {subscr_age} seconds old")
+                globals.logger.info(f"   ---> subscr_last_seen: {scanner.subscription_last_seen}          age: {subscr_age} seconds old")
             
             if scanner.state.value in "online":          # auch die Sub-Stati für renew haben "online" als value
                 # 3/4-Check for subscription
                 if subscr_age >= (globals.SCANNERS[uuid].subscription_timeout * 0.75):
                     scanner.state = globals.STATE.SUBSCR_RNW_3_4_PENDING
-                    logger.warning(f"[WSD:Heartbeat] ---> proceeding 3/4-Check for Subscription")
+                    globals.logger.warning(f"[WSD:Heartbeat] ---> proceeding 3/4-Check for Subscription")
                     try:
                         asyncio.create_task(send_subscription_renew(uuid))                # update_subscription() später im parser
                     except Exception as e:
                         scanner.state = globals.STATE.ABSENT
-                        logger.warning(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} Could not reach scanner {scanner.friendly_name} @ {scanner.ip}. Last subscription at {scanner.subscription_last_seen}. Response is {str(e)}")
+                        globals.logger.warning(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} Could not reach scanner {scanner.friendly_name} @ {scanner.ip}. Last subscription at {scanner.subscription_last_seen}. Response is {str(e)}")
 
                 # Halbzeit-Check for subscription
                 elif subscr_age >= (globals.SCANNERS[uuid].subscription_timeout / 2):
                     scanner.state = globals.STATE.SUBSCR_RNW_1_2_PENDING
-                    logger.info(f"[WSD:Heartbeat] ---> proceeding Halftime-Check for Subscription")
+                    globals.logger.info(f"[WSD:Heartbeat] ---> proceeding Halftime-Check for Subscription")
                     try:
                         asyncio.create_task(send_subscription_renew(uuid))                # update_subscription() später im parser
                     except Exception as e:
-                        logger.warning(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} Could not reach scanner {scanner.friendly_name} @ {scanner.ip}. Last subscription at {scanner.subscription_last_seen}. Response is {str(e)}")
+                        globals.logger.warning(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} Could not reach scanner {scanner.friendly_name} @ {scanner.ip}. Last subscription at {scanner.subscription_last_seen}. Response is {str(e)}")
 
                 # 3/4-Check Online
                 elif age >= (OFFLINE_TIMEOUT * 0.75):
-                    logger.warning(f"[WSD:Heartbeat] ---> proceeding 3/4-Check")
+                    globals.logger.warning(f"[WSD:Heartbeat] ---> proceeding 3/4-Check")
                     try:
                         asyncio.create_task(send_probe(uuid))
                     except Exception as e:
-                        logger.warning(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} Could not reach scanner {scanner.friendly_name} @ {scanner.ip}. Last seen at {scanner.last_seen}. Response is {str(e)}")
+                        globals.logger.warning(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} Could not reach scanner {scanner.friendly_name} @ {scanner.ip}. Last seen at {scanner.last_seen}. Response is {str(e)}")
 
                 # Halbzeit-Check Online
                 elif age >= (OFFLINE_TIMEOUT / 2):
-                    logger.info(f"[WSD:Heartbeat] ---> proceeding Halftime-Check")
+                    globals.logger.info(f"[WSD:Heartbeat] ---> proceeding Halftime-Check")
                     try:
                         asyncio.create_task(send_probe(uuid))
                     except Exception as e:
-                        logger.warning(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} Could not reach scanner with {scanner.friendly_name} @ {scanner.ip}. Last seen at {scanner.last_seen}. Response is {str(e)}")
+                        globals.logger.warning(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} Could not reach scanner with {scanner.friendly_name} @ {scanner.ip}. Last seen at {scanner.last_seen}. Response is {str(e)}")
     
             if scanner.state in globals.STATE.TF_GET_PARSED:
-                logger.info(f"[WSD:state_mon] Transfer/Get parsed, subscribing to EP...")
+                globals.logger.info(f"[WSD:state_mon] Transfer/Get parsed, subscribing to EP...")
                 try:
                     asyncio.create_task(send_subscription_ScanAvailableEvent(uuid))
                 except Exception as e:
                     scanner.state = globals.STATE.ERROR
-                    logger.warning(f"Anything went wrong while parsing the subscribe attempt from {scanner.friendly_name} @ {scanner.ip}, response is {str(e)}")
+                    globals.logger.warning(f"Anything went wrong while parsing the subscribe attempt from {scanner.friendly_name} @ {scanner.ip}, response is {str(e)}")
 
             if scanner.state in globals.STATE.PROBE_PARSED:
-                logger.info(f"[WSD:state_mon] probe parsed, get endpoint details...")
+                globals.logger.info(f"[WSD:state_mon] probe parsed, get endpoint details...")
                 try:
                     asyncio.create_task(send_transfer_get(uuid))
                 except Exception as e:
                     scanner.state = globals.STATE.ERROR
-                    logger.warning(f"Anything went wrong while parsing the XML-Probe from {scanner.friendly_name} @ {scanner.ip}, response is {str(e)}")
+                    globals.logger.warning(f"Anything went wrong while parsing the XML-Probe from {scanner.friendly_name} @ {scanner.ip}, response is {str(e)}")
 
             if scanner.state in globals.STATE.PINNED:
-                logger.info(f"[WSD:state_mon] Fresh loaded from pinning, now probing...")
+                globals.logger.info(f"[WSD:state_mon] Fresh loaded from pinning, now probing...")
                 try:
                     asyncio.create_task(send_probe(uuid))
                 except Exception as e:
                     scanner.state = globals.STATE.ERROR
-                    logger.warning(f"Anything went wrong while probing {scanner.friendly_name} @ {scanner.ip}, response is {str(e)}")
+                    globals.logger.warning(f"Anything went wrong while probing {scanner.friendly_name} @ {scanner.ip}, response is {str(e)}")
 
             if scanner.state in globals.STATE.DISCOVERED:
-                logger.info(f"[WSD:state_mon] Fresh discovered, now probing...")
+                globals.logger.info(f"[WSD:state_mon] Fresh discovered, now probing...")
                 try:
                     asyncio.create_task(send_probe(uuid))
                 except Exception as e:
                     scanner.state = globals.STATE.ERROR
-                    logger.warning(f"Anything went wrong while probing {scanner.friendly_name} @ {scanner.ip}, response is {str(e)}")
+                    globals.logger.warning(f"Anything went wrong while probing {scanner.friendly_name} @ {scanner.ip}, response is {str(e)}")
 
             # Timeout überschritten → offline markieren, damit werden alle Zwischenstati erschlagen, für den Fall dass was hängen geblieben ist und auch für ERROR
             if (age > OFFLINE_TIMEOUT or (subscr_age > scanner.subscription_timeout) and scanner.state not in {globals.STATE.ABSENT, globals.STATE.TO_REMOVE}):
-                logger.warning(f"[WSD:Heartbeat] --> mark as offline")
+                globals.logger.warning(f"[WSD:Heartbeat] --> mark as offline")
                 scanner.mark_absent()
 
             # Nach Ablauf von Timeout+Offline → entfernen
             if status == "absent" and scanner.remove_after is not None and now >= scanner.remove_after and scanner.pinned is False:
-                logger.info(f"[WSD:Heartbeat] --> Marking {scanner.friendly_name} @ {scanner.ip} to remove")
-                logger.info(f"[WSD:Heartbeat] Status={status}, RemoveAfter={scanner.remove_after}, now={now}, Pinned={scanner.pinned}")
+                globals.logger.info(f"[WSD:Heartbeat] --> Marking {scanner.friendly_name} @ {scanner.ip} to remove")
+                globals.logger.info(f"[WSD:Heartbeat] Status={status}, RemoveAfter={scanner.remove_after}, now={now}, Pinned={scanner.pinned}")
                 to_remove.append(scanner)
 
-            logger.info(f"    =====> state: {globals.SCANNERS[uuid].state.value}")
+            globals.logger.info(f"    =====> state: {globals.SCANNERS[uuid].state.value}")
     
         # welche Scanner sollen entfernt werden?
-        logger.debug(f"[WSD:Heartbeat] checking for Scanners to remove from known list")
+        globals.logger.debug(f"[WSD:Heartbeat] checking for Scanners to remove from known list")
         for s in to_remove:
-            logger.warning(f"[Heartbeat]     ---> Removing {scanner.friendly_name} @ {scanner.ip} from list")
+            globals.logger.warning(f"[Heartbeat]     ---> Removing {scanner.friendly_name} @ {scanner.ip} from list")
             del globals.SCANNERS[scanner.uuid]
             list_scanners()
 
         # Entferne die abgelaufenen Jobs
         if globals.SCAN_JOBS:   # Nur wenn überhaupt Jobs existieren
-            logger.debug(f"     ---> checking for Scan Jobs to remove")
+            globals.logger.debug(f"     ---> checking for Scan Jobs to remove")
             expired_jobs = []
             for job_id, job in list(globals.SCAN_JOBS.items()):
                 remove_after = getattr(job, "remove_after", None)
-                logger.debug(f"     ---> Job {job_id} expires on {remove_after}")
+                globals.logger.debug(f"     ---> Job {job_id} expires on {remove_after}")
                 if now >= remove_after:
-                    logger.info(f"     ---> Removing expired job {job_id} (expired at {remove_after})")
+                    globals.logger.info(f"     ---> Removing expired job {job_id} (expired at {remove_after})")
                     expired_jobs.append(job_id)
             for job_id in expired_jobs:
                 del globals.SCAN_JOBS[job_id]
@@ -271,14 +271,14 @@ async def state_monitor():
         }
         if any(scanner.state not in active_states
                for scanner in globals.SCANNERS.values()):                                        # Es läuft gerade etwas → schnell pollen
-            logger.debug(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} [WSD:sleep] short nap because something is happening")
+            globals.logger.debug(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} [WSD:sleep] short nap because something is happening")
             await asyncio.sleep(1)
         elif any(scanner.state == globals.STATE.PINNED
                  for scanner in globals.SCANNERS.values()):                                      # Nur angepinnte Scanner überwachen
-            logger.debug(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} [WSD:sleep] waiting for pinned Scanners")
+            globals.logger.debug(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} [WSD:sleep] waiting for pinned Scanners")
             await asyncio.sleep(20)
         else:                                                                            # Keine aktiven Scanner
-            logger.debug(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} [WSD:sleep] goodbye")
+            globals.logger.debug(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} [WSD:sleep] goodbye")
             await asyncio.sleep(OFFLINE_TIMEOUT / 7)
 
 
@@ -300,6 +300,6 @@ async def state_monitor():
 #            logger.debug(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} [WSD:sleep] goodbye")
 #            await asyncio.sleep(OFFLINE_TIMEOUT / 7) # damit wir iwie auf nen krummen Wert kommen
 
-        logger.debug(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} [WSD:sleep] back in town")
+        globals.logger.debug(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} [WSD:sleep] back in town")
 
 
