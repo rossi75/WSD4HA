@@ -18,6 +18,10 @@ logger = logging.getLogger("wsd-addon")
 #SCAN_FOLDER.mkdir(parents=True, exist_ok=True)
 #MAX_FILES = int(os.environ.get("MAX_FILES", 5))
 
+# -----------------  define listening states -----------------
+LISTENING_UDP_3702_WSD = False
+LISTENING_TCP_5357_NOTIFY = False
+
 # -----------------  define Startup Date and Time  -----------------
 STARTUP_DT = ""
 
