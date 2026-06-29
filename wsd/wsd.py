@@ -129,9 +129,9 @@ async def UDP_listener_3702():
         sock.setsockopt(socket.IPPROTO_IP, socket.IP_ADD_MEMBERSHIP, mreq)
         sock.setblocking(False)   # WICHTIG für asyncio!
         logger.info("WSD-Listener running on Port 3702/UDP")
-        globals.LISTENING_UDP_3702_WSD = True
+        LISTENING_UDP_3702_WSD = True
     except Exception as e:
-        globals.LISTENING_UDP_3702_WSD = False
+        LISTENING_UDP_3702_WSD = False
         logger.warning(f"Could not bind UDP/3702: {e}")
         return
 
