@@ -256,7 +256,7 @@ async def status_page(request):
                 title="UDP 3702 Discovery"
                 style="display:inline-block;width:14px;height:14px;border:1px solid black;border-radius:50%;background:{statuscolor_udp_3702_wsd};">
             </span>
-            UDP
+            WSD
             &nbsp;
             <span
                 title="TCP 5357 Notify"
