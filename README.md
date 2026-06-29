@@ -1,5 +1,3 @@
-# Development in progress - please do not install or update as long as you see this message ! 
-
 # WSD4HA
 
 provides a simple WSD protocol for scanning documents into homeassistants file system
