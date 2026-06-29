@@ -27,7 +27,10 @@ Go back to the App Store and search for "WSD4HA". Open it and you will see an "I
 
 ## Issue with parallel SAMBA App
 If you have installed the SAMBA App parallel to WSD4HA, there will be some issue. Since version 12.7.0 there is a WSDD service for Windows that shows up the HA instance as a network drive. This WSDD service occupies the WSD port 5357, which this App will also use.
-Already pinned Scanners will work fine, new scanners will only be detected if at their boot-up the Samba App was not running. I will implement a red/green light for the services in the next days.
+Already pinned Scanners will work fine, new scanners will only be detected if at their boot-up the Samba App was not running.
+
+If you experience any issues with this, you need to disable SAMBA, restart WSD4HA, enable SAMBA again. Hence both indicators should show green:  
+<img width="163" height="45" alt="grafik" src="https://github.com/user-attachments/assets/05af0df8-4322-4c89-ad0f-b0eb7b14ab37" />
 
 ## open topics / todo
 - make manual configuration functional
