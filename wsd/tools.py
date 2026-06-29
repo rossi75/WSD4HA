@@ -102,7 +102,7 @@ def list_scanners():
     if SCANNERS:
         logger.info("[TOOLS:list]   ------>   known Scanners   <------")
         for i, s in enumerate(SCANNERS.values(), start=1):
-            logger.info(f"   [{i}] {s.friendly_name or s.uuid} @ {s.ip}, Pinned = {s.pinned}, State = {s.state.value}")
+            logger.info(f"   [{i}] {s.friendly_name or s.uuid} @ {s.ip}, pinned={s.pinned}, state={s.state.value}")
             logger.debug(f"       --->  XADDR={s.xaddr}, first_seen={s.last_seen}, last_seen={s.first_seen}")
 #            logger.debug(f"       --->      XADDR: {s.xaddr}")
 #            logger.info(f"       --->     Status: {s.state.value}")
