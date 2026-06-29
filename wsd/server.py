@@ -209,7 +209,7 @@ async def status_page(request):
             f"</tr>"
         )
 
-    statuscolor_udp_3704_wsd = (
+    statuscolor_udp_3702_wsd = (
         "limegreen"
         if globals.LISTENING_UDP_3702_WSD
         else "lightgray"
@@ -252,12 +252,17 @@ async def status_page(request):
         </head>
         <body>
             <h1>WSD4HA seems to be running</h1>
-            <span 
-                title="Listening on UDP/3702"
-                style="display:inline-block; width:14px; height:14px; border:1px solid black; border-radius:50%; background:{statuscolor_udp_3704_wsd};">
-                title="Listening on TCP/5357"
-                style="display:inline-block; width:14px; height:14px; border:1px solid black; border-radius:50%; background:{statuscolor_tcp_5357_notify};">
+            <span
+                title="UDP 3702 Discovery"
+                style="display:inline-block;width:14px;height:14px;border:1px solid black;border-radius:50%;background:{statuscolor_udp_3702_wsd};">
             </span>
+            UDP
+            &nbsp;
+            <span
+                title="TCP 5357 Notify"
+                style="display:inline-block;width:14px;height:14px;border:1px solid black;border-radius:50%;background:{statuscolor_tcp_5357_notify};">
+            </span>
+            Notify
             <h2>Active Scanners:</h2>
             <table>
                 <tr><th>Pin</th><th>Name</th><th>IP<br>[MAC]</th><th>State<br>Last Subscr</th><th>First seen<br>Last seen<br>[Remove after]</th><th>UUID<br>XADDR</th><th>Subscr ID<br>Subscr EndToAddr<br>Destination Token</th><th>Manufacturer<br>Model</th><th>Firmware<br>Serial</th></tr>
