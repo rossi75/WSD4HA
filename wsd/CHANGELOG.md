@@ -1,6 +1,8 @@
-# Development in progress - please do not install or update as long as you see this message !
-
 # Changelog  
+
+## 0.80 - 2026-06-29
+- fixed a bug where a pinned scanner was removed from the UIs list (and internally also), after a pinned scanner sent a BYE. After restarting the add-on, everything worked fine again, so the storage was not written
+- added a state monitor for the services WSD (UDP/3704) and Notify (TCP/5357)
 
 ## 0.79 - 2026-06-25
 - fixed a bug where a pinned scanner was removed from the UIs list (and internally also), after a pinned scanner was switched off. After restarting the add-on, everything worked fine again, so the storage was not written
