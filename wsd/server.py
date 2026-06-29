@@ -10,7 +10,7 @@ import re
 import xml.etree.ElementTree as ET
 import subprocess
 from config import OFFLINE_TIMEOUT, SCAN_FOLDER, HTTP_PORT, MAX_FILES, NOTIFY_PORT
-from globals import SCANNERS, SCAN_JOBS, NAMESPACES, STATE, USER_AGENT, logger
+from globals import LISTENING_UDP_3702_WSD, LISTENING_TCP_5357_NOTIFY, SCANNERS, SCAN_JOBS, NAMESPACES, STATE, USER_AGENT, logger
 from parse import parse_notify_msg
 from tools import find_scanner_by_endto_addr
 from scan_job import run_scan_job
@@ -210,6 +210,19 @@ async def status_page(request):
             f"</tr>"
         )
 
+    status_udp_3704_wsd = (
+        "limegreen"
+        if globals.LISTENING_UDP_3702_WSD
+        else "lightgray"
+    )
+    status_tcp_5357_notify = (
+        "limegreen"
+        if globals.LISTENING_TCP_5357_NOTIFY
+        else "lightgray"
+    )
+    logger.info(f"udp_3702_wsd={globals.LISTENING_UDP_3702_WSD}, tcp_5357_notify={globals.LISTENING_TCP_5357_NOTIFY}")
+
+    
     logger.debug(f"   ---> probably delivering http-response")
     return web.Response(text=f"""
         <html>
@@ -240,6 +253,12 @@ async def status_page(request):
         </head>
         <body>
             <h1>WSD4HA seems to be running</h1>
+            <span 
+                title="Listening on UDP/3702"
+                style="display:inline-block; width:14px; height:14px; border:1px solid black; border-radius:50%; background:{status_udp_3704_wsd};">
+                title="Listening on TCP/5357"
+                style="display:inline-block; width:14px; height:14px; border:1px solid black; border-radius:50%; background:{status_tcp_5357_notify};">
+            </span>
             <h2>Active Scanners:</h2>
             <table>
                 <tr><th>Pin</th><th>Name</th><th>IP<br>[MAC]</th><th>State<br>Last Subscr</th><th>First seen<br>Last seen<br>[Remove after]</th><th>UUID<br>XADDR</th><th>Subscr ID<br>Subscr EndToAddr<br>Destination Token</th><th>Manufacturer<br>Model</th><th>Firmware<br>Serial</th></tr>
