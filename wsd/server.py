@@ -170,7 +170,7 @@ async def status_page(request):
     # Jobs
     job_list = ''
     for j in globals.SCAN_JOBS.values():
-        job_list = "<tr style='color:{color}'>"
+        job_list += "<tr style='color:{color}'>"
         job_list += f"<td style='text-align:center;'>{j.scanjob_identifier}</td>"
         job_list += f"<td style='text-align:center;'>{j.input_source}</td>"
         job_list += f"<td style='text-align:center;'>{j.scan_from_uuid}<br>"
