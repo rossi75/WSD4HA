@@ -32,6 +32,8 @@ Already pinned Scanners will work fine, new scanners will only be detected if at
 If you experience any issues with this, you need to disable SAMBA, restart WSD4HA, enable SAMBA again. Hence both indicators should show green:  
 <img width="163" height="45" alt="grafik" src="https://github.com/user-attachments/assets/05af0df8-4322-4c89-ad0f-b0eb7b14ab37" />
 
+Update: Since some versions, you can disable the WSDD service within the SAMBA server settings
+
 ## open topics / todo
 - make manual configuration functional
 - implement simple variant of ValidateScanTicket
