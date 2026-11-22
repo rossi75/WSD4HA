@@ -1,7 +1,7 @@
 # Changelog  
 
 ## 0.81 - 2026-11-26 - 2026-xx
-- sometimes a known and pinned Scanner/MFD starts up and WSD4HA receives a 500 Server Internal Error from the device (because WSD4HA tried to update its subscription, but was not subscripted....). New state after PINNED-state, is now DISCOVERED, not the new 
+- sometimes a known and pinned Scanner/MFD starts up and WSD4HA receives a 500 Server Internal Error from the device (because WSD4HA tried to update its subscription, but was not subscripted....). New state after PINNED-state, is now DISCOVERED, not ONLINE
 - Health Check for port 3704/UDP, is being triggered every 30 seconds to check if the WSD service is still running
 - rewritten the WSD-loop, now looking deeper in which state needs the next attention
 - Scan from GUI
