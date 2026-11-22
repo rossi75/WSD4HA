@@ -2,8 +2,12 @@
 
 ## 0.81 - 2026-11-26 - 2026-xx
 - sometimes a known and pinned Scanner/MFD starts up and WSD4HA receives a 500 Server Internal Error from the device (because WSD4HA tried to update its subscription, but was not subscripted....). New state after PINNED-state, is now DISCOVERED, not ONLINE
+- resetting timestamps to 'None' in case of receiving a BYE
+- renamed server.py to webserver.py
+- renamed first_seen to online_since
+
 - Health Check for port 3704/UDP, is being triggered every 30 seconds to check if the WSD service is still running
-- rewritten the WSD-loop, now looking deeper in which state needs the next attention
+- rewritten the WSD-loop, now looking deeper in which scanner needs the next attention
 - Scan from GUI
 - with every update of the last_seen-state, it is written into the pinned_scanners.json also
 
