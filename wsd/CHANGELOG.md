@@ -1,5 +1,11 @@
 # Changelog  
 
+## 0.81 - 2026-11-26 - 2026-xx
+- sometimes a known and pinned Scanner/MFD starts up and WSD4HA receives a 500 Server Internal Error from the device
+- Health Check for port 3704/UDP, is being triggered every 30 seconds to check if the WSD service is still running
+- rewritten the WSD-loop, now looking deeper in which state needs some attention
+- Scan from GUI
+
 ## 0.80 - 2026-06-29
 - fixed a bug where a pinned scanner was removed from the UIs list (and internally also), after a pinned scanner sent a BYE. After restarting the add-on, everything worked fine again, so the storage was not written
 - added a state monitor for the services WSD (UDP/3704) and Notify (TCP/5357)
