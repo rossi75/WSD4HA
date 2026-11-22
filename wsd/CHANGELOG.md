@@ -1,10 +1,11 @@
 # Changelog  
 
 ## 0.81 - 2026-11-26 - 2026-xx
-- sometimes a known and pinned Scanner/MFD starts up and WSD4HA receives a 500 Server Internal Error from the device
+- sometimes a known and pinned Scanner/MFD starts up and WSD4HA receives a 500 Server Internal Error from the device (because WSD4HA tried to update its subscription, but was not subscripted....). New state after PINNED-state, is now DISCOVERED, not the new 
 - Health Check for port 3704/UDP, is being triggered every 30 seconds to check if the WSD service is still running
-- rewritten the WSD-loop, now looking deeper in which state needs some attention
+- rewritten the WSD-loop, now looking deeper in which state needs the next attention
 - Scan from GUI
+- with every update of the last_seen-state, it is written into the pinned_scanners.json also
 
 ## 0.80 - 2026-06-29
 - fixed a bug where a pinned scanner was removed from the UIs list (and internally also), after a pinned scanner sent a BYE. After restarting the add-on, everything worked fine again, so the storage was not written
