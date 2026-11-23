@@ -6,7 +6,7 @@
 - Scan from GUI  
 - with every update of the last_seen-state, it is written into the pinned_scanners.json also  
 
-## 0.81 - 2026-11-26 - 2026-xx
+## 0.81 - 2026-11-22 - 2026-11-23
 - sometimes a known and pinned Scanner/MFD starts up and WSD4HA receives a 500 Server Internal Error from the device (because WSD4HA tried to update its subscription, but was not subscripted....). New state after PINNED-state, is now DISCOVERED, not ONLINE
 - resetting timestamps to 'None' in case of receiving a BYE
 - renamed server.py to webserver.py
