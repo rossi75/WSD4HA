@@ -30,6 +30,21 @@ async def discovery_processor(data, addr):
         globals.logger.error("[WSD:dp] Exception while reading from ET")
         return
 
+    # --- own Keep-Alive, no real WSD-Traffic ---
+    if root.tag == "WSD4HA_Heartbeat":
+        ts_text = root.findtext("Timestamp")
+        port_text = root.findtext("Port")
+        try:
+            sent_at = datetime.datetime.fromisoformat(ts_text)
+            latency = (datetime.datetime.now() - sent_at).total_seconds()
+        except (TypeError, ValueError):
+            latency = None
+        globals.logger.debug(f"[WSD:Heartbeat] received Heartbeat for Port {port_text} at {sent_at} with a latency of {latency}s")
+        if port_text == "3702":
+            globals.PORT_3702_LAST_HEARTBEAT = datetime.datetime.now()
+        return
+
+    
     # UUID (without urn:uuid:)
     uuid_raw = root.find(".//wsa:Address", globals.NAMESPACES)
     uuid = None
@@ -60,25 +75,20 @@ async def discovery_processor(data, addr):
         xaddr = pick_best_xaddr(xaddrs_elem.text.strip())
 
     globals.logger.debug(f"    --->   UUID: {uuid}")
-    globals.logger.info(f"    ---> Action: {action_text}")
+    globals.logger.info(f"     ---> Action: {action_text}")
     globals.logger.debug(f"    --->  Types: {types_text}")
     globals.logger.debug(f"    --->  XADDR: {xaddr}")
 
     if action_text == "Hello":
         # Nur Scanner berücksichtigen
         if "ScanDeviceType" not in types_text:
-            globals.logger.info(f"[WSD:HELLO] Ignored non-scanner device UUID={uuid} Types={types_text}")
+            globals.logger.info(f"[WSD:HELLO] Ignored non-scanner device: IP={ip}, UUID={uuid}, Types={types_text}")
             return
 
         if uuid not in globals.SCANNERS:
             globals.SCANNERS[uuid] = Scanner(uuid=uuid, ip=ip, xaddr=xaddr)
             globals.logger.info(f"[WSD:HELLO] New Scanner: {globals.SCANNERS[uuid].uuid} ({ip})")
         else:
-#            if SCANNERS[uuid].state.value == "online":
-#                SCANNERS[uuid].update()
-#            logger.info(f"[WSD:HELLO] known Scanner seen again: {SCANNERS[uuid].friendly_name} ({ip})")
-
-
             # Bereits vorhandenen Scanner aktualisieren
             s = globals.SCANNERS[uuid]
     
@@ -86,19 +96,26 @@ async def discovery_processor(data, addr):
             s.xaddr = xaddr
             s.last_seen = datetime.datetime.now()
     
+            # Falls der Scanner neu gestartet wurde (dann isser ja ggf schon bekannt und bringt die Struktur durcheinander)
+            if s.state == globals.STATE.ABSENT or s.state == globals.STATE.DISCOVERED:
+                s.state = globals.STATE.DISCOVERED
+                globals.logger.info(f"[WSD:HELLO] Scanner '{s.friendly_name}' is online again, starting discovery process")
             # Falls der Scanner nur aus der Persistenz geladen wurde
-            if s.state == globals.STATE.PINNED:
-                globals.logger.info(f"[WSD:HELLO] Pinned scanner '{s.friendly_name}' is now online.")
-                s.state = globals.STATE.ONLINE
+            elif s.state == globals.STATE.PINNED:
+                s.state = globals.STATE.DISCOVERED
+                globals.logger.info(f"[WSD:HELLO] Pinned scanner '{s.friendly_name}' is now online, starting discovery process")
             else:
                 s.update()
+                globals.logger.info(f"[WSD:HELLO] Known scanner seen again: {s.friendly_name} ({ip})")
     
-            globals.logger.info(f"[WSD:HELLO] Known scanner seen again: {s.friendly_name} ({ip})")
         list_scanners()
 
     elif action_text == "Bye":
         globals.logger.info(f"[WSD:BYE] Bye for uuid: {uuid}")
         if uuid in globals.SCANNERS:
+            globals.SCANNERS[uuid].state = globals.STATE.ABSENT
+            globals.SCANNERS[uuid].online_since = None
+            globals.SCANNERS[uuid].subscription_last_seen = None
             if globals.SCANNERS[uuid].pinned is True:
                 globals.logger.info(f"[WSD:BYE] Scanner has gone, but needs to stay known because it is pinned: {globals.SCANNERS[uuid].friendly_name} ({ip})")
             else:
@@ -154,12 +171,12 @@ async def state_monitor():
             globals.logger.info(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} [WSD:state_mon] Checking State and Timer for {scanner.friendly_name} @ {scanner.ip}...")
             status = scanner.state.value
             age = (now - scanner.last_seen).total_seconds()
-            globals.logger.info(f"   --->            state: {status} ({scanner.state})")
-            globals.logger.debug(f"   --->       first_seen: {scanner.first_seen}")
-            globals.logger.info(f"   --->        last_seen: {scanner.last_seen}          age: {age} seconds old")
+            globals.logger.info(f"    --->              state: {status} ({scanner.state})")
+            globals.logger.debug(f"   --->       online_since: {scanner.online_since}")
+            globals.logger.info(f"    --->          last_seen: {scanner.last_seen}          age: {age} seconds old")
             if scanner.subscription_last_seen is not None:
                 subscr_age = (now - scanner.subscription_last_seen).total_seconds()
-                globals.logger.info(f"   ---> subscr_last_seen: {scanner.subscription_last_seen}          age: {subscr_age} seconds old")
+                globals.logger.info(f"      ---> subscr_last_seen: {scanner.subscription_last_seen}          age: {subscr_age} seconds old")
             
             if scanner.state.value in "online":          # auch die Sub-Stati für renew haben "online" als value
                 # 3/4-Check for subscription
@@ -278,7 +295,7 @@ async def state_monitor():
             globals.logger.debug(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} [WSD:sleep] waiting for pinned Scanners")
             await asyncio.sleep(20)
         else:                                                                            # Keine aktiven Scanner
-            globals.logger.debug(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} [WSD:sleep] goodbye")
+            globals.logger.debug(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} [WSD:sleep] goodnight")
             await asyncio.sleep(OFFLINE_TIMEOUT / 7)
 
 
@@ -301,5 +318,4 @@ async def state_monitor():
 #            await asyncio.sleep(OFFLINE_TIMEOUT / 7) # damit wir iwie auf nen krummen Wert kommen
 
         globals.logger.debug(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} [WSD:sleep] back in town")
-
 

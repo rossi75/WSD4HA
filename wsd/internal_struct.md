@@ -21,6 +21,7 @@
 | uuid                            | UUID-String |                  |
 | ip                              | String      | IP Adress        |
 | __WSD Parameters__              |             |                  |
+| xaddr                           | String      |                  |
 | subscription_timeout            | Integer     |                  |
 | subscription_last_seen          | DateTime    |                  |
 | subscription_id                 | UUID-String |                  |
@@ -38,7 +39,7 @@
 | _ScanTicket_Dialect             | String      | [SIMPLE\|DETAIL] |
 | __State__                       |             |                  |
 | pinned                          | Boolean     |                  |
-| first_seen                      | DateTime    |                  |
+| online_since                    | DateTime    |                  |
 | last_seen                       | DateTime    |                  |
 | state                           | switch      |                  |
 | offline_since                   | DateTime    |                  |

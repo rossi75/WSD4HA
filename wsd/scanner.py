@@ -35,7 +35,7 @@ class Scanner:
         self.ScanTicket_Dialect = None              # SIMPLE or DETAIL
 
         # Status
-        self.first_seen = datetime.datetime.now().replace(microsecond=0)
+        self.online_since = datetime.datetime.now().replace(microsecond=0)
         self.last_seen = datetime.datetime.now().replace(microsecond=0)
         self.state = STATE.DISCOVERED
         self.offline_since = None
@@ -52,8 +52,11 @@ class Scanner:
         self.state = STATE.ONLINE
         self.offline_since = None
         self.remove_after = None
+        if self.online_since is None:
+            self.online_since = datetime.datetime.now().replace(microsecond=0)
 
         logger.info(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} [SCANNER:upd] Updated timestamps for {self.friendly_name} @ {self.ip} with UUID {self.uuid}")
+        logger.debug(f"   --->  online_since: {self.online_since}")
         logger.debug(f"   ---> new last_seen: {self.last_seen}")
 
     # Scannerservice ist noch online
@@ -64,14 +67,16 @@ class Scanner:
         self.state = STATE.ONLINE
         self.offline_since = None
         self.remove_after = None
+        if self.online_since is None:
+            self.online_since = datetime.datetime.now().replace(microsecond=0)
         logger.info(f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S} [SCANNER:upd_subscr] Updated timestamps for scanner subscription {self.friendly_name} @ {self.ip} with UUID {self.uuid}")
-        logger.info(f"   ---> new subscribtion last_seen: {self.subscription_last_seen}")
+        logger.debug(f"  --->  online_since: {self.online_since}")
+        logger.info(f"   ---> new subscription_last_seen: {self.subscription_last_seen}")
 
     # wird aufgerufen wenn ein Scanner offline gesetzt wird
     # Aufruf mit SCANNER[uuid].mark_offline()
     def mark_absent(self):
         self.state = STATE.ABSENT
-#        if not self.offline_since:
         if not self.offline_since:
             self.offline_since = datetime.datetime.now().replace(microsecond=0)
             if self.pinned is True:

@@ -26,6 +26,9 @@
 #
 #
 # def create_pinned_scanners():
+#
+#
+# def create_heartbeat_xml(port: int):
 # ----------------------------------------------------------------------------
 
 import datetime
@@ -103,11 +106,7 @@ def list_scanners():
         logger.info("[TOOLS:list]   ------>   known Scanners   <------")
         for i, s in enumerate(SCANNERS.values(), start=1):
             logger.info(f"   [{i}] {s.friendly_name or s.uuid} @ {s.ip}, pinned={s.pinned}, state={s.state.value}")
-            logger.debug(f"       --->  XADDR={s.xaddr}, first_seen={s.last_seen}, last_seen={s.first_seen}")
-#            logger.debug(f"       --->      XADDR: {s.xaddr}")
-#            logger.info(f"       --->     Status: {s.state.value}")
-#            logger.debug(f"       ---> first_seen: {s.last_seen}")
-#            logger.debug(f"       --->  last_seen: {s.first_seen}")
+            logger.debug(f"       --->  XADDR={s.xaddr}, online_since={s.online_since}, last_seen={s.last_seen}")
     else:
         logger.info("[TOOLS:list] no known Scanners in list")  
 
@@ -255,6 +254,12 @@ def create_pinned_scanners():
         SCANNERS[uuid].friendly_name = entry["friendly_name"]
         SCANNERS[uuid].pinned = True
         SCANNERS[uuid].state = STATE.PINNED
+
+# ---------------- build the heartbeat xml ----------------
+def create_heartbeat_xml(port: int) -> bytes:
+    ts = datetime.datetime.now().replace(microsecond=0).isoformat()
+    xml = f"<WSD4HA_Heartbeat><Timestamp>{ts}</Timestamp></WSD4HA_Heartbeat>"
+    return xml.encode("utf-8")
 
 #
 #
