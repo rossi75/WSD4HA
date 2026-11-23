@@ -229,7 +229,7 @@ async def status_page(request):
     return web.Response(text=f"""
         <html>
         <head>
-            <title>WSD4HA_dev</title>
+            <title>WSD4HA</title>
             <meta http-equiv="refresh" content="60">
             <style>
                 table {{ border-collapse: collapse; width: 100%; }}
@@ -254,7 +254,7 @@ async def status_page(request):
             </script>
         </head>
         <body>
-            <h1>WSD4HA_dev seems to be running</h1>
+            <h1>WSD4HA seems to be running</h1>
             <span
                 title="UDP 3702 Discovery"
                 style="display:inline-block;width:14px;height:14px;border:1px solid black;border-radius:50%;background:{statuscolor_udp_3702_wsd};">
